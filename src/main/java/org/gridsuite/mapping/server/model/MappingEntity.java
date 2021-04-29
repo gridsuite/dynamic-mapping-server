@@ -15,9 +15,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MappingEntity {
+    @Id
     @PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED)
     private String name;
 
-    @OneToMany(targetEntity = RuleEntity.class, mappedBy = "MappingName")
+    @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mappingName")
     private List<RuleEntity> rules;
 }

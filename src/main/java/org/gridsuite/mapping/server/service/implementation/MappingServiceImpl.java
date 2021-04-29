@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MappingServiceImpl implements MappingService {
@@ -42,8 +43,8 @@ public class MappingServiceImpl implements MappingService {
 
     public List<InputMapping> getMappingList() {
         List<MappingEntity> mappingEntities = mappingRepository.findAll();
-        //TODO Convert
-        return new ArrayList<InputMapping>();
+
+        return mappingEntities.stream().map(mappingEntity -> new InputMapping(mappingEntity)).collect(Collectors.toList());
     }
 }
 

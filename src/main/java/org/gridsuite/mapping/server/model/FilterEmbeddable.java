@@ -12,6 +12,11 @@ import org.gridsuite.mapping.server.utils.*;
 @Embeddable
 public class FilterEmbeddable {
 
+    @Id
+    @Column(name = "filter_id")
+    private String filterId;
+
+    @Id
     @Column(name = "rule_id")
     private UUID ruleId;
 

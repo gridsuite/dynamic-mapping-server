@@ -1,6 +1,6 @@
 package org.gridsuite.mapping.server.model;
 
-import lombok.Builder;
+import lombok.*;
 import org.gridsuite.mapping.server.utils.*;
 
 import javax.persistence.*;
@@ -10,12 +10,19 @@ import java.util.UUID;
 @Entity
 @Builder
 @Table(name = "rule")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class RuleEntity {
 
     @Id
     @GeneratedValue(strategy  =  GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
+
+    @Column(name = "mappingName", nullable = false)
+    private String mappingName;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -27,8 +34,8 @@ public class RuleEntity {
     @Column(name = "composition", nullable = false)
     private String composition;
 
-    @Column(name = "filter")
-    @CollectionTable(foreignKey = @ForeignKey(name = "rule_id"))
+    @Column(name = "filters")
+    @CollectionTable(name = "filters", joinColumns = @JoinColumn(name = "rule_id"))
     @ElementCollection
     private List<FilterEmbeddable> filters;
 

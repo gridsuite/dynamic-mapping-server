@@ -1,5 +1,7 @@
 package org.gridsuite.mapping.server.dto;
 
+import org.gridsuite.mapping.server.utils.EquipmentType;
+
 public class SortedRules {
 
     private EquipmentType type;
