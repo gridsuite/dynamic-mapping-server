@@ -25,6 +25,5 @@ public class InputMapping implements Mapping {
     }
 
 
-    // Needs to put the default rule last, hence going for the most specific rule to the most generic
-    public Comparator<Rule> ruleComparator = Comparator.comparing(rule -> -rule.getFilters().size());
+
 }

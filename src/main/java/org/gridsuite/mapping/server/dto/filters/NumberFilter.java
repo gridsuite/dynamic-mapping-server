@@ -16,6 +16,7 @@ public class NumberFilter extends Filter {
 
     private float value;
 
+    @Override
     public FilterEmbeddable convertFilterToEntity(UUID ruleId) {
         FilterEmbeddable convertedFilter = new FilterEmbeddable();
         convertedFilter.setFilterId(this.getFilterId());

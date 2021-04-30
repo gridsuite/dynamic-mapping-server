@@ -15,6 +15,7 @@ public class BooleanFilter extends Filter {
 
     private boolean value;
 
+    @Override
     public FilterEmbeddable convertFilterToEntity(UUID ruleId) {
         FilterEmbeddable convertedFilter = new FilterEmbeddable();
         convertedFilter.setFilterId(this.getFilterId());

@@ -16,6 +16,7 @@ public class StringFilter extends Filter {
 
     private String value;
 
+    @Override
     public FilterEmbeddable convertFilterToEntity(UUID ruleId) {
         FilterEmbeddable convertedFilter = new FilterEmbeddable();
         convertedFilter.setFilterId(this.getFilterId());

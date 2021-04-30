@@ -18,6 +18,7 @@ public class EnumFilter extends Filter {
 
     private ArrayList<String> value;
 
+    @Override
     public FilterEmbeddable convertFilterToEntity(UUID ruleId) {
         FilterEmbeddable convertedFilter = new FilterEmbeddable();
         convertedFilter.setFilterId(this.getFilterId());

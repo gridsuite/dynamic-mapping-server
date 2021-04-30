@@ -23,11 +23,11 @@ public class MappingServiceImpl implements MappingService {
 
     @Autowired
     MappingServiceImpl self;
-    private WebClient webClient;
-    private ObjectMapper objectMapper;
+    private final WebClient webClient;
+    private final ObjectMapper objectMapper;
 
-    private MappingRepository mappingRepository;
-    private ScriptRepository scriptRepository;
+    private final MappingRepository mappingRepository;
+    private final ScriptRepository scriptRepository;
 
     public MappingServiceImpl(
             MappingRepository mappingRepository,
@@ -41,10 +41,25 @@ public class MappingServiceImpl implements MappingService {
         this.objectMapper = objectMapper;
     }
 
+    @Override
     public List<InputMapping> getMappingList() {
         List<MappingEntity> mappingEntities = mappingRepository.findAll();
 
-        return mappingEntities.stream().map(mappingEntity -> new InputMapping(mappingEntity)).collect(Collectors.toList());
+        return mappingEntities.stream().map(InputMapping::new).collect(Collectors.toList());
     }
+
+    @Override
+    public InputMapping createMapping(String mappingName, InputMapping mapping) {
+        mappingRepository.save(mapping.convertMappingToEntity());
+        return mapping;
+    }
+
+    @Override
+    public Void deleteMapping(String mappingName) {
+        return mappingRepository.deleteByName(mappingName);
+    }
+
+    ;
+
 }
 

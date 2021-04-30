@@ -44,6 +44,10 @@ public class Rule   {
         filters = ruleEntity.getFilters().stream().map(filterEmbeddable -> Filter.createFilterFromEntity(filterEmbeddable)).collect(Collectors.toList());
     }
 
+    // Needs to put the default rule last, hence going for the most specific rule to the most generic
+    public static Comparator<Rule> ruleComparator = Comparator.comparing(rule -> -rule.getFilters().size());
+    // Collections.sort(rules, ruleComparator)
+
 
 
 }
