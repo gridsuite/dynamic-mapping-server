@@ -64,6 +64,11 @@ public abstract class Filter {
 
      abstract public FilterEmbeddable convertFilterToEntity(UUID ruleId);
 
+     abstract public String convertFilterToString();
+
+
+
+
 
 
 }

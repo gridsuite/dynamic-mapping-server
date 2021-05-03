@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 public class MappingEntity {
     @Id
-    @PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED)
     private String name;
 
     @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mappingName")

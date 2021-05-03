@@ -1,18 +1,7 @@
 
 for (<equipmentType> eqpt : network.<collectionName>) {
-     <rules; separator=expr>
-
-     if (<composition>) {
-            GeneratorSynchronousFourWindingsProportionalRegulations {
-                staticId eqpt.id
-                parameterSetId "GSFWPR" + eqpt.id
-            }
-        } else {
-            <model.name> {
-                staticId eqpt.id
-                parameterSetId <model.parameterSetId>
-            }
-        }
+     <rules; separator="\n } else ">
+    }
 
     <if(equipmentType && equipmentType === "Generator">
     //

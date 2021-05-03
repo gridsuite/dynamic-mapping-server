@@ -18,7 +18,7 @@ public class RuleEntity {
 
     @Id
     @GeneratedValue(strategy  =  GenerationType.AUTO)
-    @Column(name = "id")
+    @Column(name = "rule_id")
     private UUID id;
 
     @Column(name = "mappingName", nullable = false)

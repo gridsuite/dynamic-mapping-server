@@ -9,7 +9,10 @@ import org.gridsuite.mapping.server.utils.PropertyType;
 import org.gridsuite.mapping.server.utils.methods;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
@@ -28,6 +31,32 @@ public class EnumFilter extends Filter {
         convertedFilter.setOperand(this.getOperand());
         convertedFilter.setValue(methods.convertListToString(value));
         return convertedFilter;
+    };
+
+
+    public String convertFilterToString() {
+        String stringOperand = "";
+        String notPrefix = "";
+        switch(this.getOperand()) {
+            case EQUALS:
+                stringOperand = "equals";
+                break;
+            case NOT_EQUALS:
+                stringOperand = "equals";
+                notPrefix = "!";
+                break;
+            case IN:
+                stringOperand = "contains";
+                break;
+            case NOT_IN:
+                stringOperand = "contains";
+                notPrefix = "!";
+                break;
+        }
+
+        List<String> escapedValues = value.stream().map(value -> String.format("\"%s\"", value)).collect(Collectors.toList());
+
+        return String.format("%s%s.%s(%s)", notPrefix,this.getProperty(), stringOperand, escapedValues);
     };
 
 }

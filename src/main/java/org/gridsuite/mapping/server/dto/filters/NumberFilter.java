@@ -27,4 +27,29 @@ public class NumberFilter extends Filter {
         convertedFilter.setValue(methods.convertNumberToString(value));
         return convertedFilter;
     };
+
+    public String convertFilterToString() {
+        String stringOperand = "";
+        switch(this.getOperand()) {
+            case EQUALS:
+                stringOperand = "==";
+                break;
+            case NOT_EQUALS:
+                stringOperand = "!=";
+                break;
+            case LOWER:
+                stringOperand = "<";
+                break;
+            case LOWER_OR_EQUALS:
+                stringOperand = "<=";
+                break;
+            case HIGHER_OR_EQUALS:
+                stringOperand = ">=";
+                break;
+            case HIGHER:
+                stringOperand = ">";
+                break;
+        }
+        return String.format("%s %s %f", this.getProperty(), stringOperand, value);
+    };
 }

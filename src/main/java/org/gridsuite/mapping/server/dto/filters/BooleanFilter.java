@@ -27,4 +27,16 @@ public class BooleanFilter extends Filter {
         return convertedFilter;
     };
 
+    public String convertFilterToString() {
+        String stringOperand = "";
+        switch(this.getOperand()) {
+            case EQUALS:
+                stringOperand = "==";
+                break;
+            case NOT_EQUALS:
+                stringOperand = "!=";
+                break;
+        }
+        return String.format("%s %s %b", this.getProperty(), stringOperand, value);
+    };
 }

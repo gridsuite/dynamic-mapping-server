@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.gridsuite.mapping.server.dto.filters.Filter;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.Templater;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,10 +25,7 @@ public class FlatRule {
     public FlatRule(Rule rule) {
         equipmentType = rule.getEquipmentType();
         mappedModel = rule.getMappedModel();
-        composition = Templating.flattenFilters(rule.getComposition(), rule.getFilters() );
+        composition = Templater.flattenFilters(rule.getComposition(), rule.getFilters() );
     }
-
-
-
 }
 

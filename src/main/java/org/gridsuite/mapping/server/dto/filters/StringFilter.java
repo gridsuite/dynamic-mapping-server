@@ -27,4 +27,28 @@ public class StringFilter extends Filter {
         convertedFilter.setValue(value);
         return convertedFilter;
     };
+
+    public String convertFilterToString() {
+        String stringOperand = "";
+        String notPrefix = "";
+        switch(this.getOperand()) {
+            case EQUALS:
+                stringOperand = "equals";
+                break;
+            case NOT_EQUALS:
+                stringOperand = "equals";
+                notPrefix = "!";
+                break;
+            case STARTS_WITH:
+                stringOperand = "startsWith";
+                break;
+            case INCLUDES:
+                stringOperand = "contains";
+                break;
+            case ENDS_WITH:
+                stringOperand = "endsWith";
+                break;
+        }
+        return String.format("%s%s.%s(%s)", notPrefix,this.getProperty(), stringOperand, value);
+    };
 }
