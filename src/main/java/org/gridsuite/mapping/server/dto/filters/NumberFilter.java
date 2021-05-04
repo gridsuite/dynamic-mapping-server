@@ -5,14 +5,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEmbeddable;
 import org.gridsuite.mapping.server.utils.PropertyType;
-import org.gridsuite.mapping.server.utils.methods;
+import org.gridsuite.mapping.server.utils.Methods;
 
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class NumberFilter extends Filter {
+public class NumberFilter extends AbstractFilter {
 
     private float value;
 
@@ -24,13 +24,13 @@ public class NumberFilter extends Filter {
         convertedFilter.setType(PropertyType.NUMBER);
         convertedFilter.setProperty(this.getProperty());
         convertedFilter.setOperand(this.getOperand());
-        convertedFilter.setValue(methods.convertNumberToString(value));
+        convertedFilter.setValue(Methods.convertNumberToString(value));
         return convertedFilter;
-    };
+    }
 
     public String convertFilterToString() {
         String stringOperand = "";
-        switch(this.getOperand()) {
+        switch (this.getOperand()) {
             case EQUALS:
                 stringOperand = "==";
                 break;
@@ -51,5 +51,5 @@ public class NumberFilter extends Filter {
                 break;
         }
         return String.format("equipment.%s %s %f", this.getProperty(), stringOperand, value);
-    };
+    }
 }

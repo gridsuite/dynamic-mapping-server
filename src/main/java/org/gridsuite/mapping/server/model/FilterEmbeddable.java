@@ -1,7 +1,10 @@
 package org.gridsuite.mapping.server.model;
+
 import lombok.*;
+
 import javax.persistence.*;
 import java.util.UUID;
+
 import org.gridsuite.mapping.server.utils.*;
 
 @Inheritance

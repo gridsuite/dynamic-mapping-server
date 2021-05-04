@@ -1,6 +1,5 @@
 package org.gridsuite.mapping.server.dto;
 
-
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ScriptEntity;
 

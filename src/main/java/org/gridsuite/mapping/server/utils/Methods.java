@@ -4,22 +4,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class methods {
+public final class Methods {
+
+    private Methods() {
+        // not called
+    }
+
     public static ArrayList<String> convertStringToList(String stringArray) {
         ArrayList<String> converted = new ArrayList();
-         converted.addAll(Arrays.asList(stringArray.split("\\s*,\\s*")));
-        return converted  ;
+        converted.addAll(Arrays.asList(stringArray.split("\\s*,\\s*")));
+        return converted;
     }
 
     public static String convertListToString(List<String> array) {
         return  array.stream().reduce("", (acc, element) -> acc + " , " + element);
     }
 
-    public static boolean convertStringToBoolean( String stringBool) {
-        return stringBool == "true";
+    public static boolean convertStringToBoolean(String stringBool) {
+        return stringBool.equals("true");
     }
 
-    public static String convertBooleanToString( boolean bool) {
+    public static String convertBooleanToString(boolean bool) {
         return String.valueOf(bool);
     }
 
@@ -27,7 +32,7 @@ public class methods {
         return Float.parseFloat(stringNumber);
     }
 
-    public static String convertNumberToString( float number) {
+    public static String convertNumberToString(float number) {
         return String.valueOf(number);
     }
 

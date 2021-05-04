@@ -16,8 +16,9 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @ApiModel("Rule")
-public class Rule   {
-    @ApiModelProperty("Equipment type") private EquipmentType equipmentType;
+public class Rule {
+    @ApiModelProperty("Equipment type")
+    private EquipmentType equipmentType;
 
     @ApiModelProperty("Mapped Model Instance ID")
     private String mappedModel;
@@ -26,14 +27,14 @@ public class Rule   {
     private String composition;
 
     @ApiModelProperty("Filters")
-    private List<Filter> filters;
+    private List<AbstractFilter> filters;
 
-    public List<Filter> getFilters() {
+    public List<AbstractFilter> getFilters() {
         return filters;
     }
 
     public RuleEntity convertRuleToEntity(String mappingName) {
-        UUID id =  UUID.randomUUID();
+        UUID id = UUID.randomUUID();
         return RuleEntity.builder().composition(composition).mappedModel(mappedModel).equipmentType(equipmentType).mappingName(mappingName).id(id).filters(filters.stream().map(filter -> filter.convertFilterToEntity(id)).collect(Collectors.toList())).build();
     }
 
@@ -41,7 +42,7 @@ public class Rule   {
         equipmentType = ruleEntity.getEquipmentType();
         mappedModel = ruleEntity.getMappedModel();
         composition = ruleEntity.getComposition();
-        filters = ruleEntity.getFilters().stream().map(filterEmbeddable -> Filter.createFilterFromEntity(filterEmbeddable)).collect(Collectors.toList());
+        filters = ruleEntity.getFilters().stream().map(filterEmbeddable -> AbstractFilter.createFilterFromEntity(filterEmbeddable)).collect(Collectors.toList());
     }
 
     // Needs to put the default rule last, hence going for the most specific rule to the most generic

@@ -15,8 +15,8 @@ import javax.persistence.*;
 @Setter
 @Embeddable
 @AttributeOverrides({
-        @AttributeOverride( name = "name", column = @Column(name ="params_id")),
-        @AttributeOverride( name = "type", column = @Column(name = "params_type")),
+        @AttributeOverride(name = "name", column = @Column(name = "params_id")),
+        @AttributeOverride(name = "type", column = @Column(name = "params_type")),
 })
 public class ModelParamsEmbeddable {
 

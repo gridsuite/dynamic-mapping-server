@@ -10,7 +10,7 @@ public class SetParams implements ModelParams {
     private ParamsType type;
 
     SetParams(ModelParamsEmbeddable modelParamsEmbeddable) {
-         name = modelParamsEmbeddable.getName();
-         type =modelParamsEmbeddable.getType();
+        name = modelParamsEmbeddable.getName();
+        type = modelParamsEmbeddable.getType();
     }
 }

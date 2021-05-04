@@ -1,6 +1,5 @@
 package org.gridsuite.mapping.server.model;
 
-
 import lombok.*;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.springframework.data.cassandra.core.mapping.Table;

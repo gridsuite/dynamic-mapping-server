@@ -1,81 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="8.19">
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/methods.java">
-<error line="6" column="1" severity="error" message="Les classes utilitaires ne doivent pas avoir de constructeur par défaut ou public." source="com.puppycrawl.tools.checkstyle.checks.design.HideUtilityClassConstructorCheck"/>
-<error line="6" column="14" severity="error" message="Le nom &apos;methods&apos; n&apos;est pas conforme à l&apos;expression &apos;^[A-Z][a-zA-Z0-9]*$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.TypeNameCheck"/>
-<error line="11" severity="error" message="&apos;METHOD_DEF&apos; compte plus d&apos;une ligne vide après." source="com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyLineSeparatorCheck"/>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/EquipmentType.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/EquipmentType.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/Methods.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/PropertyType.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/PropertyType.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/RulesUtils.java">
-<error line="9" column="8" severity="error" message="Import inutilisé - com.powsybl.iidm.network.Connectable." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
-<error line="10" column="8" severity="error" message="Import inutilisé - com.powsybl.iidm.network.Identifiable." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
-<error line="14" column="8" severity="error" message="Import inutilisé - java.util.List." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
-<error line="15" column="8" severity="error" message="Import inutilisé - java.util.Optional." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/Templater.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/Operands.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/ParamsType.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingApi.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/utils/Operands.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/DataSourceConfig.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingApi.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingSwaggerConfig.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/DataSourceConfig.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/Script.java">
-<error line="1" severity="error" message="Il manque un caractère NewLine à la fin du fichier." source="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck"/>
-<error line="4" severity="error" message="&apos;import&apos; a plus d&apos;une ligne vide avant." source="com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyLineSeparatorCheck"/>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingSwaggerConfig.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/Rule.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/Script.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/Mapping.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/InstanceModel.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/InputMapping.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/Rule.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/SortedMapping.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/SetParams.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/EnumFilter.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/Mapping.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/Filter.java">
-<error line="4" severity="error" message="&apos;import&apos; a plus d&apos;une ligne vide avant." source="com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyLineSeparatorCheck"/>
-<error line="9" column="1" severity="error" message="Le nom de la classe abstraite &apos;Filter&apos; n&apos;est pas conforme à l&apos;expression &apos;^Abstract.+$&apos;." source="com.puppycrawl.tools.checkstyle.checks.naming.AbstractClassNameCheck"/>
-<error line="17" severity="error" message="&apos;member def modifier&apos; au niveau d&apos;indentation 5 n&apos;est pas indenté correctement, le niveau attendu est 4." source="com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"/>
-<error line="18" severity="error" message="&apos;member def modifier&apos; au niveau d&apos;indentation 5 n&apos;est pas indenté correctement, le niveau attendu est 4." source="com.puppycrawl.tools.checkstyle.checks.indentation.IndentationCheck"/>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/ModelParams.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/NumberFilter.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/InputMapping.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/StringFilter.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/EnumFilter.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/BooleanFilter.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/AbstractFilter.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/SortedRules.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/NumberFilter.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/service/implementation/MappingServiceImpl.java">
-<error line="17" column="8" severity="error" message="Import inutilisé - java.util.Set." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/StringFilter.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/service/MappingService.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/dto/filters/BooleanFilter.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/service/ScriptService.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingException.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/model/ScriptEntity.java">
-<error line="11" column="8" severity="error" message="Import inutilisé - javax.persistence.OneToMany." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
-<error line="12" column="8" severity="error" message="Import inutilisé - java.util.List." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/service/implementation/ScriptServiceImpl.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/model/MappingEntity.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/service/implementation/MappingServiceImpl.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/model/RuleEntity.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/service/MappingService.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/model/FilterEmbeddable.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/service/ScriptService.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/repository/MappingRepository.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/InstanceModelEntity.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/repository/ScriptRepository.java">
-<error line="19" severity="error" message="&apos;METHOD_DEF&apos; doit être séparé de la déclaration précédente." source="com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyLineSeparatorCheck"/>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/ScriptEntity.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingApplication.java">
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/MappingEntity.java">
 </file>
-<file name="/home/scalbertmat/Projects/powsybl/mapping-server/src/main/java/org/gridsuite/mapping/server/controller/ScriptController.java">
-<error line="8" column="8" severity="error" message="Import inutilisé - org.gridsuite.mapping.server.dto.InputMapping." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
-<error line="10" column="8" severity="error" message="Import inutilisé - org.gridsuite.mapping.server.service.MappingService." source="com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck"/>
-<error line="37" severity="error" message="&apos;METHOD_DEF&apos; a plus d&apos;une ligne vide avant." source="com.puppycrawl.tools.checkstyle
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/RuleEntity.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/ModelParamsEmbeddable.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/FilterEmbeddable.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/repository/MappingRepository.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/repository/ScriptRepository.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/repository/InstanceModelRepository.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingApplication.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/MappingConstants.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/controller/ScriptController.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/controller/MappingController.java">
+</file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/resources/database.properties">
+</file>
+</checkstyle>

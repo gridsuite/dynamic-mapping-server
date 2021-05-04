@@ -1,23 +1,21 @@
 package org.gridsuite.mapping.server.dto.filters;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEmbeddable;
 import org.gridsuite.mapping.server.utils.PropertyType;
-import org.gridsuite.mapping.server.utils.methods;
+import org.gridsuite.mapping.server.utils.Methods;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class EnumFilter extends Filter {
+public class EnumFilter extends AbstractFilter {
 
     private ArrayList<String> value;
 
@@ -29,15 +27,14 @@ public class EnumFilter extends Filter {
         convertedFilter.setType(PropertyType.ENUM);
         convertedFilter.setProperty(this.getProperty());
         convertedFilter.setOperand(this.getOperand());
-        convertedFilter.setValue(methods.convertListToString(value));
+        convertedFilter.setValue(Methods.convertListToString(value));
         return convertedFilter;
-    };
-
+    }
 
     public String convertFilterToString() {
         String stringOperand = "";
         String notPrefix = "";
-        switch(this.getOperand()) {
+        switch (this.getOperand()) {
             case EQUALS:
                 stringOperand = "equals";
                 break;
@@ -56,7 +53,6 @@ public class EnumFilter extends Filter {
 
         List<String> escapedValues = value.stream().map(value -> String.format("\"%s\"", value)).collect(Collectors.toList());
 
-        return String.format("%sequipment.%s.%s(%s)", notPrefix,this.getProperty(), stringOperand, escapedValues);
-    };
-
+        return String.format("%sequipment.%s.%s(%s)", notPrefix, this.getProperty(), stringOperand, escapedValues);
+    }
 }

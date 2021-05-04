@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +36,7 @@ public class MappingServiceImpl implements MappingService {
     ) {
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
-        this.webClient =  webClientBuilder.build();
+        this.webClient = webClientBuilder.build();
         this.objectMapper = objectMapper;
     }
 
@@ -58,8 +57,6 @@ public class MappingServiceImpl implements MappingService {
     public Void deleteMapping(String mappingName) {
         return mappingRepository.deleteByName(mappingName);
     }
-
-    ;
 
 }
 

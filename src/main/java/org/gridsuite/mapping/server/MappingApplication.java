@@ -23,7 +23,7 @@ public class MappingApplication {
         SpringApplication.run(MappingApplication.class, args);
     }
 
-// TODO: Use actual module
+    // TODO: Use actual module
     @Bean
     public Module module() {
         return new Module() {

@@ -31,7 +31,6 @@ public class ScriptController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(scriptService.createFromMapping(mappingName));
     }
 
-
     @GetMapping(value = "/")
     @ApiOperation(value = "Get all scripts")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of scripts")})
@@ -46,6 +45,7 @@ public class ScriptController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(
                 scriptService.deleteScript(scriptName));
     }
+
     @PutMapping(value = "/{scriptName}")
     @ApiOperation(value = "update the script")
     @ApiResponses(value = {

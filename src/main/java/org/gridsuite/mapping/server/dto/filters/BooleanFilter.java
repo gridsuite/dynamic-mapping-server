@@ -5,13 +5,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEmbeddable;
 import org.gridsuite.mapping.server.utils.PropertyType;
-import org.gridsuite.mapping.server.utils.methods;
+import org.gridsuite.mapping.server.utils.Methods;
+
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class BooleanFilter extends Filter {
+public class BooleanFilter extends AbstractFilter {
 
     private boolean value;
 
@@ -23,13 +24,13 @@ public class BooleanFilter extends Filter {
         convertedFilter.setType(PropertyType.BOOLEAN);
         convertedFilter.setProperty(this.getProperty());
         convertedFilter.setOperand(this.getOperand());
-        convertedFilter.setValue(methods.convertBooleanToString(value));
+        convertedFilter.setValue(Methods.convertBooleanToString(value));
         return convertedFilter;
-    };
+    }
 
     public String convertFilterToString() {
         String stringOperand = "";
-        switch(this.getOperand()) {
+        switch (this.getOperand()) {
             case EQUALS:
                 stringOperand = "==";
                 break;
@@ -38,5 +39,5 @@ public class BooleanFilter extends Filter {
                 break;
         }
         return String.format("equipment.%s %s %b", this.getProperty(), stringOperand, value);
-    };
+    }
 }

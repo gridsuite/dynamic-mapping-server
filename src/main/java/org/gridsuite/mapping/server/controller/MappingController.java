@@ -32,10 +32,9 @@ public class MappingController {
             @ApiResponse(code = 409, message = "The mapping already exist"),
             @ApiResponse(code = 500, message = "The storage is down or a file with the same name already exists")})
     public ResponseEntity<InputMapping> createMapping(@PathVariable("mappingName") String mappingName, @RequestBody InputMapping mapping) {
-    InputMapping createMapping = mappingService.createMapping(mappingName, mapping)
+        InputMapping createMapping = mappingService.createMapping(mappingName, mapping);
         return ResponseEntity.ok().body(createMapping);
     }
-
 
     @DeleteMapping(value = "/{mappingName}")
     @ApiOperation(value = "delete the mapping")

@@ -16,6 +16,7 @@ public interface ScriptRepository extends JpaRepository<ScriptEntity, UUID> {
     List<ScriptEntity> findAll();
 
     Optional<ScriptEntity> findByName(String name);
+
     Optional<List<ScriptEntity>> findByParent(String mappingName);
 
     @Transactional

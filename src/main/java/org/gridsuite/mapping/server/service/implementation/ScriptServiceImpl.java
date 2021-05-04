@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import static org.gridsuite.mapping.server.MappingException.Type.*;
+
 import org.gridsuite.mapping.server.MappingException;
 
 import org.gridsuite.mapping.server.dto.*;
@@ -52,9 +54,10 @@ public class ScriptServiceImpl implements ScriptService {
         this.instanceModelRepository = instanceModelRepository;
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
-        this.webClient =  webClientBuilder.build();
+        this.webClient = webClientBuilder.build();
         this.objectMapper = objectMapper;
     }
+
     @Override
     public Script createFromMapping(String mappingName) {
         Optional<MappingEntity> foundMapping = mappingRepository.findByName(mappingName);
@@ -86,8 +89,6 @@ public class ScriptServiceImpl implements ScriptService {
         return null;
     }
 
-
-
     @Getter
     @Setter
     public class SortedMapping implements Mapping {
@@ -97,7 +98,7 @@ public class ScriptServiceImpl implements ScriptService {
         public SortedMapping(InputMapping mapping) {
             name = mapping.getName();
             sortedRules = new ArrayList<SortedRules>();
-            HashMap<EquipmentType, ArrayList<Rule>> sortingRules =  new HashMap<EquipmentType, ArrayList<Rule>>();
+            HashMap<EquipmentType, ArrayList<Rule>> sortingRules = new HashMap<EquipmentType, ArrayList<Rule>>();
             mapping.getRules().stream().forEach(rule -> {
                 EquipmentType ruleType = rule.getEquipmentType();
                 if (sortingRules.keySet().contains(ruleType)) {
@@ -110,8 +111,8 @@ public class ScriptServiceImpl implements ScriptService {
                 }
             });
 
-            for (EquipmentType type: sortingRules.keySet()) {
-                ArrayList<Rule> typedRules =  sortingRules.get(type);
+            for (EquipmentType type : sortingRules.keySet()) {
+                ArrayList<Rule> typedRules = sortingRules.get(type);
                 typedRules.sort(Rule.ruleComparator);
                 sortedRules.add(new SortedRules(type, typedRules));
             }
@@ -151,7 +152,7 @@ public class ScriptServiceImpl implements ScriptService {
             if (foundModel.isPresent()) {
                 equipmentType = rule.getEquipmentType();
                 mappedModel = foundModel.get();
-                composition = Templater.flattenFilters(rule.getComposition(), rule.getFilters() );
+                composition = Templater.flattenFilters(rule.getComposition(), rule.getFilters());
             } else {
                 throw new MappingException(MODEL_NOT_FOUND);
             }

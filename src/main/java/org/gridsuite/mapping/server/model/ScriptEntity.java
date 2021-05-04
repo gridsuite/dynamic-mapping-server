@@ -8,8 +8,6 @@ import org.springframework.data.cassandra.core.mapping.Table;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.util.List;
 
 @Getter
 @Setter

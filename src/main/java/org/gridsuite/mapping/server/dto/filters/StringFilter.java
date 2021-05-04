@@ -5,14 +5,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEmbeddable;
 import org.gridsuite.mapping.server.utils.PropertyType;
-import org.gridsuite.mapping.server.utils.methods;
 
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class StringFilter extends Filter {
+public class StringFilter extends AbstractFilter {
 
     private String value;
 
@@ -26,12 +25,12 @@ public class StringFilter extends Filter {
         convertedFilter.setOperand(this.getOperand());
         convertedFilter.setValue(value);
         return convertedFilter;
-    };
+    }
 
     public String convertFilterToString() {
         String stringOperand = "";
         String notPrefix = "";
-        switch(this.getOperand()) {
+        switch (this.getOperand()) {
             case EQUALS:
                 stringOperand = "equals";
                 break;
@@ -50,6 +49,6 @@ public class StringFilter extends Filter {
                 break;
         }
         // Need to escape string values;
-        return String.format("%sequipment.%s.%s(\"%s\")", notPrefix,this.getProperty(), stringOperand, value);
-    };
+        return String.format("%sequipment.%s.%s(\"%s\")", notPrefix, this.getProperty(), stringOperand, value);
+    }
 }

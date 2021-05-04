@@ -3,7 +3,6 @@ package org.gridsuite.mapping.server.dto;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.MappingEntity;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +22,4 @@ public class InputMapping implements Mapping {
         name = mappingEntity.getName();
         rules = mappingEntity.getRules().stream().map(ruleEntity -> new Rule(ruleEntity)).collect(Collectors.toList());
     }
-
-
-
 }

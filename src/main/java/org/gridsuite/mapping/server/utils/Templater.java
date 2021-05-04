@@ -3,7 +3,7 @@ package org.gridsuite.mapping.server.utils;
 import com.powsybl.commons.PowsyblException;
 import org.apache.commons.io.IOUtils;
 import org.gridsuite.mapping.server.MappingConstants;
-import org.gridsuite.mapping.server.dto.filters.Filter;
+import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
 import org.gridsuite.mapping.server.service.implementation.ScriptServiceImpl;
 import org.springframework.core.io.ClassPathResource;
@@ -12,16 +12,17 @@ import org.stringtemplate.v4.ST;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
+public final class Templater {
 
-public class Templater {
+    private Templater() {
+        // Not Called
+    }
 
-    public static String flattenFilters(String composition, List<Filter> filters) {
+    public static String flattenFilters(String composition, List<AbstractFilter> filters) {
 
-        final String[]  flattenedComposition = {composition};
+        final String[] flattenedComposition = {composition};
         // WARNING: Will not work with multithreading
         filters.stream().forEach(filter -> {
             flattenedComposition[0] = flattenedComposition[0].replaceAll(filter.getFilterId() + "\\b", filter.convertFilterToString());
@@ -48,12 +49,12 @@ public class Templater {
             imports.add(MappingConstants.IMPORT + sortedRules.getEquipmentClass());
             // Preparing the main template
             ST sortedRulesScript = new ST(sortedRulesTemplate);
-            sortedRulesScript.add("equipmentClass",sortedRules.getEquipmentClass());
-            sortedRulesScript.add("collectionName",sortedRules.getCollectionName());
-            String[] rulesScripts = sortedRules.getRules().stream().map(flatRule-> {
+            sortedRulesScript.add("equipmentClass", sortedRules.getEquipmentClass());
+            sortedRulesScript.add("collectionName", sortedRules.getCollectionName());
+            String[] rulesScripts = sortedRules.getRules().stream().map(flatRule -> {
                 ST ruleScript = new ST(ruleTemplate);
                 ruleScript.add("composition", flatRule.getComposition());
-                ruleScript.add("modelName",flatRule.getMappedModel().getModelName());
+                ruleScript.add("modelName", flatRule.getMappedModel().getModelName());
                 ruleScript.add("parameterSetId", modelToParamSetId(flatRule.getMappedModel()));
                 return ruleScript.render();
             }).toArray(String[]::new);
@@ -66,7 +67,7 @@ public class Templater {
         script.add("sortedRules", sortedRulesScripts);
 
         // TODO
-    return script.render();
+        return script.render();
     }
 
     public static String equipmentTypeToCollectionName(EquipmentType equipmentType) {
@@ -80,7 +81,6 @@ public class Templater {
         }
         return equipmentCollection;
     }
-
 
     public static String equipmentTypeToClass(EquipmentType equipmentType) {
         String equipmentClass = "";
@@ -106,7 +106,6 @@ public class Templater {
                 format = MappingConstants.EQUIPMENT_ID + "+ \"%s\"";
                 break;
         }
-        return String.format(format,instanceModelEntity.getParams().getName());
+        return String.format(format, instanceModelEntity.getParams().getName());
     }
 }
-
