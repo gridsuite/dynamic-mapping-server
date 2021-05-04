@@ -37,6 +37,6 @@ public class BooleanFilter extends Filter {
                 stringOperand = "!=";
                 break;
         }
-        return String.format("%s %s %b", this.getProperty(), stringOperand, value);
+        return String.format("equipment.%s %s %b", this.getProperty(), stringOperand, value);
     };
 }

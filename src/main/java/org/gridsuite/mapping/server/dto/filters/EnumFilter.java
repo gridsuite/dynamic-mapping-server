@@ -56,7 +56,7 @@ public class EnumFilter extends Filter {
 
         List<String> escapedValues = value.stream().map(value -> String.format("\"%s\"", value)).collect(Collectors.toList());
 
-        return String.format("%s%s.%s(%s)", notPrefix,this.getProperty(), stringOperand, escapedValues);
+        return String.format("%sequipment.%s.%s(%s)", notPrefix,this.getProperty(), stringOperand, escapedValues);
     };
 
 }

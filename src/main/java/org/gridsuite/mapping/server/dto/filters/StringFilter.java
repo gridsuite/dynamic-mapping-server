@@ -49,6 +49,7 @@ public class StringFilter extends Filter {
                 stringOperand = "endsWith";
                 break;
         }
-        return String.format("%s%s.%s(%s)", notPrefix,this.getProperty(), stringOperand, value);
+        // Need to escape string values;
+        return String.format("%sequipment.%s.%s(\"%s\")", notPrefix,this.getProperty(), stringOperand, value);
     };
 }

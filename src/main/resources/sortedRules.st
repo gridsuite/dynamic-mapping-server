@@ -1,12 +1,12 @@
 
-for (<equipmentType> eqpt : network.<collectionName>) {
-     <rules; separator="\n } else ">
+for (<equipmentClass> equipment : network.<collectionName>) {
+     <rulesScripts; separator="\n } else ">
     }
 
-    <if(equipmentType && equipmentType === "Generator">
+    <if(equipmentClass && equipmentClass === "Generator">
     //
     OmegaRef {
-        generatorDynamicModelId eqpt.id
+        generatorDynamicModelId equipment.id
     }
     <endif>
 }

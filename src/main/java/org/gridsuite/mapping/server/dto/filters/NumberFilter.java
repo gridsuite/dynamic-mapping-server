@@ -50,6 +50,6 @@ public class NumberFilter extends Filter {
                 stringOperand = ">";
                 break;
         }
-        return String.format("%s %s %f", this.getProperty(), stringOperand, value);
+        return String.format("equipment.%s %s %f", this.getProperty(), stringOperand, value);
     };
 }
