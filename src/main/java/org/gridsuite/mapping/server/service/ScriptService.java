@@ -10,7 +10,7 @@ public interface ScriptService {
 
     List<Script> getAllScripts();
 
-    Void updateScript(String scriptName, Script script);
+    Script saveScript(String scriptName, Script script);
 
     Void deleteScript(String scriptName);
 }

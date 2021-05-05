@@ -80,8 +80,9 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public Void updateScript(String scriptName, Script script) {
-        return null;
+    public Script saveScript(String scriptName, Script script) {
+        scriptRepository.save(script.convertToEntity());
+        return script;
     }
 
     @Override

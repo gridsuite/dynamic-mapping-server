@@ -21,4 +21,6 @@ public interface ScriptRepository extends JpaRepository<ScriptEntity, UUID> {
 
     @Transactional
     void deleteByName(String name);
+
+    ScriptEntity save(ScriptEntity script);
 }

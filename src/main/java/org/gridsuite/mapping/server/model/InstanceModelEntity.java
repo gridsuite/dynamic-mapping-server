@@ -10,7 +10,7 @@ import javax.persistence.Id;
 
 @Getter
 @Setter
-@Table("instance_model")
+@Table("instance_models")
 @Entity
 @Builder
 @NoArgsConstructor

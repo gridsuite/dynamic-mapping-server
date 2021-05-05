@@ -20,4 +20,6 @@ public interface MappingRepository extends JpaRepository<MappingEntity, UUID> {
 
     @Transactional
     Void deleteByName(String name);
+
+    MappingEntity save(MappingEntity mappingEntity);
 }

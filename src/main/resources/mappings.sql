@@ -19,8 +19,8 @@ CREATE TABLE rules (
     property varchar(255),
     operand varchar(255),
     value varchar(255),
-    PRIMARY KEY (mappingName, ruleId)
-)
+    PRIMARY KEY (mappingName, rule_id)
+);
 
 
 CREATE TABLE filters (
@@ -31,4 +31,13 @@ CREATE TABLE filters (
     operand varchar(255),
     value varchar(255),
     PRIMARY KEY (filter_id,rule_id)
-    )
+);
+
+CREATE TABLE instance_models (
+    id varchar(255),
+    modelName varchar(255),
+    equipmentType varchar(255),
+    params_id varchar(255),
+    params_type varchar(255),
+    PRIMARY KEY (id)
+);

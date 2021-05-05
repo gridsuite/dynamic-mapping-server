@@ -17,7 +17,7 @@ import java.util.UUID;
 public class RuleEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy  =  GenerationType.AUTO)
     @Column(name = "rule_id")
     private UUID id;
 

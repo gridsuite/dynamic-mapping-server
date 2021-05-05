@@ -49,11 +49,11 @@ public class ScriptController {
     @PutMapping(value = "/{scriptName}")
     @ApiOperation(value = "update the script")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Script updated"),
+            @ApiResponse(code = 201, message = "Script updated"),
             @ApiResponse(code = 404, message = "Script not found")})
     public ResponseEntity<Void> updateScript(@PathVariable("scriptName") String scriptName, @RequestBody Script script) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(
-                scriptService.updateScript(scriptName, script));
+        scriptService.saveScript(scriptName, script);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(null);
     }
 
 }
