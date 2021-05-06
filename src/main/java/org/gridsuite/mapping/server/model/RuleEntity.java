@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Builder
-@Table(name = "rule")
+@Table(name = "rules")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -25,7 +25,7 @@ public class RuleEntity {
     private String mappingName;
 
     @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Enumerated
     private EquipmentType equipmentType;
 
     @Column(name = "model", nullable = false)
@@ -34,8 +34,6 @@ public class RuleEntity {
     @Column(name = "composition", nullable = false)
     private String composition;
 
-    @Column(name = "filters")
-    @CollectionTable(name = "filters", joinColumns = @JoinColumn(name = "rule_id"))
-    @ElementCollection
-    private List<FilterEmbeddable> filters;
+    @OneToMany(targetEntity = FilterEntity.class, mappedBy = "ruleId")
+    private List<FilterEntity> filters;
 }

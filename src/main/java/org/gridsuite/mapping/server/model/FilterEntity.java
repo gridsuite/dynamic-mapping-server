@@ -3,6 +3,7 @@ package org.gridsuite.mapping.server.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.UUID;
 
 import org.gridsuite.mapping.server.utils.*;
@@ -12,8 +13,9 @@ import org.gridsuite.mapping.server.utils.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Embeddable
-public class FilterEmbeddable {
+@Entity
+@Table(name = "filters")
+public class FilterEntity implements Serializable {
 
     @Id
     @Column(name = "filter_id")

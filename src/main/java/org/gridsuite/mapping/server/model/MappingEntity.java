@@ -2,12 +2,11 @@ package org.gridsuite.mapping.server.model;
 
 import lombok.*;
 import javax.persistence.*;
-import org.springframework.data.cassandra.core.mapping.Table;
 import java.util.List;
 
 @Getter
 @Setter
-@Table("mapping")
+@Table(name = "mappings")
 @Entity
 @Builder
 @NoArgsConstructor

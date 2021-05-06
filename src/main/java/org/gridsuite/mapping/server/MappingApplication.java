@@ -6,41 +6,20 @@
  */
 package org.gridsuite.mapping.server;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.Module;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * @author Geoffroy Jamgotchian <geoffroy.jamgotchian at rte-france.com>
  */
 @SuppressWarnings("checkstyle:HideUtilityClassConstructor")
 @SpringBootApplication
+@EnableJpaRepositories
 public class MappingApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MappingApplication.class, args);
     }
 
-    // TODO: Use actual module
-    @Bean
-    public Module module() {
-        return new Module() {
-            @Override
-            public String getModuleName() {
-                return null;
-            }
-
-            @Override
-            public Version version() {
-                return null;
-            }
-
-            @Override
-            public void setupModule(SetupContext setupContext) {
-
-            }
-        };
-    }
 }

@@ -1,6 +1,5 @@
 package org.gridsuite.mapping.server.service.implementation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.repository.MappingRepository;
@@ -10,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,24 +18,16 @@ public class MappingServiceImpl implements MappingService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MappingServiceImpl.class);
 
-    @Autowired
-    MappingServiceImpl self;
-    private final WebClient webClient;
-    private final ObjectMapper objectMapper;
-
     private final MappingRepository mappingRepository;
     private final ScriptRepository scriptRepository;
 
+    @Autowired
     public MappingServiceImpl(
             MappingRepository mappingRepository,
-            ScriptRepository scriptRepository,
-            WebClient.Builder webClientBuilder,
-            ObjectMapper objectMapper
+            ScriptRepository scriptRepository
     ) {
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
-        this.webClient = webClientBuilder.build();
-        this.objectMapper = objectMapper;
     }
 
     @Override

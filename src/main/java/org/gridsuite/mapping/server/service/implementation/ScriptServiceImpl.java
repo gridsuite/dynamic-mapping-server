@@ -1,6 +1,5 @@
 package org.gridsuite.mapping.server.service.implementation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +22,7 @@ import org.gridsuite.mapping.server.utils.Templater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,14 +30,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class ScriptServiceImpl implements ScriptService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MappingServiceImpl.class);
 
     @Autowired
     ScriptServiceImpl self;
-    private final WebClient webClient;
-    private final ObjectMapper objectMapper;
 
     private final InstanceModelRepository instanceModelRepository;
     private final MappingRepository mappingRepository;
@@ -47,15 +45,11 @@ public class ScriptServiceImpl implements ScriptService {
     public ScriptServiceImpl(
             MappingRepository mappingRepository,
             ScriptRepository scriptRepository,
-            InstanceModelRepository instanceModelRepository,
-            WebClient.Builder webClientBuilder,
-            ObjectMapper objectMapper
+            InstanceModelRepository instanceModelRepository
     ) {
         this.instanceModelRepository = instanceModelRepository;
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
-        this.webClient = webClientBuilder.build();
-        this.objectMapper = objectMapper;
     }
 
     @Override

@@ -52,6 +52,8 @@
 </file>
 <file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/service/ScriptService.java">
 </file>
+<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/FilterEntity.java">
+</file>
 <file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/InstanceModelEntity.java">
 </file>
 <file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/ScriptEntity.java">
@@ -61,8 +63,6 @@
 <file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/RuleEntity.java">
 </file>
 <file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/ModelParamsEmbeddable.java">
-</file>
-<file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/model/FilterEmbeddable.java">
 </file>
 <file name="/home/scalbertmat/Projects/GridSuite/mapping-server/src/main/java/org/gridsuite/mapping/server/repository/MappingRepository.java">
 </file>

@@ -3,7 +3,7 @@ package org.gridsuite.mapping.server.dto.filters;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.model.FilterEmbeddable;
+import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.utils.PropertyType;
 
 import java.util.UUID;
@@ -16,8 +16,8 @@ public class StringFilter extends AbstractFilter {
     private String value;
 
     @Override
-    public FilterEmbeddable convertFilterToEntity(UUID ruleId) {
-        FilterEmbeddable convertedFilter = new FilterEmbeddable();
+    public FilterEntity convertFilterToEntity(UUID ruleId) {
+        FilterEntity convertedFilter = new FilterEntity();
         convertedFilter.setFilterId(this.getFilterId());
         convertedFilter.setRuleId(ruleId);
         convertedFilter.setType(PropertyType.STRING);

@@ -3,7 +3,7 @@ package org.gridsuite.mapping.server.dto.filters;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
-import org.gridsuite.mapping.server.model.FilterEmbeddable;
+import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.utils.Operands;
 import org.gridsuite.mapping.server.utils.Methods;
 
@@ -21,7 +21,7 @@ public abstract class AbstractFilter {
     private String property;
     private Operands operand;
 
-    public static AbstractFilter createFilterFromEntity(FilterEmbeddable filterEntity) {
+    public static AbstractFilter createFilterFromEntity(FilterEntity filterEntity) {
         AbstractFilter filter = new StringFilter();
         switch (filterEntity.getType()) {
             case BOOLEAN:
@@ -61,7 +61,7 @@ public abstract class AbstractFilter {
         return filter;
     }
 
-    public abstract FilterEmbeddable convertFilterToEntity(UUID ruleId);
+    public abstract FilterEntity convertFilterToEntity(UUID ruleId);
 
     public abstract String convertFilterToString();
 }

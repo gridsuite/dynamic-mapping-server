@@ -16,7 +16,7 @@ public interface InstanceModelRepository extends JpaRepository<InstanceModelEnti
 
     Optional<InstanceModelEntity> findById(String id);
 
-    Optional<List<InstanceModelEntity>> findByName(String name);
+    Optional<List<InstanceModelEntity>> findByModelName(String name);
 
     @Transactional
     Void deleteById(String id);

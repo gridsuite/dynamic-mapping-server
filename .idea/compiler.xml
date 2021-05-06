@@ -13,9 +13,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="gridsuite-actions-server" target="11" />
+      <module name="gridsuite-actions-server" target="1.5" />
       <module name="mapping-server" target="11" />
-      <module name="study-server" target="11" />
+      <module name="study-server" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
