@@ -50,6 +50,7 @@ public final class Templater {
             // Preparing the main template
             ST sortedRulesScript = new ST(sortedRulesTemplate);
             sortedRulesScript.add("equipmentClass", sortedRules.getEquipmentClass());
+            sortedRulesScript.add("isGenerator", sortedRules.isGenerator());
             sortedRulesScript.add("collectionName", sortedRules.getCollectionName());
             String[] rulesScripts = sortedRules.getRules().stream().map(flatRule -> {
                 ST ruleScript = new ST(ruleTemplate);

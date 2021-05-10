@@ -17,9 +17,8 @@ import java.util.UUID;
 public class RuleEntity {
 
     @Id
-    @GeneratedValue(strategy  =  GenerationType.AUTO)
     @Column(name = "rule_id")
-    private UUID id;
+    private UUID ruleId;
 
     @Column(name = "mappingName", nullable = false)
     private String mappingName;
@@ -34,6 +33,6 @@ public class RuleEntity {
     @Column(name = "composition", nullable = false)
     private String composition;
 
-    @OneToMany(targetEntity = FilterEntity.class, mappedBy = "ruleId")
+    @OneToMany(targetEntity = FilterEntity.class, mappedBy = "ruleId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FilterEntity> filters;
 }

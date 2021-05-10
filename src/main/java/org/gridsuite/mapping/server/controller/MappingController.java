@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.service.MappingService;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,7 @@ public class MappingController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappingList());
     }
 
-    @PostMapping(value = "/{mappingName} ")
+    @PostMapping(value = "/{mappingName}")
     @ApiOperation(value = "Create a mapping")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The id of the mapping"),
             @ApiResponse(code = 409, message = "The mapping already exist"),
@@ -36,7 +35,7 @@ public class MappingController {
         return ResponseEntity.ok().body(createMapping);
     }
 
-    @DeleteMapping(value = "/{mappingName}")
+    @DeleteMapping(path = "/{mappingName}")
     @ApiOperation(value = "delete the mapping")
     @ApiResponse(code = 200, message = "Mapping deleted")
     public ResponseEntity<Void> deleteMapping(@PathVariable("mappingName") String mappingName) {

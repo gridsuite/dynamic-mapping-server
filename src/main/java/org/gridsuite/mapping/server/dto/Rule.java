@@ -34,8 +34,8 @@ public class Rule {
     }
 
     public RuleEntity convertRuleToEntity(String mappingName) {
-        UUID id = UUID.randomUUID();
-        return RuleEntity.builder().composition(composition).mappedModel(mappedModel).equipmentType(equipmentType).mappingName(mappingName).id(id).filters(filters.stream().map(filter -> filter.convertFilterToEntity(id)).collect(Collectors.toList())).build();
+        UUID createdId = UUID.randomUUID();
+        return RuleEntity.builder().composition(composition).mappedModel(mappedModel).equipmentType(equipmentType).mappingName(mappingName).ruleId(createdId).filters(filters.stream().map(filter -> filter.convertFilterToEntity(createdId)).collect(Collectors.toList())).build();
     }
 
     public Rule(RuleEntity ruleEntity) {

@@ -3,7 +3,7 @@ for (<equipmentClass> equipment : network.<collectionName>) {
      <rulesScripts; separator="\n } else ">
     }
 
-    <if(equipmentClass && equipmentClass === "Generator">
+    <if(isGenerator)>
     //
     OmegaRef {
         generatorDynamicModelId equipment.id

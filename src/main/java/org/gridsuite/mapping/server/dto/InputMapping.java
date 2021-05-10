@@ -2,6 +2,7 @@ package org.gridsuite.mapping.server.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.MappingEntity;
 
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Data
 @ApiModel("Mapping")
+@AllArgsConstructor
 public class InputMapping implements Mapping {
     @ApiModelProperty("Name")
     private String name;

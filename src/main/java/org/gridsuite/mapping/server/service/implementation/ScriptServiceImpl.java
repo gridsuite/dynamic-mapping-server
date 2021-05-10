@@ -122,12 +122,16 @@ public class ScriptServiceImpl implements ScriptService {
 
         private String equipmentClass;
 
+        private boolean isGenerator;
+
         private String collectionName;
 
         private List<FlatRule> rules;
 
         public SortedRules(EquipmentType type, ArrayList<Rule> sortedRules) {
-            this.equipmentClass = Templater.equipmentTypeToClass(type);
+            String equipmentClass = Templater.equipmentTypeToClass(type);
+            this.equipmentClass = equipmentClass;
+            this.isGenerator = equipmentClass.equals("Generator");
             this.collectionName = Templater.equipmentTypeToCollectionName(type);
             rules = sortedRules.stream().map(rule -> new FlatRule(rule)).collect(Collectors.toList());
         }

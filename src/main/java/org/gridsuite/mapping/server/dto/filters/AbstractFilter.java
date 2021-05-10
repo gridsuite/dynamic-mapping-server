@@ -9,7 +9,7 @@ import org.gridsuite.mapping.server.utils.Methods;
 
 import java.util.UUID;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = EnumFilter.class, name = "ENUM"),
         @JsonSubTypes.Type(value = NumberFilter.class, name = "NUMBER"),

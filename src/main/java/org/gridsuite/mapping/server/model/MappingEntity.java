@@ -15,6 +15,6 @@ public class MappingEntity {
     @Id
     private String name;
 
-    @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mappingName")
+    @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mappingName", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RuleEntity> rules;
 }
