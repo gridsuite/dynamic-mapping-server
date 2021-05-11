@@ -34,25 +34,36 @@ public class EnumFilter extends AbstractFilter {
     public String convertFilterToString() {
         String stringOperand = "";
         String notPrefix = "";
+        String template = "%sequipment.%s.%s(%s)";
+        boolean checkFirstValueOnly = false;
+
         switch (this.getOperand()) {
             case EQUALS:
                 stringOperand = "equals";
+                checkFirstValueOnly = true;
                 break;
             case NOT_EQUALS:
                 stringOperand = "equals";
                 notPrefix = "!";
+                checkFirstValueOnly = true;
                 break;
             case IN:
                 stringOperand = "contains";
+                template = "%s%s.%s(equipment.%s)";
                 break;
             case NOT_IN:
                 stringOperand = "contains";
                 notPrefix = "!";
+                template = "%s%s.%s(equipment.%s)";
                 break;
         }
 
         List<String> escapedValues = value.stream().map(value -> String.format("\"%s\"", value)).collect(Collectors.toList());
+        if (checkFirstValueOnly) {
+            return String.format(template, notPrefix, this.getProperty(), stringOperand, escapedValues.get(0));
+        } else {
+            return String.format(template, notPrefix, escapedValues, stringOperand, this.getProperty());
 
-        return String.format("%sequipment.%s.%s(%s)", notPrefix, this.getProperty(), stringOperand, escapedValues);
+        }
     }
 }

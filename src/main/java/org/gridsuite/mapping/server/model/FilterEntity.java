@@ -15,8 +15,9 @@ import org.gridsuite.mapping.server.utils.*;
 @Setter
 @Entity
 @Table(name = "filters")
+@IdClass(FilterId.class)
 public class FilterEntity implements Serializable {
-
+    @Id
     @Column(name = "filter_id")
     private String filterId;
 

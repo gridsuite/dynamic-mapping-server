@@ -18,6 +18,9 @@ spring:
     properties:
       dialect: org.hibernate.dialect.PostgreSQLDialect
       hibernate:
+        event:
+          merge:
+            entity_copy_observer: allow
         format_sql: true
         # Used when action: create is uncommented
         hbm2ddl:

@@ -4,7 +4,6 @@ for (<equipmentClass> equipment : network.<collectionName>) {
     }
 
     <if(isGenerator)>
-    //
     OmegaRef {
         generatorDynamicModelId equipment.id
     }
