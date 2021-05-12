@@ -19,7 +19,7 @@ public interface MappingRepository extends JpaRepository<MappingEntity, UUID> {
     Optional<MappingEntity> findByName(String name);
 
     @Transactional
-    Void deleteByName(String name);
+    int deleteByName(String name);
 
     MappingEntity save(MappingEntity mappingEntity);
 }

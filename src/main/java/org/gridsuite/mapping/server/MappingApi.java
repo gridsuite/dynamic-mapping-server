@@ -1,5 +1,8 @@
 package org.gridsuite.mapping.server;
 
+/**
+ * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
+ */
 public final class MappingApi {
 
     private MappingApi() {

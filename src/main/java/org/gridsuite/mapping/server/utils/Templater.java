@@ -1,6 +1,5 @@
 package org.gridsuite.mapping.server.utils;
 
-import com.powsybl.commons.PowsyblException;
 import org.apache.commons.io.IOUtils;
 import org.gridsuite.mapping.server.MappingConstants;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
@@ -39,7 +38,7 @@ public final class Templater {
             sortedRulesTemplate = IOUtils.toString(new ClassPathResource("sortedRules.st").getInputStream(), Charset.defaultCharset());
             ruleTemplate = IOUtils.toString(new ClassPathResource("rule.st").getInputStream(), Charset.defaultCharset());
         } catch (IOException e) {
-            throw new PowsyblException("Unable to load templates for groovy script generation !!");
+            throw new RuntimeException("Unable to load templates for groovy script generation !!");
         }
 
         ST script = new ST(scriptTemplate);

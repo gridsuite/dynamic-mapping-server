@@ -45,7 +45,7 @@ public class MappingServiceImpl implements MappingService {
     }
 
     @Override
-    public Void deleteMapping(String mappingName) {
+    public int deleteMapping(String mappingName) {
         return mappingRepository.deleteByName(mappingName);
     }
 

@@ -30,12 +30,9 @@ spring:
         persistence:
           schema-generation:
             scripts:
-              #action: create
-              create-target: src/main/resources/actions.sql
+              action: create
+              create-target: src/main/resources/mappings.sql
               create-source: metadata
-
-network-store-server:
-  base-uri: http://localhost:8080
 
 logging:
   level:

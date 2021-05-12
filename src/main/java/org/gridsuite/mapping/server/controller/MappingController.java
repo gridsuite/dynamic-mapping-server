@@ -40,8 +40,8 @@ public class MappingController {
     @ApiOperation(value = "delete the mapping")
     @ApiResponse(code = 200, message = "Mapping deleted")
     public ResponseEntity<Void> deleteMapping(@PathVariable("mappingName") String mappingName) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(
-                mappingService.deleteMapping(mappingName));
+        mappingService.deleteMapping(mappingName);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).build();
     }
 
 }

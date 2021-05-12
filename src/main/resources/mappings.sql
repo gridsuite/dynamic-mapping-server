@@ -1,40 +1,50 @@
-CREATE TABLE scriptq (
-    name varchar(255),
-    parent varchar(255),
-    script text,
-    PRIMARY KEY (name)
-);
 
-CREATE TABLE scripts (
-    name varchar(255),
-    PRIMARY KEY (name)
-);
+    create table filters (
+       filter_id varchar(255) not null,
+        rule_id uuid not null,
+        operand int4,
+        property varchar(255),
+        type int4,
+        value varchar(255),
+        primary key (filter_id, rule_id)
+    );
 
-CREATE TABLE rules (
-    rule_id uuid,
-    mappingName varchar(255),
-    type int4,
-    model varchar(255),
-    composition varchar(255),
-    PRIMARY KEY (rule_id)
-);
+    create table instance_models (
+       id varchar(255) not null,
+        equipmentType int4,
+        modelName varchar(255),
+        params_id varchar(255),
+        params_type int4,
+        primary key (id)
+    );
 
+    create table mappings (
+       name varchar(255) not null,
+        primary key (name)
+    );
 
-CREATE TABLE filters (
-    filter_id varchar(255),
-    rule_id uuid,
-    property varchar(255),
-    type int4,
-    operand int4,
-    value varchar(255),
-    PRIMARY KEY (filter_id,rule_id)
-);
+    create table rules (
+       rule_id uuid not null,
+        composition varchar(255) not null,
+        type int4 not null,
+        model varchar(255) not null,
+        mappingName varchar(255) not null,
+        primary key (rule_id)
+    );
 
-CREATE TABLE instance_models (
-    id varchar(255),
-    modelName varchar(255),
-    equipmentType int4,
-    params_id varchar(255),
-    params_type int4,
-    PRIMARY KEY (id)
-);
+    create table scripts (
+       name varchar(255) not null,
+        parent varchar(255),
+        script varchar(255) not null,
+        primary key (name)
+    );
+
+    alter table if exists filters 
+       add constraint FKfp1uckunn0eikbhu7i8vu8e51 
+       foreign key (rule_id) 
+       references rules;
+
+    alter table if exists rules 
+       add constraint FKgru6wr1k4udb1huhawgnum25b 
+       foreign key (mappingName) 
+       references mappings;

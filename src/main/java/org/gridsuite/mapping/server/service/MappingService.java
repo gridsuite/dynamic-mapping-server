@@ -10,5 +10,5 @@ public interface MappingService {
 
     InputMapping createMapping(String mappingName, InputMapping mapping);
 
-    Void deleteMapping(String mappingName);
+    int deleteMapping(String mappingName);
 }
