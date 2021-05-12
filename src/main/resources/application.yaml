@@ -38,6 +38,6 @@ logging:
   level:
     ROOT: INFO
 
-dbName: postgres
+dbName: mappings
 dbApi: jdbc
 
