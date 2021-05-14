@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ScriptEntity {
+public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<String> {
     @Id
     private String name;
 
@@ -23,4 +23,9 @@ public class ScriptEntity {
 
     @Column(name = "script", nullable = false)
     private String script;
+
+    @Override
+    public String getId() {
+        return name;
+    }
 }

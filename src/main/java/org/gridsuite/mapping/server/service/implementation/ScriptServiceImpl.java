@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static java.util.stream.Collectors.groupingBy;
 import static org.gridsuite.mapping.server.MappingException.Type.*;
 
 import org.gridsuite.mapping.server.MappingException;
@@ -24,10 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,6 +59,7 @@ public class ScriptServiceImpl implements ScriptService {
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
             ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript);
+            scriptToSave.markNotNew();
             scriptRepository.save(scriptToSave);
             return new Script(scriptToSave);
         } else {
@@ -92,27 +91,14 @@ public class ScriptServiceImpl implements ScriptService {
 
         public SortedMapping(InputMapping mapping) {
             name = mapping.getName();
-            sortedRules = new ArrayList<SortedRules>();
-            HashMap<EquipmentType, ArrayList<Rule>> sortingRules = new HashMap<EquipmentType, ArrayList<Rule>>();
-            mapping.getRules().stream().forEach(rule -> {
-                EquipmentType ruleType = rule.getEquipmentType();
-                if (sortingRules.keySet().contains(ruleType)) {
-                    ArrayList<Rule> associatedRules = sortingRules.get(ruleType);
-                    associatedRules.add(rule);
-                } else {
-                    ArrayList<Rule> newRules = new ArrayList<Rule>();
-                    newRules.add(rule);
-                    sortingRules.put(ruleType, newRules);
-                }
-            });
-
+            sortedRules = new ArrayList<>();
+            Map<EquipmentType, List<Rule>> sortingRules = mapping.getRules().stream().collect(groupingBy(Rule::getEquipmentType));
             for (EquipmentType type : sortingRules.keySet()) {
-                ArrayList<Rule> typedRules = sortingRules.get(type);
+                ArrayList<Rule> typedRules = new ArrayList<>(sortingRules.get(type));
                 typedRules.sort(Rule.ruleComparator);
                 sortedRules.add(new SortedRules(type, typedRules));
             }
         }
-
     }
 
     @Getter

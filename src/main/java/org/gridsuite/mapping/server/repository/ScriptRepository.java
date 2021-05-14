@@ -7,10 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface ScriptRepository extends JpaRepository<ScriptEntity, UUID> {
+public interface ScriptRepository extends JpaRepository<ScriptEntity, String> {
 
     // TODO Add User ?
     List<ScriptEntity> findAll();

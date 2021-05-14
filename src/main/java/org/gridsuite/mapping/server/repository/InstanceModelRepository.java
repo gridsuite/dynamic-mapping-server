@@ -7,10 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface InstanceModelRepository extends JpaRepository<InstanceModelEntity, UUID> {
+public interface InstanceModelRepository extends JpaRepository<InstanceModelEntity, String> {
 
     List<InstanceModelEntity> findAll();
 
@@ -19,5 +18,5 @@ public interface InstanceModelRepository extends JpaRepository<InstanceModelEnti
     Optional<List<InstanceModelEntity>> findByModelName(String name);
 
     @Transactional
-    Void deleteById(String id);
+    void deleteById(String id);
 }

@@ -40,6 +40,7 @@ public class MappingServiceImpl implements MappingService {
     @Override
     public InputMapping createMapping(String mappingName, InputMapping mapping) {
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
+        mappingToSave.markNotNew();
         mappingRepository.save(mappingToSave);
         return mapping;
     }

@@ -1,5 +1,5 @@
 server:
-  port: 5009
+  port: 5036
 
 
 spring:
@@ -38,6 +38,6 @@ logging:
   level:
     ROOT: INFO
 
-dbName: mappings
+dbName: dynamicmappings
 dbApi: jdbc
 

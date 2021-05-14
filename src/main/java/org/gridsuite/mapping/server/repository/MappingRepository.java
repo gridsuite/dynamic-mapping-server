@@ -8,10 +8,9 @@ import org.gridsuite.mapping.server.model.MappingEntity;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface MappingRepository extends JpaRepository<MappingEntity, UUID> {
+public interface MappingRepository extends JpaRepository<MappingEntity, String> {
 
     // TODO Add User ?
     List<MappingEntity> findAll();

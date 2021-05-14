@@ -11,10 +11,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MappingEntity {
+public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<String> {
     @Id
     private String name;
 
     @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mappingName", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RuleEntity> rules;
+
+    @Override
+    public String getId() {
+        return name;
+    }
 }

@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstanceModelEntity {
+public class InstanceModelEntity extends AbstractManuallyAssignedIdentifierEntity<String> {
 
     // Could be replaced with UUID but we lose the ease of use of names
     @Id

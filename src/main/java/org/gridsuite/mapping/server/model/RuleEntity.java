@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RuleEntity {
+public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
 
     @Id
     @Column(name = "rule_id")
@@ -35,4 +35,9 @@ public class RuleEntity {
 
     @OneToMany(targetEntity = FilterEntity.class, mappedBy = "ruleId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FilterEntity> filters;
+
+    @Override
+    public UUID getId() {
+        return ruleId;
+    }
 }
