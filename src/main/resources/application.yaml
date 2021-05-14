@@ -30,7 +30,7 @@ spring:
         persistence:
           schema-generation:
             scripts:
-              action: create
+              # action: create
               create-target: src/main/resources/mappings.sql
               create-source: metadata
 
