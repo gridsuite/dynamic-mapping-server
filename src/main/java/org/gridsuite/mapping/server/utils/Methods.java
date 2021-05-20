@@ -17,12 +17,12 @@ public final class Methods {
     }
 
     public static String convertListToString(List<String> array) {
-        return  array.stream().reduce("", (acc, element) -> {
-           if (acc == "") {
-               return element;
-           } else {
-               return acc + " , " + element;
-           }
+        return array.stream().reduce("", (acc, element) -> {
+            if (acc.equals("")) {
+                return element;
+            } else {
+                return acc + " , " + element;
+            }
         });
     }
 
