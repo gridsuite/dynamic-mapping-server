@@ -40,4 +40,14 @@ public class FilterEntity implements Serializable {
     @Column(name = "value")
     private String value;
 
+    public FilterEntity(UUID newID, FilterEntity filterEntity) {
+        this.filterId = filterEntity.getFilterId();
+        this.ruleId = newID;
+        this.property = filterEntity.getProperty();
+        this.type = filterEntity.getType();
+        this.operand = filterEntity.getOperand();
+        this.value = filterEntity.getValue();
+
+    }
+
 }

@@ -3,6 +3,7 @@ package org.gridsuite.mapping.server.model;
 import lombok.*;
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -21,5 +22,10 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<Stri
     @Override
     public String getId() {
         return name;
+    }
+
+    public MappingEntity(String name, MappingEntity mappingToCopy) {
+        this.name = name;
+        this.rules = mappingToCopy.getRules().stream().map(ruleEntity -> new RuleEntity(name, ruleEntity)).collect(Collectors.toList());
     }
 }
