@@ -6,7 +6,8 @@ public class MappingException extends RuntimeException {
 
     public enum Type {
         MODEL_NOT_FOUND,
-        MAPPING_NOT_FOUND
+        MAPPING_NOT_FOUND,
+        SCRIPT_NOT_FOUND
     }
 
     private final Type type;

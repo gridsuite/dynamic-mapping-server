@@ -1,5 +1,6 @@
 package org.gridsuite.mapping.server.service;
 
+import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.Script;
 
 import java.util.List;
@@ -12,5 +13,9 @@ public interface ScriptService {
 
     Script saveScript(String scriptName, Script script);
 
-    Void deleteScript(String scriptName);
+    String deleteScript(String scriptName);
+
+    RenameObject renameScript(String oldName, String newName);
+
+    Script copyScript(String originalName, String copyName);
 }

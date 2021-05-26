@@ -27,7 +27,7 @@ public class MappingController {
     }
 
     @PostMapping(value = "/{mappingName}")
-    @ApiOperation(value = "Create a mapping")
+    @ApiOperation(value = "Save a mapping")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "The id of the mapping"),
             @ApiResponse(code = 409, message = "The mapping already exist"),
             @ApiResponse(code = 500, message = "The storage is down or a mapping with the same name already exists")})

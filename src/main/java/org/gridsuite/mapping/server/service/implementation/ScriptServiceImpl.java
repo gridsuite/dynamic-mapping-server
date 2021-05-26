@@ -79,8 +79,34 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     @Override
-    public Void deleteScript(String scriptName) {
-        return null;
+    public String deleteScript(String scriptName) {
+        scriptRepository.deleteByName(scriptName);
+        return scriptName;
+    }
+
+    @Override
+    public RenameObject renameScript(String oldName, String newName) {
+        Optional<ScriptEntity> scriptToRename = scriptRepository.findByName(oldName);
+        if (scriptToRename.isPresent()) {
+            ScriptEntity scriptToSave = new ScriptEntity(newName, scriptToRename.get());
+            scriptRepository.deleteByName(oldName);
+            scriptRepository.save(scriptToSave);
+            return new RenameObject(oldName, newName);
+        } else {
+            throw new MappingException(MappingException.Type.SCRIPT_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public Script copyScript(String originalName, String copyName) {
+        Optional<ScriptEntity> scriptToCopy = scriptRepository.findByName(originalName);
+        if (scriptToCopy.isPresent()) {
+            ScriptEntity copiedScript = new ScriptEntity(copyName, scriptToCopy.get());
+            scriptRepository.save(copiedScript);
+            return new Script(copiedScript);
+        } else {
+            throw new MappingException(SCRIPT_NOT_FOUND);
+        }
     }
 
     @Getter

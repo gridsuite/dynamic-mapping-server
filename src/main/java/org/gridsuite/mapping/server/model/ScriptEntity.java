@@ -28,4 +28,11 @@ public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<Strin
     public String getId() {
         return name;
     }
+
+    public ScriptEntity(String name, ScriptEntity scriptToCopy) {
+        this.name = name;
+        parentName = scriptToCopy.getParentName();
+        script = scriptToCopy.getScript();
+    }
+
 }
