@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package org.gridsuite.mapping.server;
+
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.junit.Before;
@@ -51,32 +52,37 @@ public class MappingControllerTest {
         cleanDB();
     }
 
+    String mapping(String name) {
+        return "{\n" +
+                "  \"name\": \"" + name + "\",\n" +
+                "  \"rules\": [\n" +
+                "    {\n" +
+                "      \"composition\": \"filter1\",\n" +
+                "      \"equipmentType\": \"GENERATOR\",\n" +
+                "      \"filters\": [\n" +
+                "        {\n" +
+                "          \"filterId\": \"filter1\",\n" +
+                "          \"operand\": \"EQUALS\",\n" +
+                "          \"property\": \"id\",\n" +
+                "          \"value\": \"test\",\n" +
+                "          \"type\": \"STRING\"\n" +
+                "        }\n" +
+                "      ],\n" +
+                "      \"mappedModel\": \"mappedExample\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+    }
+
     @Test
     public void test() throws Exception {
-        String script =
-                "{\n" +
-                        "  \"name\": \"test\",\n" +
-                        "  \"rules\": [\n" +
-                        "    {\n" +
-                        "      \"composition\": \"filter1\",\n" +
-                        "      \"equipmentType\": \"GENERATOR\",\n" +
-                        "      \"filters\": [\n" +
-                        "        {\n" +
-                        "          \"filterId\": \"filter1\",\n" +
-                        "          \"operand\": \"EQUALS\",\n" +
-                        "          \"property\": \"id\",\n" +
-                        "          \"value\": \"test\",\n" +
-                        "          \"type\": \"STRING\"\n" +
-                        "        }\n" +
-                        "      ],\n" +
-                        "      \"mappedModel\": \"mappedExample\"\n" +
-                        "    }\n" +
-                        "  ]\n" +
-                        "}";
+
+        String name = "test";
 
         // Put data
-        mvc.perform(post("/mappings/test")
-                .content(script)
+        mvc.perform(post("/mappings/" + name)
+                .content(mapping(name))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -85,10 +91,10 @@ public class MappingControllerTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[" + script + "]", true));
+                .andExpect(content().json("[" + mapping(name) + "]", true));
 
         // delete data
-        mvc.perform(delete("/mappings/test"))
+        mvc.perform(delete("/mappings/" + name))
                 .andExpect(status().isOk());
 
         // get to verify deletion
@@ -97,5 +103,98 @@ public class MappingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[]", true));
+    }
+
+    @Test
+    public void testRename() throws Exception {
+
+        String originalName = "origin";
+
+        String newName = "new";
+
+        // Put data
+        mvc.perform(post("/mappings/" + originalName)
+                .content(mapping(originalName))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Rename data
+        mvc.perform(post("/mappings/rename/" + originalName + "/to/" + newName
+        )
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // get all data
+        mvc.perform(get("/mappings/")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("[" + mapping(newName) + "]", true));
+
+        // Add a new mapping
+        mvc.perform(post("/mappings/" + originalName)
+                .content(mapping(originalName))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Fail to rename to existing mapping
+        mvc.perform(post("/mappings/copy/" + originalName + "/to/" + newName
+        )
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isConflict());
+
+        // Fail to copy from missing mapping
+        mvc.perform(post("/mappings/copy/NotUsed/to/AnyMapping"
+        )
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void testCopy() throws Exception {
+
+        String originalName = "origin";
+
+        String copyName = "copy";
+
+        // Put data
+        mvc.perform(post("/mappings/" + originalName)
+                .content(mapping(originalName))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Rename data
+        mvc.perform(post("/mappings/copy/" + originalName + "/to/" + copyName
+        )
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // get all data
+        mvc.perform(get("/mappings/")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                // Content served in alphabetical order since name  is the id
+                .andExpect(content().json("[" + mapping(copyName) + ", " + mapping(originalName) + "]", true));
+
+        // Add a new mapping
+        mvc.perform(post("/mappings/" + originalName)
+                .content(mapping(originalName))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Fail to copy to existing mapping
+        mvc.perform(post("/mappings/copy/" + originalName + "/to/" + copyName
+        )
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isConflict());
+
+        // Fail to copy from missing mapping
+        mvc.perform(post("/mappings/copy/NotUsed/to/AnyMapping"
+        )
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
     }
 }

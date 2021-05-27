@@ -1,6 +1,5 @@
 package org.gridsuite.mapping.server.service.implementation;
 
-import org.gridsuite.mapping.server.MappingException;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.model.MappingEntity;
@@ -9,7 +8,10 @@ import org.gridsuite.mapping.server.service.MappingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,11 +56,15 @@ public class MappingServiceImpl implements MappingService {
         Optional<MappingEntity> mappingToRename = mappingRepository.findByName(oldName);
         if (mappingToRename.isPresent()) {
             MappingEntity mappingToSave = new MappingEntity(newName, mappingToRename.get());
-            mappingRepository.deleteByName(oldName);
-            mappingRepository.save(mappingToSave);
-            return new RenameObject(oldName, newName);
+            try {
+                mappingRepository.deleteByName(oldName);
+                mappingRepository.save(mappingToSave);
+                return new RenameObject(oldName, newName);
+            } catch (DataIntegrityViolationException ex) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Mapping with this name already exists", ex);
+            }
         } else {
-            throw new MappingException(MappingException.Type.MAPPING_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
         }
     }
 
@@ -67,10 +73,14 @@ public class MappingServiceImpl implements MappingService {
         Optional<MappingEntity> mappingToCopy = mappingRepository.findByName(originalName);
         if (mappingToCopy.isPresent()) {
             MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy.get());
-            mappingRepository.save(copiedMapping);
-            return new InputMapping(copiedMapping);
+            try {
+                mappingRepository.save(copiedMapping);
+                return new InputMapping(copiedMapping);
+            } catch (DataIntegrityViolationException ex) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Mapping with this name already exists", ex);
+            }
         } else {
-            throw new MappingException(MappingException.Type.MAPPING_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
         }
     }
 
