@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.gridsuite.mapping.server.MappingException.Type.*;
-
-import org.gridsuite.mapping.server.MappingException;
 
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
@@ -23,7 +20,10 @@ import org.gridsuite.mapping.server.utils.Templater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,7 +63,7 @@ public class ScriptServiceImpl implements ScriptService {
             scriptRepository.save(scriptToSave);
             return new Script(scriptToSave);
         } else {
-            throw new MappingException(MAPPING_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
         }
     }
 
@@ -89,11 +89,15 @@ public class ScriptServiceImpl implements ScriptService {
         Optional<ScriptEntity> scriptToRename = scriptRepository.findByName(oldName);
         if (scriptToRename.isPresent()) {
             ScriptEntity scriptToSave = new ScriptEntity(newName, scriptToRename.get());
-            scriptRepository.deleteByName(oldName);
-            scriptRepository.save(scriptToSave);
-            return new RenameObject(oldName, newName);
+            try {
+                scriptRepository.deleteByName(oldName);
+                scriptRepository.save(scriptToSave);
+                return new RenameObject(oldName, newName);
+            } catch (DataIntegrityViolationException ex) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Script with this name already exists", ex);
+            }
         } else {
-            throw new MappingException(MappingException.Type.SCRIPT_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No script found with this name");
         }
     }
 
@@ -102,10 +106,14 @@ public class ScriptServiceImpl implements ScriptService {
         Optional<ScriptEntity> scriptToCopy = scriptRepository.findByName(originalName);
         if (scriptToCopy.isPresent()) {
             ScriptEntity copiedScript = new ScriptEntity(copyName, scriptToCopy.get());
-            scriptRepository.save(copiedScript);
-            return new Script(copiedScript);
+            try {
+                scriptRepository.save(copiedScript);
+                return new Script(copiedScript);
+            } catch (DataIntegrityViolationException ex) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Script with this name already exists", ex);
+            }
         } else {
-            throw new MappingException(SCRIPT_NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No script found with this name");
         }
     }
 
@@ -165,7 +173,7 @@ public class ScriptServiceImpl implements ScriptService {
                 mappedModel = foundModel.get();
                 composition = Templater.flattenFilters(rule.getComposition(), rule.getFilters());
             } else {
-                throw new MappingException(MODEL_NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
             }
 
         }

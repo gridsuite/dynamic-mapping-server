@@ -35,7 +35,7 @@
     create table scripts (
        name varchar(255) not null,
         parent varchar(255),
-        script varchar(255) not null,
+        script TEXT not null,
         primary key (name)
     );
 

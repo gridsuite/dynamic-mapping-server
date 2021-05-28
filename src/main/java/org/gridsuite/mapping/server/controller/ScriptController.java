@@ -52,7 +52,7 @@ public class ScriptController {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Script save"),
             @ApiResponse(code = 404, message = "Script not found")})
-    public ResponseEntity<Void> updateScript(@PathVariable("scriptName") String scriptName, @RequestBody Script script) {
+    public ResponseEntity<Void> saveScript(@PathVariable("scriptName") String scriptName, @RequestBody Script script) {
         scriptService.saveScript(scriptName, script);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(null);
     }

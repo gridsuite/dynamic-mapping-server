@@ -7,7 +7,6 @@
 package org.gridsuite.mapping.server;
 
 import org.gridsuite.mapping.server.repository.MappingRepository;
-import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,8 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * @author Geoffroy Jamgotchian <geoffroy.jamgotchian at rte-france.com>
- * @author Franck Lecuyer <franck.lecuyer at rte-france.com>
+ * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,14 +35,10 @@ public class MappingControllerTest {
     private MappingRepository mappingRepository;
 
     @Autowired
-    private ScriptRepository scriptRepository;
-
-    @Autowired
     private MockMvc mvc;
 
     private void cleanDB() {
         mappingRepository.deleteAll();
-        scriptRepository.deleteAll();
     }
 
     @Before
@@ -57,7 +51,7 @@ public class MappingControllerTest {
                 "  \"name\": \"" + name + "\",\n" +
                 "  \"rules\": [\n" +
                 "    {\n" +
-                "      \"composition\": \"filter1\",\n" +
+                "      \"composition\": \"filter1 && filter2 && filter3 && filter4\",\n" +
                 "      \"equipmentType\": \"GENERATOR\",\n" +
                 "      \"filters\": [\n" +
                 "        {\n" +
@@ -66,6 +60,27 @@ public class MappingControllerTest {
                 "          \"property\": \"id\",\n" +
                 "          \"value\": \"test\",\n" +
                 "          \"type\": \"STRING\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"filterId\": \"filter2\",\n" +
+                "          \"operand\": \"HIGHER\",\n" +
+                "          \"property\": \"minP\",\n" +
+                "          \"value\": 3.0,\n" +
+                "          \"type\": \"NUMBER\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"filterId\": \"filter3\",\n" +
+                "          \"operand\": \"IN\",\n" +
+                "          \"property\": \"energySource\",\n" +
+                "          \"value\": [\"OTHERS\"],\n" +
+                "          \"type\": \"ENUM\"\n" +
+                "        },\n" +
+                "        {\n" +
+                "          \"filterId\": \"filter4\",\n" +
+                "          \"operand\": \"NOT_EQUALS\",\n" +
+                "          \"property\": \"voltageRegulatorOn\",\n" +
+                "          \"value\": true,\n" +
+                "          \"type\": \"BOOLEAN\"\n" +
                 "        }\n" +
                 "      ],\n" +
                 "      \"mappedModel\": \"mappedExample\"\n" +
@@ -138,13 +153,13 @@ public class MappingControllerTest {
                 .andExpect(status().isOk());
 
         // Fail to rename to existing mapping
-        mvc.perform(post("/mappings/copy/" + originalName + "/to/" + newName
+        mvc.perform(post("/mappings/rename/" + originalName + "/to/" + newName
         )
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isConflict());
 
-        // Fail to copy from missing mapping
-        mvc.perform(post("/mappings/copy/NotUsed/to/AnyMapping"
+        // Fail to rename from missing mapping
+        mvc.perform(post("/mappings/rename/NotUsed/to/AnyMapping"
         )
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());

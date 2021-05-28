@@ -21,7 +21,7 @@ public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<Strin
     @Column(name = "parent", nullable = true)
     private String parentName;
 
-    @Column(name = "script", nullable = false)
+    @Column(name = "script", nullable = false, columnDefinition = "TEXT")
     private String script;
 
     @Override
