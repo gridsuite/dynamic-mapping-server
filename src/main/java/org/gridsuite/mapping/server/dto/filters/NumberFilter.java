@@ -7,6 +7,7 @@ import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.utils.PropertyType;
 import org.gridsuite.mapping.server.utils.Methods;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @Data
@@ -50,6 +51,6 @@ public class NumberFilter extends AbstractFilter {
                 stringOperand = ">";
                 break;
         }
-        return String.format("equipment.%s %s %f", this.getProperty(), stringOperand, value);
+        return String.format(Locale.US, "equipment.%s %s %f", this.getProperty(), stringOperand, value);
     }
 }
