@@ -23,6 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -260,4 +261,34 @@ public class ScriptControllerTest {
 
     }
 
+    @Test
+    public void testSaveAndDelete() throws Exception {
+        String name = "simple";
+        String simpleScript = "{\"name\":\"" + name + "\",\"parentName\":\"\",\"script\":\"Script\"}";
+
+        // Put data
+        mvc.perform(post("/scripts/" + name)
+                .content(simpleScript)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Get Data
+        mvc.perform(get("/scripts/")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("[" + simpleScript + "]", true));
+
+        // Delete Data
+        mvc.perform(delete("/scripts/" + name))
+                .andExpect(status().isOk());
+
+        // Get Data
+        mvc.perform(get("/scripts/")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("[]", true));
+
+    }
 }

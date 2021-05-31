@@ -23,7 +23,7 @@ public class InstanceModel {
 
     private ModelParams params;
 
-    InstanceModel(InstanceModelEntity instanceModelEntity) {
+    public InstanceModel(InstanceModelEntity instanceModelEntity) {
         id = instanceModelEntity.getId();
         modelName = instanceModelEntity.getModelName();
         equipmentType = instanceModelEntity.getEquipmentType();

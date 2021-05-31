@@ -32,8 +32,6 @@ java.io.IOException: Connexion ré-initialisée par le correspondant
 	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
 	at java.base/java.lang.Thread.run(Thread.java:834)
     -->
-    <logger name="io.netty.channel.AbstractChannelHandlerContext" level="error"/>
-
 
     <!--
         suppress unreadable huge logs..
