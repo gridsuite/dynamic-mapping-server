@@ -12,6 +12,4 @@ package org.gridsuite.mapping.server.dto;
 public interface Mapping {
 
     String getName();
-
-//    Rule[] getRules();
 }

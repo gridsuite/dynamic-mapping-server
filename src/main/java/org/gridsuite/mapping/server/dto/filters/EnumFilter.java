@@ -67,7 +67,7 @@ public class EnumFilter extends AbstractFilter {
                 break;
         }
 
-        List<String> escapedValues = value.stream().map(value -> String.format("\"%s\"", value)).collect(Collectors.toList());
+        List<String> escapedValues = value.stream().map(value -> String.format("\"%s\"", value.replaceAll("\"", "\\\""))).collect(Collectors.toList());
         if (checkFirstValueOnly) {
             return String.format(template, notPrefix, this.getProperty(), stringOperand, escapedValues.get(0));
         } else {

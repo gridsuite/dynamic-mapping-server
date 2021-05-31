@@ -20,14 +20,16 @@ public final class Methods {
         // not called
     }
 
+    private static final String  ESCAPED_COMMA = "##COMMA##";
+
     public static ArrayList<String> convertStringToList(String stringArray) {
         ArrayList<String> converted = new ArrayList();
-        converted.addAll(Arrays.asList(stringArray.split(",")).stream().map(String::trim).collect(Collectors.toList()));
+        converted.addAll(Arrays.asList(stringArray.split(",")).stream().map(value -> value.trim().replaceAll(ESCAPED_COMMA, ",")).collect(Collectors.toList()));
         return converted;
     }
 
     public static String convertListToString(List<String> array) {
-        return array.stream().collect(Collectors.joining(", "));
+        return array.stream().map(value -> value.replaceAll(",", ESCAPED_COMMA)).collect(Collectors.joining(", "));
     }
 
     public static boolean convertStringToBoolean(String stringBool) {
