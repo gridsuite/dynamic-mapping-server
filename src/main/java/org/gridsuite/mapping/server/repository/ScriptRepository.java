@@ -20,9 +20,6 @@ import java.util.Optional;
 @Repository
 public interface ScriptRepository extends JpaRepository<ScriptEntity, String> {
 
-    // TODO Add User ?
-    List<ScriptEntity> findAll();
-
     Optional<ScriptEntity> findByName(String name);
 
     Optional<List<ScriptEntity>> findByParentName(String mappingName);

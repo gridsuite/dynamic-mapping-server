@@ -20,10 +20,6 @@ import java.util.Optional;
 @Repository
 public interface InstanceModelRepository extends JpaRepository<InstanceModelEntity, String> {
 
-    List<InstanceModelEntity> findAll();
-
-    Optional<InstanceModelEntity> findById(String id);
-
     Optional<List<InstanceModelEntity>> findByModelName(String name);
 
     @Transactional

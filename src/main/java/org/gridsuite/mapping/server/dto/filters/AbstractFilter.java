@@ -12,6 +12,8 @@ import lombok.Data;
 import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.utils.Operands;
 import org.gridsuite.mapping.server.utils.Methods;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -31,7 +33,6 @@ public abstract class AbstractFilter {
     private Operands operand;
 
     public static AbstractFilter createFilterFromEntity(FilterEntity filterEntity) {
-        AbstractFilter filter = new StringFilter();
         switch (filterEntity.getType()) {
             case BOOLEAN:
                 BooleanFilter booleanFilter = new BooleanFilter();
@@ -39,16 +40,14 @@ public abstract class AbstractFilter {
                 booleanFilter.setProperty(filterEntity.getProperty());
                 booleanFilter.setOperand(filterEntity.getOperand());
                 booleanFilter.setValue(Methods.convertStringToBoolean(filterEntity.getValue()));
-                filter = booleanFilter;
-                break;
+                return booleanFilter;
             case ENUM:
                 EnumFilter enumFilter = new EnumFilter();
                 enumFilter.setFilterId(filterEntity.getFilterId());
                 enumFilter.setProperty(filterEntity.getProperty());
                 enumFilter.setOperand(filterEntity.getOperand());
                 enumFilter.setValue(Methods.convertStringToList(filterEntity.getValue()));
-                filter = enumFilter;
-                break;
+                return enumFilter;
 
             case NUMBER:
                 NumberFilter numberFilter = new NumberFilter();
@@ -56,18 +55,17 @@ public abstract class AbstractFilter {
                 numberFilter.setProperty(filterEntity.getProperty());
                 numberFilter.setOperand(filterEntity.getOperand());
                 numberFilter.setValue(Methods.convertStringToNumber(filterEntity.getValue()));
-                filter = numberFilter;
-                break;
+                return numberFilter;
             case STRING:
                 StringFilter stringFilter = new StringFilter();
                 stringFilter.setFilterId(filterEntity.getFilterId());
                 stringFilter.setProperty(filterEntity.getProperty());
                 stringFilter.setOperand(filterEntity.getOperand());
                 stringFilter.setValue(filterEntity.getValue());
-                filter = stringFilter;
-                break;
+                return stringFilter;
+            default :
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown filter type");
         }
-        return filter;
     }
 
     public abstract FilterEntity convertFilterToEntity(UUID ruleId);

@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -21,18 +22,12 @@ public final class Methods {
 
     public static ArrayList<String> convertStringToList(String stringArray) {
         ArrayList<String> converted = new ArrayList();
-        converted.addAll(Arrays.asList(stringArray.split("\\s*,\\s*")));
+        converted.addAll(Arrays.asList(stringArray.split(",")).stream().map(String::trim).collect(Collectors.toList()));
         return converted;
     }
 
     public static String convertListToString(List<String> array) {
-        return array.stream().reduce("", (acc, element) -> {
-            if (acc.equals("")) {
-                return element;
-            } else {
-                return acc + " , " + element;
-            }
-        });
+        return array.stream().collect(Collectors.joining(", "));
     }
 
     public static boolean convertStringToBoolean(String stringBool) {
