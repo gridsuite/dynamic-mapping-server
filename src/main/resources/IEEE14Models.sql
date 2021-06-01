@@ -4,19 +4,19 @@ INSERT INTO instance_models (id, modelname, equipmenttype, params_id, params_typ
     VALUES (
         'GeneratorSynchronousThreeWindingsProportionalRegulations',
         'GeneratorThreeWindings',
-        'GENERATOR',
+        0,
         'GSTWPR',
-        'PREFIX'
+        1
     ), (
         'GeneratorSynchronousFourWindingsProportionalRegulations',
         'GeneratorFourWindings',
-        'GENERATOR',
+        0,
         'GSFWPR',
-        'PREFIX'
+        1
     ),(
         'LoadLab',
         'LoadAlphaBeta',
-        'LOAD',
+        1,
         'LAB',
-        'FIXED'
+        0
 );
