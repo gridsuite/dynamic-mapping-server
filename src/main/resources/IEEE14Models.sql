@@ -14,8 +14,8 @@ INSERT INTO instance_models (id, modelname, equipmenttype, params_id, params_typ
         'GSFWPR',
         'PREFIX'
     ),(
-        'LoadAlphaBeta',
         'LoadLab',
+        'LoadAlphaBeta',
         'LOAD',
         'LAB',
         'FIXED'
