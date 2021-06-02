@@ -23,7 +23,7 @@ import org.gridsuite.mapping.server.utils.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "filters")
+@Table(name = "filters", indexes = {@Index(name = "filter_rule_id_index", columnList = "rule_id")})
 @IdClass(FilterId.class)
 public class FilterEntity implements Serializable {
     @Id

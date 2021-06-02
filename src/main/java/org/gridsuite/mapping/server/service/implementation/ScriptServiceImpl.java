@@ -23,9 +23,6 @@ import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.service.ScriptService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.Templater;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,11 +36,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ScriptServiceImpl implements ScriptService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MappingServiceImpl.class);
-
-    @Autowired
-    ScriptServiceImpl self;
 
     private final InstanceModelRepository instanceModelRepository;
     private final MappingRepository mappingRepository;

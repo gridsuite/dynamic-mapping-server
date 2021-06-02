@@ -10,13 +10,9 @@ import org.gridsuite.mapping.server.model.ScriptEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Repository
 public interface ScriptRepository extends JpaRepository<ScriptEntity, String> {
-    Optional<List<ScriptEntity>> findByParentName(String mappingName);
 }

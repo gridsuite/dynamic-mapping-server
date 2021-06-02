@@ -11,8 +11,6 @@ import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.service.MappingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -28,8 +26,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MappingServiceImpl implements MappingService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MappingServiceImpl.class);
 
     private final MappingRepository mappingRepository;
 

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @Entity
 @Builder
-@Table(name = "rules")
+@Table(name = "rules", indexes = {@Index(name = "rule_mappingName_index", columnList = "mappingName")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -38,6 +38,8 @@
         script TEXT not null,
         primary key (name)
     );
+create index filter_rule_id_index on filters (rule_id);
+create index rule_mappingName_index on rules (mappingName);
 
     alter table if exists filters 
        add constraint FKRule
