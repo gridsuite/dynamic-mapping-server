@@ -9,7 +9,6 @@ package org.gridsuite.mapping.server.repository;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +20,4 @@ import java.util.Optional;
 public interface InstanceModelRepository extends JpaRepository<InstanceModelEntity, String> {
 
     Optional<List<InstanceModelEntity>> findByModelName(String name);
-
-    @Transactional
-    void deleteById(String id);
 }

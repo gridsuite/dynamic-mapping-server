@@ -56,17 +56,18 @@ public class MappingServiceImpl implements MappingService {
     }
 
     @Override
-    public int deleteMapping(String mappingName) {
-        return mappingRepository.deleteByName(mappingName);
+    public String deleteMapping(String mappingName) {
+        mappingRepository.deleteById(mappingName);
+        return mappingName;
     }
 
     @Override
     public RenameObject renameMapping(String oldName, String newName) {
-        Optional<MappingEntity> mappingToRename = mappingRepository.findByName(oldName);
+        Optional<MappingEntity> mappingToRename = mappingRepository.findById(oldName);
         if (mappingToRename.isPresent()) {
             MappingEntity mappingToSave = new MappingEntity(newName, mappingToRename.get());
             try {
-                mappingRepository.deleteByName(oldName);
+                mappingRepository.deleteById(oldName);
                 mappingRepository.save(mappingToSave);
                 return new RenameObject(oldName, newName);
             } catch (DataIntegrityViolationException ex) {
@@ -79,7 +80,7 @@ public class MappingServiceImpl implements MappingService {
 
     @Override
     public InputMapping copyMapping(String originalName, String copyName) {
-        Optional<MappingEntity> mappingToCopy = mappingRepository.findByName(originalName);
+        Optional<MappingEntity> mappingToCopy = mappingRepository.findById(originalName);
         if (mappingToCopy.isPresent()) {
             MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy.get());
             try {

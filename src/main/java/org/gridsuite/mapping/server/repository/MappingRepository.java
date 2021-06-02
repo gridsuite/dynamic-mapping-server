@@ -9,21 +9,11 @@ package org.gridsuite.mapping.server.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import org.gridsuite.mapping.server.model.MappingEntity;
-
-import java.util.Optional;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Repository
 public interface MappingRepository extends JpaRepository<MappingEntity, String> {
-
-    Optional<MappingEntity> findByName(String name);
-
-    @Transactional
-    int deleteByName(String name);
-
-    MappingEntity save(MappingEntity mappingEntity);
 }

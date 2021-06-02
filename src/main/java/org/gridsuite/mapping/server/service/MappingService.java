@@ -20,7 +20,7 @@ public interface MappingService {
 
     InputMapping createMapping(String mappingName, InputMapping mapping);
 
-    int deleteMapping(String mappingName);
+    String deleteMapping(String mappingName);
 
     RenameObject renameMapping(String oldName, String newName);
 

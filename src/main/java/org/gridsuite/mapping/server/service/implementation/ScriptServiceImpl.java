@@ -61,7 +61,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public Script createFromMapping(String mappingName) {
-        Optional<MappingEntity> foundMapping = mappingRepository.findByName(mappingName);
+        Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get()));
             String createdScript = Templater.mappingToScript(sortedMapping);
@@ -89,17 +89,17 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public String deleteScript(String scriptName) {
-        scriptRepository.deleteByName(scriptName);
+        scriptRepository.deleteById(scriptName);
         return scriptName;
     }
 
     @Override
     public RenameObject renameScript(String oldName, String newName) {
-        Optional<ScriptEntity> scriptToRename = scriptRepository.findByName(oldName);
+        Optional<ScriptEntity> scriptToRename = scriptRepository.findById(oldName);
         if (scriptToRename.isPresent()) {
             ScriptEntity scriptToSave = new ScriptEntity(newName, scriptToRename.get());
             try {
-                scriptRepository.deleteByName(oldName);
+                scriptRepository.deleteById(oldName);
                 scriptRepository.save(scriptToSave);
                 return new RenameObject(oldName, newName);
             } catch (DataIntegrityViolationException ex) {
@@ -112,7 +112,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public Script copyScript(String originalName, String copyName) {
-        Optional<ScriptEntity> scriptToCopy = scriptRepository.findByName(originalName);
+        Optional<ScriptEntity> scriptToCopy = scriptRepository.findById(originalName);
         if (scriptToCopy.isPresent()) {
             ScriptEntity copiedScript = new ScriptEntity(copyName, scriptToCopy.get());
             try {
