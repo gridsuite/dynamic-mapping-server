@@ -1,0 +1,43 @@
+server:
+  port: 5036
+
+
+spring:
+  datasource:
+    url: ${dbApi}:${dbVendor}://${hostPort}/${dbName}${query}
+    username: ${login}
+    password: ${password}
+
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        event:
+          merge:
+            entity_copy_observer: allow
+        format_sql: true
+        # Used when action: create is uncommented
+        hbm2ddl:
+          delimiter: ;
+      # Uncomment action to automatically generate the database sql schema file
+      javax:
+        persistence:
+          schema-generation:
+            scripts:
+              # action: create
+              create-target: src/main/resources/mappings.sql
+              create-source: metadata
+
+logging:
+  level:
+    ROOT: INFO
+
+dbName: dynamicmappings
+dbApi: jdbc
+
