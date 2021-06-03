@@ -43,7 +43,7 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
     @OneToMany(targetEntity = FilterEntity.class, mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FilterEntity> filters;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mappingName", foreignKey = @ForeignKey(name = "mapping_rules_fk"), referencedColumnName = "name")
     private MappingEntity mapping;
 

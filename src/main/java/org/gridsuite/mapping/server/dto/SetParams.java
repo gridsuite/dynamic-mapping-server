@@ -6,14 +6,13 @@
  */
 package org.gridsuite.mapping.server.dto;
 
-/**
- * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
- */
-
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ModelParamsEmbeddable;
 import org.gridsuite.mapping.server.utils.ParamsType;
 
+/**
+ * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
+ */
 @Data
 public class SetParams implements ModelParams {
     private String name;

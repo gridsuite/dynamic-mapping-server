@@ -49,7 +49,7 @@ public class FilterEntity implements Serializable {
     @Column(name = "value")
     private String value;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rule_id", foreignKey = @ForeignKey(name = "rules_filter_fk"))
     @MapsId("ruleId")
     private RuleEntity rule;
