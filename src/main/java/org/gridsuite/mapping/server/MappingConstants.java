@@ -17,4 +17,5 @@ public final class MappingConstants {
 
     public static String EQUIPMENT_ID = "equipment.id";
     public static String IMPORT = "import com.powsybl.iidm.network.";
+    public static String DEFAULT_MAPPING_NAME = "default";
 }
