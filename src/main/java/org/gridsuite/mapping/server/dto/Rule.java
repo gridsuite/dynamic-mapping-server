@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.*;
 import org.gridsuite.mapping.server.dto.filters.*;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @ApiModel("Rule")
 public class Rule {
     @ApiModelProperty("Equipment type")
@@ -42,9 +45,16 @@ public class Rule {
         return filters;
     }
 
-    public RuleEntity convertRuleToEntity(String mappingName) {
+    public RuleEntity convertRuleToEntity(MappingEntity parentMapping) {
         UUID createdId = UUID.randomUUID();
-        return RuleEntity.builder().composition(composition).mappedModel(mappedModel).equipmentType(equipmentType).mappingName(mappingName).ruleId(createdId).filters(filters.stream().map(filter -> filter.convertFilterToEntity(createdId)).collect(Collectors.toList())).build();
+        RuleEntity convertedRule = new RuleEntity();
+        convertedRule.setComposition(composition);
+        convertedRule.setRuleId(createdId);
+        convertedRule.setMappedModel(mappedModel);
+        convertedRule.setEquipmentType(equipmentType);
+        convertedRule.setMapping(parentMapping);
+        convertedRule.setFilters(filters.stream().map(filter -> filter.convertFilterToEntity(convertedRule)).collect(Collectors.toList()));
+        return convertedRule;
     }
 
     public Rule(RuleEntity ruleEntity) {

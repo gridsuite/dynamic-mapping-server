@@ -10,12 +10,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.FilterEntity;
+import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.Operands;
 import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -68,7 +67,7 @@ public abstract class AbstractFilter {
         }
     }
 
-    public abstract FilterEntity convertFilterToEntity(UUID ruleId);
+    public abstract FilterEntity convertFilterToEntity(RuleEntity rule);
 
     public abstract String convertFilterToString();
 }

@@ -31,7 +31,7 @@ public class InputMapping implements Mapping {
     public MappingEntity convertMappingToEntity() {
         MappingEntity convertedMapping = new MappingEntity();
         convertedMapping.setName(name);
-        convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(name)).collect(Collectors.toList()));
+        convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
         return convertedMapping;
     }
 

@@ -28,7 +28,7 @@
         composition varchar(255) not null,
         type int4 not null,
         model varchar(255) not null,
-        mappingName varchar(255) not null,
+        mappingName varchar(255),
         primary key (rule_id)
     );
 
@@ -42,11 +42,11 @@ create index filter_rule_id_index on filters (rule_id);
 create index rule_mappingName_index on rules (mappingName);
 
     alter table if exists filters 
-       add constraint FKRule
+       add constraint rules_filter_fk 
        foreign key (rule_id) 
        references rules;
 
     alter table if exists rules 
-       add constraint FKMapping
+       add constraint mapping_rules_fk 
        foreign key (mappingName) 
        references mappings;

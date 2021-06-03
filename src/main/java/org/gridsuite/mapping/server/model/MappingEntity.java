@@ -25,7 +25,7 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<Stri
     @Id
     private String name;
 
-    @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mappingName", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mapping", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RuleEntity> rules;
 
     @Override
@@ -35,6 +35,6 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<Stri
 
     public MappingEntity(String name, MappingEntity mappingToCopy) {
         this.name = name;
-        this.rules = mappingToCopy.getRules().stream().map(ruleEntity -> new RuleEntity(name, ruleEntity)).collect(Collectors.toList());
+        this.rules = mappingToCopy.getRules().stream().map(ruleEntity -> new RuleEntity(this, ruleEntity)).collect(Collectors.toList());
     }
 }

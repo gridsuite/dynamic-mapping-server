@@ -10,9 +10,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEntity;
+import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.PropertyType;
-
-import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -25,10 +24,11 @@ public class StringFilter extends AbstractFilter {
     private String value;
 
     @Override
-    public FilterEntity convertFilterToEntity(UUID ruleId) {
+    public FilterEntity convertFilterToEntity(RuleEntity rule) {
         FilterEntity convertedFilter = new FilterEntity();
         convertedFilter.setFilterId(this.getFilterId());
-        convertedFilter.setRuleId(ruleId);
+        convertedFilter.setRuleId(rule.getRuleId());
+        convertedFilter.setRule(rule);
         convertedFilter.setType(PropertyType.STRING);
         convertedFilter.setProperty(this.getProperty());
         convertedFilter.setOperand(this.getOperand());

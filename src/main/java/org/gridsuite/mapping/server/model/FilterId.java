@@ -7,8 +7,11 @@
 package org.gridsuite.mapping.server.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,9 +21,13 @@ import java.util.UUID;
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
+@Getter
+@Setter
 public class FilterId implements Serializable {
 
     private String filterId;
+
     private UUID ruleId;
 
     @Override

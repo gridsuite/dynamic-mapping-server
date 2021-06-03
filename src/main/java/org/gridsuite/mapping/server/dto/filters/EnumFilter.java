@@ -10,12 +10,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEntity;
+import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.PropertyType;
 import org.gridsuite.mapping.server.utils.Methods;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -29,10 +29,11 @@ public class EnumFilter extends AbstractFilter {
     private ArrayList<String> value;
 
     @Override
-    public FilterEntity convertFilterToEntity(UUID ruleId) {
+    public FilterEntity convertFilterToEntity(RuleEntity rule) {
         FilterEntity convertedFilter = new FilterEntity();
         convertedFilter.setFilterId(this.getFilterId());
-        convertedFilter.setRuleId(ruleId);
+        convertedFilter.setRuleId(rule.getRuleId());
+        convertedFilter.setRule(rule);
         convertedFilter.setType(PropertyType.ENUM);
         convertedFilter.setProperty(this.getProperty());
         convertedFilter.setOperand(this.getOperand());

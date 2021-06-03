@@ -49,9 +49,14 @@ public class FilterEntity implements Serializable {
     @Column(name = "value")
     private String value;
 
-    public FilterEntity(UUID newID, FilterEntity filterEntity) {
+    @ManyToOne
+    @JoinColumn(name = "rule_id", foreignKey = @ForeignKey(name = "rules_filter_fk"))
+    @MapsId("ruleId")
+    private RuleEntity rule;
+
+    public FilterEntity(UUID ruleId, FilterEntity filterEntity) {
         this.filterId = filterEntity.getFilterId();
-        this.ruleId = newID;
+        this.ruleId = ruleId;
         this.property = filterEntity.getProperty();
         this.type = filterEntity.getType();
         this.operand = filterEntity.getOperand();

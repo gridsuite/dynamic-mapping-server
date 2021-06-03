@@ -30,9 +30,6 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
     @Column(name = "rule_id")
     private UUID ruleId;
 
-    @Column(name = "mappingName", nullable = false)
-    private String mappingName;
-
     @Column(name = "type", nullable = false)
     @Enumerated
     private EquipmentType equipmentType;
@@ -43,18 +40,22 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
     @Column(name = "composition", nullable = false)
     private String composition;
 
-    @OneToMany(targetEntity = FilterEntity.class, mappedBy = "ruleId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = FilterEntity.class, mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FilterEntity> filters;
+
+    @ManyToOne
+    @JoinColumn(name = "mappingName", foreignKey = @ForeignKey(name = "mapping_rules_fk"), referencedColumnName = "name")
+    private MappingEntity mapping;
 
     @Override
     public UUID getId() {
         return ruleId;
     }
 
-    public RuleEntity(String mappingName, RuleEntity ruleToCopy) {
+    public RuleEntity(MappingEntity mapping, RuleEntity ruleToCopy) {
         UUID newID = UUID.randomUUID();
         this.ruleId = newID;
-        this.mappingName = mappingName;
+        this.mapping = mapping;
         this.equipmentType = ruleToCopy.getEquipmentType();
         this.mappedModel = ruleToCopy.getMappedModel();
         this.composition = ruleToCopy.getComposition();
