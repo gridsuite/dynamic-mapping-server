@@ -57,6 +57,15 @@
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
             </plugin>
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <classpathDependencyExcludes>
+                    <classpathDependencyExclude>com.powsybl:powsybl-config-classic</classpathDependencyExclude>
+                </classpathDependencyExcludes>
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 
@@ -72,7 +81,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
+            <dependency>
+                <groupId>com.powsybl</groupId>
+                <artifactId>powsybl-network-store-client</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
             <!-- project specific dependencies -->
             <dependency>
                 <groupId>org.antlr</groupId>
@@ -83,6 +96,14 @@
     </dependencyManagement>
     <dependencies>
         <!-- Compilation dependencies -->
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-network-store-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
@@ -104,6 +125,14 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
@@ -121,6 +150,16 @@
         </dependency>
         <!-- Runtime dependencies -->
         <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-config-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <scope>runtime</scope>
@@ -136,6 +175,16 @@
             <scope>runtime</scope>
         </dependency>
         <!-- Test dependencies -->
+        <dependency>
+        <groupId>com.powsybl</groupId>
+        <artifactId>powsybl-config-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-iidm-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

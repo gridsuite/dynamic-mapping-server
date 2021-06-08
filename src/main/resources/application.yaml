@@ -38,6 +38,17 @@ logging:
   level:
     ROOT: INFO
 
+
+backing-services:
+  case:
+    base-uri: http://localhost:5000
+  network-conversion:
+    base-uri: http://localhost:5003
+
+network-store-server:
+  preloading-strategy: COLLECTION
+  base-uri: http://localhost:8080/
+
 dbName: dynamicmappings
 dbApi: jdbc
 

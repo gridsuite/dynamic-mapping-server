@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/scripts")
-@Api(value = "Mapping server")
+@Api(value = "Mapping script server")
 @AllArgsConstructor
 public class ScriptController {
 
