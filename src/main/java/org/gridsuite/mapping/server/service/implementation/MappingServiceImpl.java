@@ -17,9 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -66,6 +69,15 @@ public class MappingServiceImpl implements MappingService {
                 mappingRepository.deleteById(oldName);
                 mappingRepository.save(mappingToSave);
                 return new RenameObject(oldName, newName);
+            } catch (DataIntegrityViolationException ex) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Mapping with this name already exists", ex);
+            }
+        } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
+            // In case of naming of new mapping, save it to db.
+            try {
+                mappingRepository.save(new MappingEntity(newName, new ArrayList<>()));
+                return new RenameObject(DEFAULT_MAPPING_NAME, newName);
+
             } catch (DataIntegrityViolationException ex) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "A Mapping with this name already exists", ex);
             }
