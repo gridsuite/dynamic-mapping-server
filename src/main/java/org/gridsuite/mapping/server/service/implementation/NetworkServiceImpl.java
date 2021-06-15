@@ -2,26 +2,20 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import com.powsybl.iidm.network.Country;
 import com.powsybl.network.store.client.PreloadingStrategy;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
+import org.gridsuite.mapping.server.dto.NetworkIdentification;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.iidm.network.Network;
@@ -37,7 +31,7 @@ import static org.gridsuite.mapping.server.MappingConstants.*;
 @ComponentScan(basePackageClasses = {NetworkStoreService.class})
 public class NetworkServiceImpl implements NetworkService {
 
-    private WebClient webClient;
+    private RestTemplate restTemplate;
 
     private String caseServerBaseUri;
     private String networkConversionServerBaseUri;
@@ -48,26 +42,12 @@ public class NetworkServiceImpl implements NetworkService {
     @Autowired
     public NetworkServiceImpl(
             @Value("${backing-services.case.base-uri:http://case-server/}") String caseServerBaseUri,
-            @Value("${backing-services.network-conversion.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri,
-            WebClient.Builder webClientBuilder) {
+            @Value("${backing-services.network-conversion.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri) {
         this.caseServerBaseUri = caseServerBaseUri;
         this.networkConversionServerBaseUri = networkConversionServerBaseUri;
 
-        this.webClient = webClientBuilder.build();
+        this.restTemplate = new RestTemplate();
     }
-
-//    private Flux<NetworkElement> getNetworkElements(Mono<NetworkIdentification> network, String elementType) {
-//        return network.flatMapMany(networkId -> {
-//            Flux<NetworkElement> networkGenerators = webClient.get()
-//                    .uri(networkStoreServerBaseUri + "/" + networkId.networkUuid + "/" + elementType)
-//                    .retrieve()
-//                    .bodyToFlux(NetworkElement.class)
-//                    .flatMap(networkElement -> {
-//                        networkElement.setType(elementType);
-//                        return networkElement;
-//                    });
-//        });
-//    }
 
     private Network getNetwork(UUID networkUuid) {
         try {
@@ -78,24 +58,21 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public Flux<EquipmentValues> getNetworkValuesFromExistingCase(Mono<UUID> caseUUID) {
-        Mono<NetworkIdentification> networkIdentification = webClient.post()
-                .uri(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks")
-                .retrieve()
-                .bodyToMono(NetworkIdentification.class);
+    public List<EquipmentValues> getNetworkValuesFromExistingNetwork(UUID networkUuid) {
+        Network network = getNetwork(networkUuid);
 
-        return networkIdentification.flatMapMany(networkIdentification1 -> {
-            Network network = getNetwork(UUID.fromString(networkIdentification1.networkUuid));
+        HashMap<String, List<String>> substationsPropertyValues = getSubstationsPropertyValues(network);
+        HashMap<String, List<String>> voltageLevelsPropertyValues = getVoltageLevelsPropertyValues(network);
 
-            HashMap<String, List<String>> substationsPropertyValues = getSubstationsPropertyValues(network);
-            HashMap<String, List<String>> voltageLevelsPropertyValues = getVoltageLevelsPropertyValues(network);
+        List<EquipmentValues> equipmentValuesList = new ArrayList<>();
 
-            EquipmentValues generatorEquipmentValues = getGeneratorsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
-            EquipmentValues loadsEquipmentValues = getLoadsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
+        EquipmentValues generatorEquipmentValues = getGeneratorsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
+        equipmentValuesList.add(generatorEquipmentValues);
 
-            return Flux.just(generatorEquipmentValues, loadsEquipmentValues);
+        EquipmentValues loadsEquipmentValues = getLoadsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
+        equipmentValuesList.add(loadsEquipmentValues);
 
-        });
+        return equipmentValuesList;
     }
 
     private void setPropertyMap(HashMap<String, List<String>> propertyMap, String value, String propertyName) {
@@ -168,35 +145,32 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public Flux<EquipmentValues> getNetworkValues(Mono<FilePart> multipartFile) {
-        Mono<UUID> caseUUID = multipartFile.flatMap(file -> {
-            MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-            multipartBodyBuilder.part("file", file);
+    public List<EquipmentValues> getNetworkValues(MultipartFile multipartFile) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-            return webClient.post()
-                    .uri(caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/private")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA.toString())
-                    .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                    .retrieve()
-                    .onStatus(httpStatus -> httpStatus != HttpStatus.OK, clientResponse -> Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "An error occured while importing the file")))
-                    .bodyToMono(UUID.class);
-        });
+        Resource fileResource = multipartFile.getResource();
 
-        return getNetworkValuesFromExistingCase(caseUUID);
-    }
+        LinkedMultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+        parts.add("file", fileResource);
 
-    @Getter
-    @AllArgsConstructor
-    public class NetworkIdentification {
-        private String networkId;
-        private String networkUuid;
-    }
+        ContentDisposition contentDisposition = ContentDisposition
+                .builder("form-data")
+                .name("file")
+                .filename("network.iidm")
+                .build();
+        parts.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
-    @Getter
-    @Setter
-    public class NetworkElement {
-        private String type;
-        private String id;
-        private Map<String, String> attributes;
+        ResponseEntity<UUID> response = restTemplate.exchange(
+                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/private",
+                HttpMethod.POST,
+                requestEntity,
+                UUID.class);
+
+        UUID caseUuid = response.getBody();
+        NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
+
+        return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
     }
 }

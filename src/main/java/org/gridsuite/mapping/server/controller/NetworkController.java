@@ -17,18 +17,17 @@ import org.gridsuite.mapping.server.service.implementation.NetworkServiceImpl;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @RestController
-@RequestMapping(value = "/networks")
+@RequestMapping(value = "/network")
 @Api(value = "Mapping network server")
 @AllArgsConstructor
 @ComponentScan(basePackageClasses = {NetworkServiceImpl.class})
@@ -37,21 +36,21 @@ public class NetworkController {
 
     private final NetworkService networkService;
 
-    @GetMapping(value = "/{caseUUID}/values")
+    @GetMapping(value = "/{networkUuid}/values")
     @ApiOperation(value = "Convert a mapping to a groovy script and return it")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Possible property values of the network") })
 
-    public ResponseEntity<Flux<EquipmentValues>> getNetworkValuesFromExistingCase(@PathVariable("caseUUID") UUID caseUUID) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingCase(Mono.just(caseUUID)));
+    public ResponseEntity<List<EquipmentValues>> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
     }
 
     @PostMapping(value = "/new")
     @ApiOperation(value = "Import an iidm")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Possible property values of the network") })
-    public ResponseEntity<Flux<EquipmentValues>> getNetworkValues(@RequestPart FilePart networkFile) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(Mono.just(networkFile)));
+    public ResponseEntity<List<EquipmentValues>> getNetworkValues(@RequestPart MultipartFile networkFile) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(networkFile));
     }
 
 }
