@@ -49,7 +49,7 @@ public class NetworkController {
     @ApiOperation(value = "Import an iidm")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Possible property values of the network") })
-    public ResponseEntity<List<EquipmentValues>> getNetworkValues(@RequestPart MultipartFile networkFile) {
+    public ResponseEntity<List<EquipmentValues>> getNetworkValues(@RequestPart("file") MultipartFile networkFile) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(networkFile));
     }
 

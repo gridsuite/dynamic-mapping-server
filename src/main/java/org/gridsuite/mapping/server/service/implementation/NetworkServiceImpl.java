@@ -31,6 +31,7 @@ import static org.gridsuite.mapping.server.MappingConstants.*;
 @ComponentScan(basePackageClasses = {NetworkStoreService.class})
 public class NetworkServiceImpl implements NetworkService {
 
+    @Autowired
     private RestTemplate restTemplate;
 
     private String caseServerBaseUri;
@@ -45,8 +46,6 @@ public class NetworkServiceImpl implements NetworkService {
             @Value("${backing-services.network-conversion.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri) {
         this.caseServerBaseUri = caseServerBaseUri;
         this.networkConversionServerBaseUri = networkConversionServerBaseUri;
-
-        this.restTemplate = new RestTemplate();
     }
 
     private Network getNetwork(UUID networkUuid) {
@@ -162,15 +161,17 @@ public class NetworkServiceImpl implements NetworkService {
         parts.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
-        ResponseEntity<UUID> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/private",
                 HttpMethod.POST,
                 requestEntity,
-                UUID.class);
+                // Cannot convert to UUID in test mocks
+                String.class
+        );
 
-        UUID caseUuid = response.getBody();
+        System.out.println(response.getBody());
+        UUID caseUuid = UUID.fromString(response.getBody().substring(1, 37));
         NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
-
         return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
     }
 }
