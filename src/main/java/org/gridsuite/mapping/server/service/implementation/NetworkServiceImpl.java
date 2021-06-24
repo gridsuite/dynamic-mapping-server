@@ -19,6 +19,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -174,10 +175,12 @@ public class NetworkServiceImpl implements NetworkService {
                 // Cannot convert to UUID in test mocks
                 String.class
         );
-
-        System.out.println(response.getBody());
-        UUID caseUuid = UUID.fromString(response.getBody().substring(1, 37));
-        NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
-        return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
+        try {
+            UUID caseUuid = UUID.fromString(response.getBody().substring(1, 37));
+            NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
+            return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
+        } catch (NullPointerException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
     }
 }
