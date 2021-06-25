@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -20,7 +21,7 @@ public final class Methods {
         // not called
     }
 
-    private static final String  ESCAPED_COMMA = "##COMMA##";
+    private static final String ESCAPED_COMMA = "##COMMA##";
 
     public static ArrayList<String> convertStringToList(String stringArray) {
         ArrayList<String> converted = new ArrayList();
@@ -40,12 +41,13 @@ public final class Methods {
         return String.valueOf(bool);
     }
 
-    public static float convertStringToNumber(String stringNumber) {
-        return Float.parseFloat(stringNumber);
+    public static ArrayList<Float> convertStringToNumberList(String stringNumberArray) {
+        ArrayList<Float> converted = new ArrayList();
+        converted.addAll(Arrays.asList(stringNumberArray.split(",")).stream().map(value -> Float.parseFloat(value.trim())).collect(Collectors.toList()));
+        return converted;
     }
 
-    public static String convertNumberToString(float number) {
-        return String.valueOf(number);
+    public static String convertNumberListToString(List<Float> array) {
+        return array.stream().map(value -> String.format(Locale.US, "%f", value)).collect(Collectors.joining(", "));
     }
-
 }
