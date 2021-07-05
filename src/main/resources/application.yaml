@@ -3,6 +3,11 @@ server:
 
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 103MB
+
   datasource:
     url: ${dbApi}:${dbVendor}://${hostPort}/${dbName}${query}
     username: ${login}
