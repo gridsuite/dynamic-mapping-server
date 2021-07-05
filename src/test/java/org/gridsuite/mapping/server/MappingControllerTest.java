@@ -85,6 +85,14 @@ public class MappingControllerTest {
                 "      ],\n" +
                 "      \"mappedModel\": \"mappedExample\"\n" +
                 "    }\n" +
+                "  ],\n" +
+                "  \"automata\": [\n" +
+                "    {\n" +
+                "      \"family\": \"CURRENT_LIMIT\",\n" +
+                "      \"model\": \"automaton_model\",\n" +
+                "      \"watchedElement\": \"element_id\",\n" +
+                "      \"side\": \"Branch.Side.ONE\"\n" +
+                "    }\n" +
                 "  ]\n" +
                 "}";
 

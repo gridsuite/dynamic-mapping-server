@@ -1,4 +1,21 @@
 
+    create table automata (
+       automaton_id uuid not null,
+        type int4 not null,
+        model varchar(255) not null,
+        watched_element varchar(255) not null,
+        mappingName varchar(255),
+        primary key (automaton_id)
+    );
+
+    create table automaton_properties (
+       automaton_id uuid not null,
+        name varchar(255) not null,
+        type int4,
+        value varchar(255),
+        primary key (automaton_id, name)
+    );
+
     create table filters (
        filter_id varchar(255) not null,
         rule_id uuid not null,
@@ -38,8 +55,20 @@
         script TEXT not null,
         primary key (name)
     );
+create index automaton_mappingName_index on automata (mappingName);
+create index property_automaton_id_index on automaton_properties (automaton_id);
 create index filter_rule_id_index on filters (rule_id);
 create index rule_mappingName_index on rules (mappingName);
+
+    alter table if exists automata 
+       add constraint mapping_automata_fk 
+       foreign key (mappingName) 
+       references mappings;
+
+    alter table if exists automaton_properties 
+       add constraint automata_property_fk 
+       foreign key (automaton_id) 
+       references automata;
 
     alter table if exists filters 
        add constraint rules_filter_fk 

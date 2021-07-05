@@ -102,13 +102,27 @@ public class ScriptControllerTest {
                 "      ],\n" +
                 "      \"mappedModel\": \"" + modelName + "\"\n" +
                 "    }\n" +
+                "  ],\n" +
+                "  \"automata\": [\n" +
+                "    {\n" +
+                "      \"family\": \"CURRENT_LIMIT\",\n" +
+                "      \"model\": \"automaton_model\",\n" +
+                "      \"watchedElement\": \"element_id\",\n" +
+                "      \"side\": \"Branch.Side.ONE\"\n" +
+                "    }\n" +
                 "  ]\n" +
                 "}";
 
     }
 
     String scriptOutput(String scriptName, String parentName) {
-        return "{\"name\":\"" + scriptName + "\",\"parentName\":\"" + parentName + "\",\"script\":\"/**\n * Copyright (c) 2021, RTE (http://www.rte-france.com)\n * This Source Code Form is subject to the terms of the Mozilla Public\n * License, v. 2.0. If a copy of the MPL was not distributed with this\n * file, You can obtain one at http://mozilla.org/MPL/2.0/.\n */\n\nimport com.powsybl.iidm.network.Generator\n\nfor (Generator equipment : network.generators) {\n          if (equipment.id.equals(\\\"test\\\") && equipment.minP > 3.000000 && [\\\"HYDRO\\\", \\\"OTHERS\\\"].contains(equipment.energySource) && equipment.voltageRegulatorOn != true) {\n                 GeneratorFourWindings {\n                     staticId equipment.id\n                     parameterSetId  \\\"GSFWPR\\\" + equipment.id\n                 }\n    }\n\n    OmegaRef {\n        generatorDynamicModelId equipment.id\n    }\n}\"}";
+        return "{\"name\":\"" + scriptName + "\",\"parentName\":\"" + parentName + "\",\"script\":\"/**\n * Copyright (c) 2021, RTE (http://www.rte-france.com)\n * This Source Code Form is subject to the terms of the Mozilla Public\n * License, v. 2.0. If a copy of the MPL was not distributed with this\n * file, You can obtain one at http://mozilla.org/MPL/2.0/.\n */\n\nimport com.powsybl.iidm.network.Generator\nimport com.powsybl.dynawaltz.automatons.CurrentLimitAutomaton\n\nfor (Generator equipment : network.generators) {\n          if (equipment.id.equals(\\\"test\\\") && equipment.minP > 3.000000 && [\\\"HYDRO\\\", \\\"OTHERS\\\"].contains(equipment.energySource) && equipment.voltageRegulatorOn != true) {\n                 GeneratorFourWindings {\n                     staticId equipment.id\n                     parameterSetId  \\\"GSFWPR\\\" + equipment.id\n                 }\n    }\n\n    OmegaRef {\n        generatorDynamicModelId equipment.id\n    }\n}\n\n" +
+                "CurrentLimitAutomaton {\n" +
+                "     staticId \\\"element_id\\\"\n" +
+                "     dynamicModelId \\\"automaton_model\\\"\n" +
+                "     parameterSetId \\\"automaton_model\\\"\n" +
+                "     side Branch.Side.ONE\n" +
+                "}\"}";
     }
 
     @Test

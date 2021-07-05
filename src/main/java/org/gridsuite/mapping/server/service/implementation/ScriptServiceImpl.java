@@ -14,6 +14,7 @@ import lombok.Setter;
 import static java.util.stream.Collectors.groupingBy;
 
 import org.gridsuite.mapping.server.dto.*;
+import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.ScriptEntity;
@@ -123,9 +124,11 @@ public class ScriptServiceImpl implements ScriptService {
     public class SortedMapping implements Mapping {
         private String name;
         private ArrayList<SortedRules> sortedRules;
+        private ArrayList<AbstractAutomaton> automata;
 
         public SortedMapping(InputMapping mapping) {
             name = mapping.getName();
+            automata = (ArrayList<AbstractAutomaton>) mapping.getAutomata();
             sortedRules = new ArrayList<>();
             Map<EquipmentType, List<Rule>> sortingRules = mapping.getRules().stream().collect(groupingBy(Rule::getEquipmentType));
             for (EquipmentType type : sortingRules.keySet()) {
