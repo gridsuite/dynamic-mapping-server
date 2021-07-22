@@ -40,6 +40,35 @@
         primary key (name)
     );
 
+    create table model_parameter_definitions (
+       model_name varchar(255) not null,
+        name varchar(255) not null,
+        origin int4,
+        origin_name varchar(255),
+        type int4,
+        primary key (model_name, name)
+    );
+
+    create table model_parameter_sets (
+       model_name varchar(255) not null,
+        name varchar(255) not null,
+        primary key (model_name, name)
+    );
+
+    create table model_parameters (
+       model_name varchar(255) not null,
+        name varchar(255) not null,
+        set_name varchar(255) not null,
+        value varchar(255),
+        primary key (model_name, name, set_name)
+    );
+
+    create table models (
+       model_name varchar(255) not null,
+        equipment_type int4,
+        primary key (model_name)
+    );
+
     create table rules (
        rule_id uuid not null,
         composition varchar(255) not null,
@@ -58,6 +87,9 @@
 create index automaton_mappingName_index on automata (mappingName);
 create index property_automaton_id_index on automaton_properties (automaton_id);
 create index filter_rule_id_index on filters (rule_id);
+create index model_parameter_definitions_model_name_index on model_parameter_definitions (model_name);
+create index model_parameter_sets_model_name_index on model_parameter_sets (model_name);
+create index model_parameter_set_index on model_parameters (set_name);
 create index rule_mappingName_index on rules (mappingName);
 
     alter table if exists automata 
@@ -74,6 +106,21 @@ create index rule_mappingName_index on rules (mappingName);
        add constraint rules_filter_fk 
        foreign key (rule_id) 
        references rules;
+
+    alter table if exists model_parameter_definitions 
+       add constraint model_parameter_definition_fk 
+       foreign key (model_name) 
+       references models;
+
+    alter table if exists model_parameter_sets 
+       add constraint model_parameter_sets_fk 
+       foreign key (model_name) 
+       references models;
+
+    alter table if exists model_parameters 
+       add constraint parameter_set_fk 
+       foreign key (model_name, name) 
+       references model_parameter_sets;
 
     alter table if exists rules 
        add constraint mapping_rules_fk 
