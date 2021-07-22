@@ -60,7 +60,7 @@ public class ScriptServiceImpl implements ScriptService {
             String createdScript = Templater.mappingToScript(sortedMapping);
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
-            ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript);
+            ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript, new Date());
             scriptToSave.markNotNew();
             scriptRepository.save(scriptToSave);
             return new Script(scriptToSave);

@@ -6,10 +6,13 @@
  */
 package org.gridsuite.mapping.server.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ScriptEntity;
+
+import java.util.Date;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -28,14 +31,19 @@ public class Script {
     @Schema(description = "Generated Script")
     private String script;
 
+    @JsonIgnore
+    @Schema(description = "Creation date")
+    private Date createdDate;
+
     public Script(ScriptEntity scriptEntity) {
         name = scriptEntity.getName();
         parentName = scriptEntity.getParentName();
         script = scriptEntity.getScript();
+        createdDate = scriptEntity.getCreatedDate();
     }
 
     public ScriptEntity convertToEntity() {
-        return new ScriptEntity(name, parentName, script);
+        return new ScriptEntity(name, parentName, script, createdDate);
     }
 
 }

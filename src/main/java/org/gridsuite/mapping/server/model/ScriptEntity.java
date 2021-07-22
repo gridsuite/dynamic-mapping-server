@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -37,6 +38,9 @@ public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<Strin
     public String getId() {
         return name;
     }
+
+    @Column(name = "created_date")
+    private Date createdDate;
 
     public ScriptEntity(String name, ScriptEntity scriptToCopy) {
         this.name = name;
