@@ -6,8 +6,10 @@
  */
 package org.gridsuite.mapping.server.dto.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,4 +19,6 @@ import java.util.List;
 public class ParametersSet {
     private String name;
     private List<ModelParameter> parameters;
+    @JsonIgnore
+    private Date lastModifiedDate;
 }

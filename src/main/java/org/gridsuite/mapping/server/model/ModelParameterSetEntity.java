@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,6 +39,9 @@ public class ModelParameterSetEntity implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "set")
     private List<ModelParameterEntity> parameters;
+
+    @Column(name = "last_modified_date")
+    private Date lastModifiedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_name", foreignKey = @ForeignKey(name = "model_parameter_sets_fk"))
