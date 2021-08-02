@@ -1,6 +1,6 @@
 server:
   port: 5036
-
+  forward-headers-strategy: framework
 
 spring:
   datasource:
@@ -33,6 +33,10 @@ spring:
               # action: create
               create-target: src/main/resources/mappings.sql
               create-source: metadata
+
+springdoc:
+  swagger-ui:
+    path: swagger-ui.html
 
 logging:
   level:

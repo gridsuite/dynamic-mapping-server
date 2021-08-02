@@ -6,8 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,18 +26,18 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@ApiModel("Rule")
+@Schema(description = "Rule")
 public class Rule {
-    @ApiModelProperty("Equipment type")
+    @Schema(description = "Equipment type")
     private EquipmentType equipmentType;
 
-    @ApiModelProperty("Mapped Model Instance ID")
+    @Schema(description = "Mapped Model Instance ID")
     private String mappedModel;
 
-    @ApiModelProperty("Composition")
+    @Schema(description = "Composition")
     private String composition;
 
-    @ApiModelProperty("Filters")
+    @Schema(description = "Filters")
     private List<AbstractFilter> filters;
 
     public List<AbstractFilter> getFilters() {

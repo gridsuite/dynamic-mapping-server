@@ -6,7 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,9 +16,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RenameObject {
-    @ApiModelProperty("Previous Name of the Object")
+    @Schema(description = "Previous Name of the Object")
     private String oldName;
 
-    @ApiModelProperty("New Name of the Object")
+    @Schema(description = "New Name of the Object")
     private String newName;
 }
