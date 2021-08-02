@@ -34,10 +34,6 @@ spring:
               create-target: src/main/resources/mappings.sql
               create-source: metadata
 
-springdoc:
-  swagger-ui:
-    path: swagger-ui.html
-
 logging:
   level:
     ROOT: INFO
