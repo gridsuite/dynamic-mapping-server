@@ -6,8 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ScriptEntity;
@@ -16,16 +15,17 @@ import org.gridsuite.mapping.server.model.ScriptEntity;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
-@ApiModel("Script")
+@Schema(description = "Script")
 @AllArgsConstructor
 public class Script {
 
-    @ApiModelProperty("Name")
+    @Schema(description = "Name")
     private String name;
 
-    @ApiModelProperty("Name of the parent mapping")
+    @Schema(description = "Name of the parent mapping")
     private String parentName;
-    @ApiModelProperty("Generated Script")
+
+    @Schema(description = "Generated Script")
     private String script;
 
     public Script(ScriptEntity scriptEntity) {

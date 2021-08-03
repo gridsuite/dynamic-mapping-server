@@ -1,6 +1,6 @@
 server:
   port: 5036
-
+  forward-headers-strategy: framework
 
 spring:
   datasource:
