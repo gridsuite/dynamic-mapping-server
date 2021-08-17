@@ -6,10 +6,19 @@
  */
 package org.gridsuite.mapping.server.dto.models;
 
+import lombok.Data;
+import org.gridsuite.mapping.server.model.ModelParameterEntity;
+
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
+@Data
 public class ModelParameter {
     private String name;
     private String value;
+
+    public ModelParameter(ModelParameterEntity modelParameterEntity) {
+        name = modelParameterEntity.getName();
+        value = modelParameterEntity.getValue();
+    }
 }

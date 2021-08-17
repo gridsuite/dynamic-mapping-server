@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server.dto.models;
 
 import lombok.Data;
+import org.gridsuite.mapping.server.model.ModelParameterDefinitionEntity;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
 
@@ -23,4 +24,11 @@ public class ModelParameterDefinition {
     private ParameterOrigin origin;
 
     private String originName;
+
+    public ModelParameterDefinition(ModelParameterDefinitionEntity modelParameterDefinitionEntity) {
+        name = modelParameterDefinitionEntity.getName();
+        type = modelParameterDefinitionEntity.getType();
+        origin = modelParameterDefinitionEntity.getOrigin();
+        originName = modelParameterDefinitionEntity.getOriginName();
+    }
 }
