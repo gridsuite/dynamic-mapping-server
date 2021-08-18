@@ -42,10 +42,14 @@ public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<Strin
     @Column(name = "created_date")
     private Date createdDate;
 
+    @Column(name = "parameters_file", nullable = true, columnDefinition = "TEXT")
+    private String parametersFile;
+
     public ScriptEntity(String name, ScriptEntity scriptToCopy) {
         this.name = name;
         parentName = scriptToCopy.getParentName();
         script = scriptToCopy.getScript();
+        parametersFile = scriptToCopy.getParametersFile();
     }
 
 }

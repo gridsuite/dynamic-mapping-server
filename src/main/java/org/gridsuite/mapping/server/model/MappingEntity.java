@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server.model;
 
 import lombok.*;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,9 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<Stri
     @OneToMany(targetEntity = AutomatonEntity.class, mappedBy = "mapping", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AutomatonEntity> automata;
 
+    @Column(name = "control_parameters", nullable = false)
+    private boolean controlledParameters;
+
     @Override
     public String getId() {
         return name;
@@ -38,6 +42,7 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<Stri
 
     public MappingEntity(String name, MappingEntity mappingToCopy) {
         this.name = name;
+        this.controlledParameters = mappingToCopy.isControlledParameters();
         this.rules = mappingToCopy.getRules().stream().map(ruleEntity -> new RuleEntity(this, ruleEntity)).collect(Collectors.toList());
         this.automata = mappingToCopy.getAutomata().stream().map(automatonEntity -> new AutomatonEntity(this, automatonEntity)).collect(Collectors.toList());
     }

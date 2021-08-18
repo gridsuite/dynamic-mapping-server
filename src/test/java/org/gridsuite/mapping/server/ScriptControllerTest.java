@@ -23,9 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,7 +108,8 @@ public class ScriptControllerTest {
                 "      \"watchedElement\": \"element_id\",\n" +
                 "      \"side\": \"Branch.Side.ONE\"\n" +
                 "    }\n" +
-                "  ]\n" +
+                "  ],\n" +
+                "  \"controlledParameters\": false" +
                 "}";
 
     }
@@ -122,7 +121,7 @@ public class ScriptControllerTest {
                 "     dynamicModelId \\\"automaton_model\\\"\n" +
                 "     parameterSetId \\\"automaton_model\\\"\n" +
                 "     side Branch.Side.ONE\n" +
-                "}\"}";
+                "}\",\"current\": true, \"parametersFile\": null}";
     }
 
     @Test
@@ -133,32 +132,32 @@ public class ScriptControllerTest {
 
         // Put data
         mvc.perform(post("/mappings/" + name)
-                .content(mapping(name, modelName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(name, modelName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // convert to script
         mvc.perform(get("/scripts/from/" + name)
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json(scriptOutput(name + "-script", name), true));
 
         // try to convert unknown script
         mvc.perform(get("/scripts/from/" + "unknown")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
         // Post a mapping without known model (OK car model not needed yet)
         mvc.perform(post("/mappings/" + name)
-                .content(mapping(name, "unknownModel"))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(name, "unknownModel"))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Try to convert this script
         // try to convert unknown script
         mvc.perform(get("/scripts/from/" + name)
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
     }
@@ -172,49 +171,49 @@ public class ScriptControllerTest {
 
         // Put data
         mvc.perform(post("/mappings/" + mappingName)
-                .content(mapping(mappingName, modelName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(mappingName, modelName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // convert to script
         mvc.perform(get("/scripts/from/" + mappingName)
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Rename data
         mvc.perform(post("/scripts/rename/" + mappingName + "-script/to/" + newName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // get all data
         mvc.perform(get("/scripts/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + scriptOutput(newName, mappingName) + "]", true));
 
         // Add a new script
         mvc.perform(post("/mappings/" + mappingName)
-                .content(mapping(mappingName, modelName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(mappingName, modelName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // convert to script
         mvc.perform(get("/scripts/from/" + mappingName)
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Fail to rename to existing mapping
         mvc.perform(post("/scripts/rename/" + mappingName + "-script/to/" + newName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isConflict());
 
         // Fail to copy from missing mapping
         mvc.perform(post("/scripts/rename/NotUsed/to/AnyScript"
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
     }
@@ -228,49 +227,49 @@ public class ScriptControllerTest {
 
         // Put data
         mvc.perform(post("/mappings/" + mappingName)
-                .content(mapping(mappingName, modelName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(mappingName, modelName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // convert to script
         mvc.perform(get("/scripts/from/" + mappingName)
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Copy data
         mvc.perform(post("/scripts/copy/" + mappingName + "-script/to/" + copyName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // get all data
+        // get all s
         mvc.perform(get("/scripts/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + scriptOutput(mappingName + "-script", mappingName) + ", " + scriptOutput(copyName, mappingName) + "]", true));
 
         // Add a new script
         mvc.perform(post("/mappings/" + mappingName)
-                .content(mapping(mappingName, modelName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(mappingName, modelName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // convert to script
         mvc.perform(get("/scripts/from/" + mappingName)
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Fail to copy to existing mapping
         mvc.perform(post("/scripts/copy/" + mappingName + "-script/to/" + copyName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isConflict());
 
         // Fail to copy from missing mapping
         mvc.perform(post("/scripts/copy/NotUsed/to/AnyMapping"
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
     }
@@ -278,17 +277,17 @@ public class ScriptControllerTest {
     @Test
     public void testSaveAndDelete() throws Exception {
         String name = "simple";
-        String simpleScript = "{\"name\":\"" + name + "\",\"parentName\":\"\",\"script\":\"Script\"}";
+        String simpleScript = "{\"name\":\"" + name + "\",\"parentName\":\"\",\"script\":\"Script\",\"current\": true, \"parametersFile\": null}";
 
         // Put data
         mvc.perform(post("/scripts/" + name)
-                .content(simpleScript)
-                .contentType(APPLICATION_JSON))
+                        .content(simpleScript)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Get Data
         mvc.perform(get("/scripts/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + simpleScript + "]", true));
@@ -299,7 +298,7 @@ public class ScriptControllerTest {
 
         // Get Data
         mvc.perform(get("/scripts/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[]", true));

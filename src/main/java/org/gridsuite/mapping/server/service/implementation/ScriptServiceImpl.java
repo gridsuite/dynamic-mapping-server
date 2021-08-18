@@ -12,8 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
+import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
+import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.model.ScriptEntity;
 import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.MappingRepository;
@@ -21,6 +23,7 @@ import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.service.ScriptService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.Methods;
 import org.gridsuite.mapping.server.utils.Templater;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -63,13 +66,22 @@ public class ScriptServiceImpl implements ScriptService {
             String createdScript = Templater.mappingToScript(sortedMapping);
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
-            //TODO Check current .par
-
-            // End TODO
-            ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript, new Date());
+            String createdPar = null;
+            if (foundMapping.get().isControlledParameters()) {
+                try {
+                    List<String> instantiatedModels = foundMapping.get().getRules().stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
+                    List<ParametersSet> sets = instantiatedModels.stream().map(instanceId -> Methods.getSetFromInstanceId(instanceId, instanceModelRepository, modelRepository)).collect(Collectors.toList());
+                    createdPar = Templater.setsToPar(sets);
+                } catch (Error e) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter sets");
+                }
+            }
+            ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript, new Date(), createdPar);
             scriptToSave.markNotNew();
             scriptRepository.save(scriptToSave);
-            return new Script(scriptToSave);
+            Script scriptToReturn = new Script(scriptToSave);
+            scriptToReturn.setCurrent(true);
+            return scriptToReturn;
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
         }
@@ -77,11 +89,23 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public List<Script> getAllScripts() {
-        return scriptRepository.findAll().stream().map(scriptEntity -> new Script(scriptEntity)).collect(Collectors.toList());
+        return scriptRepository.findAll().stream().map(scriptEntity -> {
+            Script scriptToReturn = new Script(scriptEntity);
+            if (scriptToReturn.getParametersFile() == null) {
+                scriptToReturn.setCurrent(true);
+            } else {
+                // TODO Check current
+            }
+            return scriptToReturn;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public Script saveScript(String scriptName, Script script) {
+        if (script.getParametersFile() != null) {
+            // TODO Update .par
+        }
+        script.setCurrent(true);
         scriptRepository.save(script.convertToEntity());
         return script;
     }
@@ -116,7 +140,13 @@ public class ScriptServiceImpl implements ScriptService {
             ScriptEntity copiedScript = new ScriptEntity(copyName, scriptToCopy.get());
             try {
                 scriptRepository.save(copiedScript);
-                return new Script(copiedScript);
+                Script scriptToReturn = new Script(copiedScript);
+                if (scriptToReturn.getParametersFile() == null) {
+                    scriptToReturn.setCurrent(true);
+                } else {
+                    // TODO Check current
+                }
+                return scriptToReturn;
             } catch (DataIntegrityViolationException ex) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "A Script with this name already exists", ex);
             }
