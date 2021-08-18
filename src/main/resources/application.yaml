@@ -38,6 +38,7 @@ logging:
   level:
     ROOT: INFO
 
-dbName: dynamicmappings
+dbName: gridsuite
+query: ?currentSchema=dynamicmappings
 dbApi: jdbc
 
