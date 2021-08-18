@@ -11,6 +11,7 @@ import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -36,5 +37,22 @@ public class Model {
 
     public ModelEntity convertToEntity() {
         return new ModelEntity(this);
+    }
+
+    public boolean isParameterSetValid(String setName) {
+        ParametersSet setToTest = sets.stream().filter(set -> set.getName() == setName).findAny().orElse(null);
+        if (setToTest == null) {
+            return false;
+        } else {
+            AtomicBoolean isValid = new AtomicBoolean(true);
+            List<ModelParameter> parameters = setToTest.getParameters();
+            parameterDefinitions.forEach(definition -> {
+                if (isValid.get()) {
+                    isValid.set(parameters.stream().filter(param -> param.getName() == definition.getName()).findAny().orElse(null) != null);
+
+                }
+            });
+            return isValid.get();
+        }
     }
 }

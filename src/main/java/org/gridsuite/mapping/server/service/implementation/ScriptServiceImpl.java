@@ -10,9 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import static java.util.stream.Collectors.groupingBy;
-
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
@@ -20,6 +17,7 @@ import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.ScriptEntity;
 import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.MappingRepository;
+import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.service.ScriptService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -32,6 +30,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
@@ -39,14 +39,17 @@ import java.util.stream.Collectors;
 public class ScriptServiceImpl implements ScriptService {
 
     private final InstanceModelRepository instanceModelRepository;
+    private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
     private final ScriptRepository scriptRepository;
 
     public ScriptServiceImpl(
             MappingRepository mappingRepository,
             ScriptRepository scriptRepository,
-            InstanceModelRepository instanceModelRepository
+            InstanceModelRepository instanceModelRepository,
+            ModelRepository modelRepository
     ) {
+        this.modelRepository = modelRepository;
         this.instanceModelRepository = instanceModelRepository;
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
@@ -60,6 +63,9 @@ public class ScriptServiceImpl implements ScriptService {
             String createdScript = Templater.mappingToScript(sortedMapping);
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
+            //TODO Check current .par
+
+            // End TODO
             ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript, new Date());
             scriptToSave.markNotNew();
             scriptRepository.save(scriptToSave);
