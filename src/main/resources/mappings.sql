@@ -37,6 +37,7 @@
 
     create table mappings (
        name varchar(255) not null,
+        control_parameters boolean not null,
         primary key (name)
     );
 
@@ -58,6 +59,7 @@
     create table model_parameter_sets (
        model_name varchar(255) not null,
         name varchar(255) not null,
+        last_modified_date timestamp,
         primary key (model_name, name)
     );
 
@@ -86,6 +88,8 @@
 
     create table scripts (
        name varchar(255) not null,
+        created_date timestamp,
+        parameters_file TEXT,
         parent varchar(255),
         script TEXT not null,
         primary key (name)
@@ -123,9 +127,9 @@ create index rule_mappingName_index on rules (mappingName);
        foreign key (model_name)
        references models;
 
-    alter table if exists model_parameters
-       add constraint parameter_set_fk
-       foreign key (model_name, name)
+    alter table if exists model_parameters 
+       add constraint parameter_set_fk 
+       foreign key (model_name, set_name)
        references model_parameter_sets;
 
     alter table if exists rules

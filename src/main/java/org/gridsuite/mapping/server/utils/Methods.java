@@ -57,7 +57,7 @@ public final class Methods {
         Optional<InstanceModelEntity> instance = instanceModelRepository.findById(instanceId);
         if (instance.isPresent()) {
             String[] setName = new String[]{instance.get().getModelName(), instance.get().getParams().getName()};
-            return new ParametersSet(modelRepository.findById(setName[0]).get().getSets().stream().filter(set -> set.getName() == setName[2]).findAny().orElseThrow());
+            return new ParametersSet(modelRepository.findById(setName[0]).get().getSets().stream().filter(set -> set.getName() == setName[1]).findAny().orElseThrow());
         } else {
             throw new Error();
         }

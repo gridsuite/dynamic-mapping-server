@@ -168,7 +168,7 @@ public final class Templater {
                 ST parameterText;
                 if (parameter.getOrigin() == ParameterOrigin.NETWORK) {
                     parameterText = new ST(refParameterTemplate, '{', '}');
-                    parameterText.add("origData", parameter.getOrigin());
+                    parameterText.add("origData", "IIDM");
                     parameterText.add("origName", parameter.getOriginName());
                 } else {
                     parameterText = new ST(parameterTemplate, '{', '}');

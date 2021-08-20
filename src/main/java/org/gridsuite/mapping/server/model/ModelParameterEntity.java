@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.gridsuite.mapping.server.dto.models.ModelParameter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -44,8 +45,16 @@ public class ModelParameterEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(foreignKey = @ForeignKey(name = "parameter_set_fk"), value = {
-            @JoinColumn(name = "name", referencedColumnName = "name", insertable = false, updatable = false),
+            @JoinColumn(name = "set_name", referencedColumnName = "name", insertable = false, updatable = false),
             @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false)
     })
     private ModelParameterSetEntity set;
+
+    public ModelParameterEntity(ModelParameterSetEntity set, ModelParameter parameter) {
+        this.set = set;
+        name = parameter.getName();
+        modelName = set.getModelName();
+        setName = set.getName();
+        value = parameter.getValue();
+    }
 }

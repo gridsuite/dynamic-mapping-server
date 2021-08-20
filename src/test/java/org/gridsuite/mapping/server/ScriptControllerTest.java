@@ -6,11 +6,13 @@
  */
 package org.gridsuite.mapping.server;
 
-import org.gridsuite.mapping.server.model.InstanceModelEntity;
-import org.gridsuite.mapping.server.model.ModelParamsEmbeddable;
+import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.InstanceModelRepository;
+import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
+import org.gridsuite.mapping.server.utils.ParameterType;
 import org.gridsuite.mapping.server.utils.ParamsType;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,10 +24,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -48,6 +52,14 @@ public class ScriptControllerTest {
     private void cleanDB() {
         scriptRepository.deleteAll();
         instanceModelRepository.deleteAll();
+        modelRepository.deleteAll();
+    }
+
+    @Autowired
+    private ModelRepository modelRepository;
+
+    private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
+        return new ModelParameterDefinitionEntity(name, model.getModelName(), type, origin, originName, model);
     }
 
     @Before
@@ -55,10 +67,34 @@ public class ScriptControllerTest {
         cleanDB();
 
         // Prepare instance models
-        instanceModelRepository.save(new InstanceModelEntity("LoadAlphaBeta", "LoadLab", EquipmentType.LOAD, new ModelParamsEmbeddable("LAB", ParamsType.FIXED)));
+        instanceModelRepository.save(new InstanceModelEntity("LoadLab", "LoadAlphaBeta", EquipmentType.LOAD, new ModelParamsEmbeddable("LAB", ParamsType.FIXED)));
         instanceModelRepository.save(new InstanceModelEntity("GeneratorSynchronousThreeWindingsProportionalRegulations", "GeneratorThreeWindings", EquipmentType.GENERATOR, new ModelParamsEmbeddable("GSTWPR", ParamsType.PREFIX)));
         instanceModelRepository.save(new InstanceModelEntity("GeneratorSynchronousFourWindingsProportionalRegulations", "GeneratorFourWindings", EquipmentType.GENERATOR, new ModelParamsEmbeddable("GSFWPR", ParamsType.PREFIX)));
 
+        // prepare token model
+
+        ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD,
+                null, null);
+        ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
+        definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
+        definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
+        definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu", modelToSave));
+        definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", modelToSave));
+        definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", modelToSave));
+        definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", modelToSave));
+        modelToSave.setParameterDefinitions(definitions);
+        ArrayList<ModelParameterSetEntity> modelSets = new ArrayList<>();
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", modelToSave.getModelName(),
+                null,
+                new Date(),
+                modelToSave);
+        ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
+        setParameters.add(new ModelParameterEntity("load_alpha", setToSave.getModelName(), setToSave.getName(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_beta", setToSave.getModelName(), setToSave.getName(), "2.5", setToSave));
+        setToSave.setParameters(setParameters);
+        modelSets.add(setToSave);
+        modelToSave.setSets(modelSets);
+        modelRepository.save(modelToSave);
     }
 
     String mapping(String name, String modelName) {
@@ -303,5 +339,113 @@ public class ScriptControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[]", true));
 
+    }
+
+    // Parameters tests
+
+    @Test
+    public void parTest() throws Exception {
+        String name = "test";
+        String mappingToTest = "{\n" +
+                "  \"name\": \"" + name + "\",\n" +
+                "  \"rules\": [\n" +
+                "    {\n" +
+                "      \"composition\": \"true\",\n" +
+                "      \"equipmentType\": \"LOAD\",\n" +
+                "      \"filters\": [],\n" +
+                "      \"mappedModel\": \"" + "LoadLab" + "\"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"automata\": []," +
+                "  \"controlledParameters\": true" +
+                "}";
+
+        String parFile = "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>\n" +
+                "<parametersSet xmlns=\\\"http://www.rte-france.com/dynawo\\\">\n" +
+                "    <set id=\\\"LAB\\\">\n" +
+                "        <par type=\\\"DOUBLE\\\" name=\\\"load_alpha\\\" value=\\\"1.5\\\"/>\n" +
+                "        <par type=\\\"DOUBLE\\\" name=\\\"load_beta\\\" value=\\\"2.5\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_P0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"p_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_Q0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"q_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_U0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"v_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_UPhase0\\\" origData=\\\"IIDM\\\" origName=\\\"angle_pu\\\"/>\n" +
+                "    </set>\n" +
+                "</parametersSet>";
+
+        String scriptOutput = "{\"name\":\"" + name + "-script\",\"parentName\":\"" + name + "\",\"script\":\"/**\n * Copyright (c) 2021, RTE (http://www.rte-france.com)\n * This Source Code Form is subject to the terms of the Mozilla Public\n * License, v. 2.0. If a copy of the MPL was not distributed with this\n * file, You can obtain one at http://mozilla.org/MPL/2.0/.\n */\n\nimport com.powsybl.iidm.network.Load\n\nfor (Load equipment : network.loads) {\n          if (true) {\n                 LoadAlphaBeta {\n                     staticId equipment.id\n                     parameterSetId  \\\"LAB\\\"\n                 }\n    }\n\n}\"," +
+                "\"current\": true, \"parametersFile\": \"" + parFile + "\"}";
+
+        // Put data
+        mvc.perform(post("/mappings/" + name)
+                        .content(mappingToTest)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // convert to script
+        mvc.perform(get("/scripts/from/" + name)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(scriptOutput, true));
+    }
+
+    @Test
+    public void currentTest() throws Exception {
+        String name = "test";
+        String mappingToTest = "{\n" +
+                "  \"name\": \"" + name + "\",\n" +
+                "  \"rules\": [\n" +
+                "    {\n" +
+                "      \"composition\": \"true\",\n" +
+                "      \"equipmentType\": \"LOAD\",\n" +
+                "      \"filters\": [],\n" +
+                "      \"mappedModel\": \"" + "LoadLab" + "\"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"automata\": []," +
+                "  \"controlledParameters\": true" +
+                "}";
+
+        String setName = "LAB";
+        String modelName = "LoadAlphaBeta";
+        String set = "{\n" +
+                "  \"name\": \"" + setName + "\",\n" +
+                "  \"parameters\": [\n" +
+                "    {\n" +
+                "      \"name\": \"load_alpha\",\n" +
+                "      \"value\": \"1.5\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"load_beta\",\n" +
+                "      \"value\": \"2.5\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        // Put data
+        mvc.perform(post("/mappings/" + name)
+                        .content(mappingToTest)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // convert to script
+        mvc.perform(get("/scripts/from/" + name)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$.current").value(true));
+
+        // Modify Set
+        mvc.perform(post("/model/" + modelName + "/parameters/sets/")
+                        .content(set)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Check Current Status of the script
+        mvc.perform(get("/scripts/")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].current").value(false));
     }
 }

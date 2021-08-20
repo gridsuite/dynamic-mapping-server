@@ -1,1 +1,1 @@
-        <reference name="{name}" origData="{origData}" origName="{origName}" type="{type}"/>
+        <reference type="{type}" name="{name}" origData="{origData}" origName="{origName}"/>

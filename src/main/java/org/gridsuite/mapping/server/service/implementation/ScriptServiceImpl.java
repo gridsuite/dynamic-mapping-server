@@ -168,7 +168,7 @@ public class ScriptServiceImpl implements ScriptService {
         if (instance.isPresent()) {
             String[] setName = new String[]{instance.get().getModelName(), instance.get().getParams().getName()};
             ModelEntity model = modelRepository.findById(setName[0]).get();
-            ParametersSet correspondingSet = new ParametersSet(model.getSets().stream().filter(set -> set.getName() == setName[2]).findAny().orElseThrow());
+            ParametersSet correspondingSet = new ParametersSet(model.getSets().stream().filter(set -> set.getName().equals(setName[1])).findAny().orElseThrow());
             List<ModelParameterDefinition> correspondingDefinitions = model.getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
             return new EnrichedParametersSet(correspondingSet, correspondingDefinitions);
         } else {
@@ -251,7 +251,8 @@ public class ScriptServiceImpl implements ScriptService {
             name = set.getName();
             parameters = definitions.stream().map(definition ->
                     new EnrichedParameter(
-                            definition.getName(), set.getParameters().stream().filter(parameter -> parameter.getName() == definition.getName()).findAny().orElseThrow().getValue(),
+                            definition.getName(),
+                            definition.getOrigin() == ParameterOrigin.NETWORK ? null : set.getParameters().stream().filter(parameter -> parameter.getName() == definition.getName()).findAny().orElseThrow().getValue(),
                             definition.getType(),
                             definition.getOrigin(),
                             definition.getOriginName()

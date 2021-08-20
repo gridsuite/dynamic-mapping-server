@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ModelParameterEntity;
 
@@ -13,6 +14,7 @@ import org.gridsuite.mapping.server.model.ModelParameterEntity;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
+@AllArgsConstructor
 public class ModelParameter {
     private String name;
     private String value;
