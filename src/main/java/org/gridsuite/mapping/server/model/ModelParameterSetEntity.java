@@ -10,11 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.gridsuite.mapping.server.dto.models.ParametersSet;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -37,7 +39,7 @@ public class ModelParameterSetEntity implements Serializable {
     @Column(name = "model_name")
     private String modelName;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "set")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "set", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterEntity> parameters;
 
     @Column(name = "last_modified_date")
@@ -47,4 +49,12 @@ public class ModelParameterSetEntity implements Serializable {
     @JoinColumn(name = "model_name", foreignKey = @ForeignKey(name = "model_parameter_sets_fk"))
     @MapsId("modelName")
     private ModelEntity model;
+
+    public ModelParameterSetEntity(ModelEntity model, ParametersSet set) {
+        this.model = model;
+        this.name = set.getName();
+        this.modelName = model.getModelName();
+        this.parameters = set.getParameters().stream().map(parameter -> new ModelParameterEntity(this, parameter)).collect(Collectors.toList());
+        this.lastModifiedDate = set.getLastModifiedDate();
+    }
 }

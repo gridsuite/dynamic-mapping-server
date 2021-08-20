@@ -46,17 +46,16 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     }
 
     public ModelEntity(Model modelToConvert) {
-        ModelEntity convertedModel = new ModelEntity();
-        convertedModel.setModelName(modelToConvert.getModelName());
-        convertedModel.setEquipmentType(modelToConvert.getEquipmentType());
-        convertedModel.setParameterDefinitions(modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), convertedModel)).collect(Collectors.toList()));
-        convertedModel.setSets(modelToConvert.getSets().stream().map(set -> {
-            ModelParameterSetEntity convertedSet = new ModelParameterSetEntity(set.getName(), modelToConvert.getModelName(), null, set.getLastModifiedDate(), convertedModel);
+        modelName = modelToConvert.getModelName();
+        equipmentType = modelToConvert.getEquipmentType();
+        parameterDefinitions = modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), this)).collect(Collectors.toList());
+        sets = modelToConvert.getSets().stream().map(set -> {
+            ModelParameterSetEntity convertedSet = new ModelParameterSetEntity(set.getName(), modelToConvert.getModelName(), null, set.getLastModifiedDate(), this);
             convertedSet.setParameters(set.getParameters().stream().map(parameter -> new ModelParameterEntity(
                     parameter.getName(), modelToConvert.getModelName(), set.getName(), parameter.getValue(), convertedSet
             )).collect(Collectors.toList()));
             return convertedSet;
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
 
     }
 

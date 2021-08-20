@@ -6,13 +6,16 @@
  */
 package org.gridsuite.mapping.server.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.gridsuite.mapping.server.utils.Operands;
+import org.gridsuite.mapping.server.utils.PropertyType;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
-
-import org.gridsuite.mapping.server.utils.*;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -45,7 +48,7 @@ public class FilterEntity implements Serializable {
     @Enumerated
     private Operands operand;
 
-    // Value is the value casted to a string for persistence issue
+    // Value is the value cast to a string for persistence issue
     @Column(name = "value")
     private String value;
 

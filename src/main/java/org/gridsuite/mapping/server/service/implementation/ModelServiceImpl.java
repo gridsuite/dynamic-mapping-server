@@ -10,6 +10,8 @@ import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.model.ModelEntity;
+import org.gridsuite.mapping.server.model.ModelParameterEntity;
+import org.gridsuite.mapping.server.model.ModelParameterSetEntity;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -51,17 +54,18 @@ public class ModelServiceImpl implements ModelService {
     public ParametersSet saveParametersSet(String modelName, ParametersSet set) {
         Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
         if (foundModel.isPresent()) {
-            Model modelToSave = new Model(foundModel.get());
-            List<ParametersSet> savedSets = modelToSave.getSets();
-            ParametersSet previousSet = savedSets.stream().filter(savedSet -> savedSet.getName() == set.getName()).findAny().orElse(null);
+            ModelEntity modelToUpdate = foundModel.get();
+            List<ModelParameterSetEntity> savedSets = modelToUpdate.getSets();
+            ModelParameterSetEntity previousSet = savedSets.stream().filter(savedSet -> savedSet.getName() == set.getName()).findAny().orElse(null);
+            ModelParameterSetEntity setToAdd = new ModelParameterSetEntity(modelToUpdate, set);
             if (previousSet == null) {
                 set.setLastModifiedDate(new Date());
-                savedSets.add(set);
+                savedSets.add(setToAdd);
             } else {
-                previousSet.setParameters(set.getParameters());
+                previousSet.setParameters(set.getParameters().stream().map(modelParameter -> new ModelParameterEntity(previousSet, modelParameter)).collect(Collectors.toList()));
                 previousSet.setLastModifiedDate(new Date());
             }
-            modelRepository.save(modelToSave.convertToEntity());
+            modelRepository.save(modelToUpdate);
             return set;
         } else {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
