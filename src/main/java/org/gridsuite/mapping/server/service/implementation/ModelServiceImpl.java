@@ -6,12 +6,15 @@
  */
 package org.gridsuite.mapping.server.service.implementation;
 
+import org.gridsuite.mapping.server.dto.InstanceModel;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
+import org.gridsuite.mapping.server.dto.models.SimpleModel;
 import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.model.ModelParameterEntity;
 import org.gridsuite.mapping.server.model.ModelParameterSetEntity;
+import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +34,15 @@ import java.util.stream.Collectors;
 public class ModelServiceImpl implements ModelService {
 
     private final ModelRepository modelRepository;
+    private final InstanceModelRepository instanceModelRepository;
 
     @Autowired
     public ModelServiceImpl(
-            ModelRepository modelRepository
+            ModelRepository modelRepository,
+            InstanceModelRepository instanceModelRepository
     ) {
         this.modelRepository = modelRepository;
+        this.instanceModelRepository = instanceModelRepository;
     }
 
     @Override
@@ -50,8 +56,7 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
-    @Override
-    public ParametersSet saveParametersSet(String modelName, ParametersSet set) {
+    private ParametersSet saveSetToModel(String modelName, ParametersSet set) {
         Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
         if (foundModel.isPresent()) {
             ModelEntity modelToUpdate = foundModel.get();
@@ -65,11 +70,28 @@ public class ModelServiceImpl implements ModelService {
                 previousSet.setParameters(set.getParameters().stream().map(modelParameter -> new ModelParameterEntity(previousSet, modelParameter)).collect(Collectors.toList()));
                 previousSet.setLastModifiedDate(new Date());
             }
-            modelRepository.save(modelToUpdate);
-            return set;
+            if (new Model(modelToUpdate).isParameterSetValid(set.getName())) {
+                modelRepository.save(modelToUpdate);
+                return set;
+            } else {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+            }
         } else {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public ParametersSet saveParametersSet(String modelName, ParametersSet set) {
+        return saveSetToModel(modelName, set);
+    }
+
+    @Override
+    public ParametersSet saveParametersSet(InstanceModel instanceModel, ParametersSet set) {
+        if (!instanceModelRepository.existsById(instanceModel.getId())) {
+            instanceModelRepository.save(instanceModel.convertToEntity());
+        }
+        return saveSetToModel(instanceModel.getModelName(), set);
     }
 
     @Override
@@ -81,6 +103,11 @@ public class ModelServiceImpl implements ModelService {
         } else {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public List<SimpleModel> getModels() {
+        return modelRepository.findAll().stream().map(modelEntity -> new SimpleModel(modelEntity.getModelName(), modelEntity.getEquipmentType())).collect(Collectors.toList());
     }
 }
 

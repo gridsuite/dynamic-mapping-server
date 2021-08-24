@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server;
 
 import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.model.ModelParameterDefinitionEntity;
+import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
@@ -46,10 +47,14 @@ public class ModelControllerTest {
     private ModelRepository modelRepository;
 
     @Autowired
+    private InstanceModelRepository instanceModelRepository;
+
+    @Autowired
     private MockMvc mvc;
 
     private void cleanDB() {
         modelRepository.deleteAll();
+        instanceModelRepository.deleteAll();
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
@@ -82,6 +87,7 @@ public class ModelControllerTest {
         String modelName = "LoadAlphaBeta";
         String set = "{\n" +
                 "  \"name\": \"" + name + "\",\n" +
+                "  \"modelName\": \"" + modelName + "\",\n" +
                 "  \"parameters\": [\n" +
                 "    {\n" +
                 "      \"name\": \"load_alpha\",\n" +
@@ -93,13 +99,14 @@ public class ModelControllerTest {
                 "    }\n" +
                 "  ]\n" +
                 "}";
+        String body = "{ \"set\": " + set + ", \"instance\": null}";
         // Put data
-        mvc.perform(post("/model/" + modelName + "/parameters/sets/")
-                        .content(set)
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/")
+                        .content(body)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mvc.perform(get("/model/" + modelName + "/parameters/sets/")
+        mvc.perform(get("/models/" + modelName + "/parameters/sets/")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -108,8 +115,8 @@ public class ModelControllerTest {
         Date setCreationDate = modelRepository.findById(modelName).get().getSets().get(0).getLastModifiedDate();
 
         // Update data
-        mvc.perform(post("/model/" + modelName + "/parameters/sets/")
-                        .content(set)
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/")
+                        .content(body)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -122,7 +129,7 @@ public class ModelControllerTest {
     public void definitionTest() throws Exception {
         String modelName = "LoadAlphaBeta";
 
-        mvc.perform(get("/model/" + modelName + "/parameters/definitions/")
+        mvc.perform(get("/models/" + modelName + "/parameters/definitions/")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -143,6 +150,7 @@ public class ModelControllerTest {
         String modelName = "LoadAlphaBeta";
         String set = "{\n" +
                 "  \"name\": \"" + name + "\",\n" +
+                "  \"modelName\": \"" + modelName + "\",\n" +
                 "  \"parameters\": [\n" +
                 "    {\n" +
                 "      \"name\": \"load_alpha\",\n" +
@@ -151,8 +159,10 @@ public class ModelControllerTest {
                 "  ]\n" +
                 "}";
         // Put data
-        mvc.perform(post("/model/" + modelName + "/parameters/sets/")
-                        .content(set)
+        String body = "{ \"set\": " + set + ", \"instance\": null}";
+
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/")
+                        .content(body)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.dto.models;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,10 +47,9 @@ public class Model {
         } else {
             AtomicBoolean isValid = new AtomicBoolean(true);
             List<ModelParameter> parameters = setToTest.getParameters();
-            parameterDefinitions.forEach(definition -> {
+            parameterDefinitions.stream().filter(definition -> ParameterOrigin.USER.equals(definition.getOrigin())).forEach(definition -> {
                 if (isValid.get()) {
-                    isValid.set(parameters.stream().filter(param -> param.getName() == definition.getName()).findAny().orElse(null) != null);
-
+                    isValid.set(parameters.stream().filter(param -> param.getName().equals(definition.getName())).findAny().orElse(null) != null);
                 }
             });
             return isValid.get();

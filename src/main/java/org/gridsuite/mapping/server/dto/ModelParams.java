@@ -6,9 +6,20 @@
  */
 package org.gridsuite.mapping.server.dto;
 
+import lombok.Data;
+import org.gridsuite.mapping.server.model.ModelParamsEmbeddable;
+import org.gridsuite.mapping.server.utils.ParamsType;
+
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-public interface ModelParams {
-    String getName();
+@Data
+public class ModelParams {
+    private String name;
+    private ParamsType type;
+
+    ModelParams(ModelParamsEmbeddable modelParamsEmbeddable) {
+        name = modelParamsEmbeddable.getName();
+        type = modelParamsEmbeddable.getType();
+    }
 }
