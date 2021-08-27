@@ -7,13 +7,12 @@
 package org.gridsuite.mapping.server;
 
 import org.gridsuite.mapping.server.model.*;
-import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
-import org.gridsuite.mapping.server.utils.ParamsType;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,14 +44,10 @@ public class ScriptControllerTest {
     private ScriptRepository scriptRepository;
 
     @Autowired
-    private InstanceModelRepository instanceModelRepository;
-
-    @Autowired
     private MockMvc mvc;
 
     private void cleanDB() {
         scriptRepository.deleteAll();
-        instanceModelRepository.deleteAll();
         modelRepository.deleteAll();
     }
 
@@ -66,38 +62,48 @@ public class ScriptControllerTest {
     public void setUp() {
         cleanDB();
 
-        // Prepare instance models
-        instanceModelRepository.save(new InstanceModelEntity("LoadLab", "LoadAlphaBeta", EquipmentType.LOAD, new ModelParamsEmbeddable("LAB", ParamsType.FIXED)));
-        instanceModelRepository.save(new InstanceModelEntity("GeneratorSynchronousThreeWindingsProportionalRegulations", "GeneratorThreeWindings", EquipmentType.GENERATOR, new ModelParamsEmbeddable("GSTWPR", ParamsType.PREFIX)));
-        instanceModelRepository.save(new InstanceModelEntity("GeneratorSynchronousFourWindingsProportionalRegulations", "GeneratorFourWindings", EquipmentType.GENERATOR, new ModelParamsEmbeddable("GSFWPR", ParamsType.PREFIX)));
-
-        // prepare token model
-
-        ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD,
-                null, null);
-        ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
-        definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
-        definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
-        definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu", modelToSave));
-        definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", modelToSave));
-        definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", modelToSave));
-        definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", modelToSave));
-        modelToSave.setParameterDefinitions(definitions);
-        ArrayList<ModelParameterSetEntity> modelSets = new ArrayList<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", modelToSave.getModelName(),
+        // Prepare models
+        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, null, null);
+        ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
+        ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(),
                 null,
                 new Date(),
-                modelToSave);
+                loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", setToSave.getModelName(), setToSave.getName(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity("load_beta", setToSave.getModelName(), setToSave.getName(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "2.5", setToSave));
         setToSave.setParameters(setParameters);
-        modelSets.add(setToSave);
-        modelToSave.setSets(modelSets);
-        modelRepository.save(modelToSave);
+        groupSets.add(setToSave);
+        loadGroup.setSets(groupSets);
+        loadGroups.add(loadGroup);
+        loadModel.setSetsGroups(loadGroups);
+
+        ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
+        definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
+        definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
+        definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu", loadModel));
+        definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", loadModel));
+        definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", loadModel));
+        definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", loadModel));
+        loadModel.setParameterDefinitions(definitions);
+        modelRepository.save(loadModel);
+
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null);
+        ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
+        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), null, SetGroupType.PREFIX, generatorThreeModel));
+        generatorThreeModel.setSetsGroups(generatorThreeGroups);
+        modelRepository.save(generatorThreeModel);
+
+        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null);
+        ArrayList<ModelSetsGroupEntity> generatorFourGroups = new ArrayList<>();
+        generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", generatorFourModel.getModelName(), null, SetGroupType.PREFIX, generatorFourModel));
+        generatorFourModel.setSetsGroups(generatorFourGroups);
+        modelRepository.save(generatorFourModel);
     }
 
-    String mapping(String name, String modelName) {
+    String mapping(String name, String modelName, String groupName) {
         return "{\n" +
                 "  \"name\": \"" + name + "\",\n" +
                 "  \"rules\": [\n" +
@@ -134,13 +140,15 @@ public class ScriptControllerTest {
                 "          \"type\": \"BOOLEAN\"\n" +
                 "        }\n" +
                 "      ],\n" +
-                "      \"mappedModel\": \"" + modelName + "\"\n" +
+                "      \"mappedModel\": \"" + modelName + "\",\n" +
+                "      \"setGroup\": \"" + groupName + "\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": [\n" +
                 "    {\n" +
                 "      \"family\": \"CURRENT_LIMIT\",\n" +
                 "      \"model\": \"automaton_model\",\n" +
+                "      \"setGroup\": \"automaton_model\",\n" +
                 "      \"watchedElement\": \"element_id\",\n" +
                 "      \"side\": \"Branch.Side.ONE\"\n" +
                 "    }\n" +
@@ -161,14 +169,16 @@ public class ScriptControllerTest {
     }
 
     @Test
+    @Transactional
     public void conversionTest() throws Exception {
 
         String name = "test";
-        String modelName = "GeneratorSynchronousFourWindingsProportionalRegulations";
+        String modelName = "GeneratorFourWindings";
+        String groupName = "GSFWPR";
 
         // Put data
         mvc.perform(post("/mappings/" + name)
-                        .content(mapping(name, modelName))
+                        .content(mapping(name, modelName, groupName))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -186,7 +196,7 @@ public class ScriptControllerTest {
 
         // Post a mapping without known model (OK car model not needed yet)
         mvc.perform(post("/mappings/" + name)
-                        .content(mapping(name, "unknownModel"))
+                        .content(mapping(name, "unknownModel", "unknownSet"))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -203,11 +213,11 @@ public class ScriptControllerTest {
 
         String mappingName = "origin";
         String newName = "new";
-        String modelName = "GeneratorSynchronousFourWindingsProportionalRegulations";
-
+        String modelName = "GeneratorFourWindings";
+        String groupName = "GSFWPR";
         // Put data
         mvc.perform(post("/mappings/" + mappingName)
-                        .content(mapping(mappingName, modelName))
+                        .content(mapping(mappingName, modelName, groupName))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -231,7 +241,7 @@ public class ScriptControllerTest {
 
         // Add a new script
         mvc.perform(post("/mappings/" + mappingName)
-                        .content(mapping(mappingName, modelName))
+                        .content(mapping(mappingName, modelName, groupName))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -259,11 +269,12 @@ public class ScriptControllerTest {
 
         String mappingName = "origin";
         String copyName = "copy";
-        String modelName = "GeneratorSynchronousFourWindingsProportionalRegulations";
+        String modelName = "GeneratorFourWindings";
+        String groupName = "GSFWPR";
 
         // Put data
         mvc.perform(post("/mappings/" + mappingName)
-                        .content(mapping(mappingName, modelName))
+                        .content(mapping(mappingName, modelName, groupName))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -287,7 +298,7 @@ public class ScriptControllerTest {
 
         // Add a new script
         mvc.perform(post("/mappings/" + mappingName)
-                        .content(mapping(mappingName, modelName))
+                        .content(mapping(mappingName, modelName, groupName))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -346,6 +357,8 @@ public class ScriptControllerTest {
     @Test
     public void parTest() throws Exception {
         String name = "test";
+        String modelName = "LoadAlphaBeta";
+        String groupName = "LAB";
         String mappingToTest = "{\n" +
                 "  \"name\": \"" + name + "\",\n" +
                 "  \"rules\": [\n" +
@@ -353,7 +366,8 @@ public class ScriptControllerTest {
                 "      \"composition\": \"true\",\n" +
                 "      \"equipmentType\": \"LOAD\",\n" +
                 "      \"filters\": [],\n" +
-                "      \"mappedModel\": \"" + "LoadLab" + "\"\n" +
+                "      \"mappedModel\": \"" + modelName + "\",\n" +
+                "      \"setGroup\": \"" + groupName + "\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": []," +
@@ -390,8 +404,11 @@ public class ScriptControllerTest {
     }
 
     @Test
+    @Transactional
     public void currentTest() throws Exception {
         String name = "test";
+        String setName = "LAB";
+        String modelName = "LoadAlphaBeta";
         String mappingToTest = "{\n" +
                 "  \"name\": \"" + name + "\",\n" +
                 "  \"rules\": [\n" +
@@ -399,15 +416,14 @@ public class ScriptControllerTest {
                 "      \"composition\": \"true\",\n" +
                 "      \"equipmentType\": \"LOAD\",\n" +
                 "      \"filters\": [],\n" +
-                "      \"mappedModel\": \"" + "LoadLab" + "\"\n" +
+                "      \"mappedModel\": \"" + modelName + "\",\n" +
+                "      \"setGroup\": \"" + setName + "\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": []," +
                 "  \"controlledParameters\": true" +
                 "}";
 
-        String setName = "LAB";
-        String modelName = "LoadAlphaBeta";
         String set = "{\n" +
                 "  \"name\": \"" + setName + "\",\n" +
                 "  \"modelName\": \"" + modelName + "\",\n" +
@@ -422,8 +438,15 @@ public class ScriptControllerTest {
                 "    }\n" +
                 "  ]\n" +
                 "}";
-        String body = "{ \"set\": " + set + ", \"instance\": null}";
 
+        String setGroup = "{\n" +
+                "  \"name\": \"" + setName + "\",\n" +
+                "  \"modelName\": \"" + modelName + "\",\n" +
+                "  \"type\": \"FIXED\",\n" +
+                "  \"sets\": [\n" +
+                set +
+                "  ]\n" +
+                "}";
         // Put data
         mvc.perform(post("/mappings/" + name)
                         .content(mappingToTest)
@@ -439,7 +462,7 @@ public class ScriptControllerTest {
 
         // Modify Set
         mvc.perform(post("/models/" + modelName + "/parameters/sets/")
-                        .content(body)
+                        .content(setGroup)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 

@@ -4,15 +4,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.gridsuite.mapping.server.repository;
-
-import org.gridsuite.mapping.server.model.InstanceModelEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+package org.gridsuite.mapping.server.utils;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@Repository
-public interface InstanceModelRepository extends JpaRepository<InstanceModelEntity, String> {
+public enum SetGroupType {
+    FIXED,
+    PREFIX,
+    SUFFIX,
+    CUSTOM
 }

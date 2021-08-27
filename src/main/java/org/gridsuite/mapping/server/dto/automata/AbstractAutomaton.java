@@ -31,8 +31,11 @@ public abstract class AbstractAutomaton {
     @JsonProperty
     private AutomatonFamily family;
 
-    @ApiModelProperty("Mapped Model Instance ID")
+    @ApiModelProperty("Mapped Model ID")
     private String model;
+
+    @ApiModelProperty("Mapped Parameters Set Group ID")
+    private String setGroup;
 
     @ApiModelProperty("Element watched by the automaton")
     private String watchedElement;

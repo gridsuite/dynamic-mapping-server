@@ -3,6 +3,7 @@
        automaton_id uuid not null,
         type int4 not null,
         model varchar(255) not null,
+        set_group varchar(255) not null,
         watched_element varchar(255) not null,
         mappingName varchar(255),
         primary key (automaton_id)
@@ -26,15 +27,6 @@
         primary key (filter_id, rule_id)
     );
 
-    create table instance_models (
-       id varchar(255) not null,
-        equipmentType int4,
-        modelName varchar(255),
-        params_id varchar(255),
-        params_type int4,
-        primary key (id)
-    );
-
     create table mappings (
        name varchar(255) not null,
         control_parameters boolean not null,
@@ -51,18 +43,27 @@
     );
 
     create table model_parameter_sets (
-       model_name varchar(255) not null,
+       group_name varchar(255) not null,
+        model_name varchar(255) not null,
         name varchar(255) not null,
         last_modified_date timestamp,
-        primary key (model_name, name)
+        primary key (group_name, model_name, name)
     );
 
     create table model_parameters (
        model_name varchar(255) not null,
         name varchar(255) not null,
         set_name varchar(255) not null,
+        group_name varchar(255),
         value varchar(255),
         primary key (model_name, name, set_name)
+    );
+
+    create table model_sets_group (
+       model_name varchar(255) not null,
+        name varchar(255) not null,
+        type int4,
+        primary key (model_name, name)
     );
 
     create table models (
@@ -76,6 +77,7 @@
         composition varchar(255) not null,
         type int4 not null,
         model varchar(255) not null,
+        set_group varchar(255) not null,
         mappingName varchar(255),
         primary key (rule_id)
     );
@@ -92,8 +94,9 @@ create index automaton_mappingName_index on automata (mappingName);
 create index property_automaton_id_index on automaton_properties (automaton_id);
 create index filter_rule_id_index on filters (rule_id);
 create index model_parameter_definitions_model_name_index on model_parameter_definitions (model_name);
-create index model_parameter_sets_model_name_index on model_parameter_sets (model_name);
+create index model_parameter_sets_group_name_index on model_parameter_sets (group_name);
 create index model_parameter_set_index on model_parameters (set_name);
+create index model_sets_group_model_name_index on model_sets_group (model_name);
 create index rule_mappingName_index on rules (mappingName);
 
     alter table if exists automata 
@@ -118,13 +121,18 @@ create index rule_mappingName_index on rules (mappingName);
 
     alter table if exists model_parameter_sets 
        add constraint model_parameter_sets_fk 
-       foreign key (model_name) 
-       references models;
+       foreign key (model_name, group_name) 
+       references model_sets_group;
 
     alter table if exists model_parameters 
        add constraint parameter_set_fk 
-       foreign key (model_name, set_name) 
+       foreign key (group_name, model_name, set_name) 
        references model_parameter_sets;
+
+    alter table if exists model_sets_group 
+       add constraint model_sets_groups_fk 
+       foreign key (model_name) 
+       references models;
 
     alter table if exists rules 
        add constraint mapping_rules_fk 

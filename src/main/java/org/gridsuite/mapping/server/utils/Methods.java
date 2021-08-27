@@ -6,12 +6,13 @@
  */
 package org.gridsuite.mapping.server.utils;
 
-import org.gridsuite.mapping.server.dto.models.ParametersSet;
-import org.gridsuite.mapping.server.model.InstanceModelEntity;
-import org.gridsuite.mapping.server.repository.InstanceModelRepository;
+import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -53,13 +54,8 @@ public final class Methods {
         return array.stream().map(value -> String.format(Locale.US, "%f", value)).collect(Collectors.joining(", "));
     }
 
-    public static ParametersSet getSetFromInstanceId(String instanceId, InstanceModelRepository instanceModelRepository, ModelRepository modelRepository) {
-        Optional<InstanceModelEntity> instance = instanceModelRepository.findById(instanceId);
-        if (instance.isPresent()) {
-            String[] setName = new String[]{instance.get().getModelName(), instance.get().getParams().getName()};
-            return new ParametersSet(modelRepository.findById(setName[0]).get().getSets().stream().filter(set -> set.getName() == setName[1]).findAny().orElseThrow());
-        } else {
-            throw new Error();
-        }
+    public static ParametersSetsGroup getSetsGroupFromModel(String modelName, String setGroupName, ModelRepository modelRepository) {
+        return new ParametersSetsGroup(modelRepository.findById(modelName).get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(setGroupName)).findAny().orElseThrow());
     }
 }
+

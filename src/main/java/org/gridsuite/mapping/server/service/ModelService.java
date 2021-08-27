@@ -6,9 +6,9 @@
  */
 package org.gridsuite.mapping.server.service;
 
-import org.gridsuite.mapping.server.dto.InstanceModel;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
+import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.dto.models.SimpleModel;
 
 import java.util.List;
@@ -17,13 +17,12 @@ import java.util.List;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 public interface ModelService {
-    List<ParametersSet> getParametersSetsFromModelName(String modelName);
-
-    ParametersSet saveParametersSet(String modelName, ParametersSet set);
-
-    ParametersSet saveParametersSet(InstanceModel model, ParametersSet set);
 
     List<ModelParameterDefinition> getParametersDefinitionsFromModelName(String modelName);
 
     List<SimpleModel> getModels();
+
+    List<ParametersSet> getSetsFromGroup(String modelName, String groupName);
+
+    ParametersSetsGroup saveParametersSetsGroup(String modelName, ParametersSetsGroup setsGroup, Boolean strict);
 }

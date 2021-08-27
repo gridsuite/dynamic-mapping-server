@@ -8,9 +8,8 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
+import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.MappingEntity;
-import org.gridsuite.mapping.server.model.RuleEntity;
-import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.MappingService;
@@ -34,18 +33,15 @@ import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME
 @Service
 public class MappingServiceImpl implements MappingService {
 
-    private final InstanceModelRepository instanceModelRepository;
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
 
     @Autowired
     public MappingServiceImpl(
             MappingRepository mappingRepository,
-            InstanceModelRepository instanceModelRepository,
             ModelRepository modelRepository
     ) {
         this.modelRepository = modelRepository;
-        this.instanceModelRepository = instanceModelRepository;
         this.mappingRepository = mappingRepository;
     }
 
@@ -62,9 +58,18 @@ public class MappingServiceImpl implements MappingService {
         mappingToSave.markNotNew();
         if (mappingToSave.isControlledParameters()) {
             try {
-                List<String> instantiatedModels = mappingToSave.getRules().stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
-                // Will throw if set is not found
-                instantiatedModels.stream().map(instanceId -> Methods.getSetFromInstanceId(instanceId, instanceModelRepository, modelRepository));
+                List<String[]> instantiatedModels = mappingToSave.getRules().stream().map(ruleEntity ->
+                        new String[]{
+                                ruleEntity.getMappedModel(), ruleEntity.getSetGroup()
+                        }
+                ).collect(Collectors.toList());
+                for (String[] instantiatedModel : instantiatedModels) {
+                    ParametersSetsGroup parametersSetsGroup = Methods.getSetsGroupFromModel(instantiatedModel[0], instantiatedModel[1], modelRepository);
+                    if (parametersSetsGroup.getSets().isEmpty()) {
+                        throw new Error();
+                    }
+                }
+
             } catch (Error e) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "parameter sets not found");
             }

@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.model;
 
 import lombok.*;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +37,9 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "model", nullable = false)
     private String model;
 
+    @Column(name = "set_group", nullable = false)
+    private String setGroup;
+
     @Column(name = "watched_element", nullable = false)
     private String watchedElement;
 
@@ -57,8 +61,13 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.mapping = mapping;
         this.family = automatonToCopy.getFamily();
         this.model = automatonToCopy.getModel();
+        this.setGroup = automatonToCopy.getSetGroup();
         this.watchedElement = automatonToCopy.getWatchedElement();
         this.properties = automatonToCopy.getProperties().stream().map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity)).collect(Collectors.toList());
 
+    }
+
+    public String[] getInstantiatedModel() {
+        return new String[]{model, setGroup};
     }
 }

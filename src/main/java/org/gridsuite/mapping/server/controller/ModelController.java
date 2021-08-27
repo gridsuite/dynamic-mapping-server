@@ -11,10 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.gridsuite.mapping.server.dto.InstanceModel;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
+import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.dto.models.SimpleModel;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.service.implementation.ModelServiceImpl;
@@ -38,34 +37,29 @@ public class ModelController {
 
     private final ModelService modelService;
 
-    @GetMapping(value = "/{modelName}/parameters/sets/")
-    @ApiOperation(value = "get all parameters sets for a given model")
+    @GetMapping(value = "/{modelName}/parameters/sets/{groupName}")
+    @ApiOperation(value = "get all parameters sets for a given group")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "parameter sets of the model")})
+            @ApiResponse(code = 200, message = "parameter sets of the group")})
 
-    public ResponseEntity<List<ParametersSet>> getParametersSetsFromModelName(@PathVariable("modelName") String modelName) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParametersSetsFromModelName(modelName));
+    public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName));
+    }
+
+    @PostMapping(value = "/{modelName}/parameters/sets/strict")
+    @ApiOperation(value = "Save a new parameter sets group without checking sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Parameter Set Group Saved")})
+    public ResponseEntity<ParametersSetsGroup> saveParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, true));
     }
 
     @PostMapping(value = "/{modelName}/parameters/sets/")
-    @ApiOperation(value = "Save a new parameter set")
+    @ApiOperation(value = "Save a new parameter sets group without checking sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Parameter Set Saved")})
-    public ResponseEntity<ParametersSet> saveParametersSet(@PathVariable("modelName") String modelName, @RequestBody ModelController.InitialiseSet initSet) {
-        ParametersSet body;
-        if (initSet.getInstance() != null) {
-            body = modelService.saveParametersSet(initSet.getInstance(), initSet.getSet());
-        } else {
-            body = modelService.saveParametersSet(modelName, initSet.getSet());
-        }
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(body);
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static class InitialiseSet {
-        private ParametersSet set;
-        private InstanceModel instance;
+            @ApiResponse(code = 200, message = "Parameter Set Group Saved")})
+    public ResponseEntity<ParametersSetsGroup> saveSimpleParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, false));
     }
 
     @GetMapping(value = "/{modelName}/parameters/definitions/")
