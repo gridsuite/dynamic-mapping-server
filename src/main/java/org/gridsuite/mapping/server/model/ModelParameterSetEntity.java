@@ -27,13 +27,17 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Entity
-@Table(name = "model_parameter_sets", indexes = {@Index(name = "model_parameter_sets_model_name_index", columnList = "model_name")})
+@Table(name = "model_parameter_sets", indexes = {@Index(name = "model_parameter_sets_group_name_index", columnList = "group_name")})
 @IdClass(ModelParameterSetId.class)
 public class ModelParameterSetEntity implements Serializable {
 
     @Id
     @Column(name = "name")
     private String name;
+
+    @Id
+    @Column(name = "group_name")
+    private String groupName;
 
     @Id
     @Column(name = "model_name")
@@ -46,14 +50,17 @@ public class ModelParameterSetEntity implements Serializable {
     private Date lastModifiedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "model_name", foreignKey = @ForeignKey(name = "model_parameter_sets_fk"))
-    @MapsId("modelName")
-    private ModelEntity model;
+    @JoinColumns(foreignKey = @ForeignKey(name = "model_parameter_sets_fk"), value = {
+            @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
+            @JoinColumn(name = "group_name", referencedColumnName = "name", insertable = false, updatable = false)
+    })
+    private ModelSetsGroupEntity group;
 
-    public ModelParameterSetEntity(ModelEntity model, ParametersSet set) {
-        this.model = model;
+    public ModelParameterSetEntity(ModelSetsGroupEntity group, ParametersSet set) {
+        this.group = group;
         this.name = set.getName();
-        this.modelName = model.getModelName();
+        this.groupName = group.getName();
+        this.modelName = group.getModelName();
         this.parameters = set.getParameters().stream().map(parameter -> new ModelParameterEntity(this, parameter)).collect(Collectors.toList());
         this.lastModifiedDate = set.getLastModifiedDate();
     }

@@ -23,11 +23,9 @@ import java.util.Objects;
 @Embeddable
 @Getter
 @Setter
-public class ModelParameterSetId implements Serializable {
+public class ModelSetsGroupId implements Serializable {
 
     private String name;
-
-    private String groupName;
 
     private String modelName;
 
@@ -39,15 +37,14 @@ public class ModelParameterSetId implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ModelParameterSetId modelParameterSetIdClass = (ModelParameterSetId) o;
-        return name.equals(modelParameterSetIdClass.name) &&
-                groupName.equals(modelParameterSetIdClass.groupName) &&
-                modelName.equals(modelParameterSetIdClass.modelName);
+        ModelSetsGroupId modelSetsGroupIdClass = (ModelSetsGroupId) o;
+        return name.equals(modelSetsGroupIdClass.name) &&
+                modelName.equals(modelSetsGroupIdClass.modelName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, groupName, modelName);
+        return Objects.hash(name, modelName);
     }
 
 }

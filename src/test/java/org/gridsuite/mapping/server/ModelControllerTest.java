@@ -6,13 +6,12 @@
  */
 package org.gridsuite.mapping.server;
 
-import org.gridsuite.mapping.server.model.ModelEntity;
-import org.gridsuite.mapping.server.model.ModelParameterDefinitionEntity;
-import org.gridsuite.mapping.server.repository.InstanceModelRepository;
+import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -47,14 +47,10 @@ public class ModelControllerTest {
     private ModelRepository modelRepository;
 
     @Autowired
-    private InstanceModelRepository instanceModelRepository;
-
-    @Autowired
     private MockMvc mvc;
 
     private void cleanDB() {
         modelRepository.deleteAll();
-        instanceModelRepository.deleteAll();
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
@@ -87,7 +83,6 @@ public class ModelControllerTest {
         String modelName = "LoadAlphaBeta";
         String set = "{\n" +
                 "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
                 "  \"parameters\": [\n" +
                 "    {\n" +
                 "      \"name\": \"load_alpha\",\n" +
@@ -99,28 +94,36 @@ public class ModelControllerTest {
                 "    }\n" +
                 "  ]\n" +
                 "}";
-        String body = "{ \"set\": " + set + ", \"instance\": null}";
+        String setGroup = "{\n" +
+                "  \"name\": \"" + name + "\",\n" +
+                "  \"modelName\": \"" + modelName + "\",\n" +
+                "  \"type\": \"FIXED\",\n" +
+                "  \"sets\": [\n" +
+                set +
+                "  ]\n" +
+                "}";
+
         // Put data
-        mvc.perform(post("/models/" + modelName + "/parameters/sets/")
-                        .content(body)
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
+                        .content(setGroup)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mvc.perform(get("/models/" + modelName + "/parameters/sets/")
+        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + set + "]", true));
 
-        Date setCreationDate = modelRepository.findById(modelName).get().getSets().get(0).getLastModifiedDate();
+        Date setCreationDate = modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
 
         // Update data
-        mvc.perform(post("/models/" + modelName + "/parameters/sets/")
-                        .content(body)
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
+                        .content(setGroup)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Date setUpdateDate = modelRepository.findById(modelName).get().getSets().get(0).getLastModifiedDate();
+        Date setUpdateDate = modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
 
         assertThat(setCreationDate.compareTo(setUpdateDate) < 0);
     }
@@ -159,11 +162,56 @@ public class ModelControllerTest {
                 "  ]\n" +
                 "}";
         // Put data
-        String body = "{ \"set\": " + set + ", \"instance\": null}";
+        String setGroup = "{\n" +
+                "  \"name\": \"" + name + "\",\n" +
+                "  \"modelName\": \"" + modelName + "\",\n" +
+                "  \"type\": \"FIXED\",\n" +
+                "  \"sets\": [\n" +
+                set +
+                "  ]\n" +
+                "}";
 
-        mvc.perform(post("/models/" + modelName + "/parameters/sets/")
-                        .content(body)
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
+                        .content(setGroup)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Transactional
+    public void getTest() throws Exception {
+        // Prepare models
+        ModelEntity loadModel = modelRepository.findById("LoadAlphaBeta").get();
+        List<ModelSetsGroupEntity> loadGroups = loadModel.getSetsGroups();
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
+        ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(),
+                null,
+                new Date(),
+                loadGroup);
+        ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
+        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "2.5", setToSave));
+        setToSave.setParameters(setParameters);
+        groupSets.add(setToSave);
+        loadGroup.setSets(groupSets);
+        loadGroups.add(loadGroup);
+        loadModel.setSetsGroups(loadGroups);
+        modelRepository.save(loadModel);
+
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, new ArrayList<>(), null);
+        ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
+        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
+        generatorThreeModel.setSetsGroups(generatorThreeGroups);
+        modelRepository.save(generatorThreeModel);
+
+        mvc.perform(get("/models/")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("[\n" +
+                        "{\"name\":\"LoadAlphaBeta\",\n \"type\":\"LOAD\",\"groups\":[{\"name\": \"LAB\", \"type\": \"FIXED\"}]},\n" +
+                        "{\"name\":\"GeneratorThreeWindings\",\n \"type\":\"GENERATOR\",\"groups\":[{\"name\": \"GSTWPR\", \"type\": \"PREFIX\"}]}\n" +
+                        "]", true));
     }
 }

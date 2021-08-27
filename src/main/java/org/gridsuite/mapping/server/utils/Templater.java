@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server.utils;
 import org.apache.commons.io.IOUtils;
 import org.gridsuite.mapping.server.MappingConstants;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
-import org.gridsuite.mapping.server.model.InstanceModelEntity;
+import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.service.implementation.ScriptServiceImpl;
 import org.springframework.core.io.ClassPathResource;
 import org.stringtemplate.v4.ST;
@@ -88,8 +88,7 @@ public final class Templater {
             automatonScript.add("familyModel", familyModel);
             automatonScript.add("watchedElement", automaton.getWatchedElement());
             automatonScript.add("modelName", automaton.getModel());
-            // TODO add separation if different
-            automatonScript.add("parameterSetId", automaton.getModel());
+            automatonScript.add("parameterSetId", automaton.getSetGroup());
             String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);
                 propertyScript.add("name", property.getName());
@@ -131,9 +130,9 @@ public final class Templater {
         return equipmentClass;
     }
 
-    private static String modelToParamSetId(InstanceModelEntity instanceModelEntity) {
+    private static String modelToParamSetId(ModelSetsGroupEntity modelSetsGroupEntity) {
         String format = "\"%s\"";
-        switch (instanceModelEntity.getParams().getType()) {
+        switch (modelSetsGroupEntity.getType()) {
             case FIXED:
                 break;
             case PREFIX:
@@ -143,7 +142,7 @@ public final class Templater {
                 format = MappingConstants.EQUIPMENT_ID + "+ \"%s\"";
                 break;
         }
-        return String.format(format, instanceModelEntity.getParams().getName());
+        return String.format(format, modelSetsGroupEntity.getName());
     }
 
     public static String setsToPar(List<ScriptServiceImpl.EnrichedParametersSet> sets) {

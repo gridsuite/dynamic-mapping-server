@@ -83,13 +83,15 @@ public class MappingControllerTest {
                 "          \"type\": \"BOOLEAN\"\n" +
                 "        }\n" +
                 "      ],\n" +
-                "      \"mappedModel\": \"mappedExample\"\n" +
+                "      \"mappedModel\": \"mappedExample\",\n" +
+                "      \"setGroup\": \"setGroup\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": [\n" +
                 "    {\n" +
                 "      \"family\": \"CURRENT_LIMIT\",\n" +
                 "      \"model\": \"automaton_model\",\n" +
+                "      \"setGroup\": \"automaton_group\",\n" +
                 "      \"watchedElement\": \"element_id\",\n" +
                 "      \"side\": \"Branch.Side.ONE\"\n" +
                 "    }\n" +

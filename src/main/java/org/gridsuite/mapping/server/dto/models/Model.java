@@ -27,32 +27,45 @@ public class Model {
 
     private List<ModelParameterDefinition> parameterDefinitions;
 
-    private List<ParametersSet> sets;
+    private List<ParametersSetsGroup> setsGroups;
 
     public Model(ModelEntity modelEntity) {
         modelName = modelEntity.getModelName();
         equipmentType = modelEntity.getEquipmentType();
         parameterDefinitions = modelEntity.getParameterDefinitions().stream().map(parameterDefinitionEntity -> new ModelParameterDefinition(parameterDefinitionEntity)).collect(Collectors.toList());
-        sets = modelEntity.getSets().stream().map(parametersSetEntity -> new ParametersSet(parametersSetEntity)).collect(Collectors.toList());
+        setsGroups = modelEntity.getSetsGroups().stream().map(setsGroupEntity -> new ParametersSetsGroup(setsGroupEntity)).collect(Collectors.toList());
     }
 
     public ModelEntity convertToEntity() {
         return new ModelEntity(this);
     }
 
-    public boolean isParameterSetValid(String setName) {
-        ParametersSet setToTest = sets.stream().filter(set -> set.getName() == setName).findAny().orElse(null);
-        if (setToTest == null) {
+    public boolean isParameterSetGroupValid(String groupName, boolean strict) {
+        ParametersSetsGroup groupToTest = setsGroups.stream().filter(group -> group.getName() == groupName).findAny().orElse(null);
+        if (groupToTest == null) {
             return false;
         } else {
             AtomicBoolean isValid = new AtomicBoolean(true);
-            List<ModelParameter> parameters = setToTest.getParameters();
-            parameterDefinitions.stream().filter(definition -> ParameterOrigin.USER.equals(definition.getOrigin())).forEach(definition -> {
+            List<ParametersSet> sets = groupToTest.getSets();
+            for (ParametersSet set : sets) {
                 if (isValid.get()) {
-                    isValid.set(parameters.stream().filter(param -> param.getName().equals(definition.getName())).findAny().orElse(null) != null);
+                    isValid.set(isParameterSetValid(set));
                 }
-            });
-            return isValid.get();
+            }
+            return !(strict && sets.isEmpty()) && isValid.get();
         }
     }
+
+    public boolean isParameterSetValid(ParametersSet setToTest) {
+        AtomicBoolean isValid = new AtomicBoolean(true);
+        List<ModelParameter> parameters = setToTest.getParameters();
+        parameterDefinitions.stream().filter(definition -> ParameterOrigin.USER.equals(definition.getOrigin())).forEach(definition -> {
+            if (isValid.get()) {
+                isValid.set(parameters.stream().filter(param -> param.getName().equals(definition.getName())).findAny().orElse(null) != null);
+            }
+        });
+        return isValid.get();
+    }
 }
+
+

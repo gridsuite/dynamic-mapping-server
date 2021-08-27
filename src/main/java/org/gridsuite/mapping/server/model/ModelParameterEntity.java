@@ -37,6 +37,10 @@ public class ModelParameterEntity implements Serializable {
     private String modelName;
 
     @Id
+    @Column(name = "group_name")
+    private String groupName;
+
+    @Id
     @Column(name = "set_name")
     private String setName;
 
@@ -46,6 +50,7 @@ public class ModelParameterEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(foreignKey = @ForeignKey(name = "parameter_set_fk"), value = {
             @JoinColumn(name = "set_name", referencedColumnName = "name", insertable = false, updatable = false),
+            @JoinColumn(name = "group_name", referencedColumnName = "group_name", insertable = false, updatable = false),
             @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false)
     })
     private ModelParameterSetEntity set;
@@ -53,7 +58,7 @@ public class ModelParameterEntity implements Serializable {
     public ModelParameterEntity(ModelParameterSetEntity set, ModelParameter parameter) {
         this.set = set;
         name = parameter.getName();
-        modelName = set.getModelName();
+        modelName = set.getGroup().getModelName();
         setName = set.getName();
         value = parameter.getValue();
     }

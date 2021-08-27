@@ -14,13 +14,16 @@ import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
+import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.*;
-import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.service.ScriptService;
-import org.gridsuite.mapping.server.utils.*;
+import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
+import org.gridsuite.mapping.server.utils.ParameterType;
+import org.gridsuite.mapping.server.utils.Templater;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,7 +40,6 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 public class ScriptServiceImpl implements ScriptService {
 
-    private final InstanceModelRepository instanceModelRepository;
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
     private final ScriptRepository scriptRepository;
@@ -45,11 +47,9 @@ public class ScriptServiceImpl implements ScriptService {
     public ScriptServiceImpl(
             MappingRepository mappingRepository,
             ScriptRepository scriptRepository,
-            InstanceModelRepository instanceModelRepository,
             ModelRepository modelRepository
     ) {
         this.modelRepository = modelRepository;
-        this.instanceModelRepository = instanceModelRepository;
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
     }
@@ -65,8 +65,11 @@ public class ScriptServiceImpl implements ScriptService {
             String createdPar = null;
             if (foundMapping.get().isControlledParameters()) {
                 try {
-                    List<String> instantiatedModels = foundMapping.get().getRules().stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
-                    List<EnrichedParametersSet> sets = instantiatedModels.stream().map(this::getEnrichedSetFromInstanceId).collect(Collectors.toList());
+                    List<String[]> instantiatedModels = foundMapping.get().getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
+                    instantiatedModels.addAll(foundMapping.get().getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
+                    List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getEnrichedSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
+                    List<EnrichedParametersSet> sets = new ArrayList<>();
+                    setsLists.forEach(sets::addAll);
                     createdPar = Templater.setsToPar(sets);
                 } catch (Error e) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter sets");
@@ -154,8 +157,11 @@ public class ScriptServiceImpl implements ScriptService {
     private boolean isScriptCurrent(Script script) {
         try {
             MappingEntity scriptMapping = mappingRepository.findById(script.getParentName()).get();
-            List<String> instantiatedModels = scriptMapping.getRules().stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
-            List<ParametersSet> sets = instantiatedModels.stream().map(instanceId -> Methods.getSetFromInstanceId(instanceId, instanceModelRepository, modelRepository)).collect(Collectors.toList());
+            List<String[]> instantiatedModels = scriptMapping.getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
+            instantiatedModels.addAll(scriptMapping.getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
+            List<List<ParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
+            List<ParametersSet> sets = new ArrayList<>();
+            setsLists.forEach(sets::addAll);
             return sets.parallelStream().reduce(true, (acc, set) -> acc && script.getCreatedDate().compareTo(set.getLastModifiedDate()) >= 0, (a, b) -> a && b);
         } catch (Error e) {
             // Script status cannot be checked: Missing parts
@@ -163,14 +169,24 @@ public class ScriptServiceImpl implements ScriptService {
         }
     }
 
-    private EnrichedParametersSet getEnrichedSetFromInstanceId(String instanceId) {
-        Optional<InstanceModelEntity> instance = instanceModelRepository.findById(instanceId);
-        if (instance.isPresent()) {
-            String[] setName = new String[]{instance.get().getModelName(), instance.get().getParams().getName()};
-            ModelEntity model = modelRepository.findById(setName[0]).get();
-            ParametersSet correspondingSet = new ParametersSet(model.getSets().stream().filter(set -> set.getName().equals(setName[1])).findAny().orElseThrow());
-            List<ModelParameterDefinition> correspondingDefinitions = model.getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
-            return new EnrichedParametersSet(correspondingSet, correspondingDefinitions);
+    private List<EnrichedParametersSet> getEnrichedSetsFromInstanceModel(String modelName, String groupName) {
+        Optional<ModelEntity> model = modelRepository.findById(modelName);
+        if (model.isPresent()) {
+            ParametersSetsGroup correspondingGroup = new ParametersSetsGroup(model.get().getSetsGroups().stream().filter(group -> group.getName().equals(groupName)).findAny().orElseThrow());
+            List<ParametersSet> correspondingSets = correspondingGroup.getSets();
+            List<ModelParameterDefinition> correspondingDefinitions = model.get().getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
+
+            return correspondingSets.stream().map(set -> new EnrichedParametersSet(set, correspondingDefinitions)).collect(Collectors.toList());
+        } else {
+            throw new Error();
+        }
+    }
+
+    private List<ParametersSet> getSetsFromInstanceModel(String modelName, String groupName) {
+        Optional<ModelEntity> model = modelRepository.findById(modelName);
+        if (model.isPresent()) {
+            ParametersSetsGroup correspondingGroup = new ParametersSetsGroup(model.get().getSetsGroups().stream().filter(group -> group.getName().equals(groupName)).findAny().orElseThrow());
+            return correspondingGroup.getSets();
         } else {
             throw new Error();
         }
@@ -223,15 +239,15 @@ public class ScriptServiceImpl implements ScriptService {
     public class FlatRule {
         private EquipmentType equipmentType;
 
-        private InstanceModelEntity mappedModel;
+        private ModelSetsGroupEntity mappedModel;
 
         private String composition;
 
         public FlatRule(Rule rule) {
-            Optional<InstanceModelEntity> foundModel = instanceModelRepository.findById(rule.getMappedModel());
+            Optional<ModelEntity> foundModel = modelRepository.findById(rule.getMappedModel());
             if (foundModel.isPresent()) {
                 equipmentType = rule.getEquipmentType();
-                mappedModel = foundModel.get();
+                mappedModel = foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(rule.getSetGroup())).findAny().orElseThrow();
                 composition = Templater.flattenFilters(rule.getComposition(), rule.getFilters());
             } else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");

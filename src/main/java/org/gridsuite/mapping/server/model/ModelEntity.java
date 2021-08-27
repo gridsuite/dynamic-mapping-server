@@ -11,6 +11,7 @@ import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,10 +36,10 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     private EquipmentType equipmentType;
 
     @OneToMany(targetEntity = ModelParameterDefinitionEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ModelParameterDefinitionEntity> parameterDefinitions;
+    private List<ModelParameterDefinitionEntity> parameterDefinitions = new ArrayList<>(0);
 
-    @OneToMany(targetEntity = ModelParameterSetEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ModelParameterSetEntity> sets;
+    @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
     @Override
     public String getId() {
@@ -49,14 +50,7 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
         parameterDefinitions = modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), this)).collect(Collectors.toList());
-        sets = modelToConvert.getSets().stream().map(set -> {
-            ModelParameterSetEntity convertedSet = new ModelParameterSetEntity(set.getName(), modelToConvert.getModelName(), null, set.getLastModifiedDate(), this);
-            convertedSet.setParameters(set.getParameters().stream().map(parameter -> new ModelParameterEntity(
-                    parameter.getName(), modelToConvert.getModelName(), set.getName(), parameter.getValue(), convertedSet
-            )).collect(Collectors.toList()));
-            return convertedSet;
-        }).collect(Collectors.toList());
-
+        setsGroups = modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList());
     }
 
 }

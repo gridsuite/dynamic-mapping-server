@@ -34,6 +34,9 @@ public abstract class AbstractAutomaton {
     @Schema(description = "Mapped Model Instance ID")
     private String model;
 
+    @Schema(description = "Mapped Parameters Set Group ID")
+    private String setGroup;
+
     @Schema(description = "Element watched by the automaton")
     private String watchedElement;
 

@@ -11,5 +11,6 @@ package org.gridsuite.mapping.server.utils;
  */
 public enum EquipmentType {
     GENERATOR,
-    LOAD
+    LOAD,
+    CURRENT_LIMIT
 }
