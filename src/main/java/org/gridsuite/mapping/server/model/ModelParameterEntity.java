@@ -58,6 +58,7 @@ public class ModelParameterEntity implements Serializable {
     public ModelParameterEntity(ModelParameterSetEntity set, ModelParameter parameter) {
         this.set = set;
         name = parameter.getName();
+        groupName = set.getGroup().getName();
         modelName = set.getGroup().getModelName();
         setName = set.getName();
         value = parameter.getValue();

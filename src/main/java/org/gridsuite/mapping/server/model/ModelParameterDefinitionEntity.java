@@ -48,6 +48,9 @@ public class ModelParameterDefinitionEntity implements Serializable {
     @Column(name = "origin_name")
     private String originName;
 
+    @Column(name = "fixed_value")
+    private String fixedValue;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_name", foreignKey = @ForeignKey(name = "model_parameter_definition_fk"))
     @MapsId("modelName")
