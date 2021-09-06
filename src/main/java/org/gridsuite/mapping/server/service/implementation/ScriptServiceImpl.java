@@ -268,7 +268,7 @@ public class ScriptServiceImpl implements ScriptService {
             parameters = definitions.stream().map(definition ->
                     new EnrichedParameter(
                             definition.getName(),
-                            definition.getOrigin() == ParameterOrigin.NETWORK ? null : set.getParameters().stream().filter(parameter -> parameter.getName() == definition.getName()).findAny().orElseThrow().getValue(),
+                            definition.getOrigin() == ParameterOrigin.NETWORK ? null : set.getParameters().stream().filter(parameter -> parameter.getName().equals(definition.getName())).findAny().orElseThrow().getValue(),
                             definition.getType(),
                             definition.getOrigin(),
                             definition.getOriginName()
