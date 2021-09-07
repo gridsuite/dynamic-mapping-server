@@ -7,6 +7,8 @@
 package org.gridsuite.mapping.server.service.implementation;
 
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
 import org.gridsuite.mapping.server.dto.NetworkIdentification;
@@ -24,9 +26,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.powsybl.network.store.client.NetworkStoreService;
-import com.powsybl.iidm.network.Network;
-
 import java.util.*;
 
 import static org.gridsuite.mapping.server.MappingConstants.*;
@@ -41,8 +40,8 @@ public class NetworkServiceImpl implements NetworkService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private String caseServerBaseUri;
-    private String networkConversionServerBaseUri;
+    private final String caseServerBaseUri;
+    private final String networkConversionServerBaseUri;
 
     @Autowired
     private NetworkStoreService networkStoreService;
@@ -175,12 +174,15 @@ public class NetworkServiceImpl implements NetworkService {
                 // Cannot convert to UUID in test mocks
                 String.class
         );
-        try {
-            UUID caseUuid = UUID.fromString(response.getBody().substring(1, 37));
-            NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
-            return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
-        } catch (NullPointerException e) {
+        String responseBody = response.getBody();
+        if (responseBody == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
+        UUID caseUuid = UUID.fromString(responseBody.substring(1, 37));
+        NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
+        if (networkIdentification == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+        }
+        return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
     }
 }
