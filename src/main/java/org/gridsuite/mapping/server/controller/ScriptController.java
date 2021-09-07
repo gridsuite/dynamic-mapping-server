@@ -6,10 +6,10 @@
  */
 package org.gridsuite.mapping.server.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.Script;
@@ -25,62 +25,62 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/scripts")
-@Api(value = "Mapping script server")
+@Tag(name = "Mapping server")
 @AllArgsConstructor
 public class ScriptController {
 
     private final ScriptService scriptService;
 
     @GetMapping(value = "/from/{mappingName}")
-    @ApiOperation(value = "Convert a mapping to a groovy script and return it")
+    @Operation(summary = "Convert a mapping to a groovy script and return it")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "The converted mapping"),
-            @ApiResponse(code = 404, message = "Mapping not found"),
-            @ApiResponse(code = 400, message = "Something happened") })
+            @ApiResponse(responseCode = "200", description = "The converted mapping"),
+            @ApiResponse(responseCode = "404", description = "Mapping not found"),
+            @ApiResponse(responseCode = "400", description = "Something happened") })
     public ResponseEntity<Script> createFromMapping(@PathVariable("mappingName") String mappingName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(scriptService.createFromMapping(mappingName));
     }
 
     @GetMapping(value = "/")
-    @ApiOperation(value = "Get all scripts")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "The list of scripts")})
+    @Operation(summary = "Get all scripts")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of scripts")})
     public ResponseEntity<List<Script>> getScriptList() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(scriptService.getAllScripts());
     }
 
     @DeleteMapping(value = "/{scriptName}")
-    @ApiOperation(value = "delete the script")
-    @ApiResponse(code = 200, message = "Script deleted")
+    @Operation(summary = "delete the script")
+    @ApiResponse(responseCode = "200", description = "Script deleted")
     public ResponseEntity<String> deleteScript(@PathVariable("scriptName") String scriptName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(
                 scriptService.deleteScript(scriptName));
     }
 
     @PostMapping(value = "/{scriptName}")
-    @ApiOperation(value = "Save a script")
+    @Operation(summary = "Save a script")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Script save"),
-            @ApiResponse(code = 404, message = "Script not found")})
+            @ApiResponse(responseCode = "201", description = "Script save"),
+            @ApiResponse(responseCode = "404", description = "Script not found")})
     public ResponseEntity<Void> saveScript(@PathVariable("scriptName") String scriptName, @RequestBody Script script) {
         scriptService.saveScript(scriptName, script);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(null);
     }
 
     @PostMapping(value = "/rename/{oldName}/to/{newName}")
-    @ApiOperation(value = "Rename a script")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = " Both names of the script"),
-            @ApiResponse(code = 404, message = "Script not found"),
-            @ApiResponse(code = 500, message = "The storage is down or a script with the same name already exists")})
+    @Operation(summary = "Rename a script")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = " Both names of the script"),
+            @ApiResponse(responseCode = "404", description = "Script not found"),
+            @ApiResponse(responseCode = "500", description = "The storage is down or a script with the same name already exists")})
     public ResponseEntity<RenameObject> renameMapping(@PathVariable("oldName") String oldName, @PathVariable("newName") String newName) {
         RenameObject renamedMapping = scriptService.renameScript(oldName, newName);
         return ResponseEntity.ok().body(renamedMapping);
     }
 
     @PostMapping(value = "/copy/{originalName}/to/{copyName}")
-    @ApiOperation(value = "Copy a script")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Script Copy"),
-            @ApiResponse(code = 404, message = "Script not found"),
-            @ApiResponse(code = 500, message = "The storage is down or a script with the same name already exists")})
+    @Operation(summary = "Copy a script")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Script Copy"),
+            @ApiResponse(responseCode = "404", description = "Script not found"),
+            @ApiResponse(responseCode = "500", description = "The storage is down or a script with the same name already exists")})
     public ResponseEntity<Script> copyMapping(@PathVariable("originalName") String originalName, @PathVariable("copyName") String copyName) {
         Script copiedScript = scriptService.copyScript(originalName, copyName);
         return ResponseEntity.ok().body(copiedScript);

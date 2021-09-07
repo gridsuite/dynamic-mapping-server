@@ -6,10 +6,10 @@
  */
 package org.gridsuite.mapping.server.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
 import org.gridsuite.mapping.server.service.NetworkService;
@@ -28,7 +28,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping(value = "/network")
-@Api(value = "Mapping network server")
+@Tag(name = "Mapping network server")
 @AllArgsConstructor
 @ComponentScan(basePackageClasses = {NetworkServiceImpl.class})
 
@@ -37,18 +37,18 @@ public class NetworkController {
     private final NetworkService networkService;
 
     @GetMapping(value = "/{networkUuid}/values")
-    @ApiOperation(value = "Convert a mapping to a groovy script and return it")
+    @Operation(summary = "Convert a mapping to a groovy script and return it")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Possible property values of the network") })
+            @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
 
     public ResponseEntity<List<EquipmentValues>> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
     }
 
     @PostMapping(value = "/new")
-    @ApiOperation(value = "Import an iidm")
+    @Operation(summary = "Import an iidm")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Possible property values of the network") })
+            @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
     public ResponseEntity<List<EquipmentValues>> getNetworkValues(@RequestPart("file") MultipartFile networkFile) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(networkFile));
     }
