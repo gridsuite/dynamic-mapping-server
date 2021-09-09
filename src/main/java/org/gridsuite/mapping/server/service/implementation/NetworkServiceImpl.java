@@ -66,8 +66,8 @@ public class NetworkServiceImpl implements NetworkService {
     public List<EquipmentValues> getNetworkValuesFromExistingNetwork(UUID networkUuid) {
         Network network = getNetwork(networkUuid);
 
-        HashMap<String, List<String>> substationsPropertyValues = getSubstationsPropertyValues(network);
-        HashMap<String, List<String>> voltageLevelsPropertyValues = getVoltageLevelsPropertyValues(network);
+        HashMap<String, Set<String>> substationsPropertyValues = getSubstationsPropertyValues(network);
+        HashMap<String, Set<String>> voltageLevelsPropertyValues = getVoltageLevelsPropertyValues(network);
 
         List<EquipmentValues> equipmentValuesList = new ArrayList<>();
 
@@ -80,21 +80,19 @@ public class NetworkServiceImpl implements NetworkService {
         return equipmentValuesList;
     }
 
-    private void setPropertyMap(HashMap<String, List<String>> propertyMap, String value, String propertyName) {
+    private void setPropertyMap(HashMap<String, Set<String>> propertyMap, String value, String propertyName) {
         if (propertyMap.containsKey(propertyName)) {
-            List<String> propertyValues = propertyMap.get(propertyName);
-            if (!propertyValues.contains(value)) {
-                propertyValues.add(value);
-            }
+            Set<String> propertyValues = propertyMap.get(propertyName);
+            propertyValues.add(value);
         } else {
-            ArrayList<String> propertyValues = new ArrayList<>();
+            Set<String> propertyValues = new HashSet<>();
             propertyValues.add(value);
             propertyMap.put(propertyName, propertyValues);
         }
     }
 
-    private HashMap<String, List<String>> getSubstationsPropertyValues(Network network) {
-        final HashMap<String, List<String>> substationsMap = new HashMap<>();
+    private HashMap<String, Set<String>> getSubstationsPropertyValues(Network network) {
+        final HashMap<String, Set<String>> substationsMap = new HashMap<>();
         network.getSubstations().forEach(substation -> {
             // Country
             Optional<Country> substationCountry = substation.getCountry();
@@ -108,8 +106,8 @@ public class NetworkServiceImpl implements NetworkService {
         return substationsMap;
     }
 
-    private HashMap<String, List<String>> getVoltageLevelsPropertyValues(Network network) {
-        HashMap<String, List<String>> voltageLevelsMap = new HashMap<>();
+    private HashMap<String, Set<String>> getVoltageLevelsPropertyValues(Network network) {
+        HashMap<String, Set<String>> voltageLevelsMap = new HashMap<>();
         network.getVoltageLevels().forEach(voltageLevel -> {
             // nominalV
             String voltageLevelNominalV = String.valueOf(voltageLevel.getNominalV());
@@ -119,8 +117,8 @@ public class NetworkServiceImpl implements NetworkService {
         return voltageLevelsMap;
     }
 
-    private EquipmentValues getGeneratorsEquipmentValues(Network network, HashMap<String, List<String>> voltageLevelsPropertyValues, HashMap<String, List<String>> substationsPropertyValues) {
-        HashMap<String, List<String>> generatorValuesMap = new HashMap<>();
+    private EquipmentValues getGeneratorsEquipmentValues(Network network, HashMap<String, Set<String>> voltageLevelsPropertyValues, HashMap<String, Set<String>> substationsPropertyValues) {
+        HashMap<String, Set<String>> generatorValuesMap = new HashMap<>();
         // Own properties
         network.getGenerators().forEach(generator -> {
             setPropertyMap(generatorValuesMap, String.valueOf(generator.getId()), ID_PROPERTY);
@@ -134,8 +132,8 @@ public class NetworkServiceImpl implements NetworkService {
         return new EquipmentValues(EquipmentType.GENERATOR, generatorValuesMap);
     }
 
-    private EquipmentValues getLoadsEquipmentValues(Network network, HashMap<String, List<String>> voltageLevelsPropertyValues, HashMap<String, List<String>> substationsPropertyValues) {
-        HashMap<String, List<String>> loadValuesMap = new HashMap<>();
+    private EquipmentValues getLoadsEquipmentValues(Network network, HashMap<String, Set<String>> voltageLevelsPropertyValues, HashMap<String, Set<String>> substationsPropertyValues) {
+        HashMap<String, Set<String>> loadValuesMap = new HashMap<>();
         // Own properties
         network.getLoads().forEach(load -> {
             setPropertyMap(loadValuesMap, String.valueOf(load.getLoadType()), LOAD_TYPE_PROPERTY);

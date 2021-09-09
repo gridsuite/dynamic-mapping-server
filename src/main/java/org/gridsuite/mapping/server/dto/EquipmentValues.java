@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Data
 @Schema(description = "Equipment Values")
@@ -14,5 +14,5 @@ import java.util.Map;
 public class EquipmentValues {
     private EquipmentType type;
 
-    private Map<String, List<String>> values;
+    private Map<String, Set<String>> values;
 }
