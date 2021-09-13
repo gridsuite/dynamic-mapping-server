@@ -38,9 +38,9 @@ public class NetworkController {
     private final NetworkService networkService;
 
     @GetMapping(value = "/{networkUuid}/values")
-    @Operation(summary = "Fetch a known mapping from the server")
+    @Operation(summary = "Fetch property values of a known network from the server")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
+            @ApiResponse(responseCode = "200", description = "List of property values of the network")})
 
     public ResponseEntity<List<EquipmentValues>> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
