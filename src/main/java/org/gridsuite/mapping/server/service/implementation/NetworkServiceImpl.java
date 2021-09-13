@@ -67,7 +67,7 @@ public class NetworkServiceImpl implements NetworkService {
         try {
             return networkStoreService.getNetwork(networkUuid, PreloadingStrategy.COLLECTION);
         } catch (PowsyblException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Network '" + networkUuid + "' not found", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "network-store-client error", e);
         }
     }
 

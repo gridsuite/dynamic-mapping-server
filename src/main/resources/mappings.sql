@@ -25,7 +25,7 @@
 
     create table networks (
        network_id uuid not null,
-        iidm_name varchar(255),
+        network_name varchar(255),
         primary key (network_id)
     );
 
