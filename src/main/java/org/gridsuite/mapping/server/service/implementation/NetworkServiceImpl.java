@@ -12,6 +12,9 @@ import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
 import org.gridsuite.mapping.server.dto.NetworkIdentification;
+import org.gridsuite.mapping.server.dto.OutputNetwork;
+import org.gridsuite.mapping.server.model.NetworkEntity;
+import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.gridsuite.mapping.server.MappingConstants.*;
 
@@ -46,12 +50,16 @@ public class NetworkServiceImpl implements NetworkService {
     @Autowired
     private NetworkStoreService networkStoreService;
 
+    private final NetworkRepository networkRepository;
+
     @Autowired
     public NetworkServiceImpl(
             @Value("${backing-services.case.base-uri:http://case-server/}") String caseServerBaseUri,
-            @Value("${backing-services.network-conversion.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri) {
+            @Value("${backing-services.network-conversion.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri,
+            NetworkRepository networkRepository) {
         this.caseServerBaseUri = caseServerBaseUri;
         this.networkConversionServerBaseUri = networkConversionServerBaseUri;
+        this.networkRepository = networkRepository;
     }
 
     private Network getNetwork(UUID networkUuid) {
@@ -181,6 +189,14 @@ public class NetworkServiceImpl implements NetworkService {
         if (networkIdentification == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
+
+        networkRepository.save(new NetworkEntity(networkIdentification.getNetworkUuid(), multipartFile.getOriginalFilename()));
+
         return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
+    }
+
+    @Override
+    public List<OutputNetwork> getNetworks() {
+        return networkRepository.findAll().stream().map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getIidmName())).collect(Collectors.toList());
     }
 }

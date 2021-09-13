@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
+import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.service.implementation.NetworkServiceImpl;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,12 +38,21 @@ public class NetworkController {
     private final NetworkService networkService;
 
     @GetMapping(value = "/{networkUuid}/values")
-    @Operation(summary = "Convert a mapping to a groovy script and return it")
+    @Operation(summary = "Fetch a known mapping from the server")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
 
     public ResponseEntity<List<EquipmentValues>> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
+    }
+
+    @GetMapping(value = "/")
+    @Operation(summary = "Get all known networks names")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of the network names")})
+
+    public ResponseEntity<List<OutputNetwork>> getKnownNetworks() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworks());
     }
 
     @PostMapping(value = "/new")

@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server.service;
 
 import org.gridsuite.mapping.server.dto.EquipmentValues;
+import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -17,8 +18,9 @@ import java.util.UUID;
  */
 public interface NetworkService {
 
-    List<EquipmentValues> getNetworkValuesFromExistingNetwork(UUID  networkUuid);
+    List<EquipmentValues> getNetworkValuesFromExistingNetwork(UUID networkUuid);
 
     List<EquipmentValues> getNetworkValues(MultipartFile file);
 
+    List<OutputNetwork> getNetworks();
 }

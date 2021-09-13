@@ -23,6 +23,12 @@
         primary key (name)
     );
 
+    create table networks (
+       network_id uuid not null,
+        iidm_name varchar(255),
+        primary key (network_id)
+    );
+
     create table rules (
        rule_id uuid not null,
         composition varchar(255) not null,
