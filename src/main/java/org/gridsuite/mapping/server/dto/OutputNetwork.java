@@ -22,5 +22,5 @@ public class OutputNetwork {
 
     private UUID networkId;
 
-    private String iidmName;
+    private String networkName;
 }

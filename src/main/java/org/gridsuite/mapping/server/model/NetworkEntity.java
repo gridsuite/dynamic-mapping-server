@@ -30,6 +30,6 @@ public class NetworkEntity {
     @Column(name = "network_id")
     private UUID networkId;
 
-    @Column(name = "iidm_name")
-    private String iidmName;
+    @Column(name = "network_name")
+    private String networkName;
 }

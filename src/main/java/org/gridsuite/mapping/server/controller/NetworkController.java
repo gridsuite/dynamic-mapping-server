@@ -56,9 +56,9 @@ public class NetworkController {
     }
 
     @PostMapping(value = "/new")
-    @Operation(summary = "Import an iidm")
+    @Operation(summary = "Post a network and retrieve its values")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
+            @ApiResponse(responseCode = "200", description = "List of property values of the network")})
     public ResponseEntity<List<EquipmentValues>> getNetworkValues(@RequestPart("file") MultipartFile networkFile) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(networkFile));
     }

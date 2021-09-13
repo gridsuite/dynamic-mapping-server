@@ -124,14 +124,14 @@ public class NetworkControllerTest {
         assertEquals(1, savedNetworks.size());
         NetworkEntity expectedEntity = new NetworkEntity(networkUUID, "test.iidm");
         NetworkEntity actualEntity = savedNetworks.get(0);
-        assertTrue(expectedEntity.getNetworkId().equals(actualEntity.getNetworkId()) && expectedEntity.getIidmName().equals(actualEntity.getIidmName()));
+        assertTrue(expectedEntity.getNetworkId().equals(actualEntity.getNetworkId()) && expectedEntity.getNetworkName().equals(actualEntity.getNetworkName()));
 
     }
 
     private String network(UUID id, String name) {
         return "{\n" +
                 "  \"networkId\": \"" + id + "\",\n" +
-                "  \"iidmName\": \"" + name + "\"\n" +
+                "  \"networkName\": \"" + name + "\"\n" +
                 "}";
     }
 

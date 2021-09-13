@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.service.implementation;
 
+import com.powsybl.commons.PowsyblException;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
@@ -65,8 +66,10 @@ public class NetworkServiceImpl implements NetworkService {
     private Network getNetwork(UUID networkUuid) {
         try {
             return networkStoreService.getNetwork(networkUuid, PreloadingStrategy.COLLECTION);
-        } catch (Exception e) {
+        } catch (PowsyblException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Network '" + networkUuid + "' not found");
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Network Server is unavailable");
         }
     }
 
@@ -197,6 +200,6 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public List<OutputNetwork> getNetworks() {
-        return networkRepository.findAll().stream().map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getIidmName())).collect(Collectors.toList());
+        return networkRepository.findAll().stream().map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getNetworkName())).collect(Collectors.toList());
     }
 }
