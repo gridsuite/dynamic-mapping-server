@@ -28,7 +28,7 @@ public class InputMapping implements Mapping {
     @Schema(description = "Mapping rules")
     private List<Rule> rules;
 
-    @ApiModelProperty("Mapping automata")
+    @Schema(description = "Mapping automata")
     private List<AbstractAutomaton> automata;
 
     public MappingEntity convertMappingToEntity() {

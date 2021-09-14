@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server.dto.automata;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
@@ -27,14 +27,14 @@ import java.util.ArrayList;
         @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT")})
 @Data
 public abstract class AbstractAutomaton {
-    @ApiModelProperty("Automaton family")
+    @Schema(description = "Automaton family")
     @JsonProperty
     private AutomatonFamily family;
 
-    @ApiModelProperty("Mapped Model Instance ID")
+    @Schema(description = "Mapped Model Instance ID")
     private String model;
 
-    @ApiModelProperty("Element watched by the automaton")
+    @Schema(description = "Element watched by the automaton")
     private String watchedElement;
 
     public abstract ArrayList<BasicProperty> convertToBasicProperties();
