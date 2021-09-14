@@ -1,6 +1,8 @@
 package org.gridsuite.mapping.server;
 
-import org.gridsuite.mapping.server.dto.filters.*;
+import org.gridsuite.mapping.server.dto.filters.BooleanFilter;
+import org.gridsuite.mapping.server.dto.filters.NumberFilter;
+import org.gridsuite.mapping.server.dto.filters.StringFilter;
 import org.gridsuite.mapping.server.utils.Operands;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -40,7 +42,7 @@ public class FilterToStringTest {
 
         filter.setFilterId("id");
         filter.setProperty("property");
-        ArrayList<Float> numberList = new ArrayList();
+        ArrayList<Float> numberList = new ArrayList<>();
         numberList.add(1F);
         filter.setValue(numberList);
 

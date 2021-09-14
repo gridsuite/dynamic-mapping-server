@@ -13,8 +13,9 @@ import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.Methods;
 import org.gridsuite.mapping.server.utils.PropertyType;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class StringFilter extends AbstractFilter {
 
-    private ArrayList<String> value;
+    private List<String> value;
 
     @Override
     public FilterEntity convertFilterToEntity(RuleEntity rule) {
@@ -47,6 +48,8 @@ public class StringFilter extends AbstractFilter {
         String template = "%sequipment.%s.%s(%s)";
         boolean checkFirstValueOnly = false;
 
+        String containsOperand = "contains";
+
         switch (this.getOperand()) {
             case EQUALS:
                 stringOperand = "equals";
@@ -63,7 +66,7 @@ public class StringFilter extends AbstractFilter {
 
                 break;
             case INCLUDES:
-                stringOperand = "contains";
+                stringOperand = containsOperand;
                 checkFirstValueOnly = true;
                 break;
             case ENDS_WITH:
@@ -71,17 +74,19 @@ public class StringFilter extends AbstractFilter {
                 checkFirstValueOnly = true;
                 break;
             case IN:
-                stringOperand = "contains";
+                stringOperand = containsOperand;
                 template = "%s%s.%s(equipment.%s)";
                 break;
             case NOT_IN:
-                stringOperand = "contains";
+                stringOperand = containsOperand;
                 notPrefix = "!";
                 template = "%s%s.%s(equipment.%s)";
                 break;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Operand");
         }
-        // Need to escape string values;
-        List<String> escapedValues = value.stream().map(value -> String.format("\"%s\"", value.replaceAll("\"", "\\\""))).collect(Collectors.toList());
+
+        List<String> escapedValues = value.stream().map(unitValue -> String.format("\"%s\"", unitValue.replace("\"", "\\\""))).collect(Collectors.toList());
         if (checkFirstValueOnly) {
             return String.format(template, notPrefix, this.getProperty(), stringOperand, escapedValues.get(0));
         } else {
