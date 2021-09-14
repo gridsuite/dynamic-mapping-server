@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.model.MappingEntity;
 
 import java.util.List;
@@ -27,15 +28,20 @@ public class InputMapping implements Mapping {
     @Schema(description = "Mapping rules")
     private List<Rule> rules;
 
+    @ApiModelProperty("Mapping automata")
+    private List<AbstractAutomaton> automata;
+
     public MappingEntity convertMappingToEntity() {
         MappingEntity convertedMapping = new MappingEntity();
         convertedMapping.setName(name);
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
+        convertedMapping.setAutomata(automata.stream().map(automaton -> automaton.convertAutomatonToEntity(convertedMapping)).collect(Collectors.toList()));
         return convertedMapping;
     }
 
     public InputMapping(MappingEntity mappingEntity) {
         name = mappingEntity.getName();
         rules = mappingEntity.getRules().stream().map(ruleEntity -> new Rule(ruleEntity)).collect(Collectors.toList());
+        automata = mappingEntity.getAutomata().stream().map(automatonEntity -> AbstractAutomaton.instantiateFromEntity(automatonEntity)).collect(Collectors.toList());
     }
 }

@@ -42,16 +42,21 @@ public final class Templater {
         String scriptTemplate;
         String sortedRulesTemplate;
         String ruleTemplate;
+        String automatonTemplate;
+        String automatonPropertyTemplate;
         try {
             scriptTemplate = IOUtils.toString(new ClassPathResource("script.st").getInputStream(), Charset.defaultCharset());
             sortedRulesTemplate = IOUtils.toString(new ClassPathResource("sortedRules.st").getInputStream(), Charset.defaultCharset());
             ruleTemplate = IOUtils.toString(new ClassPathResource("rule.st").getInputStream(), Charset.defaultCharset());
+            automatonTemplate = IOUtils.toString(new ClassPathResource("automaton.st").getInputStream(), Charset.defaultCharset());
+            automatonPropertyTemplate = IOUtils.toString(new ClassPathResource("automatonProperty.st").getInputStream(), Charset.defaultCharset());
         } catch (IOException e) {
             throw new RuntimeException("Unable to load templates for groovy script generation !!");
         }
 
         ST script = new ST(scriptTemplate);
         ArrayList<String> imports = new ArrayList<>();
+        // Rules
         String[] sortedRulesScripts = sortedMapping.getSortedRules().stream().map(sortedRules -> {
             // Preparing the imports
             imports.add(MappingConstants.IMPORT + sortedRules.getEquipmentClass());
@@ -71,11 +76,34 @@ public final class Templater {
             return sortedRulesScript.render();
         }).toArray(String[]::new);
 
+        // Automata
+        String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
+            String familyModel = new String();
+            switch (automaton.getFamily()) {
+                case CURRENT_LIMIT:
+                    familyModel = MappingConstants.CURRENT_LIMIT_MODEL_CLASS;
+            }
+            imports.add(MappingConstants.AUTOMATON_IMPORT);
+            ST automatonScript = new ST(automatonTemplate);
+            automatonScript.add("familyModel", familyModel);
+            automatonScript.add("watchedElement", automaton.getWatchedElement());
+            automatonScript.add("modelName", automaton.getModel());
+            // TODO add separation if different
+            automatonScript.add("parameterSetId", automaton.getModel());
+            String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {
+                ST propertyScript = new ST(automatonPropertyTemplate);
+                propertyScript.add("name", property.getName());
+                propertyScript.add("value", property.getValue());
+                return propertyScript.render();
+            }).toArray(String[]::new);
+            automatonScript.add("properties", propertiesScripts);
+            return automatonScript.render();
+        }).toArray(String[]::new);
         // Filling the  main template
         script.add("imports", imports.toArray());
         script.add("sortedRules", sortedRulesScripts);
-
-        // TODO
+        script.add("automata", automataScripts);
+        script.add("addReturns", automataScripts.length > 0 && sortedRulesScripts.length > 0);
         return script.render();
     }
 

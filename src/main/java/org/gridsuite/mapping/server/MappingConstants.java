@@ -17,6 +17,7 @@ public final class MappingConstants {
 
     public static String EQUIPMENT_ID = "equipment.id";
     public static String IMPORT = "import com.powsybl.iidm.network.";
+    public static String AUTOMATON_IMPORT = "import com.powsybl.dynawaltz.automatons.CurrentLimitAutomaton";
     public static String DEFAULT_MAPPING_NAME = "default";
 
     public static final String CASE_API_VERSION = "v1";
@@ -33,4 +34,5 @@ public final class MappingConstants {
     // Loads
     public static final String LOAD_TYPE_PROPERTY = "loadType";
 
+    public static final String CURRENT_LIMIT_MODEL_CLASS = "CurrentLimitAutomaton";
 }

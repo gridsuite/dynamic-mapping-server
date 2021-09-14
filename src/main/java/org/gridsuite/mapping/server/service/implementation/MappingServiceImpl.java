@@ -75,7 +75,7 @@ public class MappingServiceImpl implements MappingService {
         } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
             // In case of naming of new mapping, save it to db.
             try {
-                mappingRepository.save(new MappingEntity(newName, new ArrayList<>()));
+                mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>()));
                 return new RenameObject(DEFAULT_MAPPING_NAME, newName);
 
             } catch (DataIntegrityViolationException ex) {
