@@ -18,4 +18,19 @@ public final class MappingConstants {
     public static String EQUIPMENT_ID = "equipment.id";
     public static String IMPORT = "import com.powsybl.iidm.network.";
     public static String DEFAULT_MAPPING_NAME = "default";
+
+    public static final String CASE_API_VERSION = "v1";
+    public static final String NETWORK_CONVERSION_API_VERSION = "v1";
+
+    public static final String ID_PROPERTY = "id";
+    // Substations
+    public static final String COUNTRY_PROPERTY = "terminal.voltageLevel.substation.country.name";
+    // Voltage Levels
+    public static final String NOMINAL_V_PROPERTY = "terminal.voltageLevel.nominalV";
+    // Generators
+    public static final String ENERGY_SOURCE_PROPERTY = "energySource";
+    public static final String VOLTAGE_REGULATOR_ON_PROPERTY = "voltageRegulatorOn";
+    // Loads
+    public static final String LOAD_TYPE_PROPERTY = "loadType";
+
 }
