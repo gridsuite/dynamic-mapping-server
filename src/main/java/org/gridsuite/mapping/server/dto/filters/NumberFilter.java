@@ -14,6 +14,7 @@ import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.PropertyType;
 import org.gridsuite.mapping.server.utils.Methods;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Locale;
 @NoArgsConstructor
 public class NumberFilter extends AbstractFilter {
 
-    private float value;
+    private ArrayList<Float> value;
 
     @Override
     public FilterEntity convertFilterToEntity(RuleEntity rule) {
@@ -35,32 +36,55 @@ public class NumberFilter extends AbstractFilter {
         convertedFilter.setType(PropertyType.NUMBER);
         convertedFilter.setProperty(this.getProperty());
         convertedFilter.setOperand(this.getOperand());
-        convertedFilter.setValue(Methods.convertNumberToString(value));
+        convertedFilter.setValue(Methods.convertNumberListToString(value));
         return convertedFilter;
     }
 
     public String convertFilterToString() {
         String stringOperand = "";
+        String notPrefix = "";
+        String template = "equipment.%s %s %f";
+        boolean checkFirstValueOnly = false;
         switch (this.getOperand()) {
             case EQUALS:
                 stringOperand = "==";
+                checkFirstValueOnly = true;
                 break;
             case NOT_EQUALS:
                 stringOperand = "!=";
+                checkFirstValueOnly = true;
                 break;
             case LOWER:
                 stringOperand = "<";
+                checkFirstValueOnly = true;
                 break;
             case LOWER_OR_EQUALS:
                 stringOperand = "<=";
+                checkFirstValueOnly = true;
                 break;
             case HIGHER_OR_EQUALS:
                 stringOperand = ">=";
+                checkFirstValueOnly = true;
                 break;
             case HIGHER:
                 stringOperand = ">";
+                checkFirstValueOnly = true;
+                break;
+            case IN:
+                stringOperand = "contains";
+                template = "%s%s.%s(equipment.%s)";
+                break;
+            case NOT_IN:
+                stringOperand = "contains";
+                notPrefix = "!";
+                template = "%s%s.%s(equipment.%s)";
                 break;
         }
-        return String.format(Locale.US, "equipment.%s %s %f", this.getProperty(), stringOperand, value);
+        if (checkFirstValueOnly) {
+            return String.format(Locale.US, template, this.getProperty(), stringOperand, value.get(0));
+        } else {
+            return String.format(Locale.US, template, notPrefix, value, stringOperand, this.getProperty());
+
+        }
     }
 }

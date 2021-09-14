@@ -34,48 +34,15 @@ public class FilterToStringTest {
     }
 
     @Test
-    public void enumFilterTest() {
-
-        EnumFilter filter = new EnumFilter();
-
-        filter.setFilterId("id");
-        filter.setProperty("property");
-        ArrayList<String> values = new ArrayList<>();
-        values.add("1");
-        values.add("2");
-        filter.setValue(values);
-
-        filter.setOperand(Operands.EQUALS);
-
-        // Test equals
-        String equality = "equipment.property.equals(\"1\")";
-
-        assertEquals(equality, filter.convertFilterToString());
-
-        // Test not equals
-        filter.setOperand(Operands.NOT_EQUALS);
-        assertEquals("!" + equality, filter.convertFilterToString());
-
-        // Test In
-        String contains = "[\"1\", \"2\"].contains(equipment.property)";
-
-        filter.setOperand(Operands.IN);
-        assertEquals(contains, filter.convertFilterToString());
-
-        //Test Not in
-
-        filter.setOperand(Operands.NOT_IN);
-        assertEquals("!" + contains, filter.convertFilterToString());
-    }
-
-    @Test
     public void numberFilterTest() {
 
         NumberFilter filter = new NumberFilter();
 
         filter.setFilterId("id");
         filter.setProperty("property");
-        filter.setValue(1);
+        ArrayList<Float> numberList = new ArrayList();
+        numberList.add(1F);
+        filter.setValue(numberList);
 
         filter.setOperand(Operands.EQUALS);
 
@@ -101,6 +68,20 @@ public class FilterToStringTest {
         // Test Higher Or Equals
         filter.setOperand(Operands.HIGHER_OR_EQUALS);
         assertEquals("equipment.property >= 1.000000", filter.convertFilterToString());
+
+        // Test multiple values operands
+        numberList.add(2F);
+        filter.setValue(numberList);
+        String contains = "[1.0, 2.0].contains(equipment.property)";
+
+        //Test in
+        filter.setOperand(Operands.IN);
+        assertEquals(contains, filter.convertFilterToString());
+
+        // Test Not in
+        filter.setOperand(Operands.NOT_IN);
+        assertEquals("!" + contains, filter.convertFilterToString());
+
     }
 
     @Test
@@ -110,7 +91,9 @@ public class FilterToStringTest {
 
         filter.setFilterId("id");
         filter.setProperty("property");
-        filter.setValue("value");
+        ArrayList<String> values = new ArrayList<>();
+        values.add("value");
+        filter.setValue(values);
         filter.setOperand(Operands.EQUALS);
 
         // Test equals
@@ -132,6 +115,20 @@ public class FilterToStringTest {
         //Test Ends with
         filter.setOperand(Operands.ENDS_WITH);
         assertEquals("equipment.property.endsWith(\"value\")", filter.convertFilterToString());
+
+        // Test multiple values operands
+        values.add("other");
+        filter.setValue(values);
+        String contains = "[\"value\", \"other\"].contains(equipment.property)";
+
+        //Test in
+        filter.setOperand(Operands.IN);
+        assertEquals(contains, filter.convertFilterToString());
+
+        // Test Not in
+        filter.setOperand(Operands.NOT_IN);
+        assertEquals("!" + contains, filter.convertFilterToString());
+
     }
 
 }

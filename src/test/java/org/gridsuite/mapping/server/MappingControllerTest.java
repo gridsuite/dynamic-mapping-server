@@ -58,14 +58,14 @@ public class MappingControllerTest {
                 "          \"filterId\": \"filter1\",\n" +
                 "          \"operand\": \"EQUALS\",\n" +
                 "          \"property\": \"id\",\n" +
-                "          \"value\": \"test\",\n" +
+                "          \"value\": [\"test\"],\n" +
                 "          \"type\": \"STRING\"\n" +
                 "        },\n" +
                 "        {\n" +
                 "          \"filterId\": \"filter2\",\n" +
                 "          \"operand\": \"HIGHER\",\n" +
                 "          \"property\": \"minP\",\n" +
-                "          \"value\": 3.0,\n" +
+                "          \"value\": [3.0],\n" +
                 "          \"type\": \"NUMBER\"\n" +
                 "        },\n" +
                 "        {\n" +
@@ -73,7 +73,7 @@ public class MappingControllerTest {
                 "          \"operand\": \"IN\",\n" +
                 "          \"property\": \"energySource\",\n" +
                 "          \"value\": [\"OTHERS\"],\n" +
-                "          \"type\": \"ENUM\"\n" +
+                "          \"type\": \"STRING\"\n" +
                 "        },\n" +
                 "        {\n" +
                 "          \"filterId\": \"filter4\",\n" +
