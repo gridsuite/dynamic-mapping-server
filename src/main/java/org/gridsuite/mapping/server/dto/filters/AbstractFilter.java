@@ -21,7 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = EnumFilter.class, name = "ENUM"),
         @JsonSubTypes.Type(value = NumberFilter.class, name = "NUMBER"),
         @JsonSubTypes.Type(value = StringFilter.class, name = "STRING"),
         @JsonSubTypes.Type(value = BooleanFilter.class, name = "BOOLEAN")})
@@ -40,27 +39,19 @@ public abstract class AbstractFilter {
                 booleanFilter.setOperand(filterEntity.getOperand());
                 booleanFilter.setValue(Methods.convertStringToBoolean(filterEntity.getValue()));
                 return booleanFilter;
-            case ENUM:
-                EnumFilter enumFilter = new EnumFilter();
-                enumFilter.setFilterId(filterEntity.getFilterId());
-                enumFilter.setProperty(filterEntity.getProperty());
-                enumFilter.setOperand(filterEntity.getOperand());
-                enumFilter.setValue(Methods.convertStringToList(filterEntity.getValue()));
-                return enumFilter;
-
             case NUMBER:
                 NumberFilter numberFilter = new NumberFilter();
                 numberFilter.setFilterId(filterEntity.getFilterId());
                 numberFilter.setProperty(filterEntity.getProperty());
                 numberFilter.setOperand(filterEntity.getOperand());
-                numberFilter.setValue(Methods.convertStringToNumber(filterEntity.getValue()));
+                numberFilter.setValue(Methods.convertStringToNumberList(filterEntity.getValue()));
                 return numberFilter;
             case STRING:
                 StringFilter stringFilter = new StringFilter();
                 stringFilter.setFilterId(filterEntity.getFilterId());
                 stringFilter.setProperty(filterEntity.getProperty());
                 stringFilter.setOperand(filterEntity.getOperand());
-                stringFilter.setValue(filterEntity.getValue());
+                stringFilter.setValue(Methods.convertStringToList(filterEntity.getValue()));
                 return stringFilter;
             default :
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown filter type");
