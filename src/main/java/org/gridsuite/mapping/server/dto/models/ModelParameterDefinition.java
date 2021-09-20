@@ -25,10 +25,13 @@ public class ModelParameterDefinition {
 
     private String originName;
 
+    private String fixedValue;
+
     public ModelParameterDefinition(ModelParameterDefinitionEntity modelParameterDefinitionEntity) {
         name = modelParameterDefinitionEntity.getName();
         type = modelParameterDefinitionEntity.getType();
         origin = modelParameterDefinitionEntity.getOrigin();
         originName = modelParameterDefinitionEntity.getOriginName();
+        fixedValue = modelParameterDefinitionEntity.getFixedValue();
     }
 }

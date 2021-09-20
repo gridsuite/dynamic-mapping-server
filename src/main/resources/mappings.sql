@@ -42,6 +42,7 @@
     create table model_parameter_definitions (
        model_name varchar(255) not null,
         name varchar(255) not null,
+        fixed_value varchar(255),
         origin int4,
         origin_name varchar(255),
         type int4,
