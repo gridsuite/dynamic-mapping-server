@@ -93,7 +93,8 @@ public class MappingControllerTest {
                 "      \"watchedElement\": \"element_id\",\n" +
                 "      \"side\": \"Branch.Side.ONE\"\n" +
                 "    }\n" +
-                "  ]\n" +
+                "  ],\n" +
+                "  \"controlledParameters\": false" +
                 "}";
 
     }
@@ -105,13 +106,13 @@ public class MappingControllerTest {
 
         // Put data
         mvc.perform(post("/mappings/" + name)
-                .content(mapping(name))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(name))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // get all data
         mvc.perform(get("/mappings/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + mapping(name) + "]", true));
@@ -122,7 +123,7 @@ public class MappingControllerTest {
 
         // get to verify deletion
         mvc.perform(get("/mappings/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[]", true));
@@ -137,39 +138,39 @@ public class MappingControllerTest {
 
         // Put data
         mvc.perform(post("/mappings/" + originalName)
-                .content(mapping(originalName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(originalName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Rename data
         mvc.perform(post("/mappings/rename/" + originalName + "/to/" + newName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // get all data
         mvc.perform(get("/mappings/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + mapping(newName) + "]", true));
 
         // Add a new mapping
         mvc.perform(post("/mappings/" + originalName)
-                .content(mapping(originalName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(originalName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Fail to rename to existing mapping
         mvc.perform(post("/mappings/rename/" + originalName + "/to/" + newName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isConflict());
 
         // Fail to rename from missing mapping
         mvc.perform(post("/mappings/rename/NotUsed/to/AnyMapping"
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
     }
@@ -183,40 +184,40 @@ public class MappingControllerTest {
 
         // Put data
         mvc.perform(post("/mappings/" + originalName)
-                .content(mapping(originalName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(originalName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Rename data
         mvc.perform(post("/mappings/copy/" + originalName + "/to/" + copyName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // get all data
         mvc.perform(get("/mappings/")
-                .contentType(APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 // Content served in alphabetical order since name  is the id
-                .andExpect(content().json("[" + mapping(copyName) + ", " + mapping(originalName) + "]", true));
+                .andExpect(content().json("[" + mapping(originalName) + ", " + mapping(copyName) + "]", true));
 
         // Add a new mapping
         mvc.perform(post("/mappings/" + originalName)
-                .content(mapping(originalName))
-                .contentType(APPLICATION_JSON))
+                        .content(mapping(originalName))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // Fail to copy to existing mapping
         mvc.perform(post("/mappings/copy/" + originalName + "/to/" + copyName
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isConflict());
 
         // Fail to copy from missing mapping
         mvc.perform(post("/mappings/copy/NotUsed/to/AnyMapping"
-        )
-                .contentType(APPLICATION_JSON))
+                )
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
     }

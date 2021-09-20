@@ -108,7 +108,8 @@ public class ScriptControllerTest {
                 "      \"watchedElement\": \"element_id\",\n" +
                 "      \"side\": \"Branch.Side.ONE\"\n" +
                 "    }\n" +
-                "  ]\n" +
+                "  ],\n" +
+                "  \"controlledParameters\": false" +
                 "}";
 
     }
@@ -120,7 +121,7 @@ public class ScriptControllerTest {
                 "     dynamicModelId \\\"automaton_model\\\"\n" +
                 "     parameterSetId \\\"automaton_model\\\"\n" +
                 "     side Branch.Side.ONE\n" +
-                "}\"}";
+                "}\",\"current\": true, \"parametersFile\": null}";
     }
 
     @Test
@@ -241,7 +242,7 @@ public class ScriptControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // get all data
+        // get all s
         mvc.perform(get("/scripts/")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -276,7 +277,7 @@ public class ScriptControllerTest {
     @Test
     public void testSaveAndDelete() throws Exception {
         String name = "simple";
-        String simpleScript = "{\"name\":\"" + name + "\",\"parentName\":\"\",\"script\":\"Script\"}";
+        String simpleScript = "{\"name\":\"" + name + "\",\"parentName\":\"\",\"script\":\"Script\",\"current\": true, \"parametersFile\": null}";
 
         // Put data
         mvc.perform(post("/scripts/" + name)

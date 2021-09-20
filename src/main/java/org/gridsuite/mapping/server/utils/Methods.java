@@ -6,10 +6,12 @@
  */
 package org.gridsuite.mapping.server.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import org.gridsuite.mapping.server.dto.models.ParametersSet;
+import org.gridsuite.mapping.server.model.InstanceModelEntity;
+import org.gridsuite.mapping.server.repository.InstanceModelRepository;
+import org.gridsuite.mapping.server.repository.ModelRepository;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,5 +51,15 @@ public final class Methods {
 
     public static String convertNumberListToString(List<Float> array) {
         return array.stream().map(value -> String.format(Locale.US, "%f", value)).collect(Collectors.joining(", "));
+    }
+
+    public static ParametersSet getSetFromInstanceId(String instanceId, InstanceModelRepository instanceModelRepository, ModelRepository modelRepository) {
+        Optional<InstanceModelEntity> instance = instanceModelRepository.findById(instanceId);
+        if (instance.isPresent()) {
+            String[] setName = new String[]{instance.get().getModelName(), instance.get().getParams().getName()};
+            return new ParametersSet(modelRepository.findById(setName[0]).get().getSets().stream().filter(set -> set.getName() == setName[2]).findAny().orElseThrow());
+        } else {
+            throw new Error();
+        }
     }
 }

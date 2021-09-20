@@ -9,8 +9,12 @@ package org.gridsuite.mapping.server.service.implementation;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.model.MappingEntity;
+import org.gridsuite.mapping.server.model.RuleEntity;
+import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.MappingRepository;
+import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.MappingService;
+import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -30,12 +34,18 @@ import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME
 @Service
 public class MappingServiceImpl implements MappingService {
 
+    private final InstanceModelRepository instanceModelRepository;
+    private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
 
     @Autowired
     public MappingServiceImpl(
-            MappingRepository mappingRepository
+            MappingRepository mappingRepository,
+            InstanceModelRepository instanceModelRepository,
+            ModelRepository modelRepository
     ) {
+        this.modelRepository = modelRepository;
+        this.instanceModelRepository = instanceModelRepository;
         this.mappingRepository = mappingRepository;
     }
 
@@ -50,6 +60,15 @@ public class MappingServiceImpl implements MappingService {
     public InputMapping createMapping(String mappingName, InputMapping mapping) {
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
         mappingToSave.markNotNew();
+        if (mappingToSave.isControlledParameters()) {
+            try {
+                List<String> instantiatedModels = mappingToSave.getRules().stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
+                // Will throw if set is not found
+                instantiatedModels.stream().map(instanceId -> Methods.getSetFromInstanceId(instanceId, instanceModelRepository, modelRepository));
+            } catch (Error e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "parameter sets not found");
+            }
+        }
         mappingRepository.save(mappingToSave);
         return mapping;
     }
@@ -75,7 +94,7 @@ public class MappingServiceImpl implements MappingService {
         } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
             // In case of naming of new mapping, save it to db.
             try {
-                mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>()));
+                mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>(), false));
                 return new RenameObject(DEFAULT_MAPPING_NAME, newName);
 
             } catch (DataIntegrityViolationException ex) {

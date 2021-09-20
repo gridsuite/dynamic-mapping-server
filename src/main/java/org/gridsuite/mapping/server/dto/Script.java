@@ -35,15 +35,23 @@ public class Script {
     @Schema(description = "Creation date")
     private Date createdDate;
 
+    @ApiModelProperty("Script parameters are up to date")
+    private boolean current;
+
+    @ApiModelProperty("Parameter file")
+    private String parametersFile;
+
     public Script(ScriptEntity scriptEntity) {
         name = scriptEntity.getName();
         parentName = scriptEntity.getParentName();
         script = scriptEntity.getScript();
         createdDate = scriptEntity.getCreatedDate();
+        parametersFile = scriptEntity.getParametersFile();
+        current = false; // Assume false
     }
 
     public ScriptEntity convertToEntity() {
-        return new ScriptEntity(name, parentName, script, createdDate);
+        return new ScriptEntity(name, parentName, script, createdDate, parametersFile);
     }
 
 }

@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.utils;
 import org.apache.commons.io.IOUtils;
 import org.gridsuite.mapping.server.MappingConstants;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
+import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
 import org.gridsuite.mapping.server.service.implementation.ScriptServiceImpl;
 import org.springframework.core.io.ClassPathResource;
@@ -78,7 +79,7 @@ public final class Templater {
 
         // Automata
         String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
-            String familyModel = new String();
+            String familyModel = "";
             switch (automaton.getFamily()) {
                 case CURRENT_LIMIT:
                     familyModel = MappingConstants.CURRENT_LIMIT_MODEL_CLASS;
@@ -144,5 +145,10 @@ public final class Templater {
                 break;
         }
         return String.format(format, instanceModelEntity.getParams().getName());
+    }
+
+    public static String setsToPar(List<ParametersSet> sets) {
+        // TODO
+        return null;
     }
 }
