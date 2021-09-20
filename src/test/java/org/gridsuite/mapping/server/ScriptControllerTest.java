@@ -410,6 +410,7 @@ public class ScriptControllerTest {
         String modelName = "LoadAlphaBeta";
         String set = "{\n" +
                 "  \"name\": \"" + setName + "\",\n" +
+                "  \"modelName\": \"" + modelName + "\",\n" +
                 "  \"parameters\": [\n" +
                 "    {\n" +
                 "      \"name\": \"load_alpha\",\n" +
@@ -421,6 +422,7 @@ public class ScriptControllerTest {
                 "    }\n" +
                 "  ]\n" +
                 "}";
+        String body = "{ \"set\": " + set + ", \"instance\": null}";
 
         // Put data
         mvc.perform(post("/mappings/" + name)
@@ -436,8 +438,8 @@ public class ScriptControllerTest {
                 .andExpect(jsonPath("$.current").value(true));
 
         // Modify Set
-        mvc.perform(post("/model/" + modelName + "/parameters/sets/")
-                        .content(set)
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/")
+                        .content(body)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 

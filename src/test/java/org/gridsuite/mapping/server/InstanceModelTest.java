@@ -1,7 +1,6 @@
 package org.gridsuite.mapping.server;
 
 import org.gridsuite.mapping.server.dto.InstanceModel;
-import org.gridsuite.mapping.server.dto.SetParams;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
 import org.gridsuite.mapping.server.model.ModelParamsEmbeddable;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -11,7 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -35,9 +34,7 @@ public class InstanceModelTest {
         assertEquals(modelName, model.getModelName());
         assertEquals(equipmentType, model.getEquipmentType());
         assertEquals(setName, model.getParams().getName());
-        assertEquals(SetParams.class, model.getParams().getClass());
-        SetParams params = (SetParams) model.getParams();
-        assertEquals(paramsType, params.getType());
+        assertEquals(paramsType, model.getParams().getType());
 
     }
 

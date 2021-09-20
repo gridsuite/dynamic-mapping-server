@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.dto;
 
 import lombok.Data;
 import org.gridsuite.mapping.server.model.InstanceModelEntity;
+import org.gridsuite.mapping.server.model.ModelParamsEmbeddable;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
 /**
@@ -27,6 +28,10 @@ public class InstanceModel {
         id = instanceModelEntity.getId();
         modelName = instanceModelEntity.getModelName();
         equipmentType = instanceModelEntity.getEquipmentType();
-        params = new SetParams(instanceModelEntity.getParams());
+        params = new ModelParams(instanceModelEntity.getParams());
+    }
+
+    public InstanceModelEntity convertToEntity() {
+        return new InstanceModelEntity(id, modelName, equipmentType, new ModelParamsEmbeddable(params.getName(), params.getType()));
     }
 }

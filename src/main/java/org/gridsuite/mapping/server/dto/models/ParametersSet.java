@@ -24,15 +24,19 @@ public class ParametersSet {
     @JsonIgnore
     private Date lastModifiedDate;
 
+    private String modelName;
+
     public ParametersSet(ModelParameterSetEntity modelParameterSetEntity) {
         name = modelParameterSetEntity.getName();
         parameters = modelParameterSetEntity.getParameters().stream().map(modelParameterEntity -> new ModelParameter(modelParameterEntity)).collect(Collectors.toList());
         lastModifiedDate = modelParameterSetEntity.getLastModifiedDate();
+        modelName = modelParameterSetEntity.getModelName();
     }
 
-    public ParametersSet(String name, List<ModelParameter> parameters) {
+    public ParametersSet(String name, List<ModelParameter> parameters, String modelName) {
         this.name = name;
         this.parameters = parameters;
         lastModifiedDate = new Date();
+        this.modelName = modelName;
     }
 }
