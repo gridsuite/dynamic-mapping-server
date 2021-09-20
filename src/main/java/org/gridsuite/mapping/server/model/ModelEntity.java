@@ -7,10 +7,12 @@
 package org.gridsuite.mapping.server.model;
 
 import lombok.*;
+import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -41,6 +43,21 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @Override
     public String getId() {
         return modelName;
+    }
+
+    public ModelEntity(Model modelToConvert) {
+        ModelEntity convertedModel = new ModelEntity();
+        convertedModel.setModelName(modelToConvert.getModelName());
+        convertedModel.setEquipmentType(modelToConvert.getEquipmentType());
+        convertedModel.setParameterDefinitions(modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), convertedModel)).collect(Collectors.toList()));
+        convertedModel.setSets(modelToConvert.getSets().stream().map(set -> {
+            ModelParameterSetEntity convertedSet = new ModelParameterSetEntity(set.getName(), modelToConvert.getModelName(), null, set.getLastModifiedDate(), convertedModel);
+            convertedSet.setParameters(set.getParameters().stream().map(parameter -> new ModelParameterEntity(
+                    parameter.getName(), modelToConvert.getModelName(), set.getName(), parameter.getValue(), convertedSet
+            )).collect(Collectors.toList()));
+            return convertedSet;
+        }).collect(Collectors.toList()));
+
     }
 
 }

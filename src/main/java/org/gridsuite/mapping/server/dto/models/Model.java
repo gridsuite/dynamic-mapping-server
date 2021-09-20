@@ -7,9 +7,11 @@
 package org.gridsuite.mapping.server.dto.models;
 
 import lombok.Data;
+import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -25,11 +27,14 @@ public class Model {
 
     private List<ParametersSet> sets;
 
+    public Model(ModelEntity modelEntity) {
+        modelName = modelEntity.getModelName();
+        equipmentType = modelEntity.getEquipmentType();
+        parameterDefinitions = modelEntity.getParameterDefinitions().stream().map(parameterDefinitionEntity -> new ModelParameterDefinition(parameterDefinitionEntity)).collect(Collectors.toList());
+        sets = modelEntity.getSets().stream().map(parametersSetEntity -> new ParametersSet(parametersSetEntity)).collect(Collectors.toList());
+    }
 
-//    public Model(InstanceModelEntity instanceModelEntity) {
-//        id = instanceModelEntity.getId();
-//        modelName = instanceModelEntity.getModelName();
-//        equipmentType = instanceModelEntity.getEquipmentType();
-//        params = new SetParams(instanceModelEntity.getParams());
-//    }
+    public ModelEntity convertToEntity() {
+        return new ModelEntity(this);
+    }
 }
