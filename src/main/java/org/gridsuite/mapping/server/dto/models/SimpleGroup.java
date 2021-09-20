@@ -7,9 +7,11 @@ import org.gridsuite.mapping.server.utils.SetGroupType;
 public class SimpleGroup {
     private final String name;
     private final SetGroupType type;
+    private final int setsNumber;
 
     SimpleGroup(ParametersSetsGroup group) {
         name = group.getName();
         type = group.getType();
+        setsNumber = group.getSets().size();
     }
 }
