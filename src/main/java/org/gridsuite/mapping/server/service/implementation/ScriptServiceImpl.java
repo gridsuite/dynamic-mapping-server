@@ -54,6 +54,8 @@ public class ScriptServiceImpl implements ScriptService {
         this.scriptRepository = scriptRepository;
     }
 
+    String noModelFoundErrorMessage = "No model found with this name";
+
     @Override
     public Script createFromMapping(String mappingName) {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
@@ -71,7 +73,7 @@ public class ScriptServiceImpl implements ScriptService {
                     List<EnrichedParametersSet> sets = new ArrayList<>();
                     setsLists.forEach(sets::addAll);
                     createdPar = Templater.setsToPar(sets);
-                } catch (Error e) {
+                } catch (Exception e) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter sets");
                 }
             }
@@ -102,9 +104,11 @@ public class ScriptServiceImpl implements ScriptService {
     @Override
     public Script saveScript(String scriptName, Script script) {
         if (script.getParametersFile() != null) {
-            // TODO Update .par
+            // TODO: If you want to update .par via the script, add parametersFile creation here (found in createFromMapping)
+            script.setCurrent(isScriptCurrent(script));
+        } else {
+            script.setCurrent(true);
         }
-        script.setCurrent(true);
         scriptRepository.save(script.convertToEntity());
         return script;
     }
@@ -155,18 +159,24 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     private boolean isScriptCurrent(Script script) {
-        try {
-            MappingEntity scriptMapping = mappingRepository.findById(script.getParentName()).get();
-            List<String[]> instantiatedModels = scriptMapping.getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
-            instantiatedModels.addAll(scriptMapping.getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
-            List<List<ParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
-            List<ParametersSet> sets = new ArrayList<>();
-            setsLists.forEach(sets::addAll);
-            return sets.parallelStream().reduce(true, (acc, set) -> acc && script.getCreatedDate().compareTo(set.getLastModifiedDate()) >= 0, (a, b) -> a && b);
-        } catch (Error e) {
-            // Script status cannot be checked: Missing parts
+        Optional<MappingEntity> foundMapping = mappingRepository.findById(script.getParentName());
+        if (foundMapping.isPresent()) {
+            try {
+                MappingEntity scriptMapping = foundMapping.get();
+                List<String[]> instantiatedModels = scriptMapping.getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
+                instantiatedModels.addAll(scriptMapping.getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
+                List<List<ParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
+                List<ParametersSet> sets = new ArrayList<>();
+                setsLists.forEach(sets::addAll);
+                return sets.parallelStream().reduce(true, (acc, set) -> acc && script.getCreatedDate().compareTo(set.getLastModifiedDate()) >= 0, (a, b) -> a && b);
+            } catch (Exception e) {
+                // Script status cannot be checked: Missing parts
+                return false;
+            }
+        } else {
             return false;
         }
+
     }
 
     private List<EnrichedParametersSet> getEnrichedSetsFromInstanceModel(String modelName, String groupName) {
@@ -178,7 +188,7 @@ public class ScriptServiceImpl implements ScriptService {
 
             return correspondingSets.stream().map(set -> new EnrichedParametersSet(set, correspondingDefinitions)).collect(Collectors.toList());
         } else {
-            throw new Error();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, noModelFoundErrorMessage);
         }
     }
 
@@ -188,7 +198,7 @@ public class ScriptServiceImpl implements ScriptService {
             ParametersSetsGroup correspondingGroup = new ParametersSetsGroup(model.get().getSetsGroups().stream().filter(group -> group.getName().equals(groupName)).findAny().orElseThrow());
             return correspondingGroup.getSets();
         } else {
-            throw new Error();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, noModelFoundErrorMessage);
         }
     }
 
@@ -204,10 +214,10 @@ public class ScriptServiceImpl implements ScriptService {
             automata = (ArrayList<AbstractAutomaton>) mapping.getAutomata();
             sortedRules = new ArrayList<>();
             Map<EquipmentType, List<Rule>> sortingRules = mapping.getRules().stream().collect(groupingBy(Rule::getEquipmentType));
-            for (EquipmentType type : sortingRules.keySet()) {
-                ArrayList<Rule> typedRules = new ArrayList<>(sortingRules.get(type));
+            for (Map.Entry<EquipmentType, List<Rule>> sortingRulesEntry : sortingRules.entrySet()) {
+                ArrayList<Rule> typedRules = new ArrayList<>(sortingRulesEntry.getValue());
                 typedRules.sort(Rule.ruleComparator);
-                sortedRules.add(new SortedRules(type, typedRules));
+                sortedRules.add(new SortedRules(sortingRulesEntry.getKey(), typedRules));
             }
         }
     }
@@ -225,12 +235,12 @@ public class ScriptServiceImpl implements ScriptService {
 
         private List<FlatRule> rules;
 
-        public SortedRules(EquipmentType type, ArrayList<Rule> sortedRules) {
-            String equipmentClass = Templater.equipmentTypeToClass(type);
-            this.equipmentClass = equipmentClass;
-            this.isGenerator = equipmentClass.equals("Generator");
+        public SortedRules(EquipmentType type, List<Rule> sortedRules) {
+            String convertedClass = Templater.equipmentTypeToClass(type);
+            this.equipmentClass = convertedClass;
+            this.isGenerator = convertedClass.equals("Generator");
             this.collectionName = Templater.equipmentTypeToCollectionName(type);
-            rules = sortedRules.stream().map(rule -> new FlatRule(rule)).collect(Collectors.toList());
+            rules = sortedRules.stream().map(FlatRule::new).collect(Collectors.toList());
         }
     }
 
@@ -250,7 +260,7 @@ public class ScriptServiceImpl implements ScriptService {
                 mappedModel = foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(rule.getSetGroup())).findAny().orElseThrow();
                 composition = Templater.flattenFilters(rule.getComposition(), rule.getFilters());
             } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, noModelFoundErrorMessage);
             }
 
         }

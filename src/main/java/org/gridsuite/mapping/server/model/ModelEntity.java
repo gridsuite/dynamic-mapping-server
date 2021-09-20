@@ -11,6 +11,7 @@ import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,9 +26,9 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String> {
+public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String> implements Serializable {
 
-    // Could be replaced with UUID but we lose the ease of use of names
+    // Could be replaced with UUID, but we lose the ease of use of names
     @Id
     @Column(name = "model_name")
     private String modelName;

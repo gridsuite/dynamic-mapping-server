@@ -32,9 +32,9 @@ public final class Templater {
 
         final String[] flattenedComposition = {composition};
         // WARNING: Will not work with multithreading
-        filters.stream().forEach(filter -> {
-            flattenedComposition[0] = flattenedComposition[0].replaceAll(filter.getFilterId() + "\\b", filter.convertFilterToString());
-        });
+        filters.stream().forEach(filter ->
+                flattenedComposition[0] = flattenedComposition[0].replaceAll(filter.getFilterId() + "\\b", filter.convertFilterToString())
+        );
         return flattenedComposition[0];
     }
 

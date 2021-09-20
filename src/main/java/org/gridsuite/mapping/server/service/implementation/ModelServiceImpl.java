@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -54,7 +55,12 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public List<ParametersSet> getSetsFromGroup(String modelName, String groupName) {
-        return modelRepository.findById(modelName).get().getSetsGroups().stream().map(ParametersSetsGroup::new).filter(parametersSetsGroup -> parametersSetsGroup.getName().equals(groupName)).findAny().orElseThrow().getSets();
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        if (foundModel.isPresent()) {
+            return foundModel.get().getSetsGroups().stream().map(ParametersSetsGroup::new).filter(parametersSetsGroup -> parametersSetsGroup.getName().equals(groupName)).findAny().orElseThrow().getSets();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
+        }
     }
 
     @Override
@@ -63,7 +69,7 @@ public class ModelServiceImpl implements ModelService {
         if (foundModel.isPresent()) {
             ModelEntity modelToUpdate = foundModel.get();
             List<ModelSetsGroupEntity> savedGroups = modelToUpdate.getSetsGroups();
-            ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName() == setsGroup.getName()).findAny().orElse(null);
+            ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName().equals(setsGroup.getName())).findAny().orElse(null);
             ModelSetsGroupEntity groupToAdd = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
             groupToAdd.getSets().forEach(set -> set.setLastModifiedDate(new Date()));
 

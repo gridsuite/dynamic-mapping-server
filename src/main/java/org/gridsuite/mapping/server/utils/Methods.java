@@ -7,12 +7,12 @@
 package org.gridsuite.mapping.server.utils;
 
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
+import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.repository.ModelRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,7 +55,12 @@ public final class Methods {
     }
 
     public static ParametersSetsGroup getSetsGroupFromModel(String modelName, String setGroupName, ModelRepository modelRepository) {
-        return new ParametersSetsGroup(modelRepository.findById(modelName).get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(setGroupName)).findAny().orElseThrow());
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        if (foundModel.isPresent()) {
+            return new ParametersSetsGroup(foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(setGroupName)).findAny().orElseThrow());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
+        }
     }
 }
 

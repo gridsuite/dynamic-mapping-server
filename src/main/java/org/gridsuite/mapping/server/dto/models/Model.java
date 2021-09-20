@@ -32,16 +32,12 @@ public class Model {
     public Model(ModelEntity modelEntity) {
         modelName = modelEntity.getModelName();
         equipmentType = modelEntity.getEquipmentType();
-        parameterDefinitions = modelEntity.getParameterDefinitions().stream().map(parameterDefinitionEntity -> new ModelParameterDefinition(parameterDefinitionEntity)).collect(Collectors.toList());
-        setsGroups = modelEntity.getSetsGroups().stream().map(setsGroupEntity -> new ParametersSetsGroup(setsGroupEntity)).collect(Collectors.toList());
-    }
-
-    public ModelEntity convertToEntity() {
-        return new ModelEntity(this);
+        parameterDefinitions = modelEntity.getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
+        setsGroups = modelEntity.getSetsGroups().stream().map(ParametersSetsGroup::new).collect(Collectors.toList());
     }
 
     public boolean isParameterSetGroupValid(String groupName, boolean strict) {
-        ParametersSetsGroup groupToTest = setsGroups.stream().filter(group -> group.getName() == groupName).findAny().orElse(null);
+        ParametersSetsGroup groupToTest = setsGroups.stream().filter(group -> group.getName().equals(groupName)).findAny().orElse(null);
         if (groupToTest == null) {
             return false;
         } else {

@@ -12,6 +12,5 @@ package org.gridsuite.mapping.server.utils;
 public enum SetGroupType {
     FIXED,
     PREFIX,
-    SUFFIX,
-    CUSTOM
+    SUFFIX
 }

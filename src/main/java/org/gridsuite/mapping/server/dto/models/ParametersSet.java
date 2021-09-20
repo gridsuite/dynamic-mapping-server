@@ -26,11 +26,11 @@ public class ParametersSet {
 
     public ParametersSet(ModelParameterSetEntity modelParameterSetEntity) {
         name = modelParameterSetEntity.getName();
-        parameters = modelParameterSetEntity.getParameters().stream().map(modelParameterEntity -> new ModelParameter(modelParameterEntity)).collect(Collectors.toList());
+        parameters = modelParameterSetEntity.getParameters().stream().map(ModelParameter::new).collect(Collectors.toList());
         lastModifiedDate = modelParameterSetEntity.getLastModifiedDate();
     }
 
-    public ParametersSet(String name, List<ModelParameter> parameters, String modelName) {
+    public ParametersSet(String name, List<ModelParameter> parameters) {
         this.name = name;
         this.parameters = parameters;
         lastModifiedDate = new Date();
