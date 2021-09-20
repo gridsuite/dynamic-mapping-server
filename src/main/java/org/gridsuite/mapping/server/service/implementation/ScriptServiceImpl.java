@@ -12,19 +12,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
+import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
-import org.gridsuite.mapping.server.model.InstanceModelEntity;
-import org.gridsuite.mapping.server.model.MappingEntity;
-import org.gridsuite.mapping.server.model.RuleEntity;
-import org.gridsuite.mapping.server.model.ScriptEntity;
+import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.InstanceModelRepository;
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.service.ScriptService;
-import org.gridsuite.mapping.server.utils.EquipmentType;
-import org.gridsuite.mapping.server.utils.Methods;
-import org.gridsuite.mapping.server.utils.Templater;
+import org.gridsuite.mapping.server.utils.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -70,7 +66,7 @@ public class ScriptServiceImpl implements ScriptService {
             if (foundMapping.get().isControlledParameters()) {
                 try {
                     List<String> instantiatedModels = foundMapping.get().getRules().stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
-                    List<ParametersSet> sets = instantiatedModels.stream().map(instanceId -> Methods.getSetFromInstanceId(instanceId, instanceModelRepository, modelRepository)).collect(Collectors.toList());
+                    List<EnrichedParametersSet> sets = instantiatedModels.stream().map(this::getEnrichedSetFromInstanceId).collect(Collectors.toList());
                     createdPar = Templater.setsToPar(sets);
                 } catch (Error e) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter sets");
@@ -94,7 +90,7 @@ public class ScriptServiceImpl implements ScriptService {
             if (scriptToReturn.getParametersFile() == null) {
                 scriptToReturn.setCurrent(true);
             } else {
-                // TODO Check current
+                scriptToReturn.setCurrent(isScriptCurrent(scriptToReturn));
             }
             return scriptToReturn;
         }).collect(Collectors.toList());
@@ -144,7 +140,7 @@ public class ScriptServiceImpl implements ScriptService {
                 if (scriptToReturn.getParametersFile() == null) {
                     scriptToReturn.setCurrent(true);
                 } else {
-                    // TODO Check current
+                    scriptToReturn.setCurrent(isScriptCurrent(scriptToReturn));
                 }
                 return scriptToReturn;
             } catch (DataIntegrityViolationException ex) {
@@ -152,6 +148,31 @@ public class ScriptServiceImpl implements ScriptService {
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No script found with this name");
+        }
+    }
+
+    private boolean isScriptCurrent(Script script) {
+        try {
+            MappingEntity scriptMapping = mappingRepository.findById(script.getParentName()).get();
+            List<String> instantiatedModels = scriptMapping.getRules().stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
+            List<ParametersSet> sets = instantiatedModels.stream().map(instanceId -> Methods.getSetFromInstanceId(instanceId, instanceModelRepository, modelRepository)).collect(Collectors.toList());
+            return sets.parallelStream().reduce(true, (acc, set) -> acc && script.getCreatedDate().compareTo(set.getLastModifiedDate()) >= 0, (a, b) -> a && b);
+        } catch (Error e) {
+            // Script status cannot be checked: Missing parts
+            return false;
+        }
+    }
+
+    private EnrichedParametersSet getEnrichedSetFromInstanceId(String instanceId) {
+        Optional<InstanceModelEntity> instance = instanceModelRepository.findById(instanceId);
+        if (instance.isPresent()) {
+            String[] setName = new String[]{instance.get().getModelName(), instance.get().getParams().getName()};
+            ModelEntity model = modelRepository.findById(setName[0]).get();
+            ParametersSet correspondingSet = new ParametersSet(model.getSets().stream().filter(set -> set.getName() == setName[2]).findAny().orElseThrow());
+            List<ModelParameterDefinition> correspondingDefinitions = model.getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
+            return new EnrichedParametersSet(correspondingSet, correspondingDefinitions);
+        } else {
+            throw new Error();
         }
     }
 
@@ -218,4 +239,38 @@ public class ScriptServiceImpl implements ScriptService {
 
         }
     }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public class EnrichedParametersSet {
+        private String name;
+        private List<EnrichedParameter> parameters;
+
+        public EnrichedParametersSet(ParametersSet set, List<ModelParameterDefinition> definitions) {
+            name = set.getName();
+            parameters = definitions.stream().map(definition ->
+                    new EnrichedParameter(
+                            definition.getName(), set.getParameters().stream().filter(parameter -> parameter.getName() == definition.getName()).findAny().orElseThrow().getValue(),
+                            definition.getType(),
+                            definition.getOrigin(),
+                            definition.getOriginName()
+                    )).collect(Collectors.toList());
+        }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class EnrichedParameter {
+        private String name;
+        private String value;
+        private ParameterType type;
+        private ParameterOrigin origin;
+        private String originName;
+
+
+    }
 }
+
