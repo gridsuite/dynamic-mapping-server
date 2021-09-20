@@ -33,12 +33,6 @@
         primary key (name)
     );
 
-    create table networks (
-       network_id uuid not null,
-        network_name varchar(255),
-        primary key (network_id)
-    );
-
     create table model_parameter_definitions (
        model_name varchar(255) not null,
         name varchar(255) not null,
@@ -77,6 +71,12 @@
        model_name varchar(255) not null,
         equipment_type int4,
         primary key (model_name)
+    );
+
+    create table networks (
+       network_id uuid not null,
+        network_name varchar(255),
+        primary key (network_id)
     );
 
     create table rules (
@@ -121,27 +121,27 @@ create index rule_mappingName_index on rules (mappingName);
        foreign key (rule_id) 
        references rules;
 
-    alter table if exists model_parameter_definitions
-       add constraint model_parameter_definition_fk
-       foreign key (model_name)
+    alter table if exists model_parameter_definitions 
+       add constraint model_parameter_definition_fk 
+       foreign key (model_name) 
        references models;
 
     alter table if exists model_parameter_sets 
        add constraint model_parameter_sets_fk 
-       foreign key (model_name, group_name)
+       foreign key (model_name, group_name) 
        references model_sets_group;
 
     alter table if exists model_parameters 
        add constraint parameter_set_fk 
-       foreign key (group_name, model_name, set_name)
+       foreign key (group_name, model_name, set_name) 
        references model_parameter_sets;
 
-    alter table if exists model_sets_group
-       add constraint model_sets_groups_fk
-       foreign key (model_name)
+    alter table if exists model_sets_group 
+       add constraint model_sets_groups_fk 
+       foreign key (model_name) 
        references models;
 
-    alter table if exists rules
-       add constraint mapping_rules_fk
+    alter table if exists rules 
+       add constraint mapping_rules_fk 
        foreign key (mappingName) 
        references mappings;

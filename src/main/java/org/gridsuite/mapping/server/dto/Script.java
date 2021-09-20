@@ -35,10 +35,10 @@ public class Script {
     @Schema(description = "Creation date")
     private Date createdDate;
 
-    @ApiModelProperty("Script parameters are up to date")
+    @Schema(description = "Script parameters are up to date")
     private boolean current;
 
-    @ApiModelProperty("Parameter file")
+    @Schema(description = "Parameter file")
     private String parametersFile;
 
     public Script(ScriptEntity scriptEntity) {

@@ -31,7 +31,7 @@ public class InputMapping implements Mapping {
     @Schema(description = "Mapping automata")
     private List<AbstractAutomaton> automata;
 
-    @ApiModelProperty("Mapping should control its parameters")
+    @Schema(description = "Mapping should control its parameters")
     private boolean controlledParameters;
 
     public MappingEntity convertMappingToEntity() {
