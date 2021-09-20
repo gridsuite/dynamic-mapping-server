@@ -6,10 +6,10 @@
  */
 package org.gridsuite.mapping.server.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/models")
-@Api(value = "Mapping model server")
+@Tag(name = "Mapping model server")
 @AllArgsConstructor
 @ComponentScan(basePackageClasses = {ModelServiceImpl.class})
 
@@ -38,42 +38,42 @@ public class ModelController {
     private final ModelService modelService;
 
     @GetMapping(value = "/{modelName}/parameters/sets/{groupName}")
-    @ApiOperation(value = "get all parameters sets for a given group")
+    @Operation(summary = "get all parameters sets for a given group")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "parameter sets of the group")})
+            @ApiResponse(responseCode = "200", description = "parameter sets of the group")})
 
     public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName));
     }
 
     @PostMapping(value = "/{modelName}/parameters/sets/strict")
-    @ApiOperation(value = "Save a new parameter sets group without checking sets")
+    @Operation(summary = "Save a new parameter sets group without checking sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Parameter Set Group Saved")})
+            @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
     public ResponseEntity<ParametersSetsGroup> saveParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, true));
     }
 
     @PostMapping(value = "/{modelName}/parameters/sets/")
-    @ApiOperation(value = "Save a new parameter sets group without checking sets")
+    @Operation(summary = "Save a new parameter sets group without checking sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Parameter Set Group Saved")})
+            @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
     public ResponseEntity<ParametersSetsGroup> saveSimpleParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, false));
     }
 
     @GetMapping(value = "/{modelName}/parameters/definitions/")
-    @ApiOperation(value = "get parameters definitions for a given model")
+    @Operation(summary = "get parameters definitions for a given model")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "parameters definitions of the model")})
+            @ApiResponse(responseCode = "200", description = "parameters definitions of the model")})
     public ResponseEntity<List<ModelParameterDefinition>> getParametersDefinitionsFromModelName(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParametersDefinitionsFromModelName(modelName));
     }
 
     @GetMapping(value = "/")
-    @ApiOperation(value = "get models names")
+    @Operation(summary = "get models names")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "names of all models")})
+            @ApiResponse(responseCode = "200", description = "names of all models")})
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
     }
