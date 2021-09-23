@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.model;
 
 import lombok.*;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import javax.persistence.*;
 import java.util.List;
@@ -40,6 +41,9 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
     @Column(name = "set_group", nullable = false)
     private String setGroup;
 
+    @Column(name = "group_type", nullable = false)
+    private SetGroupType groupType;
+
     @Column(name = "composition", nullable = false)
     private String composition;
 
@@ -62,6 +66,7 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
         this.equipmentType = ruleToCopy.getEquipmentType();
         this.mappedModel = ruleToCopy.getMappedModel();
         this.setGroup = ruleToCopy.getSetGroup();
+        this.groupType = ruleToCopy.getGroupType();
         this.composition = ruleToCopy.getComposition();
         this.filters = ruleToCopy.getFilters().stream().map(filterEntity -> new FilterEntity(newID, filterEntity)).collect(Collectors.toList());
 

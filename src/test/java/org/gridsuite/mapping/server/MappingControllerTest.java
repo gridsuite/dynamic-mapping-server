@@ -84,7 +84,8 @@ public class MappingControllerTest {
                 "        }\n" +
                 "      ],\n" +
                 "      \"mappedModel\": \"mappedExample\",\n" +
-                "      \"setGroup\": \"setGroup\"\n" +
+                "      \"setGroup\": \"setGroup\",\n" +
+                "      \"groupType\": \"FIXED\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": [\n" +

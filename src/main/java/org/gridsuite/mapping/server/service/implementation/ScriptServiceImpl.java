@@ -257,7 +257,7 @@ public class ScriptServiceImpl implements ScriptService {
             Optional<ModelEntity> foundModel = modelRepository.findById(rule.getMappedModel());
             if (foundModel.isPresent()) {
                 equipmentType = rule.getEquipmentType();
-                mappedModel = foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(rule.getSetGroup())).findAny().orElseThrow();
+                mappedModel = foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(rule.getSetGroup()) && setGroup.getType().equals(rule.getGroupType())).findAny().orElseThrow();
                 composition = Templater.flattenFilters(rule.getComposition(), rule.getFilters());
             } else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, noModelFoundErrorMessage);

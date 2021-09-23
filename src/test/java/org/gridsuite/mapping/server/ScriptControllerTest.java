@@ -141,7 +141,8 @@ public class ScriptControllerTest {
                 "        }\n" +
                 "      ],\n" +
                 "      \"mappedModel\": \"" + modelName + "\",\n" +
-                "      \"setGroup\": \"" + groupName + "\"\n" +
+                "      \"setGroup\": \"" + groupName + "\",\n" +
+                "      \"groupType\": \"PREFIX\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": [\n" +
@@ -367,7 +368,8 @@ public class ScriptControllerTest {
                 "      \"equipmentType\": \"LOAD\",\n" +
                 "      \"filters\": [],\n" +
                 "      \"mappedModel\": \"" + modelName + "\",\n" +
-                "      \"setGroup\": \"" + groupName + "\"\n" +
+                "      \"setGroup\": \"" + groupName + "\",\n" +
+                "      \"groupType\": \"FIXED\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": []," +
@@ -417,7 +419,8 @@ public class ScriptControllerTest {
                 "      \"equipmentType\": \"LOAD\",\n" +
                 "      \"filters\": [],\n" +
                 "      \"mappedModel\": \"" + modelName + "\",\n" +
-                "      \"setGroup\": \"" + setName + "\"\n" +
+                "      \"setGroup\": \"" + setName + "\",\n" +
+                "      \"groupType\": \"FIXED\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"automata\": []," +
