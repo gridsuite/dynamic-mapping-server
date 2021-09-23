@@ -109,11 +109,15 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name)
+        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + set + "]", true));
+
+        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "PREFIX")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
 
         Date setCreationDate = modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
 
@@ -185,13 +189,13 @@ public class ModelControllerTest {
         List<ModelSetsGroupEntity> loadGroups = loadModel.getSetsGroups();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(),
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(), loadGroup.getType(),
                 null,
                 new Date(),
                 loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "2.5", setToSave));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);

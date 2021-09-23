@@ -67,13 +67,13 @@ public class ScriptControllerTest {
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(),
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(), loadGroup.getType(),
                 null,
                 new Date(),
                 loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), setToSave.getName(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "2.5", setToSave));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);

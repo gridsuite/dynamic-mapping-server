@@ -11,6 +11,7 @@ import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.ModelService;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,10 +56,14 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public List<ParametersSet> getSetsFromGroup(String modelName, String groupName) {
+    public List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType) {
         Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
         if (foundModel.isPresent()) {
-            return foundModel.get().getSetsGroups().stream().map(ParametersSetsGroup::new).filter(parametersSetsGroup -> parametersSetsGroup.getName().equals(groupName)).findAny().orElseThrow().getSets();
+            try {
+                return foundModel.get().getSetsGroups().stream().map(ParametersSetsGroup::new).filter(parametersSetsGroup -> parametersSetsGroup.getName().equals(groupName) && parametersSetsGroup.getType() == groupType).findAny().orElseThrow().getSets();
+            } catch (NoSuchElementException e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No group found with this type");
+            }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
         }

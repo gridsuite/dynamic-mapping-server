@@ -43,6 +43,7 @@ public class ModelSetsGroupEntity implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterSetEntity> sets = new ArrayList<>(0);
 
+    @Id
     @Column(name = "type")
     private SetGroupType type;
 

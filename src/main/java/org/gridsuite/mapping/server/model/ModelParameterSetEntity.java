@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -43,6 +44,10 @@ public class ModelParameterSetEntity implements Serializable {
     @Column(name = "model_name")
     private String modelName;
 
+    @Id
+    @Column(name = "group_type")
+    private SetGroupType groupType;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "set", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterEntity> parameters;
 
@@ -52,7 +57,8 @@ public class ModelParameterSetEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(foreignKey = @ForeignKey(name = "model_parameter_sets_fk"), value = {
             @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
-            @JoinColumn(name = "group_name", referencedColumnName = "name", insertable = false, updatable = false)
+            @JoinColumn(name = "group_name", referencedColumnName = "name", insertable = false, updatable = false),
+            @JoinColumn(name = "group_type", referencedColumnName = "type", insertable = false, updatable = false)
     })
     private ModelSetsGroupEntity group;
 
@@ -60,6 +66,7 @@ public class ModelParameterSetEntity implements Serializable {
         this.group = group;
         this.name = set.getName();
         this.groupName = group.getName();
+        this.groupType = group.getType();
         this.modelName = group.getModelName();
         this.parameters = set.getParameters().stream().map(parameter -> new ModelParameterEntity(this, parameter)).collect(Collectors.toList());
         this.lastModifiedDate = set.getLastModifiedDate();

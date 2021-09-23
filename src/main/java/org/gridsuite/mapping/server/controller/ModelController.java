@@ -17,6 +17,7 @@ import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.dto.models.SimpleModel;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.service.implementation.ModelServiceImpl;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,13 +38,13 @@ public class ModelController {
 
     private final ModelService modelService;
 
-    @GetMapping(value = "/{modelName}/parameters/sets/{groupName}")
+    @GetMapping(value = "/{modelName}/parameters/sets/{groupName}/{groupType}")
     @Operation(summary = "get all parameters sets for a given group")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "parameter sets of the group")})
 
-    public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName));
+    public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName, groupType));
     }
 
     @PostMapping(value = "/{modelName}/parameters/sets/strict")

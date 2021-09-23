@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
@@ -29,6 +30,8 @@ public class ModelSetsGroupId implements Serializable {
 
     private String modelName;
 
+    private SetGroupType type;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -39,12 +42,13 @@ public class ModelSetsGroupId implements Serializable {
         }
         ModelSetsGroupId modelSetsGroupIdClass = (ModelSetsGroupId) o;
         return name.equals(modelSetsGroupIdClass.name) &&
-                modelName.equals(modelSetsGroupIdClass.modelName);
+                modelName.equals(modelSetsGroupIdClass.modelName) &&
+                type.equals(modelSetsGroupIdClass.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, modelName);
+        return Objects.hash(name, modelName, type);
     }
 
 }

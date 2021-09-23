@@ -10,6 +10,7 @@ import org.gridsuite.mapping.server.model.ModelParameterDefinitionId;
 import org.gridsuite.mapping.server.model.ModelParameterId;
 import org.gridsuite.mapping.server.model.ModelParameterSetId;
 import org.gridsuite.mapping.server.model.ModelSetsGroupId;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,8 +38,8 @@ public class ModelEntitiesTest {
 
     @Test
     public void parameterIdTestEqualHashCode() {
-        ModelParameterId id = new ModelParameterId("name", "modelName", "setName");
-        ModelParameterId id2 = new ModelParameterId("name", "modelName", "setName");
+        ModelParameterId id = new ModelParameterId("name", "modelName", "setName", "groupName", SetGroupType.FIXED);
+        ModelParameterId id2 = new ModelParameterId("name", "modelName", "setName", "groupName", SetGroupType.FIXED);
 
         assertEquals(id, id);
         assertEquals(id, id2);
@@ -48,8 +49,8 @@ public class ModelEntitiesTest {
 
     @Test
     public void parameterSetIdTestEqualHashCode() {
-        ModelParameterSetId id = new ModelParameterSetId("name", "groupName", "modelName");
-        ModelParameterSetId id2 = new ModelParameterSetId("name", "groupName", "modelName");
+        ModelParameterSetId id = new ModelParameterSetId("name", "groupName", "modelName", SetGroupType.FIXED);
+        ModelParameterSetId id2 = new ModelParameterSetId("name", "groupName", "modelName", SetGroupType.FIXED);
 
         assertEquals(id, id);
         assertEquals(id, id2);
@@ -59,8 +60,8 @@ public class ModelEntitiesTest {
 
     @Test
     public void setsGroupIdTestEqualHashCode() {
-        ModelSetsGroupId id = new ModelSetsGroupId("name", "modelName");
-        ModelSetsGroupId id2 = new ModelSetsGroupId("name", "modelName");
+        ModelSetsGroupId id = new ModelSetsGroupId("name", "modelName", SetGroupType.FIXED);
+        ModelSetsGroupId id2 = new ModelSetsGroupId("name", "modelName", SetGroupType.FIXED);
 
         assertEquals(id, id);
         assertEquals(id, id2);

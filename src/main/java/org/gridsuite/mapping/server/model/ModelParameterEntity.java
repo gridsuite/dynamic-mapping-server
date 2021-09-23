@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelParameter;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -41,6 +42,10 @@ public class ModelParameterEntity implements Serializable {
     private String groupName;
 
     @Id
+    @Column(name = "group_type")
+    private SetGroupType groupType;
+
+    @Id
     @Column(name = "set_name")
     private String setName;
 
@@ -51,7 +56,8 @@ public class ModelParameterEntity implements Serializable {
     @JoinColumns(foreignKey = @ForeignKey(name = "parameter_set_fk"), value = {
             @JoinColumn(name = "set_name", referencedColumnName = "name", insertable = false, updatable = false),
             @JoinColumn(name = "group_name", referencedColumnName = "group_name", insertable = false, updatable = false),
-            @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false)
+            @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
+            @JoinColumn(name = "group_type", referencedColumnName = "group_type", insertable = false, updatable = false)
     })
     private ModelParameterSetEntity set;
 
@@ -59,6 +65,7 @@ public class ModelParameterEntity implements Serializable {
         this.set = set;
         name = parameter.getName();
         groupName = set.getGroup().getName();
+        groupType = set.getGroup().getType();
         modelName = set.getGroup().getModelName();
         setName = set.getName();
         value = parameter.getValue();

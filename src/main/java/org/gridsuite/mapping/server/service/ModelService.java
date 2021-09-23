@@ -10,6 +10,7 @@ import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.dto.models.SimpleModel;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface ModelService {
 
     List<SimpleModel> getModels();
 
-    List<ParametersSet> getSetsFromGroup(String modelName, String groupName);
+    List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType);
 
     ParametersSetsGroup saveParametersSetsGroup(String modelName, ParametersSetsGroup setsGroup, Boolean strict);
 }
