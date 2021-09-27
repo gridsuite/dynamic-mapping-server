@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
+@AllArgsConstructor
 public class Model {
 
     private String modelName;

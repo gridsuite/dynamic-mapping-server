@@ -1,0 +1,41 @@
+{
+  "modelName": "LoadAlphaBeta",
+  "equipmentType": "LOAD",
+  "parameterDefinitions": [
+    {
+      "name": "load_alpha",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "load_beta",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "load_P0Pu",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "p_pu"
+    },
+    {
+      "name": "load_Q0Pu",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "q_pu"
+    },
+    {
+      "name": "load_U0Pu",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "v_pu"
+    },
+    {
+      "name": "load_UPhase0",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "angle_pu"
+    }
+  ],
+  "setsGroups": []
+}
