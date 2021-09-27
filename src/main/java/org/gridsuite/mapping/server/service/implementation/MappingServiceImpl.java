@@ -84,7 +84,7 @@ public class MappingServiceImpl implements MappingService {
         return mappingName;
     }
 
-    String conflictMappingErrorMessage = "A Mapping with this name already exists";
+    static String conflictMappingErrorMessage = "A Mapping with this name already exists";
 
     @Override
     public RenameObject renameMapping(String oldName, String newName) {
