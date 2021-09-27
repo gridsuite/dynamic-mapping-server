@@ -6,7 +6,9 @@
  */
 package org.gridsuite.mapping.server.dto.automata;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.AutomatonPropertyEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
@@ -34,6 +36,7 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     public CurrentLimitAutomaton(AutomatonEntity automatonEntity) {
         this.setFamily(automatonEntity.getFamily());
         this.setModel(automatonEntity.getModel());
+        this.setSetGroup(automatonEntity.getSetGroup());
         this.setWatchedElement(automatonEntity.getWatchedElement());
         // TODO Create generic function for all properties
         Optional<AutomatonPropertyEntity> foundSideProperty = automatonEntity.getProperties().stream().filter(property -> property.getName().equals("side")).findAny();
@@ -48,6 +51,7 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
         convertedAutomaton.setAutomatonId(createdId);
         convertedAutomaton.setFamily(this.getFamily());
         convertedAutomaton.setModel(this.getModel());
+        convertedAutomaton.setSetGroup(this.getSetGroup());
         convertedAutomaton.setWatchedElement(this.getWatchedElement());
         convertedAutomaton.setMapping(parentMapping);
         ArrayList<AutomatonPropertyEntity> convertedProperties = new ArrayList<>();

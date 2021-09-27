@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server.utils;
 import org.apache.commons.io.IOUtils;
 import org.gridsuite.mapping.server.MappingConstants;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
-import org.gridsuite.mapping.server.model.InstanceModelEntity;
+import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.service.implementation.ScriptServiceImpl;
 import org.springframework.core.io.ClassPathResource;
 import org.stringtemplate.v4.ST;
@@ -32,9 +32,9 @@ public final class Templater {
 
         final String[] flattenedComposition = {composition};
         // WARNING: Will not work with multithreading
-        filters.stream().forEach(filter -> {
-            flattenedComposition[0] = flattenedComposition[0].replaceAll(filter.getFilterId() + "\\b", filter.convertFilterToString());
-        });
+        filters.stream().forEach(filter ->
+                flattenedComposition[0] = flattenedComposition[0].replaceAll(filter.getFilterId() + "\\b", filter.convertFilterToString())
+        );
         return flattenedComposition[0];
     }
 
@@ -78,7 +78,7 @@ public final class Templater {
 
         // Automata
         String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
-            String familyModel = new String();
+            String familyModel = "";
             switch (automaton.getFamily()) {
                 case CURRENT_LIMIT:
                     familyModel = MappingConstants.CURRENT_LIMIT_MODEL_CLASS;
@@ -88,8 +88,7 @@ public final class Templater {
             automatonScript.add("familyModel", familyModel);
             automatonScript.add("watchedElement", automaton.getWatchedElement());
             automatonScript.add("modelName", automaton.getModel());
-            // TODO add separation if different
-            automatonScript.add("parameterSetId", automaton.getModel());
+            automatonScript.add("parameterSetId", automaton.getSetGroup());
             String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);
                 propertyScript.add("name", property.getName());
@@ -131,9 +130,9 @@ public final class Templater {
         return equipmentClass;
     }
 
-    private static String modelToParamSetId(InstanceModelEntity instanceModelEntity) {
+    private static String modelToParamSetId(ModelSetsGroupEntity modelSetsGroupEntity) {
         String format = "\"%s\"";
-        switch (instanceModelEntity.getParams().getType()) {
+        switch (modelSetsGroupEntity.getType()) {
             case FIXED:
                 break;
             case PREFIX:
@@ -143,6 +142,45 @@ public final class Templater {
                 format = MappingConstants.EQUIPMENT_ID + "+ \"%s\"";
                 break;
         }
-        return String.format(format, instanceModelEntity.getParams().getName());
+        return String.format(format, modelSetsGroupEntity.getName());
+    }
+
+    public static String setsToPar(List<ScriptServiceImpl.EnrichedParametersSet> sets) {
+        String parFileTemplate;
+        String parametersSetTemplate;
+        String parameterTemplate;
+        String refParameterTemplate;
+
+        try {
+            parFileTemplate = IOUtils.toString(new ClassPathResource("parFile.st").getInputStream(), Charset.defaultCharset());
+            parametersSetTemplate = IOUtils.toString(new ClassPathResource("parametersSet.st").getInputStream(), Charset.defaultCharset());
+            parameterTemplate = IOUtils.toString(new ClassPathResource("parameter.st").getInputStream(), Charset.defaultCharset());
+            refParameterTemplate = IOUtils.toString(new ClassPathResource("refParameter.st").getInputStream(), Charset.defaultCharset());
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load templates for .par generation !!");
+        }
+        ST parFile = new ST(parFileTemplate, '{', '}');
+        parFile.add("sets", sets.stream().map(set -> {
+            ST setText = new ST(parametersSetTemplate, '{', '}');
+            setText.add("id", set.getName());
+            String[] parameterTexts = set.getParameters().stream().map(parameter -> {
+                ST parameterText;
+                if (parameter.getOrigin() == ParameterOrigin.NETWORK) {
+                    parameterText = new ST(refParameterTemplate, '{', '}');
+                    parameterText.add("origData", "IIDM");
+                    parameterText.add("origName", parameter.getOriginName());
+                } else {
+                    parameterText = new ST(parameterTemplate, '{', '}');
+                    parameterText.add("value", parameter.getValue());
+                }
+                parameterText.add("name", parameter.getName());
+                parameterText.add("type", parameter.getType());
+                return parameterText.render();
+            }).toArray(String[]::new);
+            setText.add("name", set.getName());
+            setText.add("parameters", parameterTexts);
+            return setText.render();
+        }).toArray(String[]::new));
+        return parFile.render();
     }
 }

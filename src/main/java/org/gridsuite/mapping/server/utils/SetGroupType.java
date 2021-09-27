@@ -9,9 +9,8 @@ package org.gridsuite.mapping.server.utils;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-public enum ParamsType {
+public enum SetGroupType {
     FIXED,
     PREFIX,
-    SUFFIX,
-    CUSTOM
+    SUFFIX
 }

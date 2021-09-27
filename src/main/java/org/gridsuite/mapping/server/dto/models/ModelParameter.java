@@ -4,22 +4,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.gridsuite.mapping.server.dto;
+package org.gridsuite.mapping.server.dto.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.gridsuite.mapping.server.model.ModelParamsEmbeddable;
-import org.gridsuite.mapping.server.utils.ParamsType;
+import org.gridsuite.mapping.server.model.ModelParameterEntity;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
-public class SetParams implements ModelParams {
+@AllArgsConstructor
+public class ModelParameter {
     private String name;
-    private ParamsType type;
+    private String value;
 
-    SetParams(ModelParamsEmbeddable modelParamsEmbeddable) {
-        name = modelParamsEmbeddable.getName();
-        type = modelParamsEmbeddable.getType();
+    public ModelParameter(ModelParameterEntity modelParameterEntity) {
+        name = modelParameterEntity.getName();
+        value = modelParameterEntity.getValue();
     }
 }

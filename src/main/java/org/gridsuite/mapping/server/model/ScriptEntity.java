@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -38,10 +39,17 @@ public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<Strin
         return name;
     }
 
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @Column(name = "parameters_file", nullable = true, columnDefinition = "TEXT")
+    private String parametersFile;
+
     public ScriptEntity(String name, ScriptEntity scriptToCopy) {
         this.name = name;
         parentName = scriptToCopy.getParentName();
         script = scriptToCopy.getScript();
+        parametersFile = scriptToCopy.getParametersFile();
     }
 
 }

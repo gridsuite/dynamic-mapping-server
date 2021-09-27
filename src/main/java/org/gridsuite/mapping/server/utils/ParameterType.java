@@ -4,11 +4,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.gridsuite.mapping.server.dto;
+package org.gridsuite.mapping.server.utils;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-public interface ModelParams {
-    String getName();
+public enum ParameterType {
+    INT,
+    BOOL,
+    DOUBLE,
+    STRING
 }

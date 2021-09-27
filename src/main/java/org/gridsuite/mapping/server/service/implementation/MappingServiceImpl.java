@@ -8,9 +8,12 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
+import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.repository.MappingRepository;
+import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.MappingService;
+import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -30,12 +33,15 @@ import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME
 @Service
 public class MappingServiceImpl implements MappingService {
 
+    private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
 
     @Autowired
     public MappingServiceImpl(
-            MappingRepository mappingRepository
+            MappingRepository mappingRepository,
+            ModelRepository modelRepository
     ) {
+        this.modelRepository = modelRepository;
         this.mappingRepository = mappingRepository;
     }
 
@@ -50,6 +56,24 @@ public class MappingServiceImpl implements MappingService {
     public InputMapping createMapping(String mappingName, InputMapping mapping) {
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
         mappingToSave.markNotNew();
+        if (mappingToSave.isControlledParameters()) {
+            try {
+                List<String[]> instantiatedModels = mappingToSave.getRules().stream().map(ruleEntity ->
+                        new String[]{
+                                ruleEntity.getMappedModel(), ruleEntity.getSetGroup()
+                        }
+                ).collect(Collectors.toList());
+                for (String[] instantiatedModel : instantiatedModels) {
+                    ParametersSetsGroup parametersSetsGroup = Methods.getSetsGroupFromModel(instantiatedModel[0], instantiatedModel[1], modelRepository);
+                    if (parametersSetsGroup.getSets().isEmpty()) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No sets associated to the group");
+                    }
+                }
+
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parameter sets not found", e);
+            }
+        }
         mappingRepository.save(mappingToSave);
         return mapping;
     }
@@ -59,6 +83,8 @@ public class MappingServiceImpl implements MappingService {
         mappingRepository.deleteById(mappingName);
         return mappingName;
     }
+
+    static String conflictMappingErrorMessage = "A Mapping with this name already exists";
 
     @Override
     public RenameObject renameMapping(String oldName, String newName) {
@@ -70,16 +96,16 @@ public class MappingServiceImpl implements MappingService {
                 mappingRepository.save(mappingToSave);
                 return new RenameObject(oldName, newName);
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Mapping with this name already exists", ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
             }
         } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
             // In case of naming of new mapping, save it to db.
             try {
-                mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>()));
+                mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>(), false));
                 return new RenameObject(DEFAULT_MAPPING_NAME, newName);
 
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Mapping with this name already exists", ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
@@ -95,7 +121,7 @@ public class MappingServiceImpl implements MappingService {
                 mappingRepository.save(copiedMapping);
                 return new InputMapping(copiedMapping);
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "A Mapping with this name already exists", ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");

@@ -6,7 +6,7 @@
  */
 package org.gridsuite.mapping.server.repository;
 
-import org.gridsuite.mapping.server.model.InstanceModelEntity;
+import org.gridsuite.mapping.server.model.ModelEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,5 +14,5 @@ import org.springframework.stereotype.Repository;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Repository
-public interface InstanceModelRepository extends JpaRepository<InstanceModelEntity, String> {
+public interface ModelRepository extends JpaRepository<ModelEntity, String> {
 }

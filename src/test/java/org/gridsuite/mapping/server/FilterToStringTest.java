@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2021, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package org.gridsuite.mapping.server;
 
 import org.gridsuite.mapping.server.dto.filters.BooleanFilter;
@@ -13,6 +19,9 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FilterToStringTest {

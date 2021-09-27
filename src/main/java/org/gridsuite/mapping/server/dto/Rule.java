@@ -10,10 +10,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
-import org.gridsuite.mapping.server.utils.*;
-import org.gridsuite.mapping.server.dto.filters.*;
+import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +35,12 @@ public class Rule {
     @Schema(description = "Mapped Model Instance ID")
     private String mappedModel;
 
+    @Schema(description = "Mapped Parameter Set Group ID")
+    private String setGroup;
+
+    @Schema(description = "Mapped Parameter Set Group Type")
+    private SetGroupType groupType;
+
     @Schema(description = "Composition")
     private String composition;
 
@@ -50,6 +57,8 @@ public class Rule {
         convertedRule.setComposition(composition);
         convertedRule.setRuleId(createdId);
         convertedRule.setMappedModel(mappedModel);
+        convertedRule.setSetGroup(setGroup);
+        convertedRule.setGroupType(groupType);
         convertedRule.setEquipmentType(equipmentType);
         convertedRule.setMapping(parentMapping);
         convertedRule.setFilters(filters.stream().map(filter -> filter.convertFilterToEntity(convertedRule)).collect(Collectors.toList()));
@@ -59,6 +68,8 @@ public class Rule {
     public Rule(RuleEntity ruleEntity) {
         equipmentType = ruleEntity.getEquipmentType();
         mappedModel = ruleEntity.getMappedModel();
+        setGroup = ruleEntity.getSetGroup();
+        groupType = ruleEntity.getGroupType();
         composition = ruleEntity.getComposition();
         filters = ruleEntity.getFilters().stream().map(filterEmbeddable -> AbstractFilter.createFilterFromEntity(filterEmbeddable)).collect(Collectors.toList());
     }

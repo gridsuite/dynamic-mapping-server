@@ -31,9 +31,13 @@ public class InputMapping implements Mapping {
     @Schema(description = "Mapping automata")
     private List<AbstractAutomaton> automata;
 
+    @Schema(description = "Mapping should control its parameters")
+    private boolean controlledParameters;
+
     public MappingEntity convertMappingToEntity() {
         MappingEntity convertedMapping = new MappingEntity();
         convertedMapping.setName(name);
+        convertedMapping.setControlledParameters(controlledParameters);
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
         convertedMapping.setAutomata(automata.stream().map(automaton -> automaton.convertAutomatonToEntity(convertedMapping)).collect(Collectors.toList()));
         return convertedMapping;
@@ -41,6 +45,7 @@ public class InputMapping implements Mapping {
 
     public InputMapping(MappingEntity mappingEntity) {
         name = mappingEntity.getName();
+        controlledParameters = mappingEntity.isControlledParameters();
         rules = mappingEntity.getRules().stream().map(ruleEntity -> new Rule(ruleEntity)).collect(Collectors.toList());
         automata = mappingEntity.getAutomata().stream().map(automatonEntity -> AbstractAutomaton.instantiateFromEntity(automatonEntity)).collect(Collectors.toList());
     }

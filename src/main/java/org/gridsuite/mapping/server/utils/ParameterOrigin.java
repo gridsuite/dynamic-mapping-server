@@ -9,8 +9,8 @@ package org.gridsuite.mapping.server.utils;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-public enum EquipmentType {
-    GENERATOR,
-    LOAD,
-    CURRENT_LIMIT
+public enum ParameterOrigin {
+    NETWORK,
+    FIXED,
+    USER
 }
