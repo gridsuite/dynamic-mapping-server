@@ -24,8 +24,6 @@ import org.gridsuite.mapping.server.utils.Methods;
 import org.gridsuite.mapping.server.utils.Operands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -70,7 +68,6 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    @Cacheable("networks")
     public Network getNetwork(UUID networkUuid) {
         try {
             return networkStoreService.getNetwork(networkUuid, PreloadingStrategy.COLLECTION);
@@ -165,7 +162,6 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    @CacheEvict(value = "addresses", allEntries = true)
     public List<EquipmentValues> getNetworkValues(MultipartFile multipartFile) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
