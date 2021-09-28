@@ -11,9 +11,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.gridsuite.mapping.server.dto.EquipmentValues;
-import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.gridsuite.mapping.server.dto.MatchedRule;
+import org.gridsuite.mapping.server.dto.NetworkValues;
+import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.service.implementation.NetworkServiceImpl;
@@ -44,7 +44,7 @@ public class NetworkController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of property values of the network")})
 
-    public ResponseEntity<List<EquipmentValues>> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
+    public ResponseEntity<NetworkValues> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
     }
 
@@ -61,7 +61,7 @@ public class NetworkController {
     @Operation(summary = "Post a network and retrieve its values")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of property values of the network")})
-    public ResponseEntity<List<EquipmentValues>> getNetworkValues(@RequestPart("file") MultipartFile networkFile) {
+    public ResponseEntity<NetworkValues> getNetworkValues(@RequestPart("file") MultipartFile networkFile) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(networkFile));
     }
 

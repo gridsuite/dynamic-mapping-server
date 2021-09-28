@@ -11,15 +11,11 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
-import org.gridsuite.mapping.server.dto.EquipmentValues;
-import org.gridsuite.mapping.server.dto.MatchedRule;
-import org.gridsuite.mapping.server.dto.NetworkIdentification;
-import org.gridsuite.mapping.server.dto.OutputNetwork;
-import org.gridsuite.mapping.server.dto.RuleToMatch;
+import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
+import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
-import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -82,7 +78,7 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public List<EquipmentValues> getNetworkValuesFromExistingNetwork(UUID networkUuid) {
+    public NetworkValues getNetworkValuesFromExistingNetwork(UUID networkUuid) {
         Network network = getNetwork(networkUuid);
 
         HashMap<String, Set<String>> substationsPropertyValues = getSubstationsPropertyValues(network);
@@ -96,7 +92,7 @@ public class NetworkServiceImpl implements NetworkService {
         EquipmentValues loadsEquipmentValues = getLoadsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
         equipmentValuesList.add(loadsEquipmentValues);
 
-        return equipmentValuesList;
+        return new NetworkValues(networkUuid, equipmentValuesList);
     }
 
     private void setPropertyMap(HashMap<String, Set<String>> propertyMap, String value, String propertyName) {
@@ -167,7 +163,7 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public List<EquipmentValues> getNetworkValues(MultipartFile multipartFile) {
+    public NetworkValues getNetworkValues(MultipartFile multipartFile) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 

@@ -159,7 +159,9 @@ public class NetworkControllerTest {
         Network testNetwork = NetworkTest1Factory.create();
         Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
 
-        String expectedResult = "[\n" +
+        String expectedResult = "{\n" +
+                "\"networkId\": \"" + networkUUID + "\",\n" +
+                "\"propertyValues\": [\n" +
                 "  {\n" +
                 "    \"type\": \"GENERATOR\",\n" +
                 "    \"values\": {\n" +
@@ -198,7 +200,8 @@ public class NetworkControllerTest {
                 "      ]\n" +
                 "    }\n" +
                 "  }\n" +
-                "]";
+                "]\n" +
+                "}";
 
         mvc.perform(MockMvcRequestBuilders.get("/network/" + networkUUID + "/values")
                         .contentType(APPLICATION_JSON))
