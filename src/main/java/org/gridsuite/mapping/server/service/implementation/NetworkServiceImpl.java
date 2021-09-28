@@ -12,9 +12,10 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
+import org.gridsuite.mapping.server.dto.MatchedRule;
 import org.gridsuite.mapping.server.dto.NetworkIdentification;
 import org.gridsuite.mapping.server.dto.OutputNetwork;
-import org.gridsuite.mapping.server.dto.Rule;
+import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
@@ -72,6 +73,12 @@ public class NetworkServiceImpl implements NetworkService {
         } catch (PowsyblException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "network-store-client error", e);
         }
+    }
+
+    @Override
+    public MatchedRule getNetworkMatches(UUID networkUuid, RuleToMatch ruleToMatch) {
+        List<String> matches = matchNetworkToRule(getNetwork(networkUuid), ruleToMatch);
+        return new MatchedRule(ruleToMatch.getRuleIndex(), matches);
     }
 
     @Override
@@ -272,7 +279,7 @@ public class NetworkServiceImpl implements NetworkService {
         return loads;
     }
 
-    private List<String> matchNetworkToRule(Network network, Rule rule) {
+    private List<String> matchNetworkToRule(Network network, RuleToMatch rule) {
         HashMap<String, HashMap<String, String>> substationsValues = getPropertyValuesBySubstations(network);
         HashMap<String, HashMap<String, String>> voltageLevelsValues = getPropertyValuesByVoltageLevel(network);
 
@@ -283,7 +290,7 @@ public class NetworkServiceImpl implements NetworkService {
         return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(matched -> !matched.equals(null)).collect(Collectors.toList());
     }
 
-    private String matchEquipmentToRule(HashMap<String, String> equipment, Rule rule) {
+    private String matchEquipmentToRule(HashMap<String, String> equipment, RuleToMatch rule) {
         boolean isMatched = rule.getFilters().stream().reduce(true, (acc, filter) -> acc && matchEquipmentToFilter(equipment, filter), (a, b) -> a && b);
         return isMatched ? equipment.get(ID_PROPERTY) : null;
     }
