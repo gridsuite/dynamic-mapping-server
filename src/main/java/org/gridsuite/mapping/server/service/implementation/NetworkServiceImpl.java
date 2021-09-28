@@ -14,12 +14,17 @@ import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
 import org.gridsuite.mapping.server.dto.NetworkIdentification;
 import org.gridsuite.mapping.server.dto.OutputNetwork;
+import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.model.NetworkEntity;
+import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.Methods;
+import org.gridsuite.mapping.server.utils.Operands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.Resource;
@@ -160,6 +165,7 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
+    @CacheEvict(value = "addresses", allEntries = true)
     public List<EquipmentValues> getNetworkValues(MultipartFile multipartFile) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -232,5 +238,137 @@ public class NetworkServiceImpl implements NetworkService {
             voltageLevelsMap.put(voltageLevel.getId(), voltageLevelMap);
         });
         return voltageLevelsMap;
+    }
+
+    private List<HashMap<String, String>> getPropertyValuesByGenerators(Network network, HashMap<String, HashMap<String, String>> voltageLevelsValues, HashMap<String, HashMap<String, String>> substationsValues) {
+
+        List<HashMap<String, String>> generators = new ArrayList<>();
+        network.getGenerators().forEach(generator -> {
+            final HashMap<String, String> generatorMap = new HashMap<>();
+            generatorMap.put(ID_PROPERTY, String.valueOf(generator.getId()));
+            generatorMap.put(ENERGY_SOURCE_PROPERTY, String.valueOf(generator.getEnergySource()));
+            generatorMap.put(VOLTAGE_REGULATOR_ON_PROPERTY, String.valueOf(generator.isVoltageRegulatorOn()));
+
+            String voltageLevelId = generator.getTerminal().getVoltageLevel().getId();
+            generatorMap.putAll(voltageLevelsValues.get(voltageLevelId));
+
+            String subStationId = generator.getTerminal().getVoltageLevel().getSubstation().getId();
+            generatorMap.putAll(substationsValues.get(subStationId));
+
+            generators.add(generatorMap);
+        });
+        return generators;
+    }
+
+    private List<HashMap<String, String>> getPropertyValuesByLoads(Network network, HashMap<String, HashMap<String, String>> voltageLevelsValues, HashMap<String, HashMap<String, String>> substationsValues) {
+        List<HashMap<String, String>> loads = new ArrayList<>();
+        network.getLoads().forEach(load -> {
+            final HashMap<String, String> loadMap = new HashMap<>();
+            loadMap.put(ID_PROPERTY, String.valueOf(load.getId()));
+            loadMap.put(LOAD_TYPE_PROPERTY, String.valueOf(load.getLoadType()));
+
+            String voltageLevelId = load.getTerminal().getVoltageLevel().getId();
+            loadMap.putAll(voltageLevelsValues.get(voltageLevelId));
+
+            String subStationId = load.getTerminal().getVoltageLevel().getSubstation().getId();
+            loadMap.putAll(substationsValues.get(subStationId));
+
+            loads.add(loadMap);
+        });
+        return loads;
+    }
+
+    private List<String> matchNetworkToRule(Network network, RuleEntity rule) {
+        HashMap<String, HashMap<String, String>> substationsValues = getPropertyValuesBySubstations(network);
+        HashMap<String, HashMap<String, String>> voltageLevelsValues = getPropertyValuesByVoltageLevel(network);
+
+        List<HashMap<String, String>> correspondingValues = rule.getEquipmentType() == EquipmentType.GENERATOR ?
+                getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues) :
+                getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
+
+        return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(matched -> !matched.equals(null)).collect(Collectors.toList());
+    }
+
+    private String matchEquipmentToRule(HashMap<String, String> equipment, RuleEntity rule) {
+        boolean isMatched = rule.getFilters().stream().reduce(true, (acc, filter) -> acc && matchEquipmentToFilter(equipment, filter), (a, b) -> a && b);
+        return isMatched ? equipment.get(ID_PROPERTY) : null;
+    }
+
+    private boolean matchEquipmentToFilter(HashMap<String, String> equipment, FilterEntity filter) {
+        String valueToTest = equipment.get(filter.getProperty());
+        Operands operand = filter.getOperand();
+        String filterValue = filter.getValue();
+
+        boolean isMatched = false;
+
+        switch (filter.getType()) {
+            case NUMBER:
+                isMatched = matchValueToNumberFilter(valueToTest, operand, filterValue);
+                break;
+            case STRING:
+                isMatched = matchValueToStringFilter(valueToTest, operand, filterValue);
+                break;
+            case BOOLEAN:
+                boolean isNot = operand.equals(Operands.NOT_EQUALS);
+                isMatched = isNot != valueToTest.equals(filterValue);
+                break;
+            default:
+                break;
+        }
+        return isMatched;
+    }
+
+    private boolean matchValueToNumberFilter(String valueToTest, Operands operand, String filterValue) {
+        double min = 1e-15;
+        boolean isMatched = false;
+        switch (operand) {
+            case EQUALS:
+            case IN:
+            case NOT_IN:
+            case NOT_EQUALS:
+                boolean isNot = operand.equals(Operands.NOT_IN) || operand.equals(Operands.NOT_EQUALS);
+                isMatched = isNot != Methods.convertStringToList(filterValue).stream().reduce(false, (acc, filterUniqueValue) -> acc || (Float.parseFloat(valueToTest) - Float.parseFloat(filterUniqueValue) < min), (a, b) -> a || b);
+                break;
+            case LOWER:
+                isMatched = Float.parseFloat(valueToTest) < Float.parseFloat(filterValue);
+                break;
+            case LOWER_OR_EQUALS:
+                isMatched = Float.parseFloat(valueToTest) - min < Float.parseFloat(filterValue);
+                break;
+            case HIGHER:
+                isMatched = Float.parseFloat(valueToTest) > Float.parseFloat(filterValue);
+                break;
+            case HIGHER_OR_EQUALS:
+                isMatched = Float.parseFloat(valueToTest) + min > Float.parseFloat(filterValue);
+                break;
+            default:
+                break;
+        }
+        return isMatched;
+    }
+
+    private boolean matchValueToStringFilter(String valueToTest, Operands operand, String filterValue) {
+        boolean isMatched = false;
+        switch (operand) {
+            case EQUALS:
+            case IN:
+            case NOT_IN:
+            case NOT_EQUALS:
+                boolean isNot = operand.equals(Operands.NOT_IN) || operand.equals(Operands.NOT_EQUALS);
+                isMatched = isNot != Methods.convertStringToList(filterValue).stream().reduce(false, (acc, filterUniqueValue) -> acc || valueToTest.equals(filterUniqueValue), (a, b) -> a || b);
+                break;
+            case INCLUDES:
+                isMatched = valueToTest.contains(filterValue);
+                break;
+            case STARTS_WITH:
+                isMatched = valueToTest.startsWith(filterValue);
+                break;
+            case ENDS_WITH:
+                isMatched = valueToTest.endsWith(filterValue);
+                break;
+            default:
+                break;
+        }
+        return isMatched;
     }
 }
