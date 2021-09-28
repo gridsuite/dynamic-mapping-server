@@ -11,8 +11,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
-import org.gridsuite.mapping.server.utils.PropertyType;
 import org.gridsuite.mapping.server.utils.Methods;
+import org.gridsuite.mapping.server.utils.Operands;
+import org.gridsuite.mapping.server.utils.PropertyType;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -48,5 +49,11 @@ public class BooleanFilter extends AbstractFilter {
                 break;
         }
         return String.format("equipment.%s %s %b", this.getProperty(), stringOperand, value);
+    }
+
+    @Override
+    public boolean matchValueToFilter(String valueToTest) {
+        boolean isNot = this.getOperand().equals(Operands.NOT_EQUALS);
+        return isNot != (Methods.convertStringToBoolean(valueToTest) == value);
     }
 }

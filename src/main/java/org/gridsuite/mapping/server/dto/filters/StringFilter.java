@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.Methods;
+import org.gridsuite.mapping.server.utils.Operands;
 import org.gridsuite.mapping.server.utils.PropertyType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -95,4 +96,32 @@ public class StringFilter extends AbstractFilter {
         }
 
     }
+
+    @Override
+    public boolean matchValueToFilter(String valueToTest) {
+        boolean isMatched = false;
+
+        switch (this.getOperand()) {
+            case EQUALS:
+            case IN:
+            case NOT_IN:
+            case NOT_EQUALS:
+                boolean isNot = this.getOperand().equals(Operands.NOT_IN) || this.getOperand().equals(Operands.NOT_EQUALS);
+                isMatched = isNot != value.stream().reduce(false, (acc, filterUniqueValue) -> acc || valueToTest.equals(filterUniqueValue), (a, b) -> a || b);
+                break;
+            case INCLUDES:
+                isMatched = valueToTest.contains(value.get(0));
+                break;
+            case STARTS_WITH:
+                isMatched = valueToTest.startsWith(value.get(0));
+                break;
+            case ENDS_WITH:
+                isMatched = valueToTest.endsWith(value.get(0));
+                break;
+            default:
+                break;
+        }
+        return isMatched;
+    }
 }
+

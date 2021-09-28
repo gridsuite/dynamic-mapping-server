@@ -14,14 +14,12 @@ import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
 import org.gridsuite.mapping.server.dto.NetworkIdentification;
 import org.gridsuite.mapping.server.dto.OutputNetwork;
-import org.gridsuite.mapping.server.model.FilterEntity;
+import org.gridsuite.mapping.server.dto.Rule;
+import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
 import org.gridsuite.mapping.server.model.NetworkEntity;
-import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
-import org.gridsuite.mapping.server.utils.Methods;
-import org.gridsuite.mapping.server.utils.Operands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -274,7 +272,7 @@ public class NetworkServiceImpl implements NetworkService {
         return loads;
     }
 
-    private List<String> matchNetworkToRule(Network network, RuleEntity rule) {
+    private List<String> matchNetworkToRule(Network network, Rule rule) {
         HashMap<String, HashMap<String, String>> substationsValues = getPropertyValuesBySubstations(network);
         HashMap<String, HashMap<String, String>> voltageLevelsValues = getPropertyValuesByVoltageLevel(network);
 
@@ -285,86 +283,13 @@ public class NetworkServiceImpl implements NetworkService {
         return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(matched -> !matched.equals(null)).collect(Collectors.toList());
     }
 
-    private String matchEquipmentToRule(HashMap<String, String> equipment, RuleEntity rule) {
+    private String matchEquipmentToRule(HashMap<String, String> equipment, Rule rule) {
         boolean isMatched = rule.getFilters().stream().reduce(true, (acc, filter) -> acc && matchEquipmentToFilter(equipment, filter), (a, b) -> a && b);
         return isMatched ? equipment.get(ID_PROPERTY) : null;
     }
 
-    private boolean matchEquipmentToFilter(HashMap<String, String> equipment, FilterEntity filter) {
+    private boolean matchEquipmentToFilter(HashMap<String, String> equipment, AbstractFilter filter) {
         String valueToTest = equipment.get(filter.getProperty());
-        Operands operand = filter.getOperand();
-        String filterValue = filter.getValue();
-
-        boolean isMatched = false;
-
-        switch (filter.getType()) {
-            case NUMBER:
-                isMatched = matchValueToNumberFilter(valueToTest, operand, filterValue);
-                break;
-            case STRING:
-                isMatched = matchValueToStringFilter(valueToTest, operand, filterValue);
-                break;
-            case BOOLEAN:
-                boolean isNot = operand.equals(Operands.NOT_EQUALS);
-                isMatched = isNot != valueToTest.equals(filterValue);
-                break;
-            default:
-                break;
-        }
-        return isMatched;
-    }
-
-    private boolean matchValueToNumberFilter(String valueToTest, Operands operand, String filterValue) {
-        double min = 1e-15;
-        boolean isMatched = false;
-        switch (operand) {
-            case EQUALS:
-            case IN:
-            case NOT_IN:
-            case NOT_EQUALS:
-                boolean isNot = operand.equals(Operands.NOT_IN) || operand.equals(Operands.NOT_EQUALS);
-                isMatched = isNot != Methods.convertStringToList(filterValue).stream().reduce(false, (acc, filterUniqueValue) -> acc || (Float.parseFloat(valueToTest) - Float.parseFloat(filterUniqueValue) < min), (a, b) -> a || b);
-                break;
-            case LOWER:
-                isMatched = Float.parseFloat(valueToTest) < Float.parseFloat(filterValue);
-                break;
-            case LOWER_OR_EQUALS:
-                isMatched = Float.parseFloat(valueToTest) - min < Float.parseFloat(filterValue);
-                break;
-            case HIGHER:
-                isMatched = Float.parseFloat(valueToTest) > Float.parseFloat(filterValue);
-                break;
-            case HIGHER_OR_EQUALS:
-                isMatched = Float.parseFloat(valueToTest) + min > Float.parseFloat(filterValue);
-                break;
-            default:
-                break;
-        }
-        return isMatched;
-    }
-
-    private boolean matchValueToStringFilter(String valueToTest, Operands operand, String filterValue) {
-        boolean isMatched = false;
-        switch (operand) {
-            case EQUALS:
-            case IN:
-            case NOT_IN:
-            case NOT_EQUALS:
-                boolean isNot = operand.equals(Operands.NOT_IN) || operand.equals(Operands.NOT_EQUALS);
-                isMatched = isNot != Methods.convertStringToList(filterValue).stream().reduce(false, (acc, filterUniqueValue) -> acc || valueToTest.equals(filterUniqueValue), (a, b) -> a || b);
-                break;
-            case INCLUDES:
-                isMatched = valueToTest.contains(filterValue);
-                break;
-            case STARTS_WITH:
-                isMatched = valueToTest.startsWith(filterValue);
-                break;
-            case ENDS_WITH:
-                isMatched = valueToTest.endsWith(filterValue);
-                break;
-            default:
-                break;
-        }
-        return isMatched;
+        return filter.matchValueToFilter(valueToTest);
     }
 }
