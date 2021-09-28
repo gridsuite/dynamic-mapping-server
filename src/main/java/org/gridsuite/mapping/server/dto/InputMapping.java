@@ -46,7 +46,7 @@ public class InputMapping implements Mapping {
     public InputMapping(MappingEntity mappingEntity) {
         name = mappingEntity.getName();
         controlledParameters = mappingEntity.isControlledParameters();
-        rules = mappingEntity.getRules().stream().map(ruleEntity -> new Rule(ruleEntity)).collect(Collectors.toList());
-        automata = mappingEntity.getAutomata().stream().map(automatonEntity -> AbstractAutomaton.instantiateFromEntity(automatonEntity)).collect(Collectors.toList());
+        rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
+        automata = mappingEntity.getAutomata().stream().map(AbstractAutomaton::instantiateFromEntity).collect(Collectors.toList());
     }
 }

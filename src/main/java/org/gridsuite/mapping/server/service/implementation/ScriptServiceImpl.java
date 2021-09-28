@@ -216,7 +216,7 @@ public class ScriptServiceImpl implements ScriptService {
             Map<EquipmentType, List<Rule>> sortingRules = mapping.getRules().stream().collect(groupingBy(Rule::getEquipmentType));
             for (Map.Entry<EquipmentType, List<Rule>> sortingRulesEntry : sortingRules.entrySet()) {
                 ArrayList<Rule> typedRules = new ArrayList<>(sortingRulesEntry.getValue());
-                typedRules.sort(Rule.ruleComparator);
+                typedRules.sort(Rule.RULE_COMPARATOR);
                 sortedRules.add(new SortedRules(sortingRulesEntry.getKey(), typedRules));
             }
         }

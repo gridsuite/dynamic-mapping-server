@@ -71,10 +71,10 @@ public class Rule {
         setGroup = ruleEntity.getSetGroup();
         groupType = ruleEntity.getGroupType();
         composition = ruleEntity.getComposition();
-        filters = ruleEntity.getFilters().stream().map(filterEmbeddable -> AbstractFilter.createFilterFromEntity(filterEmbeddable)).collect(Collectors.toList());
+        filters = ruleEntity.getFilters().stream().map(AbstractFilter::createFilterFromEntity).collect(Collectors.toList());
     }
 
     // Needs to put the default rule last, hence going for the most specific rule to the most generic
-    public static Comparator<Rule> ruleComparator = Comparator.comparing(rule -> -rule.getFilters().size());
+    public static final Comparator<Rule> RULE_COMPARATOR = Comparator.comparing(rule -> -rule.getFilters().size());
 }
 

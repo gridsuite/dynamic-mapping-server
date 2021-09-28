@@ -13,9 +13,9 @@ import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
-import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
+import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -288,7 +288,7 @@ public class NetworkServiceImpl implements NetworkService {
                 getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues) :
                 getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
 
-        return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(matched -> Objects.nonNull(matched)).collect(Collectors.toList());
+        return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private String matchEquipmentToRule(HashMap<String, String> equipment, RuleToMatch rule) {
