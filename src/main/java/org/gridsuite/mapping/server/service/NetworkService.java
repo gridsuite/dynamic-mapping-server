@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.service;
 
+import com.powsybl.iidm.network.Network;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
 import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,4 +24,6 @@ public interface NetworkService {
     List<EquipmentValues> getNetworkValues(MultipartFile file);
 
     List<OutputNetwork> getNetworks();
+
+    Network getNetwork(UUID networkUuid);
 }

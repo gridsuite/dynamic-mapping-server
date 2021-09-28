@@ -20,6 +20,7 @@ import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -63,7 +64,9 @@ public class NetworkServiceImpl implements NetworkService {
         this.networkRepository = networkRepository;
     }
 
-    private Network getNetwork(UUID networkUuid) {
+    @Override
+    @Cacheable("networks")
+    public Network getNetwork(UUID networkUuid) {
         try {
             return networkStoreService.getNetwork(networkUuid, PreloadingStrategy.COLLECTION);
         } catch (PowsyblException e) {
@@ -121,7 +124,7 @@ public class NetworkServiceImpl implements NetworkService {
             // nominalV
             String voltageLevelNominalV = String.valueOf(voltageLevel.getNominalV());
             setPropertyMap(voltageLevelsMap, voltageLevelNominalV, NOMINAL_V_PROPERTY);
-            // Add future substations properties here
+            // Add future voltageLevels properties here
         });
         return voltageLevelsMap;
     }
@@ -199,5 +202,35 @@ public class NetworkServiceImpl implements NetworkService {
     @Override
     public List<OutputNetwork> getNetworks() {
         return networkRepository.findAll().stream().map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getNetworkName())).collect(Collectors.toList());
+    }
+
+    private HashMap<String, HashMap<String, String>> getPropertyValuesBySubstations(Network network) {
+        final HashMap<String, HashMap<String, String>> substationsMap = new HashMap<>();
+        network.getSubstations().forEach(substation -> {
+            final HashMap<String, String> substationMap = new HashMap<>();
+            // Country
+            Optional<Country> substationCountry = substation.getCountry();
+            if (substationCountry.isPresent()) {
+                String countryName = substationCountry.get().getName();
+                substationMap.put(COUNTRY_PROPERTY, countryName);
+            }
+            // Add future substations properties here
+            substationsMap.put(substation.getId(), substationMap);
+        });
+        return substationsMap;
+    }
+
+    private HashMap<String, HashMap<String, String>> getPropertyValuesByVoltageLevel(Network network) {
+        final HashMap<String, HashMap<String, String>> voltageLevelsMap = new HashMap<>();
+        network.getVoltageLevels().forEach(voltageLevel -> {
+            final HashMap<String, String> voltageLevelMap = new HashMap<>();
+            // nominalV
+            String voltageLevelNominalV = String.valueOf(voltageLevel.getNominalV());
+            voltageLevelMap.put(NOMINAL_V_PROPERTY, voltageLevelNominalV);
+
+            // Add future voltageLevels properties here
+            voltageLevelsMap.put(voltageLevel.getId(), voltageLevelMap);
+        });
+        return voltageLevelsMap;
     }
 }
