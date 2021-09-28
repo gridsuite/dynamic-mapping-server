@@ -95,7 +95,6 @@ public class NumberFilter extends AbstractFilter {
 
     @Override
     public boolean matchValueToFilter(String valueToTest) {
-        double min = 1e-15;
         boolean isMatched = false;
 
         Float floatValue = Float.parseFloat(valueToTest);
@@ -106,19 +105,20 @@ public class NumberFilter extends AbstractFilter {
             case NOT_IN:
             case NOT_EQUALS:
                 boolean isNot = this.getOperand().equals(Operands.NOT_IN) || this.getOperand().equals(Operands.NOT_EQUALS);
-                isMatched = isNot != value.stream().reduce(false, (acc, filterUniqueValue) -> acc || (floatValue - filterUniqueValue < min), (a, b) -> a || b);
+                isMatched = isNot != value.stream().reduce(false, (acc, filterUniqueValue) -> acc || (Float.compare(floatValue, filterUniqueValue) == 0
+                ), (a, b) -> a || b);
                 break;
             case LOWER:
-                isMatched = floatValue < value.get(0);
+                isMatched = Float.compare(floatValue, value.get(0)) == -1;
                 break;
             case LOWER_OR_EQUALS:
-                isMatched = floatValue - min < value.get(0);
+                isMatched = Float.compare(floatValue, value.get(0)) <= 0;
                 break;
             case HIGHER:
-                isMatched = floatValue > value.get(0);
+                isMatched = Float.compare(floatValue, value.get(0)) == 1;
                 break;
             case HIGHER_OR_EQUALS:
-                isMatched = floatValue + min > value.get(0);
+                isMatched = Float.compare(floatValue, value.get(0)) >= 0;
                 break;
             default:
                 break;
