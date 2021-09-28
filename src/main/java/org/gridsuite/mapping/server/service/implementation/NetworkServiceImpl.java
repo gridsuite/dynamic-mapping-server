@@ -17,10 +17,14 @@ import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.Resource;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -30,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.gridsuite.mapping.server.MappingConstants.*;
@@ -283,11 +288,24 @@ public class NetworkServiceImpl implements NetworkService {
                 getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues) :
                 getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
 
-        return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(matched -> !matched.equals(null)).collect(Collectors.toList());
+        return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(matched -> Objects.nonNull(matched)).collect(Collectors.toList());
     }
 
     private String matchEquipmentToRule(HashMap<String, String> equipment, RuleToMatch rule) {
-        boolean isMatched = rule.getFilters().stream().reduce(true, (acc, filter) -> acc && matchEquipmentToFilter(equipment, filter), (a, b) -> a && b);
+        AtomicReference<String> evaluatedComposition = new AtomicReference<>(rule.getComposition());
+        rule.getFilters().stream().forEach(filter -> {
+            boolean isFilterMatched = matchEquipmentToFilter(equipment, filter);
+            evaluatedComposition.set(evaluatedComposition.get().replace(filter.getFilterId(), Methods.convertBooleanToString(isFilterMatched)));
+        });
+        boolean isMatched = false;
+        try {
+            ExpressionParser parser = new SpelExpressionParser();
+            isMatched = (boolean) parser.parseExpression(evaluatedComposition.get()).getValue();
+
+        } catch (SpelEvaluationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid composition", e);
+        }
+
         return isMatched ? equipment.get(ID_PROPERTY) : null;
     }
 

@@ -25,6 +25,9 @@ public class RuleToMatch {
     @Schema(description = "Equipment type")
     private EquipmentType equipmentType;
 
+    @Schema(description = "Composition")
+    private String composition;
+
     @Schema(description = "Filters")
     private List<AbstractFilter> filters;
 }
