@@ -61,6 +61,8 @@ After creating the database and its tables, load **src/main/resources/IEEE14Mode
     - Either put a default set in `parameterDefinitions` (FE & BE) or use first set to prefill all the others (FE only)
 - Fetch EquipmentTypes from BE instead of defining them in the Front End
     - Update Data Model and add an `EquipmentController`
+- Manage Equipment properties and creates an interface to update/add a type.
+    - New endpoints to `EquipmentController`
 - Create an interface to import models
     - FE only, add a page with a form to create new model and its parameters
 - Directly create the .dyd without using the script.
@@ -69,3 +71,4 @@ After creating the database and its tables, load **src/main/resources/IEEE14Mode
       values
 - Optimise Redux store to speed up FE when the attached network become massive
     - Reduce data stored and optimise selectors (memoization)
+- Polish Parameters Management appearance (FE)
