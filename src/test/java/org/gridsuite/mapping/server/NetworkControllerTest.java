@@ -273,7 +273,7 @@ public class NetworkControllerTest {
         String loadRuleToMatch = "{\n" +
                 "  \"ruleIndex\": " + loadIndex + ",\n" +
                 "  \"equipmentType\": \"" + "LOAD" + "\",\n" +
-                "  \"composition\": \"" + "filter1" + "\",\n" +
+                "  \"composition\": \"" + "filter1 || filter2 || filter3 || filter4 || filter5" + "\",\n" +
                 "  \"filters\": [\n" +
                 "    {\n" +
                 "      \"filterId\": \"filter1\",\n" +
@@ -281,6 +281,34 @@ public class NetworkControllerTest {
                 "      \"property\": \"id\",\n" +
                 "      \"value\": [\"load1\"],\n" +
                 "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter2\",\n" +
+                "      \"operand\": \"NOT_EQUALS\",\n" +
+                "      \"property\": \"terminal.voltageLevel.substation.country.name\",\n" +
+                "      \"value\": [\"FRANCE\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter3\",\n" +
+                "      \"operand\": \"STARTS_WITH\",\n" +
+                "      \"property\": \"terminal.voltageLevel.substation.country.name\",\n" +
+                "      \"value\": [\"GER\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter4\",\n" +
+                "      \"operand\": \"NOT_IN\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [60, 225, 400],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter5\",\n" +
+                "      \"operand\": \"LOWER_OR_EQUALS\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [380],\n" +
+                "      \"type\": \"NUMBER\"\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";
