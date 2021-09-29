@@ -72,3 +72,4 @@ After creating the database and its tables, load **src/main/resources/IEEE14Mode
 - Optimise Redux store to speed up FE when the attached network become massive
     - Reduce data stored and optimise selectors (memoization)
 - Polish Parameters Management appearance (FE)
+- Sends only relevant sets to the FE (pertaining to the attached network only), avoid unnecessary forms.
