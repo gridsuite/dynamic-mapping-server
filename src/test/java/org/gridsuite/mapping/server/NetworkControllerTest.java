@@ -237,7 +237,7 @@ public class NetworkControllerTest {
         String generatorRuleToMatch = "{\n" +
                 "  \"ruleIndex\": " + generatorIndex + ",\n" +
                 "  \"equipmentType\": \"" + "GENERATOR" + "\",\n" +
-                "  \"composition\": \"" + "(filter1 || filter2) && filter3" + "\",\n" +
+                "  \"composition\": \"" + "(filter1 || filter2 || filter4 || filter5) && (filter3 || filter6 || filter7) || filter8" + "\",\n" +
                 "  \"filters\": [\n" +
                 "    {\n" +
                 "      \"filterId\": \"filter1\",\n" +
@@ -256,6 +256,41 @@ public class NetworkControllerTest {
                 "    {\n" +
                 "      \"filterId\": \"filter3\",\n" +
                 "      \"operand\": \"EQUALS\",\n" +
+                "      \"property\": \"voltageRegulatorOn\",\n" +
+                "      \"value\": true,\n" +
+                "      \"type\": \"BOOLEAN\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter4\",\n" +
+                "      \"operand\": \"INCLUDES\",\n" +
+                "      \"property\": \"id\",\n" +
+                "      \"value\": [\"generator\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter5\",\n" +
+                "      \"operand\": \"ENDS_WITH\",\n" +
+                "      \"property\": \"id\",\n" +
+                "      \"value\": [\"1\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter6\",\n" +
+                "      \"operand\": \"HIGHER_OR_EQUALS\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [400],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter7\",\n" +
+                "      \"operand\": \"IN\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [20,60,400],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter8\",\n" +
+                "      \"operand\": \"NOT_EQUALS\",\n" +
                 "      \"property\": \"voltageRegulatorOn\",\n" +
                 "      \"value\": true,\n" +
                 "      \"type\": \"BOOLEAN\"\n" +

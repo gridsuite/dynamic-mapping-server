@@ -83,9 +83,9 @@ public class ModelServiceImpl implements ModelService {
                 savedGroups.add(groupToAdd);
             } else {
                 // If additional checks are required here, ensure that set erasure cannot happen here with sets merging.
-                groupToAdd.getSets().forEach(set -> {
-                    previousGroup.getSets().add(set);
-                });
+                groupToAdd.getSets().forEach(set ->
+                        previousGroup.getSets().add(set)
+                );
             }
             if (new Model(modelToUpdate).isParameterSetGroupValid(setsGroup.getName(), strict)) {
                 modelRepository.save(modelToUpdate);
