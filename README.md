@@ -73,3 +73,4 @@ After creating the database and its tables, load **src/main/resources/IEEE14Mode
     - Reduce data stored and optimise selectors (memoization)
 - Polish Parameters Management appearance (FE)
 - Sends only relevant sets to the FE (pertaining to the attached network only), avoid unnecessary forms.
+- Rename Script class as Results since the script is no longer the only result
