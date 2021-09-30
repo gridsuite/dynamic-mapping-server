@@ -48,7 +48,7 @@ public class ModelController {
     }
 
     @PostMapping(value = "/{modelName}/parameters/sets/strict")
-    @Operation(summary = "Save a new parameter sets group without checking sets")
+    @Operation(summary = "Save a new parameter sets group with checking sets")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
     public ResponseEntity<ParametersSetsGroup> saveParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
@@ -72,9 +72,9 @@ public class ModelController {
     }
 
     @GetMapping(value = "/")
-    @Operation(summary = "get models names")
+    @Operation(summary = "get models")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "names of all models")})
+            @ApiResponse(responseCode = "200", description = "simplified versions of all models")})
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
     }
