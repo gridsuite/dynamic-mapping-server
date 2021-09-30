@@ -1,0 +1,199 @@
+@startuml
+
+'EQUIPMENT'
+enum ET as "EquipmentType" {
+  GENERATOR
+  LINE
+  LOAD
+}
+
+enum PT as "ParameterType" {
+  STRING
+  INT
+  DOUBLE
+  BOOLEAN
+}
+
+class EP as "EquipmentProperty" {
+  String name
+  String value
+  ParameterType type
+}
+
+class E as "Equipment" {
+  EquipmentType type
+  EquipmentProperty[] properties
+}
+
+E "1" *-right- "1"  ET
+E "1" *-left- "*"  EP
+EP "1" *-left- "1"  PT
+
+'MODEL'
+
+enum ST as "SetGroupType" {
+FIXED
+PREFIX
+SUFFIX
+}
+
+enum PO as "ParameterOrigin" {
+    NETWORK
+    FIXED
+    USER
+}
+
+class MPD as "ModelParameterDefinition" {
+  String name
+  ParameterType type
+  ParameterOrigin origin
+  String originName
+  String fixedValue
+}
+
+MPD "1" *-up- "1"  PT
+MPD "1" *-down- "1"  PO
+
+class MP as "ModelParameter" {
+  String name
+  String value
+}
+
+
+class PS as "ParametersSet" {
+  String name
+  ModelParameter[] parameters
+  Date lastModifiedDate
+}
+
+PS "1" *-left- "*"  MP
+
+
+
+class PSG as "ParametersSetsGroup" {
+  # String modelName
+  # String name
+  # SetGroupType type
+  ParametersSet[] sets
+}
+
+PSG "1" *-down- "1" ST
+PSG "1" *-down- "*" PS
+
+'housekeeping'
+PS -right[hidden]- ST
+
+class M as "Model" {
+  String modelName
+  EquipmentType equipmentType
+  ModelParameterDefinition[] parameterDefinitions
+  ParametersSetsGroup[] setsGroups
+  Boolean isParameterSetGroupValid()
+}
+
+M "1" *-left- "*"  MPD
+M "1" *-up- "*"  PSG
+
+
+'FILTER'
+enum O as "Operand" {
+  EQUALS
+  NOT_EQUALS
+  LOWER
+  LOWER_OR_EQUALS
+  HIGHER_OR_EQUALS
+  HIGHER
+  INCLUDES
+  STARTS_WITH
+  ENDS_WITH
+  IN
+  NOT_IN
+}
+
+abstract F as "AbstractFilter" {
+  EquipmentProperty property
+  String filterId
+  Operand operand
+  String convertFilterToString()
+  boolean matchValueToFilter(String valueToTest)
+}
+F "1" *-up- "1" EP
+F "1" *-left- "1" O
+
+class NF as "NumberFilter" extends F {
+  Float[] value
+}
+
+class SF as "StringFilter" extends F {
+  String[] value
+}
+
+class BF as "BooleanFilter" extends F {
+  Boolean value
+}
+
+'housekeeping:'
+NF-up[hidden]-F
+SF-up[hidden]-F
+BF-up[hidden]-F
+
+
+'RULE'
+class R as "Rule" {
+EquipmentType type
+String mappedModel
+String setGroup
+SetGroupType groupType
+AbstractFilter[] filters
+String composition
+}
+
+R "1" *-left- "*" F
+R "1" *-up- "1" ET
+R "1" *-down- "1" PSG
+
+note right of R
+composition is the expression
+organizing the different filters
+<b>Example:</b> <i>(Filter1 && Filter3) || Filter2</i>
+end note
+
+'AUTOMATON'
+enum AF as "AutomatonFamily" {
+CURRENT_LIMIT_AUTOMATON
+}
+
+abstract AA as "AbstractAutomaton" {
+AutomatonFamily family
+String model
+String setGroup
+String watchedElement
+}
+
+AA "1" *- "1" AF
+AA "1" *-down- "1" PSG
+
+
+class CLA as "CurrentLimitAutomaton" extends AA {
+  String side
+}
+
+'housekeeping:'
+'CLA-left[hidden]-AA
+
+'MAPPING'
+
+class DynamicMapping {
+# String name
+Rule[] rules
+Automaton[] automata
+Boolean controlledParameters
+Script convertToScript()
+}
+
+DynamicMapping "1" o-down- "*" R
+DynamicMapping "1" o-down- "*" AA
+
+'housekeeping'
+R -right[hidden]- AA
+@enduml
