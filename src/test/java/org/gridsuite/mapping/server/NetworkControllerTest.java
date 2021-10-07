@@ -84,8 +84,8 @@ public class NetworkControllerTest {
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
-    String caseApiUri = "http://case-server/";
-    String networkConversionApiUri = "http://network-conversion-server/";
+    String caseApiUri = "http://localhost:5000/";
+    String networkConversionApiUri = "http://localhost:5003/";
 
     @Test
     public void fileTest() throws Exception {
