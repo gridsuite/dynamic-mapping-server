@@ -1,8 +1,10 @@
 server:
-  port: 5036
   forward-headers-strategy: framework
 
 spring:
+  profiles:
+    active: default,local
+
   servlet:
     multipart:
       max-file-size: 100MB
@@ -43,16 +45,8 @@ logging:
   level:
     ROOT: INFO
 
-
-backing-services:
-  case:
-    base-uri: http://localhost:5000
-  network-conversion:
-    base-uri: http://localhost:5003
-
 network-store-server:
   preloading-strategy: COLLECTION
-  base-uri: http://localhost:8080/
 
 # this structure is shared among all microservices, if you change it, change it everywhere.
 # customQuery allows a microservice to set query parameters specific to itself.
