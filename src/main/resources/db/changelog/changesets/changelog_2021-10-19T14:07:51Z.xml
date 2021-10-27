@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-1">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.10.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.10.xsd">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-1">
         <createTable tableName="automata">
             <column name="automaton_id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="automataPK"/>
@@ -17,10 +17,10 @@
             <column name="watched_element" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="mappingName" type="VARCHAR(255)"/>
+            <column name="mapping_name" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-2">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-2">
         <createTable tableName="automaton_properties">
             <column name="automaton_id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="automaton_propertiesPK"/>
@@ -32,7 +32,7 @@
             <column name="value" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-3">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-3">
         <createTable tableName="filters">
             <column name="filter_id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="filtersPK"/>
@@ -46,7 +46,7 @@
             <column name="value" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-4">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-4">
         <createTable tableName="mappings">
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="mappingsPK"/>
@@ -56,7 +56,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-5">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-5">
         <createTable tableName="model_parameter_definitions">
             <column name="model_name" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="model_parameter_definitionsPK"/>
@@ -70,7 +70,7 @@
             <column name="type" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-6">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-6">
         <createTable tableName="model_parameter_sets">
             <column name="group_name" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="model_parameter_setsPK"/>
@@ -87,7 +87,7 @@
             <column name="last_modified_date" type="TIMESTAMP"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-7">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-7">
         <createTable tableName="model_parameters">
             <column name="group_name" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="model_parametersPK"/>
@@ -107,7 +107,7 @@
             <column name="value" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-8">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-8">
         <createTable tableName="model_sets_group">
             <column name="model_name" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="model_sets_groupPK"/>
@@ -120,7 +120,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-9">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-9">
         <createTable tableName="models">
             <column name="model_name" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="modelsPK"/>
@@ -128,7 +128,7 @@
             <column name="equipment_type" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-10">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-10">
         <createTable tableName="networks">
             <column name="network_id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="networksPK"/>
@@ -136,7 +136,7 @@
             <column name="network_name" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-11">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-11">
         <createTable tableName="rules">
             <column name="rule_id" type="UUID">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="rulesPK"/>
@@ -156,10 +156,10 @@
             <column name="set_group" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="mappingName" type="VARCHAR(255)"/>
+            <column name="mapping_name" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-12">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-12">
         <createTable tableName="scripts">
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="scriptsPK"/>
@@ -172,68 +172,68 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-13">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-13">
         <createIndex indexName="automaton_mappingName_index" tableName="automata">
-            <column name="mappingName"/>
+            <column name="mapping_name"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-14">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-14">
         <createIndex indexName="filter_rule_id_index" tableName="filters">
             <column name="rule_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-15">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-15">
         <createIndex indexName="model_parameter_definitions_model_name_index" tableName="model_parameter_definitions">
             <column name="model_name"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-16">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-16">
         <createIndex indexName="model_parameter_set_index" tableName="model_parameters">
             <column name="set_name"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-17">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-17">
         <createIndex indexName="model_parameter_sets_group_name_index" tableName="model_parameter_sets">
             <column name="group_name"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-18">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-18">
         <createIndex indexName="model_sets_group_model_name_index" tableName="model_sets_group">
             <column name="model_name"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-19">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-19">
         <createIndex indexName="property_automaton_id_index" tableName="automaton_properties">
             <column name="automaton_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-20">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-20">
         <createIndex indexName="rule_mappingName_index" tableName="rules">
-            <column name="mappingName"/>
+            <column name="mapping_name"/>
         </createIndex>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-21">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-21">
         <addForeignKeyConstraint baseColumnNames="automaton_id" baseTableName="automaton_properties" constraintName="automata_property_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="automaton_id" referencedTableName="automata" validate="true"/>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-22">
-        <addForeignKeyConstraint baseColumnNames="mappingName" baseTableName="automata" constraintName="mapping_automata_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="mappings" validate="true"/>
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-22">
+        <addForeignKeyConstraint baseColumnNames="mapping_name" baseTableName="automata" constraintName="mapping_automata_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="mappings" validate="true"/>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-23">
-        <addForeignKeyConstraint baseColumnNames="mappingName" baseTableName="rules" constraintName="mapping_rules_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="mappings" validate="true"/>
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-23">
+        <addForeignKeyConstraint baseColumnNames="mapping_name" baseTableName="rules" constraintName="mapping_rules_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="mappings" validate="true"/>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-24">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-24">
         <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="model_parameter_definitions" constraintName="model_parameter_definition_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="model_name" referencedTableName="models" validate="true"/>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-25">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-25">
         <addForeignKeyConstraint baseColumnNames="model_name,group_name,group_type" baseTableName="model_parameter_sets" constraintName="model_parameter_sets_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="model_name,name,type" referencedTableName="model_sets_group" validate="true"/>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-26">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-26">
         <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="model_sets_group" constraintName="model_sets_groups_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="model_name" referencedTableName="models" validate="true"/>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-27">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-27">
         <addForeignKeyConstraint baseColumnNames="group_name,group_type,model_name,set_name" baseTableName="model_parameters" constraintName="parameter_set_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="group_name,group_type,model_name,name" referencedTableName="model_parameter_sets" validate="true"/>
     </changeSet>
-    <changeSet author="borsenbergerjac (generated)" id="1634137589486-28">
+    <changeSet author="borsenbergerjac (generated)" id="1635328242976-28">
         <addForeignKeyConstraint baseColumnNames="rule_id" baseTableName="filters" constraintName="rules_filter_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="rule_id" referencedTableName="rules" validate="true"/>
     </changeSet>
 </databaseChangeLog>

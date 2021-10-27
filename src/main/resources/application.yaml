@@ -19,9 +19,6 @@ spring:
     database: POSTGRESQL
     hibernate:
       ddl-auto: validate
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
     properties:
       dialect: org.hibernate.dialect.PostgreSQLDialect
       hibernate:
@@ -33,8 +30,6 @@ spring:
         hbm2ddl:
           delimiter: ;
       # Uncomment action to automatically generate the database sql schema file
-  liquibase:
-    change-log: classpath:db/init-db.xml
 
 logging:
   level:
