@@ -31,7 +31,7 @@ public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<Strin
     @Column(name = "parent", nullable = true)
     private String parentName;
 
-    @Column(name = "script", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "script", nullable = false, columnDefinition = "CLOB")
     private String script;
 
     @Override
@@ -42,7 +42,7 @@ public class ScriptEntity extends AbstractManuallyAssignedIdentifierEntity<Strin
     @Column(name = "created_date")
     private Date createdDate;
 
-    @Column(name = "parameters_file", nullable = true, columnDefinition = "TEXT")
+    @Column(name = "parameters_file", nullable = true, columnDefinition = "CLOB")
     private String parametersFile;
 
     public ScriptEntity(String name, ScriptEntity scriptToCopy) {

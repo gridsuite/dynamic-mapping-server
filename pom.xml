@@ -14,7 +14,7 @@
     <parent>
         <groupId>com.powsybl</groupId>
         <artifactId>powsybl-parent-ws</artifactId>
-        <version>4</version>
+        <version>6</version>
         <relativePath/>
     </parent>
 
@@ -39,6 +39,7 @@
         <string-template.version>4.3.1</string-template.version>
         <commons-lang3.version>3.9</commons-lang3.version>
         <jib.container.environment>SPRING_PROFILES_ACTIVE=default</jib.container.environment>
+        <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
     </properties>
 
     <build>
@@ -158,6 +159,12 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>com.powsybl</groupId>
