@@ -1,0 +1,12 @@
+server:
+  port: 5036
+
+backing-services:
+  case:
+    base-uri: http://localhost:5000
+  network-conversion:
+    base-uri: http://localhost:5003
+
+network-store-server:
+  base-uri: http://localhost:8080/
+
