@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import com.powsybl.commons.PowsyblException;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
@@ -254,8 +255,9 @@ public class NetworkServiceImpl implements NetworkService {
             String voltageLevelId = generator.getTerminal().getVoltageLevel().getId();
             generatorMap.putAll(voltageLevelsValues.get(voltageLevelId));
 
-            String subStationId = generator.getTerminal().getVoltageLevel().getSubstation().getId();
-            generatorMap.putAll(substationsValues.get(subStationId));
+            generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getId).ifPresent(subStationId -> {
+                generatorMap.putAll(substationsValues.get(subStationId));
+            });
 
             generators.add(generatorMap);
         });
@@ -272,8 +274,9 @@ public class NetworkServiceImpl implements NetworkService {
             String voltageLevelId = load.getTerminal().getVoltageLevel().getId();
             loadMap.putAll(voltageLevelsValues.get(voltageLevelId));
 
-            String subStationId = load.getTerminal().getVoltageLevel().getSubstation().getId();
-            loadMap.putAll(substationsValues.get(subStationId));
+            load.getTerminal().getVoltageLevel().getSubstation().map(Substation::getId).ifPresent(subStationId -> {
+                loadMap.putAll(substationsValues.get(subStationId));
+            });
 
             loads.add(loadMap);
         });
