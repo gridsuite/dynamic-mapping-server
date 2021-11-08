@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.ModelEntity;
+import org.gridsuite.mapping.server.model.ModelParameterSetEntity;
 import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.ModelService;
@@ -93,6 +94,30 @@ public class ModelServiceImpl implements ModelService {
             }
         } else {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override
+    public Model saveModel(Model model) {
+        modelRepository.save(new ModelEntity(model));
+        return model;
+    }
+
+    @Override
+    public ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName) {
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        if (foundModel.isPresent()) {
+            ModelEntity modelToEdit = foundModel.get();
+            ModelSetsGroupEntity setsGroup = modelToEdit.getSetsGroups().stream()
+                    .filter(setGroup -> setGroup.getName().equals(groupName) && setGroup.getType().equals(groupType))
+                    .findAny()
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No group found"));
+            List<ModelParameterSetEntity> sets = setsGroup.getSets();
+            setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toList()));
+            modelRepository.save(modelToEdit);
+            return new ParametersSetsGroup(setsGroup);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
         }
     }
 }
