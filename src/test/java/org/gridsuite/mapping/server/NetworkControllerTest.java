@@ -159,7 +159,9 @@ public class NetworkControllerTest {
         Network testNetwork = NetworkTest1Factory.create();
         Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
 
-        String expectedResult = "[\n" +
+        String expectedResult = "{\n" +
+                "\"networkId\": \"" + networkUUID + "\",\n" +
+                "\"propertyValues\": [\n" +
                 "  {\n" +
                 "    \"type\": \"GENERATOR\",\n" +
                 "    \"values\": {\n" +
@@ -198,7 +200,8 @@ public class NetworkControllerTest {
                 "      ]\n" +
                 "    }\n" +
                 "  }\n" +
-                "]";
+                "]\n" +
+                "}";
 
         mvc.perform(MockMvcRequestBuilders.get("/network/" + networkUUID + "/values")
                         .contentType(APPLICATION_JSON))
@@ -221,5 +224,134 @@ public class NetworkControllerTest {
 
         Mockito.verify(networkStoreService, times(1)).getNetwork(networkUUID, PreloadingStrategy.COLLECTION);
 
+    }
+
+    @Test
+    public void ruleMatchingTest() throws Exception {
+        UUID networkUUID = UUID.randomUUID();
+
+        Network testNetwork = NetworkTest1Factory.create();
+        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
+
+        int generatorIndex = 2;
+        String generatorRuleToMatch = "{\n" +
+                "  \"ruleIndex\": " + generatorIndex + ",\n" +
+                "  \"equipmentType\": \"" + "GENERATOR" + "\",\n" +
+                "  \"composition\": \"" + "(filter1 || filter2 || filter4 || filter5) && (filter3 || filter6 || filter7) || filter8" + "\",\n" +
+                "  \"filters\": [\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter1\",\n" +
+                "      \"operand\": \"EQUALS\",\n" +
+                "      \"property\": \"id\",\n" +
+                "      \"value\": [\"generator1\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter2\",\n" +
+                "      \"operand\": \"HIGHER\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [3.0],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter3\",\n" +
+                "      \"operand\": \"EQUALS\",\n" +
+                "      \"property\": \"voltageRegulatorOn\",\n" +
+                "      \"value\": true,\n" +
+                "      \"type\": \"BOOLEAN\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter4\",\n" +
+                "      \"operand\": \"INCLUDES\",\n" +
+                "      \"property\": \"id\",\n" +
+                "      \"value\": [\"generator\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter5\",\n" +
+                "      \"operand\": \"ENDS_WITH\",\n" +
+                "      \"property\": \"id\",\n" +
+                "      \"value\": [\"1\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter6\",\n" +
+                "      \"operand\": \"HIGHER_OR_EQUALS\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [400],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter7\",\n" +
+                "      \"operand\": \"IN\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [20,60,400],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter8\",\n" +
+                "      \"operand\": \"NOT_EQUALS\",\n" +
+                "      \"property\": \"voltageRegulatorOn\",\n" +
+                "      \"value\": true,\n" +
+                "      \"type\": \"BOOLEAN\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        mvc.perform(MockMvcRequestBuilders.post("/network/" + networkUUID + "/matches/rule")
+                        .content(generatorRuleToMatch)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"ruleIndex\":" + generatorIndex + ",\"matchedIds\":[\"generator1\"]}", true));
+
+        int loadIndex = 0;
+        String loadRuleToMatch = "{\n" +
+                "  \"ruleIndex\": " + loadIndex + ",\n" +
+                "  \"equipmentType\": \"" + "LOAD" + "\",\n" +
+                "  \"composition\": \"" + "filter1 || filter2 || filter3 || filter4 || filter5" + "\",\n" +
+                "  \"filters\": [\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter1\",\n" +
+                "      \"operand\": \"NOT_IN\",\n" +
+                "      \"property\": \"id\",\n" +
+                "      \"value\": [\"load1\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter2\",\n" +
+                "      \"operand\": \"NOT_EQUALS\",\n" +
+                "      \"property\": \"terminal.voltageLevel.substation.country.name\",\n" +
+                "      \"value\": [\"FRANCE\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter3\",\n" +
+                "      \"operand\": \"STARTS_WITH\",\n" +
+                "      \"property\": \"terminal.voltageLevel.substation.country.name\",\n" +
+                "      \"value\": [\"GER\"],\n" +
+                "      \"type\": \"STRING\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter4\",\n" +
+                "      \"operand\": \"NOT_IN\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [60, 225, 400],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter5\",\n" +
+                "      \"operand\": \"LOWER_OR_EQUALS\",\n" +
+                "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
+                "      \"value\": [380],\n" +
+                "      \"type\": \"NUMBER\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+
+        mvc.perform(MockMvcRequestBuilders.post("/network/" + networkUUID + "/matches/rule")
+                        .content(loadRuleToMatch)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"ruleIndex\":" + loadIndex + ",\"matchedIds\":[]}", true));
     }
 }

@@ -8,20 +8,24 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import com.powsybl.commons.PowsyblException;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
-import org.gridsuite.mapping.server.dto.EquipmentValues;
-import org.gridsuite.mapping.server.dto.NetworkIdentification;
-import org.gridsuite.mapping.server.dto.OutputNetwork;
+import org.gridsuite.mapping.server.dto.*;
+import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.Resource;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.gridsuite.mapping.server.MappingConstants.*;
@@ -63,7 +68,8 @@ public class NetworkServiceImpl implements NetworkService {
         this.networkRepository = networkRepository;
     }
 
-    private Network getNetwork(UUID networkUuid) {
+    @Override
+    public Network getNetwork(UUID networkUuid) {
         try {
             return networkStoreService.getNetwork(networkUuid, PreloadingStrategy.COLLECTION);
         } catch (PowsyblException e) {
@@ -72,7 +78,13 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public List<EquipmentValues> getNetworkValuesFromExistingNetwork(UUID networkUuid) {
+    public MatchedRule getNetworkMatches(UUID networkUuid, RuleToMatch ruleToMatch) {
+        List<String> matches = matchNetworkToRule(getNetwork(networkUuid), ruleToMatch);
+        return new MatchedRule(ruleToMatch.getRuleIndex(), matches);
+    }
+
+    @Override
+    public NetworkValues getNetworkValuesFromExistingNetwork(UUID networkUuid) {
         Network network = getNetwork(networkUuid);
 
         HashMap<String, Set<String>> substationsPropertyValues = getSubstationsPropertyValues(network);
@@ -86,7 +98,7 @@ public class NetworkServiceImpl implements NetworkService {
         EquipmentValues loadsEquipmentValues = getLoadsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
         equipmentValuesList.add(loadsEquipmentValues);
 
-        return equipmentValuesList;
+        return new NetworkValues(networkUuid, equipmentValuesList);
     }
 
     private void setPropertyMap(HashMap<String, Set<String>> propertyMap, String value, String propertyName) {
@@ -121,7 +133,7 @@ public class NetworkServiceImpl implements NetworkService {
             // nominalV
             String voltageLevelNominalV = String.valueOf(voltageLevel.getNominalV());
             setPropertyMap(voltageLevelsMap, voltageLevelNominalV, NOMINAL_V_PROPERTY);
-            // Add future substations properties here
+            // Add future voltageLevels properties here
         });
         return voltageLevelsMap;
     }
@@ -157,7 +169,7 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public List<EquipmentValues> getNetworkValues(MultipartFile multipartFile) {
+    public NetworkValues getNetworkValues(MultipartFile multipartFile) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
@@ -199,5 +211,109 @@ public class NetworkServiceImpl implements NetworkService {
     @Override
     public List<OutputNetwork> getNetworks() {
         return networkRepository.findAll().stream().map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getNetworkName())).collect(Collectors.toList());
+    }
+
+    private HashMap<String, HashMap<String, String>> getPropertyValuesBySubstations(Network network) {
+        final HashMap<String, HashMap<String, String>> substationsMap = new HashMap<>();
+        network.getSubstations().forEach(substation -> {
+            final HashMap<String, String> substationMap = new HashMap<>();
+            // Country
+            Optional<Country> substationCountry = substation.getCountry();
+            if (substationCountry.isPresent()) {
+                String countryName = substationCountry.get().getName();
+                substationMap.put(COUNTRY_PROPERTY, countryName);
+            }
+            // Add future substations properties here
+            substationsMap.put(substation.getId(), substationMap);
+        });
+        return substationsMap;
+    }
+
+    private HashMap<String, HashMap<String, String>> getPropertyValuesByVoltageLevel(Network network) {
+        final HashMap<String, HashMap<String, String>> voltageLevelsMap = new HashMap<>();
+        network.getVoltageLevels().forEach(voltageLevel -> {
+            final HashMap<String, String> voltageLevelMap = new HashMap<>();
+            // nominalV
+            String voltageLevelNominalV = String.valueOf(voltageLevel.getNominalV());
+            voltageLevelMap.put(NOMINAL_V_PROPERTY, voltageLevelNominalV);
+
+            // Add future voltageLevels properties here
+            voltageLevelsMap.put(voltageLevel.getId(), voltageLevelMap);
+        });
+        return voltageLevelsMap;
+    }
+
+    private List<HashMap<String, String>> getPropertyValuesByGenerators(Network network, HashMap<String, HashMap<String, String>> voltageLevelsValues, HashMap<String, HashMap<String, String>> substationsValues) {
+
+        List<HashMap<String, String>> generators = new ArrayList<>();
+        network.getGenerators().forEach(generator -> {
+            final HashMap<String, String> generatorMap = new HashMap<>();
+            generatorMap.put(ID_PROPERTY, String.valueOf(generator.getId()));
+            generatorMap.put(ENERGY_SOURCE_PROPERTY, String.valueOf(generator.getEnergySource()));
+            generatorMap.put(VOLTAGE_REGULATOR_ON_PROPERTY, String.valueOf(generator.isVoltageRegulatorOn()));
+
+            String voltageLevelId = generator.getTerminal().getVoltageLevel().getId();
+            generatorMap.putAll(voltageLevelsValues.get(voltageLevelId));
+
+            generator.getTerminal().getVoltageLevel().getSubstation().map(Substation::getId).ifPresent(subStationId -> {
+                generatorMap.putAll(substationsValues.get(subStationId));
+            });
+
+            generators.add(generatorMap);
+        });
+        return generators;
+    }
+
+    private List<HashMap<String, String>> getPropertyValuesByLoads(Network network, HashMap<String, HashMap<String, String>> voltageLevelsValues, HashMap<String, HashMap<String, String>> substationsValues) {
+        List<HashMap<String, String>> loads = new ArrayList<>();
+        network.getLoads().forEach(load -> {
+            final HashMap<String, String> loadMap = new HashMap<>();
+            loadMap.put(ID_PROPERTY, String.valueOf(load.getId()));
+            loadMap.put(LOAD_TYPE_PROPERTY, String.valueOf(load.getLoadType()));
+
+            String voltageLevelId = load.getTerminal().getVoltageLevel().getId();
+            loadMap.putAll(voltageLevelsValues.get(voltageLevelId));
+
+            load.getTerminal().getVoltageLevel().getSubstation().map(Substation::getId).ifPresent(subStationId -> {
+                loadMap.putAll(substationsValues.get(subStationId));
+            });
+
+            loads.add(loadMap);
+        });
+        return loads;
+    }
+
+    private List<String> matchNetworkToRule(Network network, RuleToMatch rule) {
+        HashMap<String, HashMap<String, String>> substationsValues = getPropertyValuesBySubstations(network);
+        HashMap<String, HashMap<String, String>> voltageLevelsValues = getPropertyValuesByVoltageLevel(network);
+
+        List<HashMap<String, String>> correspondingValues = rule.getEquipmentType() == EquipmentType.GENERATOR ?
+                getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues) :
+                getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
+
+        return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    private String matchEquipmentToRule(HashMap<String, String> equipment, RuleToMatch rule) {
+        AtomicReference<String> evaluatedComposition = new AtomicReference<>(rule.getComposition());
+        rule.getFilters().stream().forEach(filter -> {
+            boolean isFilterMatched = matchEquipmentToFilter(equipment, filter);
+            evaluatedComposition.set(evaluatedComposition.get().replace(filter.getFilterId(), Methods.convertBooleanToString(isFilterMatched)));
+        });
+        boolean isMatched = false;
+        try {
+            ExpressionParser parser = new SpelExpressionParser();
+            isMatched = (boolean) parser.parseExpression(evaluatedComposition.get()).getValue();
+
+        } catch (SpelEvaluationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid composition", e);
+        }
+
+        return isMatched ? equipment.get(ID_PROPERTY) : null;
+    }
+
+    private boolean matchEquipmentToFilter(HashMap<String, String> equipment, AbstractFilter filter) {
+        String valueToTest = equipment.get(filter.getProperty());
+        return filter.matchValueToFilter(valueToTest);
     }
 }
