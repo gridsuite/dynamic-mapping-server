@@ -1,8 +1,6 @@
 spring:
   jpa:
     database: H2
-    hibernate:
-      ddl-auto: create-drop
     properties:
       dialect: org.hibernate.dialect.H2Dialect
       hibernate.format_sql: true
@@ -16,10 +14,4 @@ logging:
 
 dbVendor: h2:mem
 query: ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-hostPort:
-
-backing-services:
-  case:
-    base-uri: http://case-server/
-  network-conversion:
-    base-uri: http://network-conversion-server/
+hostPort: ":"

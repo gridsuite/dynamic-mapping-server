@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v1
         with:
           repository: powsybl/powsybl-network-store
-          ref: refs/heads/master
+          ref: refs/heads/main
 
       - name: Build and install network store client with Maven
         run: mvn --batch-mode -Pclient -DskipTests=true --file ../powsybl-network-store/pom.xml install
@@ -50,7 +50,7 @@ jobs:
 
       - name: Broadcast update event
         if: github.ref == 'refs/heads/main'
-        uses: gridsuite/broadcast-event@master
+        uses: gridsuite/broadcast-event@main
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           event-type: dynamic_mapping_server_updated

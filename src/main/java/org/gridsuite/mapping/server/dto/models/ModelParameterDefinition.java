@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.ModelParameterDefinitionEntity;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
@@ -15,6 +16,7 @@ import org.gridsuite.mapping.server.utils.ParameterType;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
+@AllArgsConstructor
 public class ModelParameterDefinition {
 
     private String name;
