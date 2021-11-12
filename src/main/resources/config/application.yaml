@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: dynamic-mapping-server
+
+logging:
+  level:
+    ROOT: INFO
+
+network-store-server:
+  preloading-strategy: COLLECTION
+
+dbName: dynamicmappings
