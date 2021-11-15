@@ -2,6 +2,13 @@ spring:
   application:
     name: dynamic-mapping-server
 
+  jpa:
+    properties:
+      hibernates:
+        event:
+          merge:
+            entity_copy_observer: allow
+
 logging:
   level:
     ROOT: INFO
