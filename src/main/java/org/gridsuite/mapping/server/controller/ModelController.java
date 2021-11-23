@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
-import org.gridsuite.mapping.server.dto.models.ParametersSet;
-import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
-import org.gridsuite.mapping.server.dto.models.SimpleModel;
+import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.service.implementation.ModelServiceImpl;
 import org.gridsuite.mapping.server.utils.SetGroupType;
@@ -77,5 +74,21 @@ public class ModelController {
             @ApiResponse(responseCode = "200", description = "names of all models")})
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
+    }
+
+    @PostMapping(value = "/")
+    @Operation(summary = "Post a model")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "saved model")})
+    public ResponseEntity<Model> saveModel(@RequestBody Model model) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveModel(model));
+    }
+
+    @DeleteMapping(value = "/{modelName}/parameters/sets/{groupName}/{groupType}/{setName}")
+    @Operation(summary = "Delete a parameter set")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "updated parameter group")})
+    public ResponseEntity<ParametersSetsGroup> deleteSet(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType, @PathVariable("setName") String setName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
     }
 }

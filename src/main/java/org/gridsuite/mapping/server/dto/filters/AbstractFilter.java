@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
-import org.gridsuite.mapping.server.utils.Operands;
 import org.gridsuite.mapping.server.utils.Methods;
+import org.gridsuite.mapping.server.utils.Operands;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -53,7 +53,7 @@ public abstract class AbstractFilter {
                 stringFilter.setOperand(filterEntity.getOperand());
                 stringFilter.setValue(Methods.convertStringToList(filterEntity.getValue()));
                 return stringFilter;
-            default :
+            default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown filter type");
         }
     }
@@ -61,4 +61,6 @@ public abstract class AbstractFilter {
     public abstract FilterEntity convertFilterToEntity(RuleEntity rule);
 
     public abstract String convertFilterToString();
+
+    public abstract boolean matchValueToFilter(String valueToTest);
 }

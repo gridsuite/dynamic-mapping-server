@@ -23,14 +23,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -217,5 +219,121 @@ public class ModelControllerTest {
                         "{\"name\":\"LoadAlphaBeta\",\n \"type\":\"LOAD\",\"groups\":[{\"name\": \"LAB\", \"type\": \"FIXED\", \"setsNumber\": 1}]},\n" +
                         "{\"name\":\"GeneratorThreeWindings\",\n \"type\":\"GENERATOR\",\"groups\":[{\"name\": \"GSTWPR\", \"type\": \"PREFIX\", \"setsNumber\": 0}]}\n" +
                         "]", true));
+    }
+
+    public static String readFileAsString(String file) throws Exception {
+        return new String(Files.readAllBytes(Paths.get(file)));
+    }
+
+    @Test
+    @Transactional
+    public void testSave() throws Exception {
+        String modelName = "LoadAlphaBeta";
+        ModelEntity previousModel = modelRepository.findById(modelName).orElseThrow();
+        String newModel = readFileAsString("src/test/resources/loadAlphaBeta.json");
+
+        cleanDB();
+        // Put data
+        mvc.perform(post("/models/")
+                        .content(newModel)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Get Data
+        ModelEntity savedModel = modelRepository.findById(modelName).orElseThrow();
+
+        assertEquals(previousModel.getModelName(), savedModel.getModelName());
+        assertEquals(previousModel.getEquipmentType(), savedModel.getEquipmentType());
+        List<ModelParameterDefinitionEntity> previousDefinitions = previousModel.getParameterDefinitions();
+        List<ModelParameterDefinitionEntity> savedDefinitions = savedModel.getParameterDefinitions();
+        assertEquals(previousDefinitions.size(), savedDefinitions.size());
+        for (int i = 0; i < previousDefinitions.size(); i++) {
+            ModelParameterDefinitionEntity previousDefinition = previousDefinitions.get(i);
+            ModelParameterDefinitionEntity savedDefinition = savedDefinitions.get(i);
+            assertEquals(previousDefinition.getName(), savedDefinition.getName());
+            assertEquals(previousDefinition.getModelName(), savedDefinition.getModelName());
+            assertEquals(previousDefinition.getType(), savedDefinition.getType());
+            assertEquals(previousDefinition.getOrigin(), savedDefinition.getOrigin());
+            assertEquals(previousDefinition.getOriginName(), savedDefinition.getOriginName());
+            assertEquals(previousDefinition.getFixedValue(), savedDefinition.getFixedValue());
+        }
+        // Import does not check sets because it is not part of the typical model import
+    }
+
+    @Test
+    @Transactional
+    public void deleteTest() throws Exception {
+
+        String name = "setName";
+        String modelName = "LoadAlphaBeta";
+        String set = "{\n" +
+                "  \"name\": \"" + name + "\",\n" +
+                "  \"parameters\": [\n" +
+                "    {\n" +
+                "      \"name\": \"load_alpha\",\n" +
+                "      \"value\": \"1.5\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"load_beta\",\n" +
+                "      \"value\": \"2.5\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        String setGroup = "{\n" +
+                "  \"name\": \"" + name + "\",\n" +
+                "  \"modelName\": \"" + modelName + "\",\n" +
+                "  \"type\": \"FIXED\",\n" +
+                "  \"sets\": [\n" +
+                set +
+                "  ]\n" +
+                "}";
+
+        // Put data
+        mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
+                        .content(setGroup)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("[" + set + "]", true));
+
+        // Trying to delete from a non-existing model will throw
+        mvc.perform(delete("/models/" + "unknownModel" + "/parameters/sets/" + name + "/" + "FIXED" + "/" + name))
+                .andExpect(status().isNotFound());
+
+        // Trying to delete from a non-existing setGroup will throw
+        mvc.perform(delete("/models/" + modelName + "/parameters/sets/" + "unknownGroup" + "/" + "FIXED" + "/" + name))
+                .andExpect(status().isNotFound());
+
+        // Trying to delete a non-existing set will do nothing
+        mvc.perform(delete("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED" + "/" + "unusedName"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(setGroup));
+
+        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("[" + set + "]", true));
+
+        // Delete the set
+        mvc.perform(delete("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED" + "/" + name))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("{\n" +
+                        "  \"name\": \"" + name + "\",\n" +
+                        "  \"modelName\": \"" + modelName + "\",\n" +
+                        "  \"type\": \"FIXED\",\n" +
+                        "  \"sets\": []\n" +
+                        "}"));
+        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json("[]", true));
     }
 }

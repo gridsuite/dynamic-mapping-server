@@ -15,6 +15,7 @@ import org.gridsuite.mapping.server.utils.Methods;
 import org.gridsuite.mapping.server.utils.PropertyType;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import org.gridsuite.mapping.server.utils.Operands;
 
 import java.util.List;
 import java.util.Locale;
@@ -91,4 +92,38 @@ public class NumberFilter extends AbstractFilter {
 
         }
     }
+
+    @Override
+    public boolean matchValueToFilter(String valueToTest) {
+        boolean isMatched = false;
+
+        Float floatValue = Float.parseFloat(valueToTest);
+
+        switch (this.getOperand()) {
+            case EQUALS:
+            case IN:
+            case NOT_IN:
+            case NOT_EQUALS:
+                boolean isNot = this.getOperand().equals(Operands.NOT_IN) || this.getOperand().equals(Operands.NOT_EQUALS);
+                isMatched = isNot != value.stream().reduce(false, (acc, filterUniqueValue) -> acc || (Float.compare(floatValue, filterUniqueValue) == 0
+                ), (a, b) -> a || b);
+                break;
+            case LOWER:
+                isMatched = Float.compare(floatValue, value.get(0)) == -1;
+                break;
+            case LOWER_OR_EQUALS:
+                isMatched = Float.compare(floatValue, value.get(0)) <= 0;
+                break;
+            case HIGHER:
+                isMatched = Float.compare(floatValue, value.get(0)) == 1;
+                break;
+            case HIGHER_OR_EQUALS:
+                isMatched = Float.compare(floatValue, value.get(0)) >= 0;
+                break;
+            default:
+                break;
+        }
+        return isMatched;
+    }
 }
+
