@@ -4,11 +4,11 @@ spring:
 
   jpa:
     properties:
-      hibernates:
+      hibernate:
         event:
           merge:
             entity_copy_observer: allow
-
+        
 logging:
   level:
     ROOT: INFO
