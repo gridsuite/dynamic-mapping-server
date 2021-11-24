@@ -14,17 +14,17 @@
     <parent>
         <groupId>com.powsybl</groupId>
         <artifactId>powsybl-parent-ws</artifactId>
-        <version>6</version>
+        <version>7</version>
         <relativePath/>
     </parent>
 
     <groupId>org.gridsuite</groupId>
-    <artifactId>gridsuite-mapping-server</artifactId>
+    <artifactId>gridsuite-dynamic-mapping-server</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
-    <name>Mapping server</name>
-    <description>Mapping service</description>
+    <name>Dynamic Mapping server</name>
+    <description>Dynamic Mapping server</description>
     <url>http://www.gridsuite.org/</url>
 
     <scm>
@@ -35,10 +35,9 @@
 
     <properties>
         <java.version>11</java.version>
-        <gridsuite-dependencies.version>11</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>12</gridsuite-dependencies.version>
         <string-template.version>4.3.1</string-template.version>
         <commons-lang3.version>3.9</commons-lang3.version>
-        <jib.container.environment>SPRING_PROFILES_ACTIVE=default</jib.container.environment>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
     </properties>
 
@@ -106,6 +105,10 @@
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-network-store-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-ws-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>

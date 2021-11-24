@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: dynamic-mapping-server
+
+  jpa:
+    properties:
+      hibernate:
+        event:
+          merge:
+            entity_copy_observer: allow
+        
+logging:
+  level:
+    ROOT: INFO
+
+network-store-server:
+  preloading-strategy: COLLECTION
+
+dbName: dynamicmappings
