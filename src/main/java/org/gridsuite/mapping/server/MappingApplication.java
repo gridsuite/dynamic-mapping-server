@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server;
 
+import com.powsybl.ws.commons.Utils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -19,6 +20,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class MappingApplication {
 
     public static void main(String[] args) {
+        Utils.initProperties();
         SpringApplication.run(MappingApplication.class, args);
     }
 }
