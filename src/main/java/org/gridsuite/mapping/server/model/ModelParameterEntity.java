@@ -49,7 +49,7 @@ public class ModelParameterEntity implements Serializable {
     @Column(name = "set_name")
     private String setName;
 
-    @Column(name = "value")
+    @Column(name = "value_")
     private String value;
 
     @ManyToOne(fetch = FetchType.LAZY)
