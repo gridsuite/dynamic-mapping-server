@@ -49,7 +49,7 @@ public class FilterEntity implements Serializable {
     private Operands operand;
 
     // Value is the value cast to a string for persistence issue
-    @Column(name = "value")
+    @Column(name = "value_")
     private String value;
 
     @ManyToOne(fetch = FetchType.LAZY)
