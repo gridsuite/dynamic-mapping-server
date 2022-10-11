@@ -198,7 +198,8 @@ public class NetworkServiceImpl implements NetworkService {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
         UUID caseUuid = UUID.fromString(responseBody.substring(1, 37));
-        NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
+        String url = networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid + "&isAsyncRun=false";
+        NetworkIdentification networkIdentification = restTemplate.postForEntity(url, Collections.emptyMap(), NetworkIdentification.class).getBody();
         if (networkIdentification == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }

@@ -106,7 +106,7 @@ public class NetworkControllerTest {
                         .body("\"" + caseUUID + "\""));
 
         // Mock call to case-server for conversion
-        mockServer.expect(ExpectedCount.once(), requestTo(new URI(networkConversionApiUri + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUUID)))
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(networkConversionApiUri + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUUID + "&isAsyncRun=false")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(APPLICATION_JSON)
