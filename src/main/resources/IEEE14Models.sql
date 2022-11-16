@@ -251,7 +251,7 @@ VALUES ('CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 0, NULL, 2
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_IMax', 2, NULL, 2),
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_tLagBeforeActing', 2, NULL, 2);
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'generator_ExcitationPu', 'GSTW', 1.),
        ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'generator_md', 'GSTW', 0.16),
        ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'generator_mq', 'GSTW', 0.16),
@@ -290,7 +290,7 @@ VALUES ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'generator_P0Pu', 'GSTW'
        ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'generator_U0Pu', 'GSTW'),
        ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'generator_UPhase0', 'GSTW');
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('GSFW', 0, 'GeneratorSynchronousFourWindings', 'generator_ExcitationPu', 'GSFW', 1.),
        ('GSFW', 0, 'GeneratorSynchronousFourWindings', 'generator_md', 'GSFW', 0.215),
        ('GSFW', 0, 'GeneratorSynchronousFourWindings', 'generator_mq', 'GSFW', 0.215),
@@ -331,7 +331,7 @@ VALUES ('GSFW', 0, 'GeneratorSynchronousFourWindings', 'generator_P0Pu', 'GSFW')
        ('GSFW', 0, 'GeneratorSynchronousFourWindings', 'generator_U0Pu', 'GSFW'),
        ('GSFW', 0, 'GeneratorSynchronousFourWindings', 'generator_UPhase0', 'GSFW');
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('GSTWPR', 0, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_ExcitationPu', 'GSTWPR', 1.),
        ('GSTWPR', 0, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_md', 'GSTWPR', 0.16),
        ('GSTWPR', 0, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_mq', 'GSTWPR', 0.16),
@@ -381,7 +381,7 @@ VALUES ('GSTWPR', 0, 'GeneratorSynchronousThreeWindingsProportionalRegulations',
        ('GSTWPR', 0, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_U0Pu', 'GSTWPR'),
        ('GSTWPR', 0, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_UPhase0', 'GSTWPR');
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('GSFWPR', 0, 'GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_ExcitationPu', 'GSFWPR', 1.),
        ('GSFWPR', 0, 'GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_md', 'GSFWPR', 0.215),
        ('GSFWPR', 0, 'GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_mq', 'GSFWPR', 0.215),
@@ -433,7 +433,7 @@ VALUES ('GSFWPR', 0, 'GeneratorSynchronousFourWindingsProportionalRegulations', 
        ('GSFWPR', 0, 'GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_U0Pu', 'GSFWPR'),
        ('GSFWPR', 0, 'GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_UPhase0', 'GSFWPR');
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('GPQ', 0, 'GeneratorPQ', 'generator_AlphaPuPNom', 'GPQ', 25.);
 
 INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name)
@@ -445,7 +445,7 @@ VALUES ('GPQ', 0, 'GeneratorPQ', 'generator_P0Pu', 'GPQ'),
        ('GPQ', 0, 'GeneratorPQ', 'generator_U0Pu', 'GPQ'),
        ('GPQ', 0, 'GeneratorPQ', 'generator_UPhase0', 'GPQ');
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('GPV', 0, 'GeneratorPV', 'generator_AlphaPuPNom', 'GPV', 20.),
        ('GPV', 0, 'GeneratorPV', 'generator_LambdaPuSNom', 'GPV', 0.01),
        ('GPV', 0, 'GeneratorPV', 'generator_QMax', 'GPV', 10.),
@@ -461,7 +461,7 @@ VALUES ('GPV', 0, 'GeneratorPV', 'generator_P0Pu', 'GPV'),
        ('GPV', 0, 'GeneratorPV', 'generator_U0Pu', 'GPV'),
        ('GPV', 0, 'GeneratorPV', 'generator_UPhase0', 'GPV');
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('LAB', 0, 'LoadAlphaBeta', 'load_alpha', 'LAB', 1.),
        ('LAB', 0, 'LoadAlphaBeta', 'load_beta', 'LAB', 2.);
 
@@ -477,7 +477,7 @@ VALUES ('LPQ', 0, 'LoadPQ', 'load_P0Pu', 'LPQ'),
        ('LPQ', 0, 'LoadPQ', 'load_U0Pu', 'LPQ'),
        ('LPQ', 0, 'LoadPQ', 'load_UPhase0', 'LPQ');
 
-INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value)
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
 VALUES ('CLA', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 'CLA', 1),
        ('CLA', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_Running', 'CLA', true),
        ('CLA', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_IMax', 'CLA', 1000.),
