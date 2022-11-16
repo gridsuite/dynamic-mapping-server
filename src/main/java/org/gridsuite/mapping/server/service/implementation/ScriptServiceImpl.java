@@ -6,10 +6,7 @@
  */
 package org.gridsuite.mapping.server.service.implementation;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
@@ -323,23 +320,10 @@ public class ScriptServiceImpl implements ScriptService {
 
     @AllArgsConstructor
     @Getter
+    @EqualsAndHashCode
     public class InstantiatedModel {
         private final String model;
         private final String setGroup;
-
-        @SuppressWarnings("checkstyle:NeedBraces")
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            InstantiatedModel that = (InstantiatedModel) o;
-            return model.equals(that.model) && setGroup.equals(that.setGroup);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(model, setGroup);
-        }
     }
 }
 
