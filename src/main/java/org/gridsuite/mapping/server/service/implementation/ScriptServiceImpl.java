@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -40,6 +41,8 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 public class ScriptServiceImpl implements ScriptService {
 
+    private final Function<RuleEntity, InstantiatedModel> funcRuleToInstantiatedModel = rule -> new InstantiatedModel(rule.getMappedModel(), rule.getSetGroup());
+    private final Function<AutomatonEntity, InstantiatedModel> funcAutomatonToInstantiatedModel = automaton -> new InstantiatedModel(automaton.getModel(), automaton.getSetGroup());
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
     private final ScriptRepository scriptRepository;
@@ -67,11 +70,23 @@ public class ScriptServiceImpl implements ScriptService {
             String createdPar = null;
             if (foundMapping.get().isControlledParameters()) {
                 try {
-                    List<String[]> instantiatedModels = foundMapping.get().getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
-                    instantiatedModels.addAll(foundMapping.get().getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
-                    List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getEnrichedSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
+                    // build enriched parameters sets from the mapping
+                    List<InstantiatedModel> instantiatedModels = foundMapping.get().getRules().stream()
+                            .map(funcRuleToInstantiatedModel::apply)
+                            .distinct()
+                            .collect(Collectors.toList());
+                    instantiatedModels.addAll(foundMapping.get().getAutomata().stream()
+                            .map(funcAutomatonToInstantiatedModel::apply)
+                            .distinct()
+                            .collect(Collectors.toList())
+                    );
+                    List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream()
+                            .map(instantiatedModel -> getEnrichedSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
+                            .collect(Collectors.toList());
                     List<EnrichedParametersSet> sets = new ArrayList<>();
                     setsLists.forEach(sets::addAll);
+
+                    // generate .par content
                     createdPar = Templater.setsToPar(sets);
                 } catch (Exception e) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter sets");
@@ -163,9 +178,15 @@ public class ScriptServiceImpl implements ScriptService {
         if (foundMapping.isPresent()) {
             try {
                 MappingEntity scriptMapping = foundMapping.get();
-                List<String[]> instantiatedModels = scriptMapping.getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
-                instantiatedModels.addAll(scriptMapping.getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
-                List<List<ParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
+                List<InstantiatedModel> instantiatedModels = scriptMapping.getRules().stream()
+                        .map(funcRuleToInstantiatedModel::apply)
+                        .collect(Collectors.toList());
+                instantiatedModels.addAll(scriptMapping.getAutomata().stream()
+                        .map(funcAutomatonToInstantiatedModel::apply)
+                        .collect(Collectors.toList()));
+                List<List<ParametersSet>> setsLists = instantiatedModels.stream()
+                        .map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
+                        .collect(Collectors.toList());
                 List<ParametersSet> sets = new ArrayList<>();
                 setsLists.forEach(sets::addAll);
                 return sets.parallelStream().reduce(true, (acc, set) -> acc && script.getCreatedDate().compareTo(set.getLastModifiedDate()) >= 0, (a, b) -> a && b);
@@ -298,6 +319,27 @@ public class ScriptServiceImpl implements ScriptService {
         private String originName;
 
 
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public class InstantiatedModel {
+        private final String model;
+        private final String setGroup;
+
+        @SuppressWarnings("checkstyle:NeedBraces")
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            InstantiatedModel that = (InstantiatedModel) o;
+            return model.equals(that.model) && setGroup.equals(that.setGroup);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(model, setGroup);
+        }
     }
 }
 
