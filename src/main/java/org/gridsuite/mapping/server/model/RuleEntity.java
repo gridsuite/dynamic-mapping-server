@@ -71,8 +71,4 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
         this.filters = ruleToCopy.getFilters().stream().map(filterEntity -> new FilterEntity(newID, filterEntity)).collect(Collectors.toList());
 
     }
-
-    public String[] getInstantiatedModel() {
-        return new String[]{mappedModel, setGroup};
-    }
 }
