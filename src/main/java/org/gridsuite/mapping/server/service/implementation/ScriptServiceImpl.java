@@ -68,15 +68,13 @@ public class ScriptServiceImpl implements ScriptService {
             if (foundMapping.get().isControlledParameters()) {
                 try {
                     // build enriched parameters sets from the mapping
-                    List<InstantiatedModel> instantiatedModels = foundMapping.get().getRules().stream()
+                    Set<InstantiatedModel> instantiatedModels = foundMapping.get().getRules().stream()
                             .map(funcRuleToInstantiatedModel::apply)
-                            .distinct()
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
                     instantiatedModels.addAll(foundMapping.get().getAutomata().stream()
                             .map(funcAutomatonToInstantiatedModel::apply)
-                            .distinct()
-                            .collect(Collectors.toList())
-                    );
+                            .collect(Collectors.toCollection(LinkedHashSet::new)));
+
                     List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream()
                             .map(instantiatedModel -> getEnrichedSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
                             .collect(Collectors.toList());
@@ -175,12 +173,12 @@ public class ScriptServiceImpl implements ScriptService {
         if (foundMapping.isPresent()) {
             try {
                 MappingEntity scriptMapping = foundMapping.get();
-                List<InstantiatedModel> instantiatedModels = scriptMapping.getRules().stream()
+                Set<InstantiatedModel> instantiatedModels = scriptMapping.getRules().stream()
                         .map(funcRuleToInstantiatedModel::apply)
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
                 instantiatedModels.addAll(scriptMapping.getAutomata().stream()
                         .map(funcAutomatonToInstantiatedModel::apply)
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toCollection(LinkedHashSet::new)));
                 List<List<ParametersSet>> setsLists = instantiatedModels.stream()
                         .map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
                         .collect(Collectors.toList());
