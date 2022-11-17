@@ -173,12 +173,12 @@ public class ScriptServiceImpl implements ScriptService {
         if (foundMapping.isPresent()) {
             try {
                 MappingEntity scriptMapping = foundMapping.get();
-                Set<InstantiatedModel> instantiatedModels = scriptMapping.getRules().stream()
+                List<InstantiatedModel> instantiatedModels = scriptMapping.getRules().stream()
                         .map(funcRuleToInstantiatedModel::apply)
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                        .collect(Collectors.toList());
                 instantiatedModels.addAll(scriptMapping.getAutomata().stream()
                         .map(funcAutomatonToInstantiatedModel::apply)
-                        .collect(Collectors.toCollection(LinkedHashSet::new)));
+                        .collect(Collectors.toList()));
                 List<List<ParametersSet>> setsLists = instantiatedModels.stream()
                         .map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
                         .collect(Collectors.toList());
