@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -38,8 +37,6 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 public class ScriptServiceImpl implements ScriptService {
 
-    private final Function<RuleEntity, InstantiatedModel> funcRuleToInstantiatedModel = rule -> new InstantiatedModel(rule.getMappedModel(), rule.getSetGroup());
-    private final Function<AutomatonEntity, InstantiatedModel> funcAutomatonToInstantiatedModel = automaton -> new InstantiatedModel(automaton.getModel(), automaton.getSetGroup());
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
     private final ScriptRepository scriptRepository;
@@ -69,10 +66,10 @@ public class ScriptServiceImpl implements ScriptService {
                 try {
                     // build enriched parameters sets from the mapping
                     Set<InstantiatedModel> instantiatedModels = foundMapping.get().getRules().stream()
-                            .map(funcRuleToInstantiatedModel::apply)
+                            .map(InstantiatedModel::new)
                             .collect(Collectors.toCollection(LinkedHashSet::new));
                     instantiatedModels.addAll(foundMapping.get().getAutomata().stream()
-                            .map(funcAutomatonToInstantiatedModel::apply)
+                            .map(InstantiatedModel::new)
                             .collect(Collectors.toCollection(LinkedHashSet::new)));
 
                     List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream()
@@ -174,10 +171,10 @@ public class ScriptServiceImpl implements ScriptService {
             try {
                 MappingEntity scriptMapping = foundMapping.get();
                 List<InstantiatedModel> instantiatedModels = scriptMapping.getRules().stream()
-                        .map(funcRuleToInstantiatedModel::apply)
+                        .map(InstantiatedModel::new)
                         .collect(Collectors.toList());
                 instantiatedModels.addAll(scriptMapping.getAutomata().stream()
-                        .map(funcAutomatonToInstantiatedModel::apply)
+                        .map(InstantiatedModel::new)
                         .collect(Collectors.toList()));
                 List<List<ParametersSet>> setsLists = instantiatedModels.stream()
                         .map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
@@ -316,12 +313,21 @@ public class ScriptServiceImpl implements ScriptService {
 
     }
 
-    @AllArgsConstructor
     @Getter
     @EqualsAndHashCode
     public class InstantiatedModel {
         private final String model;
         private final String setGroup;
+
+        public InstantiatedModel(RuleEntity rule) {
+            this.model = rule.getMappedModel();
+            this.setGroup = rule.getSetGroup();
+        }
+
+        public InstantiatedModel(AutomatonEntity automaton) {
+            this.model = automaton.getModel();
+            this.setGroup = automaton.getSetGroup();
+        }
     }
 }
 
