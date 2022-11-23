@@ -1,6 +1,6 @@
 <familyModel> {
      staticId "<watchedElement>"
-     dynamicModelId "<modelName>"
+     dynamicModelId "<automatonId>"
      parameterSetId "<parameterSetId>"
      <properties; separator="\n">
 }

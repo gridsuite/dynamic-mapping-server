@@ -17,10 +17,7 @@ import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.service.ScriptService;
-import org.gridsuite.mapping.server.utils.EquipmentType;
-import org.gridsuite.mapping.server.utils.ParameterOrigin;
-import org.gridsuite.mapping.server.utils.ParameterType;
-import org.gridsuite.mapping.server.utils.Templater;
+import org.gridsuite.mapping.server.utils.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -58,7 +55,7 @@ public class ScriptServiceImpl implements ScriptService {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get()));
-            String createdScript = Templater.mappingToScript(sortedMapping);
+            String createdScript = Templater.mappingToScript(sortedMapping, new AutomatonIdProvider());
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
             String createdPar = null;
@@ -327,6 +324,13 @@ public class ScriptServiceImpl implements ScriptService {
         public InstantiatedModel(AutomatonEntity automaton) {
             this.model = automaton.getModel();
             this.setGroup = automaton.getSetGroup();
+        }
+    }
+
+    private class AutomatonIdProvider implements IAutomatonIdProvider {
+        @Override
+        public String getId(AbstractAutomaton automaton) {
+            return String.format("%s_%s", automaton.getModel(), automaton.getWatchedElement());
         }
     }
 }
