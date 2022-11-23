@@ -20,7 +20,9 @@ VALUES ('GeneratorSynchronousThreeWindings', 'GSTW', 0),
        ('GeneratorPV', 'GPV', 0),
        ('LoadAlphaBeta', 'LAB', 0),
        ('LoadPQ', 'LPQ', 0),
-       ('CurrentLimitAutomaton', 'CLA', 0);
+       ('CurrentLimitAutomaton', 'CLA', 0),
+       ('CurrentLimitAutomaton', 'CLA_2_4', 0),
+       ('CurrentLimitAutomaton', 'CLA_2_5', 0);
 
 INSERT INTO model_parameter_sets (group_name, group_type, model_name, name)
 VALUES ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'GSTW'),
@@ -31,7 +33,9 @@ VALUES ('GSTW', 0, 'GeneratorSynchronousThreeWindings', 'GSTW'),
        ('GPV', 0, 'GeneratorPV', 'GPV'),
        ('LAB', 0, 'LoadAlphaBeta', 'LAB'),
        ('LPQ', 0, 'LoadPQ', 'LPQ'),
-       ('CLA', 0, 'CurrentLimitAutomaton', 'CLA');
+       ('CLA', 0, 'CurrentLimitAutomaton', 'CLA'),
+       ('CLA_2_4', 0, 'CurrentLimitAutomaton', 'CLA_2_4'),
+       ('CLA_2_5', 0, 'CurrentLimitAutomaton', 'CLA_2_5');
 
 INSERT INTO model_parameter_definitions (model_name, name, origin, origin_name, type, fixed_value)
 VALUES ('GeneratorSynchronousThreeWindings', 'generator_UNom', 2, NULL, 2, NULL),
@@ -246,7 +250,7 @@ VALUES ('LoadPQ', 'load_P0Pu', 0, 'p_pu', 2),
        ('LoadPQ', 'load_UPhase0', 0, 'angle_pu', 2);
 
 INSERT INTO model_parameter_definitions (model_name, name, origin, origin_name, type)
-VALUES ('CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 0, NULL, 2),
+VALUES ('CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 2, NULL, 2),
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_Running', 2, NULL, 1),
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_IMax', 2, NULL, 2),
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_tLagBeforeActing', 2, NULL, 2);
@@ -482,6 +486,18 @@ VALUES ('CLA', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 
        ('CLA', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_Running', 'CLA', true),
        ('CLA', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_IMax', 'CLA', 1000.),
        ('CLA', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_tLagBeforeActing', 'CLA', 10.);
+       
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
+VALUES ('CLA_2_4', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 'CLA_2_4', 3),
+       ('CLA_2_4', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_Running', 'CLA_2_4', true),
+       ('CLA_2_4', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_IMax', 'CLA_2_4', 1000.),
+       ('CLA_2_4', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_tLagBeforeActing', 'CLA_2_4', 10.);
+       
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
+VALUES ('CLA_2_5', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 'CLA_2_5', 1),
+       ('CLA_2_5', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_Running', 'CLA_2_5', true),
+       ('CLA_2_5', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_IMax', 'CLA_2_5', 600.),
+       ('CLA_2_5', 0, 'CurrentLimitAutomaton', 'currentLimitAutomaton_tLagBeforeActing', 'CLA_2_5', 5.);
 
 -- Update parameters for IEEE14 model
 
