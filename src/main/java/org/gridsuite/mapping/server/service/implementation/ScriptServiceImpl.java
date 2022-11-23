@@ -55,7 +55,7 @@ public class ScriptServiceImpl implements ScriptService {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get()));
-            String createdScript = Templater.mappingToScript(sortedMapping, new AutomatonIdProvider());
+            String createdScript = Templater.mappingToScript(sortedMapping, new AutomatonIdProviderImpl());
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
             String createdPar = null;
@@ -327,7 +327,7 @@ public class ScriptServiceImpl implements ScriptService {
         }
     }
 
-    private class AutomatonIdProvider implements IAutomatonIdProvider {
+    private class AutomatonIdProviderImpl implements AutomatonIdProvider {
         @Override
         public String getId(AbstractAutomaton automaton) {
             return String.format("%s_%s", automaton.getModel(), automaton.getWatchedElement());

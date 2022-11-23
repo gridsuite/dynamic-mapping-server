@@ -38,7 +38,7 @@ public final class Templater {
         return flattenedComposition[0];
     }
 
-    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping, IAutomatonIdProvider automatonIdProvider) {
+    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping, AutomatonIdProvider automatonIdProvider) {
         String scriptTemplate;
         String sortedRulesTemplate;
         String ruleTemplate;
