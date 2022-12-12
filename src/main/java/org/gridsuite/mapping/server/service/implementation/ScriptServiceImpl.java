@@ -51,7 +51,7 @@ public class ScriptServiceImpl implements ScriptService {
     String noModelFoundErrorMessage = "No model found with this name";
 
     @Override
-    public Script createFromMapping(String mappingName) {
+    public Script createFromMapping(String mappingName, boolean isPersistent) {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get()));
@@ -83,7 +83,9 @@ public class ScriptServiceImpl implements ScriptService {
             }
             ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript, new Date(), createdPar);
             scriptToSave.markNotNew();
-            scriptRepository.save(scriptToSave);
+            if (isPersistent) {
+                scriptRepository.save(scriptToSave);
+            }
             Script scriptToReturn = new Script(scriptToSave);
             scriptToReturn.setCurrent(true);
             return scriptToReturn;
