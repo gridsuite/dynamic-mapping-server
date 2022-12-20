@@ -2,13 +2,12 @@ server:
   port: 5036
 
 backing-services:
-  case:
+  case-server:
     base-uri: http://localhost:5000
-  network-conversion:
+  network-conversion-server:
     base-uri: http://localhost:5003
-
-network-store-server:
-  base-uri: http://localhost:8080/
+  network-store-server:
+    base-uri: http://localhost:8080/
 
 powsybl-ws:
   database:

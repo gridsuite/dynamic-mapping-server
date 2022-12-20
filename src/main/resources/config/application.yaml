@@ -9,8 +9,9 @@ spring:
           merge:
             entity_copy_observer: allow
         
-network-store-server:
-  preloading-strategy: COLLECTION
+backing-services:
+  network-store-server:
+    preloading-strategy: COLLECTION
 
 powsybl-ws:
   database:
