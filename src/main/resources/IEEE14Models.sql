@@ -250,7 +250,7 @@ VALUES ('LoadPQ', 'load_P0Pu', 0, 'p_pu', 2),
        ('LoadPQ', 'load_UPhase0', 0, 'angle_pu', 2);
 
 INSERT INTO model_parameter_definitions (model_name, name, origin, origin_name, type)
-VALUES ('CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 2, NULL, 2),
+VALUES ('CurrentLimitAutomaton', 'currentLimitAutomaton_OrderToEmit', 2, NULL, 0),
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_Running', 2, NULL, 1),
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_IMax', 2, NULL, 2),
        ('CurrentLimitAutomaton', 'currentLimitAutomaton_tLagBeforeActing', 2, NULL, 2);
