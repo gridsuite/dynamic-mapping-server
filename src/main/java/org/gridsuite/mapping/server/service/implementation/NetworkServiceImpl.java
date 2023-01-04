@@ -60,8 +60,8 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Autowired
     public NetworkServiceImpl(
-            @Value("${backing-services.case-server.base-uri:http://case-server/}") String caseServerBaseUri,
-            @Value("${backing-services.network-conversion-server.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri,
+            @Value("${powsybl.services.case-server.base-uri:http://case-server/}") String caseServerBaseUri,
+            @Value("${powsybl.services.network-conversion-server.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri,
             NetworkRepository networkRepository) {
         this.caseServerBaseUri = caseServerBaseUri;
         this.networkConversionServerBaseUri = networkConversionServerBaseUri;
