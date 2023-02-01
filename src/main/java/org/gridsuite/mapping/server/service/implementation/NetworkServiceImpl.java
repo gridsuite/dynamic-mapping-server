@@ -187,7 +187,7 @@ public class NetworkServiceImpl implements NetworkService {
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/private",
+                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases",
                 HttpMethod.POST,
                 requestEntity,
                 // Cannot convert to UUID in test mocks
