@@ -99,7 +99,7 @@ public class NetworkControllerTest {
                 "This is a network".getBytes());
 
         // Mock call to case-server for import
-        mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases/private")))
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(TEXT_PLAIN)
