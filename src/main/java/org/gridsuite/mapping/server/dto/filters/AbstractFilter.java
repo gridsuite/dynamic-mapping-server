@@ -53,6 +53,13 @@ public abstract class AbstractFilter {
                 stringFilter.setOperand(filterEntity.getOperand());
                 stringFilter.setValue(Methods.convertStringToList(filterEntity.getValue()));
                 return stringFilter;
+            case ENUM:
+                EnumFilter enumFilter = new EnumFilter();
+                enumFilter.setFilterId(filterEntity.getFilterId());
+                enumFilter.setProperty(filterEntity.getProperty());
+                enumFilter.setOperand(filterEntity.getOperand());
+                enumFilter.setValue(filterEntity.getValue());
+                return enumFilter;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown filter type");
         }
