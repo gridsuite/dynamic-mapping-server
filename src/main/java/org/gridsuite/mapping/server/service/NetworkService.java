@@ -31,5 +31,5 @@ public interface NetworkService {
 
     MatchedRule getNetworkMatches(UUID networkUuid, RuleToMatch ruleToMatch);
 
-    String deleteNetwork(UUID networkUuid);
+    UUID deleteNetwork(UUID networkUuid);
 }

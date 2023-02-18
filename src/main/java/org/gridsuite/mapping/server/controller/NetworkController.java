@@ -76,9 +76,9 @@ public class NetworkController {
     @DeleteMapping(path = "/{networkUuid}")
     @Operation(summary = "delete the network")
     @ApiResponse(responseCode = "200", description = "Network deleted")
-    public ResponseEntity<String> deleteNetwork(@PathVariable("networkUuid") UUID networkUuid) {
-        networkService.deleteNetwork(networkUuid);
-        return ResponseEntity.ok().contentType(MediaType.TEXT_PLAIN).body(networkUuid.toString());
+    public ResponseEntity<UUID> deleteNetwork(@PathVariable("networkUuid") UUID networkUuid) {
+        UUID deletedNetworkUuid = networkService.deleteNetwork(networkUuid);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(deletedNetworkUuid);
     }
 
 }

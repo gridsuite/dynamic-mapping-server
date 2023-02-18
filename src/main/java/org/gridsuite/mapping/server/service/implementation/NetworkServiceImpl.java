@@ -102,10 +102,10 @@ public class NetworkServiceImpl implements NetworkService {
     }
 
     @Override
-    public String deleteNetwork(UUID networkUuid) {
+    public UUID deleteNetwork(UUID networkUuid) {
         networkRepository.deleteById(networkUuid);
         networkStoreService.deleteNetwork(networkUuid);
-        return networkUuid.toString();
+        return networkUuid;
     }
 
     private void setPropertyMap(HashMap<String, Set<String>> propertyMap, String value, String propertyName) {
