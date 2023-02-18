@@ -151,14 +151,32 @@ public class FilterToStringTest {
         filter.setFilterId("id");
         filter.setProperty("property");
         filter.setOperand(Operands.EQUALS);
-        filter.setValue("value");
+        ArrayList<String> values = new ArrayList<>();
+        values.add("value");
+        filter.setValue(values);
+
+        // Test single value
+        String equals = "equipment.property.toString().equals(\"value\")";
 
         // Test equals
-        assertEquals("equipment.property.toString().equals(\"value\")", filter.convertFilterToString());
+        assertEquals(equals, filter.convertFilterToString());
 
         // Test not equals
         filter.setOperand(Operands.NOT_EQUALS);
-        assertEquals("!equipment.property.toString().equals(\"value\")", filter.convertFilterToString());
+        assertEquals("!" + equals, filter.convertFilterToString());
+
+        // Test multiple values operands
+        values.add("other");
+        filter.setValue(values);
+        String contains = "[\"value\", \"other\"].contains(equipment.property.toString())";
+
+        //Test in
+        filter.setOperand(Operands.IN);
+        assertEquals(contains, filter.convertFilterToString());
+
+        // Test Not in
+        filter.setOperand(Operands.NOT_IN);
+        assertEquals("!" + contains, filter.convertFilterToString());
     }
 
 }

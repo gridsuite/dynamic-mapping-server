@@ -23,7 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = NumberFilter.class, name = "NUMBER"),
         @JsonSubTypes.Type(value = StringFilter.class, name = "STRING"),
-        @JsonSubTypes.Type(value = BooleanFilter.class, name = "BOOLEAN")})
+        @JsonSubTypes.Type(value = BooleanFilter.class, name = "BOOLEAN"),
+        @JsonSubTypes.Type(value = EnumFilter.class, name = "ENUM")})
 @Data
 public abstract class AbstractFilter {
     private String filterId;
@@ -58,7 +59,7 @@ public abstract class AbstractFilter {
                 enumFilter.setFilterId(filterEntity.getFilterId());
                 enumFilter.setProperty(filterEntity.getProperty());
                 enumFilter.setOperand(filterEntity.getOperand());
-                enumFilter.setValue(filterEntity.getValue());
+                enumFilter.setValue(Methods.convertStringToList(filterEntity.getValue()));
                 return enumFilter;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown filter type");

@@ -12,8 +12,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.FilterEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
+import org.gridsuite.mapping.server.utils.Methods;
 import org.gridsuite.mapping.server.utils.Operands;
 import org.gridsuite.mapping.server.utils.PropertyType;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -23,7 +29,7 @@ import org.gridsuite.mapping.server.utils.PropertyType;
 @NoArgsConstructor
 public class EnumFilter extends AbstractFilter {
 
-    private String value;
+    private List<String> value;
 
     @Override
     public FilterEntity convertFilterToEntity(RuleEntity rule) {
@@ -34,30 +40,67 @@ public class EnumFilter extends AbstractFilter {
         convertedFilter.setType(PropertyType.ENUM);
         convertedFilter.setProperty(this.getProperty());
         convertedFilter.setOperand(this.getOperand());
-        convertedFilter.setValue(value);
+        convertedFilter.setValue(Methods.convertListToString(value));
         return convertedFilter;
     }
 
     @Override
     public String convertFilterToString() {
-        String stringOperand = "";
+        String operand = "";
         String notPrefix = "";
+        String template = "%sequipment.%s.toString().%s(%s)";
+        String multiTemplate = "%s%s.%s(equipment.%s.toString())";
+        boolean checkFirstValueOnly = false;
+
+        String equalsOperand = "equals";
+        String containsOperand = "contains";
+
         switch (this.getOperand()) {
             case EQUALS:
-                stringOperand = "equals";
+                operand = equalsOperand;
+                checkFirstValueOnly = true;
                 break;
             case NOT_EQUALS:
-                stringOperand = "equals";
+                operand = equalsOperand;
                 notPrefix = "!";
+                checkFirstValueOnly = true;
                 break;
+            case IN:
+                operand = containsOperand;
+                template = multiTemplate;
+                break;
+            case NOT_IN:
+                operand = containsOperand;
+                notPrefix = "!";
+                template = multiTemplate;
+                break;
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Operand");
         }
-        return String.format("%sequipment.%s.toString().%s(\"%s\")", notPrefix, this.getProperty(), stringOperand, value);
+        List<String> escapedValues = value.stream().map(unitValue -> String.format("\"%s\"", unitValue.replace("\"", "\\\""))).collect(Collectors.toList());
+        if (checkFirstValueOnly) {
+            return String.format(template, notPrefix, this.getProperty(), operand, escapedValues.get(0));
+        } else {
+            return String.format(template, notPrefix, escapedValues, operand, this.getProperty());
 
+        }
     }
 
     @Override
     public boolean matchValueToFilter(String valueToTest) {
-        boolean isNot = this.getOperand().equals(Operands.NOT_EQUALS);
-        return isNot != (valueToTest.equals(value));
+        boolean isMatched = false;
+
+        switch (this.getOperand()) {
+            case EQUALS:
+            case IN:
+            case NOT_IN:
+            case NOT_EQUALS:
+                boolean isNot = this.getOperand().equals(Operands.NOT_IN) || this.getOperand().equals(Operands.NOT_EQUALS);
+                isMatched = isNot != value.stream().reduce(false, (acc, filterUniqueValue) -> acc || valueToTest.equals(filterUniqueValue), (a, b) -> a || b);
+                break;
+            default:
+                break;
+        }
+        return isMatched;
     }
 }
