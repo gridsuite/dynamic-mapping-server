@@ -17,7 +17,7 @@ public final class MappingConstants {
 
     public static String EQUIPMENT_ID = "equipment.id";
     public static String IMPORT = "import com.powsybl.iidm.network.";
-    public static String AUTOMATON_IMPORT = "import com.powsybl.dynawaltz.automatons.CurrentLimitAutomaton\nimport com.powsybl.iidm.network.Branch";
+    public static String AUTOMATON_IMPORT = "import com.powsybl.dynawaltz.models.automatons.CurrentLimitAutomaton\nimport com.powsybl.iidm.network.Branch";
     public static String DEFAULT_MAPPING_NAME = "default";
 
     public static final String CASE_API_VERSION = "v1";

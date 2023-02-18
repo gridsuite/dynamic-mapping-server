@@ -66,8 +66,4 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.properties = automatonToCopy.getProperties().stream().map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity)).collect(Collectors.toList());
 
     }
-
-    public String[] getInstantiatedModel() {
-        return new String[]{model, setGroup};
-    }
 }

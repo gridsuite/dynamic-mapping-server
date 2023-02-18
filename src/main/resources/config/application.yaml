@@ -9,11 +9,11 @@ spring:
           merge:
             entity_copy_observer: allow
         
-logging:
-  level:
-    ROOT: INFO
+powsybl:
+  services:
+    network-store-server:
+      preloading-strategy: COLLECTION
 
-network-store-server:
-  preloading-strategy: COLLECTION
-
-dbName: dynamicmappings
+powsybl-ws:
+  database:
+    name: dynamicmappings

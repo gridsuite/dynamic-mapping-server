@@ -38,7 +38,7 @@ public class AutomatonPropertyEntity implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "value")
+    @Column(name = "value_")
     private String value;
 
     @Column(name = "type")

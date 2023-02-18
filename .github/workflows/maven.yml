@@ -2,6 +2,11 @@ name: CI
 
 on:
   push:
+    branches:
+      - 'main'
+    tags:
+      - 'v[0-9]*'
+  pull_request:
 
 jobs:
   build:
@@ -13,15 +18,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-
-      - name: Checkout network store sources
-        uses: actions/checkout@v1
-        with:
-          repository: powsybl/powsybl-network-store
-          ref: refs/heads/main
-
-      - name: Build and install network store client with Maven
-        run: mvn --batch-mode -Pclient -DskipTests=true --file ../powsybl-network-store/pom.xml install
 
       - name: Checkout sources
         uses: actions/checkout@v1
@@ -39,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Build Docker image
+      - name: Build Docker image - Main
         if: github.ref == 'refs/heads/main'
         run: >
           mvn --batch-mode deploy -DskipTests -Dmaven.install.skip -Dmaven.deploy.skip -Dpowsybl.docker.deploy
@@ -48,6 +44,15 @@ jobs:
           -Djib.to.auth.username=gridsuiteci
           -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Build Docker image - Tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: >
+          mvn --batch-mode deploy -DskipTests -Dmaven.install.skip -Dmaven.deploy.skip -Dpowsybl.docker.deploy
+          -Djib.httpTimeout=60000
+          -Djib.to.image=docker.io/gridsuite/dynamic-mapping-server:${GITHUB_REF_NAME#v}
+          -Djib.to.auth.username=gridsuiteci
+          -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
+          
       - name: Broadcast update event
         if: github.ref == 'refs/heads/main'
         uses: gridsuite/broadcast-event@main

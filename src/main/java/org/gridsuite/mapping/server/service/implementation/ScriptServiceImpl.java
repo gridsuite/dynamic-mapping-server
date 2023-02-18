@@ -6,10 +6,7 @@
  */
 package org.gridsuite.mapping.server.service.implementation;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
@@ -20,10 +17,7 @@ import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.service.ScriptService;
-import org.gridsuite.mapping.server.utils.EquipmentType;
-import org.gridsuite.mapping.server.utils.ParameterOrigin;
-import org.gridsuite.mapping.server.utils.ParameterType;
-import org.gridsuite.mapping.server.utils.Templater;
+import org.gridsuite.mapping.server.utils.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -57,21 +51,31 @@ public class ScriptServiceImpl implements ScriptService {
     String noModelFoundErrorMessage = "No model found with this name";
 
     @Override
-    public Script createFromMapping(String mappingName) {
+    public Script createFromMapping(String mappingName, boolean isPersistent) {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get()));
-            String createdScript = Templater.mappingToScript(sortedMapping);
+            String createdScript = Templater.mappingToScript(sortedMapping, new AutomatonIdProviderImpl());
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
             String createdPar = null;
             if (foundMapping.get().isControlledParameters()) {
                 try {
-                    List<String[]> instantiatedModels = foundMapping.get().getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
-                    instantiatedModels.addAll(foundMapping.get().getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
-                    List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getEnrichedSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
+                    // build enriched parameters sets from the mapping
+                    Set<InstantiatedModel> instantiatedModels = foundMapping.get().getRules().stream()
+                            .map(InstantiatedModel::new)
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
+                    instantiatedModels.addAll(foundMapping.get().getAutomata().stream()
+                            .map(InstantiatedModel::new)
+                            .collect(Collectors.toCollection(LinkedHashSet::new)));
+
+                    List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream()
+                            .map(instantiatedModel -> getEnrichedSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
+                            .collect(Collectors.toList());
                     List<EnrichedParametersSet> sets = new ArrayList<>();
                     setsLists.forEach(sets::addAll);
+
+                    // generate .par content
                     createdPar = Templater.setsToPar(sets);
                 } catch (Exception e) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter sets");
@@ -79,7 +83,9 @@ public class ScriptServiceImpl implements ScriptService {
             }
             ScriptEntity scriptToSave = new ScriptEntity(savedScriptName, sortedMapping.getName(), createdScript, new Date(), createdPar);
             scriptToSave.markNotNew();
-            scriptRepository.save(scriptToSave);
+            if (isPersistent) {
+                scriptRepository.save(scriptToSave);
+            }
             Script scriptToReturn = new Script(scriptToSave);
             scriptToReturn.setCurrent(true);
             return scriptToReturn;
@@ -163,9 +169,15 @@ public class ScriptServiceImpl implements ScriptService {
         if (foundMapping.isPresent()) {
             try {
                 MappingEntity scriptMapping = foundMapping.get();
-                List<String[]> instantiatedModels = scriptMapping.getRules().stream().map(RuleEntity::getInstantiatedModel).collect(Collectors.toList());
-                instantiatedModels.addAll(scriptMapping.getAutomata().stream().map(AutomatonEntity::getInstantiatedModel).collect(Collectors.toList()));
-                List<List<ParametersSet>> setsLists = instantiatedModels.stream().map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel[0], instantiatedModel[1])).collect(Collectors.toList());
+                List<InstantiatedModel> instantiatedModels = scriptMapping.getRules().stream()
+                        .map(InstantiatedModel::new)
+                        .collect(Collectors.toList());
+                instantiatedModels.addAll(scriptMapping.getAutomata().stream()
+                        .map(InstantiatedModel::new)
+                        .collect(Collectors.toList()));
+                List<List<ParametersSet>> setsLists = instantiatedModels.stream()
+                        .map(instantiatedModel -> getSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
+                        .collect(Collectors.toList());
                 List<ParametersSet> sets = new ArrayList<>();
                 setsLists.forEach(sets::addAll);
                 return sets.parallelStream().reduce(true, (acc, set) -> acc && script.getCreatedDate().compareTo(set.getLastModifiedDate()) >= 0, (a, b) -> a && b);
@@ -298,6 +310,30 @@ public class ScriptServiceImpl implements ScriptService {
         private String originName;
 
 
+    }
+
+    @Getter
+    @EqualsAndHashCode
+    public class InstantiatedModel {
+        private final String model;
+        private final String setGroup;
+
+        public InstantiatedModel(RuleEntity rule) {
+            this.model = rule.getMappedModel();
+            this.setGroup = rule.getSetGroup();
+        }
+
+        public InstantiatedModel(AutomatonEntity automaton) {
+            this.model = automaton.getModel();
+            this.setGroup = automaton.getSetGroup();
+        }
+    }
+
+    private class AutomatonIdProviderImpl implements AutomatonIdProvider {
+        @Override
+        public String getId(AbstractAutomaton automaton) {
+            return String.format("%s_%s", automaton.getModel(), automaton.getWatchedElement());
+        }
     }
 }
 

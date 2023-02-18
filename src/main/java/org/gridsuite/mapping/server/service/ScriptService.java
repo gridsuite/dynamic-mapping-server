@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface ScriptService {
 
-    Script createFromMapping(String mappingName);
+    Script createFromMapping(String mappingName, boolean isPersitent);
 
     List<Script> getAllScripts();
 

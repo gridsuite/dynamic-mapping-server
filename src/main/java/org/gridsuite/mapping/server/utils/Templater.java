@@ -16,8 +16,9 @@ import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -38,7 +39,7 @@ public final class Templater {
         return flattenedComposition[0];
     }
 
-    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping) {
+    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping, AutomatonIdProvider automatonIdProvider) {
         String scriptTemplate;
         String sortedRulesTemplate;
         String ruleTemplate;
@@ -55,7 +56,7 @@ public final class Templater {
         }
 
         ST script = new ST(scriptTemplate);
-        ArrayList<String> imports = new ArrayList<>();
+        Set<String> imports = new LinkedHashSet<>();
         // Rules
         String[] sortedRulesScripts = sortedMapping.getSortedRules().stream().map(sortedRules -> {
             // Preparing the imports
@@ -87,7 +88,7 @@ public final class Templater {
             ST automatonScript = new ST(automatonTemplate);
             automatonScript.add("familyModel", familyModel);
             automatonScript.add("watchedElement", automaton.getWatchedElement());
-            automatonScript.add("modelName", automaton.getModel());
+            automatonScript.add("automatonId", automatonIdProvider.getId(automaton));
             automatonScript.add("parameterSetId", automaton.getSetGroup());
             String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);

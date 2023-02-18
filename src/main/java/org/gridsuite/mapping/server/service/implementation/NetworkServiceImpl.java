@@ -60,8 +60,8 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Autowired
     public NetworkServiceImpl(
-            @Value("${backing-services.case.base-uri:http://case-server/}") String caseServerBaseUri,
-            @Value("${backing-services.network-conversion.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri,
+            @Value("${powsybl.services.case-server.base-uri:http://case-server/}") String caseServerBaseUri,
+            @Value("${powsybl.services.network-conversion-server.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri,
             NetworkRepository networkRepository) {
         this.caseServerBaseUri = caseServerBaseUri;
         this.networkConversionServerBaseUri = networkConversionServerBaseUri;
@@ -194,7 +194,7 @@ public class NetworkServiceImpl implements NetworkService {
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/private",
+                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases",
                 HttpMethod.POST,
                 requestEntity,
                 // Cannot convert to UUID in test mocks
@@ -205,7 +205,8 @@ public class NetworkServiceImpl implements NetworkService {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
         UUID caseUuid = UUID.fromString(responseBody.substring(1, 37));
-        NetworkIdentification networkIdentification = restTemplate.postForEntity(networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid, null, NetworkIdentification.class).getBody();
+        String url = networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid + "&isAsyncRun=false";
+        NetworkIdentification networkIdentification = restTemplate.postForEntity(url, Collections.emptyMap(), NetworkIdentification.class).getBody();
         if (networkIdentification == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
