@@ -73,7 +73,7 @@ public class MappingControllerTest {
                 "          \"operand\": \"IN\",\n" +
                 "          \"property\": \"energySource\",\n" +
                 "          \"value\": [\"OTHERS\"],\n" +
-                "          \"type\": \"STRING\"\n" +
+                "          \"type\": \"ENUM\"\n" +
                 "        },\n" +
                 "        {\n" +
                 "          \"filterId\": \"filter4\",\n" +
