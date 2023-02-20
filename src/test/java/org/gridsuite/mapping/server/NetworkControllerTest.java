@@ -237,7 +237,7 @@ public class NetworkControllerTest {
         String generatorRuleToMatch = "{\n" +
                 "  \"ruleIndex\": " + generatorIndex + ",\n" +
                 "  \"equipmentType\": \"" + "GENERATOR" + "\",\n" +
-                "  \"composition\": \"" + "(filter1 || filter2 || filter4 || filter5) && (filter3 || filter6 || filter7) || filter8" + "\",\n" +
+                "  \"composition\": \"" + "(filter1 || filter2 || filter4 || filter5) && (filter3 || filter6 || filter7) || filter8 || filter9" + "\",\n" +
                 "  \"filters\": [\n" +
                 "    {\n" +
                 "      \"filterId\": \"filter1\",\n" +
@@ -294,6 +294,13 @@ public class NetworkControllerTest {
                 "      \"property\": \"voltageRegulatorOn\",\n" +
                 "      \"value\": true,\n" +
                 "      \"type\": \"BOOLEAN\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter9\",\n" +
+                "      \"operand\": \"EQUALS\",\n" +
+                "      \"property\": \"energySource\",\n" +
+                "      \"value\": [\"OTHERS\"],\n" +
+                "      \"type\": \"ENUM\"\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";
@@ -308,7 +315,7 @@ public class NetworkControllerTest {
         String loadRuleToMatch = "{\n" +
                 "  \"ruleIndex\": " + loadIndex + ",\n" +
                 "  \"equipmentType\": \"" + "LOAD" + "\",\n" +
-                "  \"composition\": \"" + "filter1 || filter2 || filter3 || filter4 || filter5" + "\",\n" +
+                "  \"composition\": \"" + "filter1 || filter2 || filter3 || filter4 || filter5 || filter6" + "\",\n" +
                 "  \"filters\": [\n" +
                 "    {\n" +
                 "      \"filterId\": \"filter1\",\n" +
@@ -344,6 +351,13 @@ public class NetworkControllerTest {
                 "      \"property\": \"terminal.voltageLevel.nominalV\",\n" +
                 "      \"value\": [380],\n" +
                 "      \"type\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"filterId\": \"filter6\",\n" +
+                "      \"operand\": \"EQUALS\",\n" +
+                "      \"property\": \"loadType\",\n" +
+                "      \"value\": [\"UNDEFINED\"],\n" +
+                "      \"type\": \"ENUM\"\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}";
@@ -352,6 +366,6 @@ public class NetworkControllerTest {
                         .content(loadRuleToMatch)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"ruleIndex\":" + loadIndex + ",\"matchedIds\":[]}", true));
+                .andExpect(content().json("{\"ruleIndex\":" + loadIndex + ",\"matchedIds\":[\"load1\"]}", true));
     }
 }
