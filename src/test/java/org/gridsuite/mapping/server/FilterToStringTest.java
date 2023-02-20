@@ -156,7 +156,7 @@ public class FilterToStringTest {
         filter.setValue(values);
 
         // Test single value
-        String equals = "equipment.property.toString().equals(\"value\")";
+        String equals = "equipment.property.name().equals(\"value\")";
 
         // Test equals
         assertEquals(equals, filter.convertFilterToString());
@@ -168,7 +168,7 @@ public class FilterToStringTest {
         // Test multiple values operands
         values.add("other");
         filter.setValue(values);
-        String contains = "[\"value\", \"other\"].contains(equipment.property.toString())";
+        String contains = "[\"value\", \"other\"].contains(equipment.property.name())";
 
         //Test in
         filter.setOperand(Operands.IN);

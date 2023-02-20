@@ -48,8 +48,8 @@ public class EnumFilter extends AbstractFilter {
     public String convertFilterToString() {
         String operand = "";
         String notPrefix = "";
-        String template = "%sequipment.%s.toString().%s(%s)";
-        String multiTemplate = "%s%s.%s(equipment.%s.toString())";
+        String template = "%sequipment.%s.name().%s(%s)";
+        String multiTemplate = "%s%s.%s(equipment.%s.name())";
         boolean checkFirstValueOnly = false;
 
         String equalsOperand = "equals";
