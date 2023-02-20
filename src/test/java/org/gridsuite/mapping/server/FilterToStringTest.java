@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server;
 
 import org.gridsuite.mapping.server.dto.filters.BooleanFilter;
+import org.gridsuite.mapping.server.dto.filters.EnumFilter;
 import org.gridsuite.mapping.server.dto.filters.NumberFilter;
 import org.gridsuite.mapping.server.dto.filters.StringFilter;
 import org.gridsuite.mapping.server.utils.Operands;
@@ -140,6 +141,42 @@ public class FilterToStringTest {
         filter.setOperand(Operands.NOT_IN);
         assertEquals("!" + contains, filter.convertFilterToString());
 
+    }
+
+    @Test
+    public void enumFilterTest() {
+
+        EnumFilter filter = new EnumFilter();
+
+        filter.setFilterId("id");
+        filter.setProperty("property");
+        filter.setOperand(Operands.EQUALS);
+        ArrayList<String> values = new ArrayList<>();
+        values.add("value");
+        filter.setValue(values);
+
+        // Test single value
+        String equals = "equipment.property.name().equals(\"value\")";
+
+        // Test equals
+        assertEquals(equals, filter.convertFilterToString());
+
+        // Test not equals
+        filter.setOperand(Operands.NOT_EQUALS);
+        assertEquals("!" + equals, filter.convertFilterToString());
+
+        // Test multiple values operands
+        values.add("other");
+        filter.setValue(values);
+        String contains = "[\"value\", \"other\"].contains(equipment.property.name())";
+
+        //Test in
+        filter.setOperand(Operands.IN);
+        assertEquals(contains, filter.convertFilterToString());
+
+        // Test Not in
+        filter.setOperand(Operands.NOT_IN);
+        assertEquals("!" + contains, filter.convertFilterToString());
     }
 
 }
