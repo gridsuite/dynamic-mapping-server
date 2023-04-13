@@ -133,7 +133,7 @@ public class MappingServiceImpl implements MappingService {
     @Override
     public List<Model> getMappedModelsList(String mappingName) {
         Optional<MappingEntity> mappingOpt = mappingRepository.findById(mappingName);
-        MappingEntity mapping = mappingOpt.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name : " + mappingName));
+        MappingEntity mapping = mappingOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name : " + mappingName));
 
         List<RuleEntity> rules = mapping.getRules();
         List<String> mappedModelNames = rules.stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
