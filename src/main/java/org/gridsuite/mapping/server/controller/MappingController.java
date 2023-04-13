@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
+import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.service.MappingService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.http.*;
@@ -36,6 +37,13 @@ public class MappingController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mappings")})
     public ResponseEntity<List<InputMapping>> getMappingList() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappingList());
+    }
+
+    @GetMapping(value = "/{mappingName}/models")
+    @Operation(summary = "Get models used in the given mapping")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mapped models")})
+    public ResponseEntity<List<Model>> getMappedModelsList(@PathVariable("mappingName") String mappingName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappedModelsList(mappingName));
     }
 
     @PostMapping(value = "/{mappingName}")

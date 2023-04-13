@@ -8,8 +8,10 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
+import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.MappingEntity;
+import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.MappingService;
@@ -126,6 +128,23 @@ public class MappingServiceImpl implements MappingService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
         }
+    }
+
+    @Override
+    public List<Model> getMappedModelsList(String mappingName) {
+        Optional<MappingEntity> mappingOpt = mappingRepository.findById(mappingName);
+        MappingEntity mapping = mappingOpt.orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name : " + mappingName));
+
+        List<RuleEntity> rules = mapping.getRules();
+        List<String> mappedModelNames = rules.stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
+
+        List<Model> mappedModels = mappedModelNames.stream()
+                .map(mappedModelName -> modelRepository.findById(mappedModelName)
+                        .map(Model::new)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name : " + mappedModelName)))
+                .collect(Collectors.toList());
+
+        return mappedModels;
     }
 
 }
