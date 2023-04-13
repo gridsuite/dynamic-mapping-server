@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
@@ -132,17 +133,26 @@ public class MappingServiceImpl implements MappingService {
 
     @Override
     public List<Model> getMappedModelsList(String mappingName) {
-        Optional<MappingEntity> mappingOpt = mappingRepository.findById(mappingName);
-        MappingEntity mapping = mappingOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name : " + mappingName));
+        Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingName);
+        MappingEntity mapping = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name : " + mappingName));
 
-        List<RuleEntity> rules = mapping.getRules();
-        List<String> mappedModelNames = rules.stream().map(RuleEntity::getMappedModel).collect(Collectors.toList());
+        List<RuleEntity> ruleEntities = mapping.getRules();
+        Set<String> mappedModelNames = ruleEntities.stream().map(RuleEntity::getMappedModel).collect(Collectors.toSet());
 
         List<Model> mappedModels = mappedModelNames.stream()
                 .map(mappedModelName -> modelRepository.findById(mappedModelName)
                         .map(Model::new)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name : " + mappedModelName)))
                 .collect(Collectors.toList());
+
+        // keep only the set group used in rules
+        mappedModels.forEach(mappedModel -> {
+            Set<String> mappedSetGroupNames = ruleEntities.stream().filter(rule -> mappedModel.getModelName().equals(rule.getMappedModel())).map(RuleEntity::getSetGroup).collect(Collectors.toSet());
+            List<ParametersSetsGroup> mappedSetGroups = mappedModel.getSetsGroups().stream().filter(setGroup -> mappedSetGroupNames.contains(setGroup.getName())).collect(Collectors.toList());
+
+            // set mapped set groups (must contain only one element)
+            mappedModel.setSetsGroups(mappedSetGroups);
+        });
 
         return mappedModels;
     }
