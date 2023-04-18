@@ -31,11 +31,14 @@ public class Model {
 
     private List<ParametersSetsGroup> setsGroups;
 
+    private List<ModelVariableDefinition> variableDefinitions;
+
     public Model(ModelEntity modelEntity) {
         modelName = modelEntity.getModelName();
         equipmentType = modelEntity.getEquipmentType();
         parameterDefinitions = modelEntity.getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
         setsGroups = modelEntity.getSetsGroups().stream().map(ParametersSetsGroup::new).collect(Collectors.toList());
+        variableDefinitions = modelEntity.getVariableDefinitions().stream().map(ModelVariableDefinition::new).collect(Collectors.toList());
     }
 
     public boolean isParameterSetGroupValid(String groupName, boolean strict) {

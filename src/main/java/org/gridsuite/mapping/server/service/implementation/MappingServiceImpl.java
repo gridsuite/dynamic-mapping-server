@@ -145,15 +145,6 @@ public class MappingServiceImpl implements MappingService {
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name : " + mappedModelName)))
                 .collect(Collectors.toList());
 
-        // keep only the set group used in rules
-        mappedModels.forEach(mappedModel -> {
-            Set<String> mappedSetGroupNames = ruleEntities.stream().filter(rule -> mappedModel.getModelName().equals(rule.getMappedModel())).map(RuleEntity::getSetGroup).collect(Collectors.toSet());
-            List<ParametersSetsGroup> mappedSetGroups = mappedModel.getSetsGroups().stream().filter(setGroup -> mappedSetGroupNames.contains(setGroup.getName())).collect(Collectors.toList());
-
-            // set mapped set groups (must contain only one element)
-            mappedModel.setSetsGroups(mappedSetGroups);
-        });
-
         return mappedModels;
     }
 

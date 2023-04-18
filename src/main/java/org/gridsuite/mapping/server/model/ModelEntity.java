@@ -42,6 +42,9 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
+    @OneToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ModelVariableDefinitionEntity> variableDefinitions = new ArrayList<>(0);
+
     @Override
     public String getId() {
         return modelName;
@@ -52,6 +55,7 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
         equipmentType = modelToConvert.getEquipmentType();
         parameterDefinitions = modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList());
         setsGroups = modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList());
+        variableDefinitions = modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(variableDefinition.getName(), modelToConvert.getModelName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), this)).collect(Collectors.toList());
     }
 
 }

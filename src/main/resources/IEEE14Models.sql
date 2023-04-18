@@ -777,3 +777,10 @@ VALUES ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations',
        ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_Q0Pu', 'IEEE14_GEN____8_SM'),
        ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_U0Pu', 'IEEE14_GEN____8_SM'),
        ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_UPhase0', 'IEEE14_GEN____8_SM');
+
+INSERT INTO model_variable_definitions (model_name, name, type, unit, factor)
+VALUES ('LoadAlphaBeta', 'load_PPu', 2, 'MW', 100),
+       ('LoadAlphaBeta', 'load_PRefPu', 2, 'MW', 100),
+       ('LoadAlphaBeta', 'load_QPu', 2, 'MW', 100),
+       ('LoadAlphaBeta', 'load_QRefPu', 2, 'MW', 100),
+       ('LoadAlphaBeta', 'load_running_value', 1, NULL, NULL);
