@@ -33,12 +33,15 @@ public class Model {
 
     private List<ModelVariableDefinition> variableDefinitions;
 
+    private List<VariablesSet> variablesSets;
+
     public Model(ModelEntity modelEntity) {
         modelName = modelEntity.getModelName();
         equipmentType = modelEntity.getEquipmentType();
         parameterDefinitions = modelEntity.getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
         setsGroups = modelEntity.getSetsGroups().stream().map(ParametersSetsGroup::new).collect(Collectors.toList());
         variableDefinitions = modelEntity.getVariableDefinitions().stream().map(ModelVariableDefinition::new).collect(Collectors.toList());
+        variablesSets = modelEntity.getVariableSets().stream().map(VariablesSet::new).collect(Collectors.toList());
     }
 
     public boolean isParameterSetGroupValid(String groupName, boolean strict) {

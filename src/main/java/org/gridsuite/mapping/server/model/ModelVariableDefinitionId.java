@@ -27,8 +27,6 @@ import java.util.Objects;
 public class ModelVariableDefinitionId implements Serializable {
     private String name;
 
-    private String modelName;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -38,12 +36,11 @@ public class ModelVariableDefinitionId implements Serializable {
             return false;
         }
         ModelVariableDefinitionId modelVariableDefinitionIdClass = (ModelVariableDefinitionId) o;
-        return name.equals(modelVariableDefinitionIdClass.name) &&
-                modelName.equals(modelVariableDefinitionIdClass.modelName);
+        return name.equals(modelVariableDefinitionIdClass.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, modelName);
+        return Objects.hash(name);
     }
 }

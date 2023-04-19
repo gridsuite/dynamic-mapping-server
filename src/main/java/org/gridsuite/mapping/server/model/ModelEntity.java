@@ -42,8 +42,11 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
-    @OneToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models")
     private List<ModelVariableDefinitionEntity> variableDefinitions = new ArrayList<>(0);
+
+    @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models")
+    private List<ModelVariableSetEntity> variableSets = new ArrayList<>(0);
 
     @Override
     public String getId() {
@@ -55,7 +58,8 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
         equipmentType = modelToConvert.getEquipmentType();
         parameterDefinitions = modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList());
         setsGroups = modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList());
-        variableDefinitions = modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(variableDefinition.getName(), modelToConvert.getModelName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), this)).collect(Collectors.toList());
+        variableDefinitions = modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(List.of(this), null, variableDefinition)).collect(Collectors.toList());
+        variableSets = modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(List.of(this), variablesSet)).collect(Collectors.toList());
     }
 
 }

@@ -778,33 +778,51 @@ VALUES ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations',
        ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_U0Pu', 'IEEE14_GEN____8_SM'),
        ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_UPhase0', 'IEEE14_GEN____8_SM');
 
-INSERT INTO model_variable_definitions (model_name, name, type, unit, factor)
-VALUES ('LoadAlphaBeta', 'load_PPu', 2, 'MW', 100),
-       ('LoadAlphaBeta', 'load_PRefPu', 2, 'MW', 100),
-       ('LoadAlphaBeta', 'load_QPu', 2, 'MW', 100),
-       ('LoadAlphaBeta', 'load_QRefPu', 2, 'MW', 100),
-       ('LoadAlphaBeta', 'load_running_value', 1, NULL, NULL);
+-- variables for LoadAlphaBeta model
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, variable_set_name)
+VALUES ('load_PPu', 2, 'MW', 100, NULL),
+       ('load_PRefPu', 2, 'MW', 100, NULL),
+       ('load_QPu', 2, 'MW', 100, NULL),
+       ('load_QRefPu', 2, 'MW', 100, NULL),
+       ('load_running_value', 1, NULL, NULL, NULL);
 
-INSERT INTO model_variable_definitions (model_name, name, type, unit, factor)
-VALUES ('GeneratorSynchronousThreeWindings', 'generator_omegaPu', 2, 'pu', NULL),
-       ('GeneratorSynchronousThreeWindings', 'generator_PGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousThreeWindings', 'generator_QGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousThreeWindings', 'generator_UStatorPu', 2, 'pu', NULL);
+INSERT INTO models_model_variable_definitions (model_name, variable_definition_name)
+VALUES ('LoadAlphaBeta', 'load_PPu'),
+       ('LoadAlphaBeta', 'load_PRefPu',
+       ('LoadAlphaBeta', 'load_QPu'),
+       ('LoadAlphaBeta', 'load_QRefPu'),
+       ('LoadAlphaBeta', 'load_running_value');
 
-INSERT INTO model_variable_definitions (model_name, name, type, unit, factor)
-VALUES ('GeneratorSynchronousFourWindings', 'generator_omegaPu', 2, 'pu', NULL),
-       ('GeneratorSynchronousFourWindings', 'generator_PGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousFourWindings', 'generator_QGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousFourWindings', 'generator_UStatorPu', 2, 'pu', NULL);
+INSERT INTO model_variable_sets (variable_set_name)
+VALUES ('GeneratorSynchronous')
+       ('VoltageRegulator');
 
-INSERT INTO model_variable_definitions (model_name, name, type, unit, factor)
-VALUES ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_omegaPu', 2, 'pu', NULL),
-       ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_PGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_QGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_UStatorPu', 2, 'pu', NULL);
+-- variables grouped in sets used in generator models
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, variable_set_name)
+VALUES ('generator_omegaPu', 2, 'pu', NULL, 'GeneratorSynchronous'),
+       ('generator_PGen', 2, 'MW', NULL, 'GeneratorSynchronous'),
+       ('generator_QGen', 2, 'MW', NULL, 'GeneratorSynchronous'),
+       ('generator_UStatorPu', 2, 'pu', NULL, 'GeneratorSynchronous');
 
-INSERT INTO model_variable_definitions (model_name, name, type, unit, factor)
-VALUES ('GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_omegaPu', 2, 'pu', NULL),
-       ('GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_PGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_QGen', 2, 'MW', NULL),
-       ('GeneratorSynchronousFourWindingsProportionalRegulations', 'generator_UStatorPu', 2, 'pu', NULL);
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, variable_set_name)
+VALUES ('voltageRegulator_EfdPu', 2, 'pu', NULL, 'VoltageRegulator');
+
+-- variables sets for GeneratorSynchronousThreeWindings model
+INSERT INTO models_model_variable_sets (model_name, variable_set_name)
+VALUES ('GeneratorSynchronousThreeWindings', 'GeneratorSynchronous'),
+       ('GeneratorSynchronousThreeWindings', 'VoltageRegulator');
+
+-- variables sets for GeneratorSynchronousFourWindings model
+INSERT INTO models_model_variable_sets (model_name, variable_set_name)
+VALUES ('GeneratorSynchronousFourWindings', 'GeneratorSynchronous'),
+       ('GeneratorSynchronousFourWindings', 'VoltageRegulator');
+
+-- variables sets for GeneratorSynchronousThreeWindingsProportionalRegulations model
+INSERT INTO models_model_variable_sets (model_name, variable_set_name)
+VALUES ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'GeneratorSynchronous'),
+       ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'VoltageRegulator');
+
+-- variables sets for GeneratorSynchronousFourWindingsProportionalRegulations model
+INSERT INTO models_model_variable_sets (model_name, variable_set_name)
+VALUES ('GeneratorSynchronousFourWindingsProportionalRegulations', 'GeneratorSynchronous',
+       ('GeneratorSynchronousFourWindingsProportionalRegulations', 'VoltageRegulator');
