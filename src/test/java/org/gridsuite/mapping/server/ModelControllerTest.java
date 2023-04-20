@@ -258,6 +258,34 @@ public class ModelControllerTest {
             assertEquals(previousDefinition.getFixedValue(), savedDefinition.getFixedValue());
         }
         // Import does not check sets because it is not part of the typical model import
+
+        // test variable definitions
+        assertEquals(5, savedModel.getVariableDefinitions().size());
+    }
+
+    @Test
+    @Transactional
+    public void testSaveGeneratorModel() throws Exception {
+        String modelName = "GeneratorSynchronousThreeWindingsProportionalRegulations";
+
+        String newModel = new String(getClass().getResourceAsStream("/data/generatorSynchronousThreeWindingsProportionalRegulations.json").readAllBytes());
+
+        cleanDB();
+        // Put data
+        mvc.perform(post("/models/")
+                        .content(newModel)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // Get Data
+        ModelEntity savedModel = modelRepository.findById(modelName).orElseThrow();
+
+        // sanity check
+        assertEquals(modelName, savedModel.getModelName());
+        assertEquals(EquipmentType.GENERATOR, savedModel.getEquipmentType());
+
+        // check variables sets
+        assertEquals(2, savedModel.getVariableSets().size());
     }
 
     @Test
