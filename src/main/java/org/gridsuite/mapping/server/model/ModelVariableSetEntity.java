@@ -41,7 +41,7 @@ public class ModelVariableSetEntity implements Serializable {
     public ModelVariableSetEntity(List<ModelEntity> models, VariablesSet variablesSet) {
         this.models = models;
         this.name = variablesSet.getName();
-        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity()).collect(Collectors.toList());
+        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(models, this, variableDefinition)).collect(Collectors.toList());
         this.lastModifiedDate = variablesSet.getLastModifiedDate();
     }
 }
