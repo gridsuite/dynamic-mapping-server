@@ -28,7 +28,6 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "model_variable_definitions", indexes = {@Index(name = "model_variable_definitions_variable_set_name_index", columnList = "variable_set_name")})
-@IdClass(ModelVariableDefinitionId.class)
 public class ModelVariableDefinitionEntity implements Serializable {
     @Id
     @Column(name = "variable_definition_name")

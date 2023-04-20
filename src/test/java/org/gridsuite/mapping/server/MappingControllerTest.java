@@ -251,7 +251,7 @@ public class MappingControllerTest {
 
     @Test
     public void testGetMappedModelsList() throws Exception {
-        // put a model
+        // put LoadAlphaBetaModel model
         InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(RESOURCE_PATH_DELIMETER + "loadAlphaBeta.json");
         String alphaBetaModelJson = new String(isLoadAlphaBetaModel.readAllBytes());
         mvc.perform(post("/models/")
@@ -259,7 +259,16 @@ public class MappingControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // put a mapping which uses the saved model
+        // put GeneratorSynchronousThreeWindingsProportionalRegulations model
+        InputStream isGeneratorSynchronousThreeWindingsProportionalRegulations =
+                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "generatorSynchronousThreeWindingsProportionalRegulations.json");
+        String generatorSynchronousThreeWindingsProportionalRegulationsJson = new String(isGeneratorSynchronousThreeWindingsProportionalRegulations.readAllBytes());
+        mvc.perform(post("/models/")
+                        .content(generatorSynchronousThreeWindingsProportionalRegulationsJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // put a mapping which uses the saved models
         String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "mapping_01.json").readAllBytes());
         // Put data
         mvc.perform(post("/mappings/" + "mapping_01")
@@ -278,5 +287,7 @@ public class MappingControllerTest {
         List<Model> resultMappedModelsList = objectMapper.readValue(resultMappedModelsListJson, new TypeReference<List<Model>>() { });
         // must contain at least LoadAlphaBeta model
         assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName())));
+        assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("GeneratorSynchronousThreeWindingsProportionalRegulations", model.getModelName())));
+
     }
 }
