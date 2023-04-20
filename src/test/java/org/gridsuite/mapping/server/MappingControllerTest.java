@@ -6,17 +6,29 @@
  */
 package org.gridsuite.mapping.server;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.repository.MappingRepository;
+import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import java.io.InputStream;
+import java.util.List;
+import java.util.Objects;
+
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -31,14 +43,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {MappingApplication.class})
 public class MappingControllerTest {
 
+    public static final String RESOURCE_PATH_DELIMETER = "/";
+    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMETER + "data";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MappingControllerTest.class);
+
     @Autowired
     private MappingRepository mappingRepository;
 
     @Autowired
+    ModelRepository modelRepository;
+
+    @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private void cleanDB() {
         mappingRepository.deleteAll();
+        modelRepository.deleteAll();
     }
 
     @Before
@@ -223,5 +247,36 @@ public class MappingControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
+    }
+
+    @Test
+    public void testGetMappedModelsList() throws Exception {
+        // put a model
+        InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(RESOURCE_PATH_DELIMETER + "loadAlphaBeta.json");
+        String alphaBetaModelJson = new String(isLoadAlphaBetaModel.readAllBytes());
+        mvc.perform(post("/models/")
+                        .content(alphaBetaModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // put a mapping which uses the saved model
+        String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "mapping_01.json").readAllBytes());
+        // Put data
+        mvc.perform(post("/mappings/" + "mapping_01")
+                        .content(mappingJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // main test : get the list of used models in the mapping
+        MvcResult result = mvc.perform(get("/mappings/" + "mapping_01" + "/models"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // check result
+        String resultMappedModelsListJson = result.getResponse().getContentAsString();
+        LOGGER.info("resultMappedModelsListJson : " + resultMappedModelsListJson);
+        List<Model> resultMappedModelsList = objectMapper.readValue(resultMappedModelsListJson, new TypeReference<List<Model>>() { });
+        // must contain at least LoadAlphaBeta model
+        assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName())));
     }
 }

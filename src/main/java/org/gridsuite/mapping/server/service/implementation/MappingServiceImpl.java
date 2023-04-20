@@ -22,10 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
@@ -142,7 +139,8 @@ public class MappingServiceImpl implements MappingService {
         List<Model> mappedModels = mappedModelNames.stream()
                 .map(mappedModelName -> modelRepository.findById(mappedModelName)
                         .map(Model::new)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name : " + mappedModelName)))
+                        .orElse(null))
+                .filter(Objects::nonNull) // only keep found models
                 .collect(Collectors.toList());
 
         return mappedModels;
