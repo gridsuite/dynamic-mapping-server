@@ -67,5 +67,6 @@
       "name": "load_running_value",
       "type": "BOOL"
     }
-  ]
+  ],
+  "variablesSets": []
 }
