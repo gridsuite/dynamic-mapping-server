@@ -6,7 +6,7 @@
   "variableDefinitions": [],
   "variablesSets": [
     {
-      "name": "GeneratorSynchronous",
+      "name": "Generator",
       "variableDefinitions": [
         {
           "name": "generator_omegaPu",
