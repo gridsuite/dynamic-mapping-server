@@ -6,6 +6,9 @@
  */
 package org.gridsuite.mapping.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.gridsuite.mapping.server.dto.models.Model;
+import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
 import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -15,12 +18,15 @@ import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
@@ -31,6 +37,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -45,11 +52,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {MappingApplication.class})
 public class ModelControllerTest {
 
+    public static Logger LOGGER = LoggerFactory.getLogger(ModelControllerTest.class);
+
     @Autowired
     private ModelRepository modelRepository;
 
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     private void cleanDB() {
         modelRepository.deleteAll();
@@ -230,7 +242,7 @@ public class ModelControllerTest {
     public void testSave() throws Exception {
         String modelName = "LoadAlphaBeta";
         ModelEntity previousModel = modelRepository.findById(modelName).orElseThrow();
-        String newModel = readFileAsString("src/test/resources/loadAlphaBeta.json");
+        String newModel = readFileAsString("src/test/resources/data/model/loadAlphaBeta.json");
 
         cleanDB();
         // Put data
@@ -264,13 +276,60 @@ public class ModelControllerTest {
     }
 
     @Test
+    public void testSaveLoadModelMergeVariableDefinitions() throws Exception {
+
+        String modelName = "LoadAlphaBeta";
+        String newModel = readFileAsString("src/test/resources/data/model/loadAlphaBeta.json");
+        String sameModelWithAdditionVariableDefinition = readFileAsString("src/test/resources/data/model/loadAlphaBeta_add_variable_definition.json");
+
+        cleanDB();
+
+        // Put data first time with initial variable definitions
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newModel)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // Get initial variable definitions
+        List<ModelVariableDefinition> variableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
+        assertEquals(5, variableDefinitions.size());
+
+        // Put data second time which add only a variable definition
+        MvcResult mvcResult2 = mvc.perform(post("/models/")
+                        .content(sameModelWithAdditionVariableDefinition)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // Get initial variable definitions
+        List<ModelVariableDefinition> variableDefinitions2 = objectMapper.readValue(mvcResult2.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
+        LOGGER.info("Initial variable definitions = " + variableDefinitions);
+        LOGGER.info("Updated variable definitions = " + variableDefinitions2);
+
+        // check result
+        // final model's variable definition must contains all ones of initial model
+        assertEquals(1, variableDefinitions2.size() - variableDefinitions.size());
+        assertTrue(variableDefinitions2.containsAll(variableDefinitions));
+
+        // Put data third time which remove all variable definitions
+        /*Model model = objectMapper.readValue(mvcResult2.getResponse().getContentAsString(), Model.class);
+        model.setVariableDefinitions(List.of());
+        String sameModelWithEmptyVariableDefinition = objectMapper.writeValueAsString(model);
+        MvcResult mvcResult3 = mvc.perform(post("/models/")
+                        .content(sameModelWithEmptyVariableDefinition)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        List<ModelVariableDefinition> variableDefinitions3 = objectMapper.readValue(mvcResult3.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
+        LOGGER.info("Unset variable definitions = " + variableDefinitions3);*/
+    }
+
+    @Test
     @Transactional
     public void testSaveGeneratorModel() throws Exception {
         String modelName = "GeneratorSynchronousThreeWindingsProportionalRegulations";
 
-        String newModel = new String(getClass().getResourceAsStream("/data/generatorSynchronousThreeWindingsProportionalRegulations.json").readAllBytes());
+        String newModel = new String(getClass().getResourceAsStream("/data/model/generatorSynchronousThreeWindingsProportionalRegulations.json").readAllBytes());
 
-        cleanDB();
         // Put data
         mvc.perform(post("/models/")
                         .content(newModel)

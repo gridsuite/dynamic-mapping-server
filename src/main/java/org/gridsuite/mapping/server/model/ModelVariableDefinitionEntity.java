@@ -46,7 +46,7 @@ public class ModelVariableDefinitionEntity implements Serializable {
     @Column(name = "factor")
     private Double factor;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(
             name = "models_model_variable_definitions",
             joinColumns = {@JoinColumn(name = "variable_definition_name")},
@@ -54,7 +54,7 @@ public class ModelVariableDefinitionEntity implements Serializable {
     )
     private List<ModelEntity> models;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST})
     @JoinColumn(name = "variable_set_name", foreignKey = @ForeignKey(name = "variable_set_variable_definition_fk"), insertable = false, updatable = false)
     private ModelVariableSetEntity variablesSet;
 

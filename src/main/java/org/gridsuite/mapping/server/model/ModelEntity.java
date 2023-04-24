@@ -42,7 +42,7 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
-    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models")
+    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = { CascadeType.ALL})
     private List<ModelVariableDefinitionEntity> variableDefinitions = new ArrayList<>(0);
 
     @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models")
@@ -56,10 +56,10 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
-        parameterDefinitions = modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList());
-        setsGroups = modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList());
-        variableDefinitions = modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(List.of(this), null, variableDefinition)).collect(Collectors.toList());
-        variableSets = modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(List.of(this), variablesSet)).collect(Collectors.toList());
+        parameterDefinitions = modelToConvert.getParameterDefinitions() != null ? modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList()) : null;
+        setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
+        variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(List.of(this), null, variableDefinition)).collect(Collectors.toList()) : null;
+        variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(List.of(this), variablesSet)).collect(Collectors.toList()) : null;
     }
 
 }

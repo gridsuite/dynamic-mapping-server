@@ -16,6 +16,7 @@ import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.gridsuite.mapping.server.utils.PropertyUtils.copyNonNullProperties;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -100,8 +103,33 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public Model saveModel(Model model) {
-        modelRepository.save(new ModelEntity(model));
+        Optional<ModelEntity> foundModel = modelRepository.findById(model.getModelName());
+        ModelEntity modelToSave = new ModelEntity(model);
+
+        if (foundModel.isPresent()) {
+            ModelEntity modelEntity = foundModel.get();
+
+            // --- merge first level --- //
+            // do merge the list of variable definitions
+            if (modelToSave.getVariableDefinitions() != null && !modelToSave.getVariableDefinitions().isEmpty()) {
+                // do merge with existing list
+                modelEntity.getVariableDefinitions().addAll(modelToSave.getVariableDefinitions());
+                // unset merged values before update others none-null properties
+                modelToSave.setVariableDefinitions(null);
+            }
+
+            // merge other none-null properties
+            copyNonNullProperties(modelToSave, modelEntity);
+
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelEntity);
+            return new Model(savedModelEntity);
+        } else {
+            // save a new entity
+            modelRepository.save(new ModelEntity(model));
+        }
         return model;
     }
 

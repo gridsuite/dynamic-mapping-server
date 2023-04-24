@@ -254,7 +254,7 @@ public class MappingControllerTest {
     @Transactional
     public void testGetMappedModelsList() throws Exception {
         // put LoadAlphaBetaModel model
-        InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(RESOURCE_PATH_DELIMETER + "loadAlphaBeta.json");
+        InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/loadAlphaBeta.json");
         String alphaBetaModelJson = new String(isLoadAlphaBetaModel.readAllBytes());
         mvc.perform(post("/models/")
                         .content(alphaBetaModelJson)
@@ -263,7 +263,7 @@ public class MappingControllerTest {
 
         // put GeneratorSynchronousThreeWindingsProportionalRegulations model
         InputStream isGeneratorSynchronousThreeWindingsProportionalRegulations =
-                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "generatorSynchronousThreeWindingsProportionalRegulations.json");
+                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/generatorSynchronousThreeWindingsProportionalRegulations.json");
         String generatorSynchronousThreeWindingsProportionalRegulationsJson = new String(isGeneratorSynchronousThreeWindingsProportionalRegulations.readAllBytes());
         mvc.perform(post("/models/")
                         .content(generatorSynchronousThreeWindingsProportionalRegulationsJson)
@@ -271,7 +271,7 @@ public class MappingControllerTest {
                 .andExpect(status().isOk());
 
         // put a mapping which uses the saved models
-        String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "mapping_01.json").readAllBytes());
+        String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "mapping/mapping_01.json").readAllBytes());
         // Put data
         mvc.perform(post("/mappings/" + "mapping_01")
                         .content(mappingJson)
