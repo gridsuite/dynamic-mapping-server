@@ -38,7 +38,7 @@ public class ModelController {
     @GetMapping(value = "/{modelName}/parameters/sets/{groupName}/{groupType}")
     @Operation(summary = "get all parameters sets for a given group")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "parameter sets of the group")})
+        @ApiResponse(responseCode = "200", description = "parameter sets of the group")})
 
     public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName, groupType));
@@ -47,7 +47,7 @@ public class ModelController {
     @PostMapping(value = "/{modelName}/parameters/sets/strict")
     @Operation(summary = "Save a new parameter sets group without checking sets")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
+        @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
     public ResponseEntity<ParametersSetsGroup> saveParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, true));
     }
@@ -55,7 +55,7 @@ public class ModelController {
     @PostMapping(value = "/{modelName}/parameters/sets/")
     @Operation(summary = "Save a new parameter sets group without checking sets")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
+        @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
     public ResponseEntity<ParametersSetsGroup> saveSimpleParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, false));
     }
@@ -63,7 +63,7 @@ public class ModelController {
     @GetMapping(value = "/{modelName}/parameters/definitions/")
     @Operation(summary = "get parameters definitions for a given model")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "parameters definitions of the model")})
+        @ApiResponse(responseCode = "200", description = "parameters definitions of the model")})
     public ResponseEntity<List<ModelParameterDefinition>> getParametersDefinitionsFromModelName(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParametersDefinitionsFromModelName(modelName));
     }
@@ -71,7 +71,7 @@ public class ModelController {
     @GetMapping(value = "/")
     @Operation(summary = "get models names")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "names of all models")})
+        @ApiResponse(responseCode = "200", description = "names of all models")})
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
     }
@@ -79,7 +79,7 @@ public class ModelController {
     @PostMapping(value = "/")
     @Operation(summary = "Post a model")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "saved model")})
+        @ApiResponse(responseCode = "200", description = "saved model")})
     public ResponseEntity<Model> saveModel(@RequestBody Model model) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveModel(model));
     }
@@ -87,7 +87,7 @@ public class ModelController {
     @DeleteMapping(value = "/{modelName}/parameters/sets/{groupName}/{groupType}/{setName}")
     @Operation(summary = "Delete a parameter set")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "updated parameter group")})
+        @ApiResponse(responseCode = "200", description = "updated parameter group")})
     public ResponseEntity<ParametersSetsGroup> deleteSet(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType, @PathVariable("setName") String setName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
     }

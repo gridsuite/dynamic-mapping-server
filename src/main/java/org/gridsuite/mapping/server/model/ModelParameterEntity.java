@@ -54,10 +54,10 @@ public class ModelParameterEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(foreignKey = @ForeignKey(name = "parameter_set_fk"), value = {
-            @JoinColumn(name = "set_name", referencedColumnName = "name", insertable = false, updatable = false),
-            @JoinColumn(name = "group_name", referencedColumnName = "group_name", insertable = false, updatable = false),
-            @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
-            @JoinColumn(name = "group_type", referencedColumnName = "group_type", insertable = false, updatable = false)
+        @JoinColumn(name = "set_name", referencedColumnName = "name", insertable = false, updatable = false),
+        @JoinColumn(name = "group_name", referencedColumnName = "group_name", insertable = false, updatable = false),
+        @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
+        @JoinColumn(name = "group_type", referencedColumnName = "group_type", insertable = false, updatable = false)
     })
     private ModelParameterSetEntity set;
 

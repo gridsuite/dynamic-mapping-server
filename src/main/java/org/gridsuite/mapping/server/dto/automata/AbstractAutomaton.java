@@ -24,7 +24,7 @@ import java.util.ArrayList;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT")})
+    @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT")})
 @Data
 public abstract class AbstractAutomaton {
     @Schema(description = "Automaton family")

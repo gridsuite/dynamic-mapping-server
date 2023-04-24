@@ -41,8 +41,8 @@ public class MappingController {
     @PostMapping(value = "/{mappingName}")
     @Operation(summary = "Save a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping"),
-            @ApiResponse(responseCode = "409", description = "The mapping already exist"),
-            @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
+        @ApiResponse(responseCode = "409", description = "The mapping already exist"),
+        @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
     public ResponseEntity<InputMapping> createMapping(@PathVariable("mappingName") String mappingName, @RequestBody InputMapping mapping) {
         InputMapping createMapping = mappingService.createMapping(mappingName, mapping);
         return ResponseEntity.ok().body(createMapping);
@@ -59,8 +59,8 @@ public class MappingController {
     @PostMapping(value = "/rename/{oldName}/to/{newName}")
     @Operation(summary = "Rename a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = " Both names of the mapping"),
-            @ApiResponse(responseCode = "404", description = "Mapping not found"),
-            @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
+        @ApiResponse(responseCode = "404", description = "Mapping not found"),
+        @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
     public ResponseEntity<RenameObject> renameMapping(@PathVariable("oldName") String oldName, @PathVariable("newName") String newName) {
         RenameObject renamedMapping = mappingService.renameMapping(oldName, newName);
         return ResponseEntity.ok().body(renamedMapping);
@@ -69,8 +69,8 @@ public class MappingController {
     @PostMapping(value = "/copy/{originalName}/to/{copyName}")
     @Operation(summary = "Copy a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Mapping Copy"),
-            @ApiResponse(responseCode = "404", description = "Mapping not found"),
-            @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
+        @ApiResponse(responseCode = "404", description = "Mapping not found"),
+        @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
     public ResponseEntity<InputMapping> copyMapping(@PathVariable("originalName") String originalName, @PathVariable("copyName") String copyName) {
         InputMapping copiedMapping = mappingService.copyMapping(originalName, copyName);
         return ResponseEntity.ok().body(copiedMapping);
