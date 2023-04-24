@@ -42,7 +42,7 @@ public class NetworkController {
     @GetMapping(value = "/{networkUuid}/values")
     @Operation(summary = "Fetch property values of a known network from the server")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of property values of the network")})
+        @ApiResponse(responseCode = "200", description = "List of property values of the network")})
 
     public ResponseEntity<NetworkValues> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
@@ -51,7 +51,7 @@ public class NetworkController {
     @GetMapping(value = "/")
     @Operation(summary = "Get all known networks names")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of the network names")})
+        @ApiResponse(responseCode = "200", description = "List of the network names")})
 
     public ResponseEntity<List<OutputNetwork>> getKnownNetworks() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworks());
@@ -60,7 +60,7 @@ public class NetworkController {
     @PostMapping(value = "/new")
     @Operation(summary = "Post a network and retrieve its values")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of property values of the network")})
+        @ApiResponse(responseCode = "200", description = "List of property values of the network")})
     public ResponseEntity<NetworkValues> getNetworkValues(@RequestPart("file") MultipartFile networkFile) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(networkFile));
     }
@@ -68,7 +68,7 @@ public class NetworkController {
     @PostMapping(value = "/{networkUuid}/matches/rule")
     @Operation(summary = "Get the equipment ids that matches the given rule.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
+        @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
     public ResponseEntity<MatchedRule> getNetworkMatches(@PathVariable("networkUuid") UUID networkUuid, @RequestBody RuleToMatch ruleToMatch) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkMatches(networkUuid, ruleToMatch));
     }

@@ -21,10 +21,10 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = NumberFilter.class, name = "NUMBER"),
-        @JsonSubTypes.Type(value = StringFilter.class, name = "STRING"),
-        @JsonSubTypes.Type(value = BooleanFilter.class, name = "BOOLEAN"),
-        @JsonSubTypes.Type(value = EnumFilter.class, name = "ENUM")})
+    @JsonSubTypes.Type(value = NumberFilter.class, name = "NUMBER"),
+    @JsonSubTypes.Type(value = StringFilter.class, name = "STRING"),
+    @JsonSubTypes.Type(value = BooleanFilter.class, name = "BOOLEAN"),
+    @JsonSubTypes.Type(value = EnumFilter.class, name = "ENUM")})
 @Data
 public abstract class AbstractFilter {
     private String filterId;
