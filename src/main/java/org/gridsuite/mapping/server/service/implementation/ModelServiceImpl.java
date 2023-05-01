@@ -10,7 +10,9 @@ import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.model.ModelParameterSetEntity;
 import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
+import org.gridsuite.mapping.server.model.ModelVariableDefinitionEntity;
 import org.gridsuite.mapping.server.repository.ModelRepository;
+import org.gridsuite.mapping.server.repository.ModelVariableRepository;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.gridsuite.mapping.server.utils.PropertyUtils.copyNonNullProperties;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -35,12 +32,15 @@ import static org.gridsuite.mapping.server.utils.PropertyUtils.copyNonNullProper
 public class ModelServiceImpl implements ModelService {
 
     private final ModelRepository modelRepository;
+    private final ModelVariableRepository modelVariableRepository;
 
     @Autowired
     public ModelServiceImpl(
-            ModelRepository modelRepository
+            ModelRepository modelRepository,
+            ModelVariableRepository modelVariableRepository
     ) {
         this.modelRepository = modelRepository;
+        this.modelVariableRepository = modelVariableRepository;
     }
 
     @Override
@@ -105,31 +105,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public Model saveModel(Model model) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(model.getModelName());
-        ModelEntity modelToSave = new ModelEntity(model);
-
-        if (foundModel.isPresent()) {
-            ModelEntity modelEntity = foundModel.get();
-
-            // --- merge first level --- //
-            // do merge the list of variable definitions
-            if (modelToSave.getVariableDefinitions() != null && !modelToSave.getVariableDefinitions().isEmpty()) {
-                // do merge with existing list
-                modelEntity.getVariableDefinitions().addAll(modelToSave.getVariableDefinitions());
-                // unset merged values before update others none-null properties
-                modelToSave.setVariableDefinitions(null);
-            }
-
-            // merge other none-null properties
-            copyNonNullProperties(modelToSave, modelEntity);
-
-            // save modified existing model entity
-            ModelEntity savedModelEntity = modelRepository.save(modelEntity);
-            return new Model(savedModelEntity);
-        } else {
-            // save a new entity
-            modelRepository.save(new ModelEntity(model));
-        }
+        modelRepository.save(new ModelEntity(model));
         return model;
     }
 
@@ -149,6 +125,103 @@ public class ModelServiceImpl implements ModelService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
         }
+    }
+
+    @Override
+    @Transactional
+    public Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions) {
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        // do merge the list of variable definitions if exists
+        if (variableDefinitions != null && !variableDefinitions.isEmpty()) {
+            // do merge with existing list
+            Set<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(List.of(modelToUpdate), null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new));
+            modelToUpdate.getVariableDefinitions().addAll(variableDefinitionEntities);
+
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames) {
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        // do merge the list of variable definitions if exists
+        if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
+            // find existing variable definitions
+            List<ModelVariableDefinitionEntity> foundVariableDefinitionEntities = modelVariableRepository.findAllById(variableDefinitionNames);
+
+            // check whether found all
+            if (foundVariableDefinitionEntities.size() != variableDefinitionNames.size()) {
+                List<String> foundNames = foundVariableDefinitionEntities.stream().map(ModelVariableDefinitionEntity::getName).collect(Collectors.toList());
+                List<String> notFoundNames = variableDefinitionNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
+                throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some variable definition not found: " + notFoundNames);
+            }
+
+            // do merge with existing list
+            modelToUpdate.getVariableDefinitions().addAll(foundVariableDefinitionEntities);
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Model removeExistingVariableDefinitionsFromModel(String modelName, List<String> variableDefinitionNames) {
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        // do merge the list of variable definitions if exists
+        if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
+            // find existing variable definitions
+            List<ModelVariableDefinitionEntity> foundVariableDefinitionEntities = modelVariableRepository.findAllById(variableDefinitionNames);
+            List<String> foundNames = foundVariableDefinitionEntities.stream().map(ModelVariableDefinitionEntity::getName).collect(Collectors.toList());
+            // do merge with existing list
+            modelToUpdate.getVariableDefinitions().removeIf(variableDefinitionEntity -> foundNames.contains(variableDefinitionEntity.getName()));
+
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    @Transactional
+    public List<ModelVariableDefinition> saveNewVariableDefinitions(List<ModelVariableDefinition> variableDefinitions) {
+        if (variableDefinitions != null && !variableDefinitions.isEmpty()) {
+            Set<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(null, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new));
+            List<ModelVariableDefinitionEntity> savedVariableDefinitionEntities = modelVariableRepository.saveAll(variableDefinitionEntities);
+            return savedVariableDefinitionEntities.stream().map(ModelVariableDefinition::new).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    @Transactional
+    public Model resetVariableDefinitionsOnModel(String modelName) {
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        modelToUpdate.getVariableDefinitions().clear();
+        // save modified existing model entity
+        ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+        return new Model(savedModelEntity);
     }
 }
 

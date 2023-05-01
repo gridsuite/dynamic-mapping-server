@@ -91,4 +91,44 @@ public class ModelController {
     public ResponseEntity<ParametersSetsGroup> deleteSet(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType, @PathVariable("setName") String setName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
     }
+
+    @PostMapping(value = "/variables")
+    @Operation(summary = "Save new variable definitions")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "saved model")})
+    public ResponseEntity<List<ModelVariableDefinition>> saveNewVariables(@RequestBody List<ModelVariableDefinition> variableDefinitions) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewVariableDefinitions(variableDefinitions));
+    }
+
+    @PostMapping(value = "/{modelName}/variables")
+    @Operation(summary = "Add new variable definitions to model")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "saved model")})
+    public ResponseEntity<Model> addNewVariablesToModel(@PathVariable("modelName") String modelName, @RequestBody List<ModelVariableDefinition> variableDefinitions) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addNewVariableDefinitionsToModel(modelName, variableDefinitions));
+    }
+
+    @PatchMapping(value = "/{modelName}/variables/add")
+    @Operation(summary = "Add existing variable definitions to model")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "saved model")})
+    public ResponseEntity<Model> addExistingVariablesToModel(@PathVariable("modelName") String modelName, @RequestBody List<String> variableDefinitionNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingVariableDefinitionsToModel(modelName, variableDefinitionNames));
+    }
+
+    @PatchMapping(value = "/{modelName}/variables/remove")
+    @Operation(summary = "Remove existing variable definitions to model")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "saved model")})
+    public ResponseEntity<Model> removeExistingVariablesToModel(@PathVariable("modelName") String modelName, @RequestBody List<String> variableDefinitionNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeExistingVariableDefinitionsFromModel(modelName, variableDefinitionNames));
+    }
+
+    @PatchMapping(value = "/{modelName}/variables/reset")
+    @Operation(summary = "Reset empty variable definitions on model")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "saved model")})
+    public ResponseEntity<Model> resetVariablesToModel(@PathVariable("modelName") String modelName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.resetVariableDefinitionsOnModel(modelName));
+    }
 }

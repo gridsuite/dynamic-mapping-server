@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.VariablesSet;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Inheritance
@@ -24,10 +27,10 @@ public class ModelVariableSetEntity implements Serializable {
     @Column(name = "variable_set_name")
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "variablesSet", cascade = {CascadeType.PERSIST}, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "variablesSet", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ModelVariableDefinitionEntity> variableDefinitions;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
         name = "models_model_variable_sets",
         joinColumns = {@JoinColumn(name = "variable_set_name")},
@@ -35,13 +38,34 @@ public class ModelVariableSetEntity implements Serializable {
     )
     private List<ModelEntity> models;
 
-    @Column(name = "last_modified_date")
-    private Date lastModifiedDate;
+    @CreationTimestamp
+    @Column(name = "created_date", updatable = false)
+    private Date createdDate;
+
+    @UpdateTimestamp
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     public ModelVariableSetEntity(List<ModelEntity> models, VariablesSet variablesSet) {
         this.models = models;
         this.name = variablesSet.getName();
         this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(models, this, variableDefinition)).collect(Collectors.toList());
-        this.lastModifiedDate = variablesSet.getLastModifiedDate();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ModelVariableSetEntity that = (ModelVariableSetEntity) o;
+        return name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

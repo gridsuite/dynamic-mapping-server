@@ -27,4 +27,14 @@ public interface ModelService {
     Model saveModel(Model model);
 
     ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName);
+
+    Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions);
+
+    Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames);
+
+    Model removeExistingVariableDefinitionsFromModel(String modelName, List<String> variableDefinitionNames);
+
+    List<ModelVariableDefinition> saveNewVariableDefinitions(List<ModelVariableDefinition> variableDefinitions);
+
+    Model resetVariableDefinitionsOnModel(String modelName);
 }

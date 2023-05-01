@@ -13,10 +13,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
 import org.gridsuite.mapping.server.utils.VariableType;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -46,7 +50,8 @@ public class ModelVariableDefinitionEntity implements Serializable {
     @Column(name = "factor")
     private Double factor;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST})
+    // must exclude CascadeType.REMOVE to avoid unexpected cascade on delete a ModelVariableDefinitionEntity
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "models_model_variable_definitions",
             joinColumns = {@JoinColumn(name = "variable_definition_name")},
@@ -54,11 +59,36 @@ public class ModelVariableDefinitionEntity implements Serializable {
     )
     private List<ModelEntity> models;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "variable_set_name", foreignKey = @ForeignKey(name = "variable_set_variable_definition_fk"), insertable = false, updatable = false)
     private ModelVariableSetEntity variablesSet;
 
     public ModelVariableDefinitionEntity(List<ModelEntity> models, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
-        this(variableDefinition.getName(), variablesSet != null ? variablesSet.getName() : null, variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), models, variablesSet);
+        this(variableDefinition.getName(), variablesSet != null ? variablesSet.getName() : null, variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), models, variablesSet, null, null);
+    }
+
+    @CreationTimestamp
+    @Column(name = "created_date", updatable = false)
+    private Date createdDate;
+
+    @UpdateTimestamp
+    @Column(name = "updated_date")
+    private Date updatedDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ModelVariableDefinitionEntity that = (ModelVariableDefinitionEntity) o;
+        return name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

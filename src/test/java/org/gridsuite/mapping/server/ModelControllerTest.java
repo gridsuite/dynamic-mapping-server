@@ -6,11 +6,13 @@
  */
 package org.gridsuite.mapping.server;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
 import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelRepository;
+import org.gridsuite.mapping.server.repository.ModelVariableRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
@@ -34,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -56,6 +59,8 @@ public class ModelControllerTest {
 
     @Autowired
     private ModelRepository modelRepository;
+    @Autowired
+    private ModelVariableRepository modelVariableRepository;
 
     @Autowired
     private MockMvc mvc;
@@ -64,6 +69,7 @@ public class ModelControllerTest {
     ObjectMapper objectMapper;
 
     private void cleanDB() {
+        modelVariableRepository.deleteAll();
         modelRepository.deleteAll();
     }
 
@@ -77,7 +83,7 @@ public class ModelControllerTest {
 
         // prepare token model
         ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD,
-                null, new ArrayList<>(), List.of(), List.of());
+                null, new ArrayList<>(), Set.of(), Set.of());
         ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
@@ -217,7 +223,7 @@ public class ModelControllerTest {
         loadModel.setSetsGroups(loadGroups);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, new ArrayList<>(), null, List.of(), List.of());
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, new ArrayList<>(), null, Set.of(), Set.of());
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
         generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
@@ -239,7 +245,7 @@ public class ModelControllerTest {
 
     @Test
     @Transactional
-    public void testSave() throws Exception {
+    public void testSaveLoadModel() throws Exception {
         String modelName = "LoadAlphaBeta";
         ModelEntity previousModel = modelRepository.findById(modelName).orElseThrow();
         String newModel = readFileAsString("src/test/resources/data/model/loadAlphaBeta.json");
@@ -276,11 +282,11 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testSaveLoadModelMergeVariableDefinitions() throws Exception {
+    public void testSaveLoadModelThenModifyVariableDefinitions() throws Exception {
 
         String modelName = "LoadAlphaBeta";
         String newModel = readFileAsString("src/test/resources/data/model/loadAlphaBeta.json");
-        String sameModelWithAdditionVariableDefinition = readFileAsString("src/test/resources/data/model/loadAlphaBeta_add_variable_definition.json");
+        String newVariableDefinitionsJson = readFileAsString("src/test/resources/data/model/loadAlphaBeta_add_variable_definition.json");
 
         cleanDB();
 
@@ -295,12 +301,12 @@ public class ModelControllerTest {
         assertEquals(5, variableDefinitions.size());
 
         // Put data second time which add only a variable definition
-        MvcResult mvcResult2 = mvc.perform(post("/models/")
-                        .content(sameModelWithAdditionVariableDefinition)
+        MvcResult mvcResult2 = mvc.perform(post("/models/" + modelName + "/variables")
+                        .content(newVariableDefinitionsJson)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        // Get initial variable definitions
+        // Get current variable definitions
         List<ModelVariableDefinition> variableDefinitions2 = objectMapper.readValue(mvcResult2.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
         LOGGER.info("Initial variable definitions = " + variableDefinitions);
         LOGGER.info("Updated variable definitions = " + variableDefinitions2);
@@ -310,17 +316,59 @@ public class ModelControllerTest {
         assertEquals(1, variableDefinitions2.size() - variableDefinitions.size());
         assertTrue(variableDefinitions2.containsAll(variableDefinitions));
 
-        // Put data third time which remove all variable definitions
-        /*Model model = objectMapper.readValue(mvcResult2.getResponse().getContentAsString(), Model.class);
-        model.setVariableDefinitions(List.of());
-        String sameModelWithEmptyVariableDefinition = objectMapper.writeValueAsString(model);
-        MvcResult mvcResult3 = mvc.perform(post("/models/")
-                        .content(sameModelWithEmptyVariableDefinition)
+        // Remove an existing variable definition
+        MvcResult mvcResult3 = mvc.perform(patch("/models/" + modelName + "/variables/remove")
+                        .content(objectMapper.writeValueAsString(List.of(variableDefinitions2.get(5).getName())))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
+        // Get current variable definitions
         List<ModelVariableDefinition> variableDefinitions3 = objectMapper.readValue(mvcResult3.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
-        LOGGER.info("Unset variable definitions = " + variableDefinitions3);*/
+        LOGGER.info("Updated variable definitions = " + variableDefinitions2);
+        LOGGER.info("Removed variable definitions = " + variableDefinitions3);
+
+        // check result
+        // final model's variable definition must contains all ones of model
+        assertEquals(1, variableDefinitions2.size() - variableDefinitions3.size());
+        assertTrue(variableDefinitions2.containsAll(variableDefinitions3));
+
+        // remove all variable definitions by reset
+        MvcResult mvcResult4 = mvc.perform(patch("/models/" + modelName + "/variables/reset")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        List<ModelVariableDefinition> variableDefinitions4 = objectMapper.readValue(mvcResult4.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
+        LOGGER.info("Unset variable definitions = " + variableDefinitions4);
+
+        // check result
+        // must have no variable definition
+        assertEquals(0, variableDefinitions4.size());
+
+        // save new variable definition
+        List<ModelVariableDefinition> variableDefinitionList = objectMapper.readValue(newVariableDefinitionsJson, new TypeReference<List<ModelVariableDefinition>>() { });
+        variableDefinitionList.get(0).setName("load_running_value_3");
+        MvcResult mvcResult5 = mvc.perform(post("/models/variables")
+                        .content(objectMapper.writeValueAsString(variableDefinitionList))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        List<ModelVariableDefinition> savedVariableDefinitionList = objectMapper.readValue(mvcResult5.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+
+        // check result
+        // must have the same number of input variable definitions
+        assertEquals(variableDefinitionList.size(), savedVariableDefinitionList.size());
+
+        // add existing variable definition to model
+        MvcResult mvcResult6 = mvc.perform(patch("/models/" + modelName + "/variables/add")
+                        .content(objectMapper.writeValueAsString(savedVariableDefinitionList.stream().map(ModelVariableDefinition::getName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // Get current variable definitions in the model
+        List<ModelVariableDefinition> variableDefinitions6 = objectMapper.readValue(mvcResult6.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
+        LOGGER.info("Updated variable definitions = " + variableDefinitions6);
+        // must have the same number of above input variable definitions
+        assertEquals(variableDefinitionList.size(), variableDefinitions6.size());
+
     }
 
     @Test

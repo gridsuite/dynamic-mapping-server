@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -64,7 +64,7 @@ public class ScriptControllerTest {
         cleanDB();
 
         // Prepare models
-        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, null, null, List.of(), List.of());
+        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, null, null, Set.of(), Set.of());
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();

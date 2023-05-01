@@ -12,8 +12,7 @@ import org.gridsuite.mapping.server.utils.EquipmentType;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,11 +41,11 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
-    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = { CascadeType.ALL})
-    private List<ModelVariableDefinitionEntity> variableDefinitions = new ArrayList<>(0);
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
-    @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models")
-    private List<ModelVariableSetEntity> variableSets = new ArrayList<>(0);
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
 
     @Override
     public String getId() {
@@ -58,8 +57,8 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
         equipmentType = modelToConvert.getEquipmentType();
         parameterDefinitions = modelToConvert.getParameterDefinitions() != null ? modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList()) : null;
         setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
-        variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(List.of(this), null, variableDefinition)).collect(Collectors.toList()) : null;
-        variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(List.of(this), variablesSet)).collect(Collectors.toList()) : null;
+        variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(List.of(this), null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
+        variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(List.of(this), variablesSet)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
     }
 
 }
