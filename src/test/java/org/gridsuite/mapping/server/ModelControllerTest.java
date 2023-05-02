@@ -332,8 +332,8 @@ public class ModelControllerTest {
         assertEquals(1, variableDefinitions2.size() - variableDefinitions3.size());
         assertTrue(variableDefinitions2.containsAll(variableDefinitions3));
 
-        // remove all variable definitions by reset
-        MvcResult mvcResult4 = mvc.perform(patch("/models/" + modelName + "/variables/reset")
+        // remove all variable definitions
+        MvcResult mvcResult4 = mvc.perform(patch("/models/" + modelName + "/variables/remove-all")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 

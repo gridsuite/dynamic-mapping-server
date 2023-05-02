@@ -48,4 +48,14 @@ public class ModelVariableSetEntity implements Serializable {
         this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this, variableDefinition)).collect(Collectors.toList());
     }
 
+    // --- utils methods --- //
+    public void addVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+        variableDefinitions.forEach(variableDefinition -> variableDefinition.setVariablesSet(this));
+        this.variableDefinitions.addAll(variableDefinitions);
+    }
+
+    public void removeVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+        variableDefinitions.forEach(variableDefinition -> variableDefinition.setVariablesSet(null));
+        this.variableDefinitions.removeAll(variableDefinitions);
+    }
 }

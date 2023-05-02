@@ -7,12 +7,10 @@
 package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.models.*;
-import org.gridsuite.mapping.server.model.ModelEntity;
-import org.gridsuite.mapping.server.model.ModelParameterSetEntity;
-import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
-import org.gridsuite.mapping.server.model.ModelVariableDefinitionEntity;
+import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ModelVariableRepository;
+import org.gridsuite.mapping.server.repository.ModelVariablesSetRepository;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +29,21 @@ import java.util.stream.Collectors;
 @Service
 public class ModelServiceImpl implements ModelService {
 
+    public static final String MODEL_NOT_FOUND = "Model not found: ";
+    public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
     private final ModelRepository modelRepository;
     private final ModelVariableRepository modelVariableRepository;
+    private final ModelVariablesSetRepository modelVariablesSetRepository;
 
     @Autowired
     public ModelServiceImpl(
             ModelRepository modelRepository,
-            ModelVariableRepository modelVariableRepository
+            ModelVariableRepository modelVariableRepository,
+            ModelVariablesSetRepository modelVariablesSetRepository
     ) {
         this.modelRepository = modelRepository;
         this.modelVariableRepository = modelVariableRepository;
+        this.modelVariablesSetRepository = modelVariablesSetRepository;
     }
 
     @Override
@@ -130,9 +133,9 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
 
         // do merge with the list of variable definitions
         if (variableDefinitions != null && !variableDefinitions.isEmpty()) {
@@ -150,9 +153,9 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
 
         // do merge with the list of variable definitions
         if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
@@ -180,9 +183,9 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public Model removeExistingVariableDefinitionsFromModel(String modelName, List<String> variableDefinitionNames) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
 
         // do remove in the list of variable definitions
         if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
@@ -213,10 +216,10 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     @Transactional
-    public Model resetVariableDefinitionsOnModel(String modelName) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+    public Model removeAllVariableDefinitionsOnModel(String modelName) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
 
          // clear the existing list
         modelToUpdate.removeVariableDefinitions(modelToUpdate.getVariableDefinitions());
@@ -224,6 +227,174 @@ public class ModelServiceImpl implements ModelService {
         // save modified existing model entity
         ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
         return new Model(savedModelEntity);
+    }
+
+    @Override
+    @Transactional
+    public VariablesSet saveNewVariablesSet(VariablesSet variableSet) {
+        ModelVariableSetEntity variableSetEntity = new ModelVariableSetEntity(null, variableSet);
+        ModelVariableSetEntity savedVariableSetEntity = modelVariablesSetRepository.save(variableSetEntity);
+        return new VariablesSet(savedVariableSetEntity);
+    }
+
+    @Override
+    @Transactional
+    public VariablesSet addNewVariableDefinitionToVariablesSet(String variableSetName, List<ModelVariableDefinition> variableDefinitions) {
+        Optional<ModelVariableSetEntity> foundModelOpt = modelVariablesSetRepository.findById(variableSetName);
+
+        ModelVariableSetEntity variableSetToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
+
+        if (variableDefinitions != null && !variableDefinitions.isEmpty()) {
+            // do merge with existing list
+            List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(null, variableSetToUpdate, variableDefinition)).collect(Collectors.toList());
+            variableSetToUpdate.addVariableDefinitions(variableDefinitionEntities);
+            // save modified existing variables set entity
+            ModelVariableSetEntity savedVariablesSetEntity = modelVariablesSetRepository.save(variableSetToUpdate);
+            return new VariablesSet(savedVariablesSetEntity);
+
+        } else {
+            return new VariablesSet(variableSetToUpdate);
+        }
+    }
+
+    @Override
+    @Transactional
+    public VariablesSet removeExistingVariableDefinitionFromVariablesSet(String variableSetName, List<String> variableDefinitionNames) {
+        Optional<ModelVariableSetEntity> foundModelOpt = modelVariablesSetRepository.findById(variableSetName);
+
+        ModelVariableSetEntity variableSetToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
+
+        if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
+            // find existing variable definitions
+            List<ModelVariableDefinitionEntity> foundVariableDefinitionEntities = modelVariableRepository.findAllById(variableDefinitionNames);
+
+            // remove in existing list
+            variableSetToUpdate.removeVariableDefinitions(foundVariableDefinitionEntities);
+
+            // save modified existing variables set entity
+            // variable definitions are systematically deleted via orphanRemoval = true
+            ModelVariableSetEntity savedVariablesSetEntity = modelVariablesSetRepository.save(variableSetToUpdate);
+
+            return new VariablesSet(savedVariablesSetEntity);
+        } else {
+            return new VariablesSet(variableSetToUpdate);
+        }
+    }
+
+    @Override
+    @Transactional
+    public VariablesSet removeAllVariableDefinitionOnVariablesSet(String variableSetName) {
+        Optional<ModelVariableSetEntity> foundModelOpt = modelVariablesSetRepository.findById(variableSetName);
+
+        ModelVariableSetEntity variableSetToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
+
+        // clear the existing list
+        variableSetToUpdate.removeVariableDefinitions(variableSetToUpdate.getVariableDefinitions());
+
+        // save modified existing variables set entity
+        // variable definitions are systematically deleted via orphanRemoval = true
+        ModelVariableSetEntity savedVariablesSetEntity = modelVariablesSetRepository.save(variableSetToUpdate);
+        return new VariablesSet(savedVariablesSetEntity);
+    }
+
+    @Override
+    @Transactional
+    public Model addNewVariablesSetsToModel(String modelName, List<VariablesSet> variableSets) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        // do merge with the list of variables set
+        if (variableSets != null && !variableSets.isEmpty()) {
+            // do merge with existing list
+            List<ModelVariableSetEntity> variablesSetEntities = variableSets.stream().map(variablesSet -> new ModelVariableSetEntity(modelToUpdate, variablesSet)).collect(Collectors.toList());
+            modelToUpdate.addVariablesSets(variablesSetEntities);
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Model addExistingVariablesSetsToModel(String modelName, List<String> variablesSetNames) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        // do merge with the list of variables set
+        if (variablesSetNames != null && !variablesSetNames.isEmpty()) {
+            // do merge with existing list
+            List<ModelVariableSetEntity> foundVariablesSetEntities = modelVariablesSetRepository.findAllById(variablesSetNames);
+
+            // check whether found all
+            if (foundVariablesSetEntities.size() != variablesSetNames.size()) {
+                List<String> foundNames = foundVariablesSetEntities.stream().map(ModelVariableSetEntity::getName).collect(Collectors.toList());
+                List<String> notFoundNames = variablesSetNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
+                throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some variables set not found: " + notFoundNames);
+            }
+
+            modelToUpdate.addVariablesSets(foundVariablesSetEntities);
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Model removeExistingVariablesSetsFromModel(String modelName, List<String> variablesSetNames) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        // do merge with the list of variables set
+        if (variablesSetNames != null && !variablesSetNames.isEmpty()) {
+            // remove from existing list
+            List<ModelVariableSetEntity> foundVariablesSetEntities = modelVariablesSetRepository.findAllById(variablesSetNames);
+            modelToUpdate.removeVariablesSets(foundVariablesSetEntities);
+
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    public Model removeAllExistingVariablesSetsFromModel(String modelName) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        modelToUpdate.removeVariablesSets(modelToUpdate.getVariableSets());
+
+        // save modified existing model entity
+        ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+        return new Model(savedModelEntity);
+    }
+
+    @Override
+    @Transactional
+    public List<String> deleteVariableDefinitions(List<String> variableDefinitionNames) {
+        if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
+            modelVariableRepository.deleteAllById(variableDefinitionNames);
+        }
+        return variableDefinitionNames;
+    }
+
+    @Override
+    @Transactional
+    public List<String> deleteVariablesSets(List<String> variablesSetNames) {
+        if (variablesSetNames != null && !variablesSetNames.isEmpty()) {
+            modelVariableRepository.deleteAllById(variablesSetNames);
+        }
+        return variablesSetNames;
     }
 }
 

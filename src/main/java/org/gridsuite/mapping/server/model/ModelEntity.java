@@ -72,4 +72,14 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
         this.variableDefinitions.removeAll(variableDefinitions);
     }
 
+    public void addVariablesSets(Collection<ModelVariableSetEntity> variablesSets) {
+        variablesSets.forEach(variablesSet -> variablesSet.getModels().add(this));
+        this.variableSets.addAll(variablesSets);
+    }
+
+    public void removeVariablesSets(Collection<ModelVariableSetEntity> variablesSets) {
+        variablesSets.forEach(variablesSet -> variablesSet.getModels().remove(this));
+        this.variableSets.removeAll(variablesSets);
+    }
+
 }
