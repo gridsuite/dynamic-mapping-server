@@ -134,12 +134,11 @@ public class ModelServiceImpl implements ModelService {
 
         ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        // do merge the list of variable definitions if exists
+        // do merge with the list of variable definitions
         if (variableDefinitions != null && !variableDefinitions.isEmpty()) {
             // do merge with existing list
-            Set<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(List.of(modelToUpdate), null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new));
-            modelToUpdate.getVariableDefinitions().addAll(variableDefinitionEntities);
-
+            List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(modelToUpdate, null, variableDefinition)).collect(Collectors.toList());
+            modelToUpdate.addVariableDefinitions(variableDefinitionEntities);
             // save modified existing model entity
             ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
             return new Model(savedModelEntity);
@@ -155,7 +154,7 @@ public class ModelServiceImpl implements ModelService {
 
         ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        // do merge the list of variable definitions if exists
+        // do merge with the list of variable definitions
         if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
             // find existing variable definitions
             List<ModelVariableDefinitionEntity> foundVariableDefinitionEntities = modelVariableRepository.findAllById(variableDefinitionNames);
@@ -168,7 +167,8 @@ public class ModelServiceImpl implements ModelService {
             }
 
             // do merge with existing list
-            modelToUpdate.getVariableDefinitions().addAll(foundVariableDefinitionEntities);
+            modelToUpdate.addVariableDefinitions(foundVariableDefinitionEntities);
+
             // save modified existing model entity
             ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
             return new Model(savedModelEntity);
@@ -184,13 +184,13 @@ public class ModelServiceImpl implements ModelService {
 
         ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        // do merge the list of variable definitions if exists
+        // do remove in the list of variable definitions
         if (variableDefinitionNames != null && !variableDefinitionNames.isEmpty()) {
             // find existing variable definitions
             List<ModelVariableDefinitionEntity> foundVariableDefinitionEntities = modelVariableRepository.findAllById(variableDefinitionNames);
-            List<String> foundNames = foundVariableDefinitionEntities.stream().map(ModelVariableDefinitionEntity::getName).collect(Collectors.toList());
-            // do merge with existing list
-            modelToUpdate.getVariableDefinitions().removeIf(variableDefinitionEntity -> foundNames.contains(variableDefinitionEntity.getName()));
+
+            // remove in existing list
+            modelToUpdate.removeVariableDefinitions(foundVariableDefinitionEntities);
 
             // save modified existing model entity
             ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
@@ -218,7 +218,9 @@ public class ModelServiceImpl implements ModelService {
 
         ModelEntity modelToUpdate = foundModel.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        modelToUpdate.getVariableDefinitions().clear();
+         // clear the existing list
+        modelToUpdate.removeVariableDefinitions(modelToUpdate.getVariableDefinitions());
+
         // save modified existing model entity
         ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
         return new Model(savedModelEntity);

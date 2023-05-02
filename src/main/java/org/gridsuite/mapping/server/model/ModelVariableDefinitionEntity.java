@@ -18,9 +18,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -57,14 +55,14 @@ public class ModelVariableDefinitionEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "variable_definition_name")},
             inverseJoinColumns = {@JoinColumn(name = "model_name")}
     )
-    private List<ModelEntity> models;
+    private Set<ModelEntity> models;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "variable_set_name", foreignKey = @ForeignKey(name = "variable_set_variable_definition_fk"), insertable = false, updatable = false)
     private ModelVariableSetEntity variablesSet;
 
-    public ModelVariableDefinitionEntity(List<ModelEntity> models, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
-        this(variableDefinition.getName(), variablesSet != null ? variablesSet.getName() : null, variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), models, variablesSet, null, null);
+    public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
+        this(variableDefinition.getName(), variablesSet != null ? variablesSet.getName() : null, variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(), variablesSet, null, null);
     }
 
     @CreationTimestamp

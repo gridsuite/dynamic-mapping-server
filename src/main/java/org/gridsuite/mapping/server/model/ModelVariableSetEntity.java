@@ -10,9 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Inheritance
@@ -36,7 +34,7 @@ public class ModelVariableSetEntity implements Serializable {
         joinColumns = {@JoinColumn(name = "variable_set_name")},
         inverseJoinColumns = {@JoinColumn(name = "model_name")}
     )
-    private List<ModelEntity> models;
+    private Set<ModelEntity> models;
 
     @CreationTimestamp
     @Column(name = "created_date", updatable = false)
@@ -46,10 +44,10 @@ public class ModelVariableSetEntity implements Serializable {
     @Column(name = "updated_date")
     private Date updatedDate;
 
-    public ModelVariableSetEntity(List<ModelEntity> models, VariablesSet variablesSet) {
-        this.models = models;
+    public ModelVariableSetEntity(ModelEntity model, VariablesSet variablesSet) {
+        this.models = model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>();
         this.name = variablesSet.getName();
-        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(models, this, variableDefinition)).collect(Collectors.toList());
+        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this, variableDefinition)).collect(Collectors.toList());
     }
 
     @Override
