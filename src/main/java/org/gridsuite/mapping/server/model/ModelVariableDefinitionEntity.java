@@ -7,10 +7,7 @@
 
 package org.gridsuite.mapping.server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
 import org.gridsuite.mapping.server.utils.VariableType;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,7 +20,7 @@ import java.util.*;
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-@Inheritance
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -32,6 +29,7 @@ import java.util.*;
 @Table(name = "model_variable_definitions", indexes = {@Index(name = "model_variable_definitions_variable_set_name_index", columnList = "variable_set_name")})
 public class ModelVariableDefinitionEntity implements Serializable {
     @Id
+    @EqualsAndHashCode.Include
     @Column(name = "variable_definition_name")
     private String name;
 
@@ -73,20 +71,4 @@ public class ModelVariableDefinitionEntity implements Serializable {
     @Column(name = "updated_date")
     private Date updatedDate;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ModelVariableDefinitionEntity that = (ModelVariableDefinitionEntity) o;
-        return name.equals(that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
 }

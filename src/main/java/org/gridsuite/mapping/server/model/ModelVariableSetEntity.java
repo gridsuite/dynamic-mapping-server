@@ -1,9 +1,6 @@
 package org.gridsuite.mapping.server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.models.VariablesSet;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -13,7 +10,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Inheritance
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -22,6 +19,7 @@ import java.util.stream.Collectors;
 @Table(name = "model_variable_sets")
 public class ModelVariableSetEntity implements Serializable {
     @Id
+    @EqualsAndHashCode.Include
     @Column(name = "variable_set_name")
     private String name;
 
@@ -50,20 +48,4 @@ public class ModelVariableSetEntity implements Serializable {
         this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this, variableDefinition)).collect(Collectors.toList());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ModelVariableSetEntity that = (ModelVariableSetEntity) o;
-        return name.equals(that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
 }
