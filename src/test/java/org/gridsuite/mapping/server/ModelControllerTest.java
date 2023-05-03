@@ -253,7 +253,7 @@ public class ModelControllerTest {
     public void testSaveLoadModel() throws Exception {
         String modelName = "LoadAlphaBeta";
         ModelEntity previousModel = modelRepository.findById(modelName).orElseThrow();
-        String newModel = readFileAsString("src/test/resources/data/model/loadAlphaBeta.json");
+        String newModel = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
 
         cleanDB();
         // Put data
@@ -290,8 +290,8 @@ public class ModelControllerTest {
     public void testSaveLoadModelThenModifyVariableDefinitions() throws Exception {
 
         String modelName = "LoadAlphaBeta";
-        String newModelJson = readFileAsString("src/test/resources/data/model/loadAlphaBeta.json");
-        String newVariableDefinitionsJson = readFileAsString("src/test/resources/data/model/loadAlphaBeta_variable_definitions.json");
+        String newModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
+        String newVariableDefinitionsJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta_variable_definitions.json");
 
         cleanDB();
 
@@ -390,8 +390,8 @@ public class ModelControllerTest {
 
     @Test
     public void testSaveNewVariablesSetThenModifyVariableDefinitions() throws Exception {
-        String newVariablesSetJson = readFileAsString("src/test/resources/data/model/variablesSet_generator2.json");
-        String newVariableDefinitionsJson = readFileAsString("src/test/resources/data/model/variablesSet_generator2_variable_definitions.json");
+        String newVariablesSetJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_generator2.json");
+        String newVariableDefinitionsJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_generator2_variable_definitions.json");
 
         cleanDB();
 
@@ -461,7 +461,7 @@ public class ModelControllerTest {
     @Transactional
     public void testSaveGeneratorModel() throws Exception {
         String modelName = "GeneratorSynchronousThreeWindingsProportionalRegulations";
-        String newModelJson = readFileAsString("src/test/resources/data/model/generatorSynchronousThreeWindingsProportionalRegulations.json");
+        String newModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
 
         // Put data
         mvc.perform(post("/models/")
@@ -482,8 +482,8 @@ public class ModelControllerTest {
 
     @Test
     public void testSaveGeneratorModelThenModifyVariablesSets() throws Exception {
-        String newVariablesSetJson = readFileAsString("src/test/resources/data/model/variablesSet_generator2.json");
-        String newModelJson = readFileAsString("src/test/resources/data/model/generatorSynchronousThreeWindingsProportionalRegulations.json");
+        String newVariablesSetJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_generator2.json");
+        String newModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
 
         cleanDB();
 

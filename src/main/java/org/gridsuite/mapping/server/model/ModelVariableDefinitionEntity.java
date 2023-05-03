@@ -33,9 +33,6 @@ public class ModelVariableDefinitionEntity implements Serializable {
     @Column(name = "variable_definition_name")
     private String name;
 
-    @Column(name = "variable_set_name")
-    private String variableSetName;
-
     @Column(name = "type")
     @Enumerated
     private VariableType type;
@@ -56,11 +53,11 @@ public class ModelVariableDefinitionEntity implements Serializable {
     private Set<ModelEntity> models;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "variable_set_name", foreignKey = @ForeignKey(name = "variable_set_variable_definition_fk"), insertable = false, updatable = false)
+    @JoinColumn(name = "variable_set_name", foreignKey = @ForeignKey(name = "variable_set_variable_definition_fk"), updatable = false)
     private ModelVariableSetEntity variablesSet;
 
     public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
-        this(variableDefinition.getName(), variablesSet != null ? variablesSet.getName() : null, variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(), variablesSet, null, null);
+        this(variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(), variablesSet, null, null);
     }
 
     @CreationTimestamp

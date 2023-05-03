@@ -254,7 +254,7 @@ public class MappingControllerTest {
     @Transactional
     public void testGetMappedModelsList() throws Exception {
         // put LoadAlphaBetaModel model
-        InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/loadAlphaBeta.json");
+        InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/load/loadAlphaBeta.json");
         String alphaBetaModelJson = new String(isLoadAlphaBetaModel.readAllBytes());
         mvc.perform(post("/models/")
                         .content(alphaBetaModelJson)
@@ -263,7 +263,7 @@ public class MappingControllerTest {
 
         // put GeneratorSynchronousThreeWindingsProportionalRegulations model
         InputStream isGeneratorSynchronousThreeWindingsProportionalRegulations =
-                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/generatorSynchronousThreeWindingsProportionalRegulations.json");
+                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
         String generatorSynchronousThreeWindingsProportionalRegulationsJson = new String(isGeneratorSynchronousThreeWindingsProportionalRegulations.readAllBytes());
         mvc.perform(post("/models/")
                         .content(generatorSynchronousThreeWindingsProportionalRegulationsJson)
