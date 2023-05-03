@@ -392,7 +392,7 @@ public class ModelServiceImpl implements ModelService {
     @Transactional
     public List<String> deleteVariablesSets(List<String> variablesSetNames) {
         if (variablesSetNames != null && !variablesSetNames.isEmpty()) {
-            modelVariableRepository.deleteAllById(variablesSetNames);
+            modelVariablesSetRepository.deleteAllById(variablesSetNames);
         }
         return variablesSetNames;
     }

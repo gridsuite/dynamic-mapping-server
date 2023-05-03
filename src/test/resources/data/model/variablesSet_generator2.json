@@ -1,0 +1,15 @@
+{
+  "name": "Generator2",
+  "variableDefinitions": [
+    {
+      "name": "generator2_omegaPu",
+      "type": "DOUBLE",
+      "unit": "pu"
+    },
+    {
+      "name": "generator2_PGen",
+      "type": "DOUBLE",
+      "unit": "MW"
+    }
+  ]
+}

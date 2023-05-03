@@ -92,14 +92,6 @@ public class ModelController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
     }
 
-    @PostMapping(value = "/variables")
-    @Operation(summary = "Save new variable definitions")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "saved model")})
-    public ResponseEntity<List<ModelVariableDefinition>> saveNewVariables(@RequestBody List<ModelVariableDefinition> variableDefinitions) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewVariableDefinitions(variableDefinitions));
-    }
-
     @PostMapping(value = "/{modelName}/variables")
     @Operation(summary = "Add new variable definitions to model")
     @ApiResponses(value = {
@@ -130,14 +122,6 @@ public class ModelController {
             @ApiResponse(responseCode = "200", description = "saved model")})
     public ResponseEntity<Model> removeAllVariablesToModel(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllVariableDefinitionsOnModel(modelName));
-    }
-
-    @PostMapping(value = "/variables-sets")
-    @Operation(summary = "Save new variables set")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "saved variables set")})
-    public ResponseEntity<VariablesSet> saveNewVariablesSet(@RequestBody VariablesSet variablesSet) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewVariablesSet(variablesSet));
     }
 
     @PostMapping(value = "/variables-sets/{variableSetName}/variables")
@@ -196,18 +180,34 @@ public class ModelController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllExistingVariablesSetsFromModel(modelName));
     }
 
+    @PostMapping(value = "/variables")
+    @Operation(summary = "Save new variable definitions")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Saved variable definitions")})
+    public ResponseEntity<List<ModelVariableDefinition>> saveNewVariables(@RequestBody List<ModelVariableDefinition> variableDefinitions) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewVariableDefinitions(variableDefinitions));
+    }
+
     @DeleteMapping(value = "/variables")
     @Operation(summary = "Delete variables")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Delete variables")})
+            @ApiResponse(responseCode = "200", description = "Deleted variables")})
     public ResponseEntity<List<String>> deleteVariables(@RequestBody List<String> variableDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteVariableDefinitions(variableDefinitionNames));
+    }
+
+    @PostMapping(value = "/variables-sets")
+    @Operation(summary = "Save new variables set")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Saved variables set")})
+    public ResponseEntity<VariablesSet> saveNewVariablesSet(@RequestBody VariablesSet variablesSet) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewVariablesSet(variablesSet));
     }
 
     @DeleteMapping(value = "/variables-sets")
     @Operation(summary = "Delete variables set")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Delete variables set")})
+            @ApiResponse(responseCode = "200", description = "Deleted variables set")})
     public ResponseEntity<List<String>> deleteVariablesSets(@RequestBody List<String> variablesSetNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteVariablesSets(variablesSetNames));
     }
