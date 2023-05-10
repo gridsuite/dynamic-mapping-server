@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.automata;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,6 @@ import org.gridsuite.mapping.server.utils.PropertyType;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -25,18 +25,13 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class CurrentLimitAutomaton extends AbstractAutomaton {
+
+    @Schema(description = "Element watched by the automaton")
+    private String watchedElement;
     private String side;
 
-    public ArrayList<BasicProperty> convertToBasicProperties() {
-        ArrayList<BasicProperty> propertiesList = new ArrayList<>();
-        propertiesList.add(new BasicProperty("side", side));
-        return propertiesList;
-    }
-
     public CurrentLimitAutomaton(AutomatonEntity automatonEntity) {
-        this.setFamily(automatonEntity.getFamily());
-        this.setModel(automatonEntity.getModel());
-        this.setSetGroup(automatonEntity.getSetGroup());
+        super(automatonEntity);
         this.setWatchedElement(automatonEntity.getWatchedElement());
         // TODO Create generic function for all properties
         Optional<AutomatonPropertyEntity> foundSideProperty = automatonEntity.getProperties().stream().filter(property -> property.getName().equals("side")).findAny();
@@ -45,23 +40,32 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
         }
     }
 
+    @Override
+    public ArrayList<BasicProperty> convertToBasicProperties() {
+        ArrayList<BasicProperty> propertiesList = new ArrayList<>();
+        propertiesList.add(new BasicProperty("side", side));
+        return propertiesList;
+    }
+
+    @Override
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
-        UUID createdId = UUID.randomUUID();
-        AutomatonEntity convertedAutomaton = new AutomatonEntity();
-        convertedAutomaton.setAutomatonId(createdId);
-        convertedAutomaton.setFamily(this.getFamily());
-        convertedAutomaton.setModel(this.getModel());
-        convertedAutomaton.setSetGroup(this.getSetGroup());
+        AutomatonEntity convertedAutomaton = super.convertAutomatonToEntity(parentMapping);
+
+        // model properties
         convertedAutomaton.setWatchedElement(this.getWatchedElement());
-        convertedAutomaton.setMapping(parentMapping);
+
+        // additional properties
         ArrayList<AutomatonPropertyEntity> convertedProperties = new ArrayList<>();
+        convertedAutomaton.setProperties(convertedProperties);
+
+        // side property
         AutomatonPropertyEntity convertedProperty = new AutomatonPropertyEntity();
-        convertedProperty.setAutomatonId(createdId);
+        convertedProperty.setAutomatonId(convertedAutomaton.getAutomatonId());
         convertedProperty.setName("side");
         convertedProperty.setValue(this.getSide());
         convertedProperty.setType(PropertyType.STRING);
         convertedProperties.add(convertedProperty);
-        convertedAutomaton.setProperties(convertedProperties);
+
         return convertedAutomaton;
     }
 }

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
@@ -18,14 +19,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT")})
+    @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT"),
+    @JsonSubTypes.Type(value = TapChangerBlocking.class, name = "VOLTAGE"),
+})
 @Data
+@NoArgsConstructor
 public abstract class AbstractAutomaton {
     @Schema(description = "Automaton family")
     @JsonProperty
@@ -37,16 +43,31 @@ public abstract class AbstractAutomaton {
     @Schema(description = "Mapped Parameters Set Group ID")
     private String setGroup;
 
-    @Schema(description = "Element watched by the automaton")
-    private String watchedElement;
+    protected AbstractAutomaton(AutomatonEntity automatonEntity) {
+        this.setFamily(automatonEntity.getFamily());
+        this.setModel(automatonEntity.getModel());
+        this.setSetGroup(automatonEntity.getSetGroup());
+    }
 
-    public abstract ArrayList<BasicProperty> convertToBasicProperties();
+    public abstract List<BasicProperty> convertToBasicProperties();
 
-    public abstract AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping);
+    public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
+        UUID createdId = UUID.randomUUID();
+        AutomatonEntity convertedAutomaton = new AutomatonEntity();
+        convertedAutomaton.setAutomatonId(createdId);
+        convertedAutomaton.setFamily(this.getFamily());
+        convertedAutomaton.setModel(this.getModel());
+        convertedAutomaton.setSetGroup(this.getSetGroup());
+
+        convertedAutomaton.setMapping(parentMapping);
+        return convertedAutomaton;
+    }
 
     public static AbstractAutomaton instantiateFromEntity(AutomatonEntity automatonEntity) {
         if (automatonEntity.getFamily() == AutomatonFamily.CURRENT_LIMIT) {
             return new CurrentLimitAutomaton(automatonEntity);
+        } else if (automatonEntity.getFamily() == AutomatonFamily.VOLTAGE) {
+            return new TapChangerBlocking(automatonEntity);
         } else {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }

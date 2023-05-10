@@ -8,8 +8,10 @@ package org.gridsuite.mapping.server.model;
 
 import lombok.*;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
+import org.gridsuite.mapping.server.utils.StringListConverter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,8 +42,21 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "set_group", nullable = false)
     private String setGroup;
 
-    @Column(name = "watched_element", nullable = false)
+    // fields for CurrentLimitAutomaton model
+    @Column(name = "watched_element")
     private String watchedElement;
+
+    // fields for TapChangerBlocking model
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "u_measurement", columnDefinition = "CLOB")
+    @Convert(converter = StringListConverter.class)
+    private List<String> uMeasurements;
+
+    @Column(name = "transformer", columnDefinition = "CLOB")
+    @Convert(converter = StringListConverter.class)
+    private List<String> transformers;
 
     @OneToMany(targetEntity = AutomatonPropertyEntity.class, mappedBy = "automaton", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AutomatonPropertyEntity> properties;
@@ -63,6 +78,9 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.model = automatonToCopy.getModel();
         this.setGroup = automatonToCopy.getSetGroup();
         this.watchedElement = automatonToCopy.getWatchedElement();
+        this.name = automatonToCopy.getName();
+        this.uMeasurements = new ArrayList<>(automatonToCopy.getUMeasurements());
+        this.transformers = new ArrayList<>(automatonToCopy.getTransformers());
         this.properties = automatonToCopy.getProperties().stream().map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity)).collect(Collectors.toList());
 
     }

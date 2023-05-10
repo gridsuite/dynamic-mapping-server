@@ -83,11 +83,15 @@ public final class Templater {
             switch (automaton.getFamily()) {
                 case CURRENT_LIMIT:
                     familyModel = MappingConstants.CURRENT_LIMIT_MODEL_CLASS;
+                    break;
+                case VOLTAGE:
+                    familyModel = MappingConstants.VOLTAGE_MODEL_CLASS;
+                    break;
             }
             imports.add(MappingConstants.AUTOMATON_IMPORT);
             ST automatonScript = new ST(automatonTemplate);
             automatonScript.add("familyModel", familyModel);
-            automatonScript.add("watchedElement", automaton.getWatchedElement());
+            //automatonScript.add("watchedElement", automaton.getWatchedElement());
             automatonScript.add("automatonId", automatonIdProvider.getId(automaton));
             automatonScript.add("parameterSetId", automaton.getSetGroup());
             String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {

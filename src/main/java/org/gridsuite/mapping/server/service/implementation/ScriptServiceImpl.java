@@ -9,6 +9,8 @@ package org.gridsuite.mapping.server.service.implementation;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
+import org.gridsuite.mapping.server.dto.automata.CurrentLimitAutomaton;
+import org.gridsuite.mapping.server.dto.automata.TapChangerBlocking;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
@@ -332,7 +334,14 @@ public class ScriptServiceImpl implements ScriptService {
     private class AutomatonIdProviderImpl implements AutomatonIdProvider {
         @Override
         public String getId(AbstractAutomaton automaton) {
-            return String.format("%s_%s", automaton.getModel(), automaton.getWatchedElement());
+            String uniqueId = "";
+            if (automaton instanceof CurrentLimitAutomaton) {
+                uniqueId = ((CurrentLimitAutomaton) automaton).getWatchedElement();
+            } else if (automaton instanceof TapChangerBlocking) {
+                uniqueId = ((TapChangerBlocking) automaton).getName();
+            }
+
+            return String.format("%s_%s", automaton.getModel(), uniqueId);
         }
     }
 }
