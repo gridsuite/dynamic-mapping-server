@@ -185,7 +185,7 @@ public class NetworkControllerTest {
 
         String expectNetworkValuesJson = objectMapper.writeValueAsString(networkValues);
         LOGGER.info("expect network values = " + expectNetworkValuesJson);
-        LOGGER.info("result network values = " +  resultNetworkValuesJson);
+        LOGGER.info("result network values = " + resultNetworkValuesJson);
 
         assertEquals(objectMapper.readTree(expectNetworkValuesJson), objectMapper.readTree(resultNetworkValuesJson));
 
