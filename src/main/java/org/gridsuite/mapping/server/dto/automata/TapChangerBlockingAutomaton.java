@@ -17,6 +17,7 @@ import org.gridsuite.mapping.server.model.MappingEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -24,7 +25,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class TapChangerBlocking extends AbstractAutomaton {
+public class TapChangerBlockingAutomaton extends AbstractAutomaton {
 
     @Schema(description = "Name")
     private String name;
@@ -36,7 +37,7 @@ public class TapChangerBlocking extends AbstractAutomaton {
     @Schema(description = "Transformers ")
     private List<String> transformers;
 
-    public TapChangerBlocking(AutomatonEntity automatonEntity) {
+    public TapChangerBlockingAutomaton(AutomatonEntity automatonEntity) {
         super(automatonEntity);
         this.setName(automatonEntity.getName());
         this.setUMeasurements(new ArrayList<>(automatonEntity.getUMeasurements()));
@@ -46,6 +47,8 @@ public class TapChangerBlocking extends AbstractAutomaton {
     @Override
     public ArrayList<BasicProperty> convertToBasicProperties() {
         ArrayList<BasicProperty> propertiesList = new ArrayList<>();
+        propertiesList.add(new BasicProperty("uMeasurements", uMeasurements.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
+        propertiesList.add(new BasicProperty("transformers", transformers.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
         return propertiesList;
     }
 

@@ -27,7 +27,7 @@ import java.util.UUID;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT"),
-    @JsonSubTypes.Type(value = TapChangerBlocking.class, name = "VOLTAGE"),
+    @JsonSubTypes.Type(value = TapChangerBlockingAutomaton.class, name = "VOLTAGE"),
 })
 @Data
 @NoArgsConstructor
@@ -42,16 +42,12 @@ public abstract class AbstractAutomaton {
     @Schema(description = "Mapped Parameters Set Group ID")
     private String setGroup;
 
-    @Schema(description = "Element watched by the automaton")
-    private String watchedElement;
-
     public abstract List<BasicProperty> convertToBasicProperties();
 
     protected AbstractAutomaton(AutomatonEntity automatonEntity) {
         this.setFamily(automatonEntity.getFamily());
         this.setModel(automatonEntity.getModel());
         this.setSetGroup(automatonEntity.getSetGroup());
-        this.setWatchedElement(automatonEntity.getWatchedElement());
     }
 
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
@@ -61,7 +57,6 @@ public abstract class AbstractAutomaton {
         convertedAutomaton.setFamily(this.getFamily());
         convertedAutomaton.setModel(this.getModel());
         convertedAutomaton.setSetGroup(this.getSetGroup());
-        convertedAutomaton.setWatchedElement(this.getWatchedElement());
 
         convertedAutomaton.setMapping(parentMapping);
         return convertedAutomaton;
@@ -71,7 +66,7 @@ public abstract class AbstractAutomaton {
         if (automatonEntity.getFamily() == AutomatonFamily.CURRENT_LIMIT) {
             return new CurrentLimitAutomaton(automatonEntity);
         } else if (automatonEntity.getFamily() == AutomatonFamily.VOLTAGE) {
-            return new TapChangerBlocking(automatonEntity);
+            return new TapChangerBlockingAutomaton(automatonEntity);
         } else {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }

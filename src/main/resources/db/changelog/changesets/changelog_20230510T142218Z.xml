@@ -15,4 +15,7 @@
             <column name="u_measurement" type="CLOB"/>
         </addColumn>
     </changeSet>
+    <changeSet author="phamquy (generated)" id="1683728546058-1">
+        <dropNotNullConstraint columnDataType="varchar(255)" columnName="watched_element" tableName="automata"/>
+    </changeSet>
 </databaseChangeLog>

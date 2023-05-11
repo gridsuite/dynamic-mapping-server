@@ -35,5 +35,5 @@ public final class MappingConstants {
     public static final String LOAD_TYPE_PROPERTY = "loadType";
 
     public static final String CURRENT_LIMIT_MODEL_CLASS = "CurrentLimitAutomaton";
-    public static final String VOLTAGE_MODEL_CLASS = "TapChangerBlocking";
+    public static final String VOLTAGE_MODEL_CLASS = "TapChangerBlockingAutomaton";
 }

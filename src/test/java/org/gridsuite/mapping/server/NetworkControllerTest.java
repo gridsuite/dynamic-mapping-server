@@ -6,11 +6,13 @@
  */
 package org.gridsuite.mapping.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.PowsyblException;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.test.NetworkTest1Factory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
+import org.gridsuite.mapping.server.dto.NetworkValues;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
@@ -18,6 +20,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +36,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
 
@@ -62,8 +67,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {MappingApplication.class})
 public class NetworkControllerTest {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkControllerTest.class);
+
+    public static final String RESOURCE_PATH_DELIMETER = "/";
+    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMETER + "data";
+
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private NetworkRepository networkRepository;
@@ -159,54 +172,22 @@ public class NetworkControllerTest {
         Network testNetwork = NetworkTest1Factory.create();
         Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
 
-        String expectedResult = "{\n" +
-                "\"networkId\": \"" + networkUUID + "\",\n" +
-                "\"propertyValues\": [\n" +
-                "  {\n" +
-                "    \"type\": \"GENERATOR\",\n" +
-                "    \"values\": {\n" +
-                "      \"terminal.voltageLevel.nominalV\": [\n" +
-                "        \"400.0\"\n" +
-                "      ],\n" +
-                "      \"terminal.voltageLevel.substation.country.name\": [\n" +
-                "        \"FRANCE\"\n" +
-                "      ],\n" +
-                "      \"id\": [\n" +
-                "        \"generator1\"\n" +
-
-                "      ],\n" +
-                "      \"energySource\": [\n" +
-                "        \"NUCLEAR\"\n" +
-                "      ],\n" +
-                "      \"voltageRegulatorOn\": [\n" +
-                "        \"true\"\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  },\n" +
-                "  {\n" +
-                "    \"type\": \"LOAD\",\n" +
-                "    \"values\": {\n" +
-                "      \"loadType\": [\n" +
-                "        \"UNDEFINED\"\n" +
-                "      ],\n" +
-                "      \"terminal.voltageLevel.nominalV\": [\n" +
-                "        \"400.0\"\n" +
-                "      ],\n" +
-                "      \"terminal.voltageLevel.substation.country.name\": [\n" +
-                "        \"FRANCE\"\n" +
-                "      ],\n" +
-                "      \"id\": [\n" +
-                "        \"load1\"\n" +
-                "      ]\n" +
-                "    }\n" +
-                "  }\n" +
-                "]\n" +
-                "}";
-
-        mvc.perform(MockMvcRequestBuilders.get("/network/" + networkUUID + "/values")
+        MvcResult mvcResult = mvc.perform(get("/network/" + networkUUID + "/values")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(expectedResult, true));
+                .andReturn();
+
+        String resultNetworkValuesJson = mvcResult.getResponse().getContentAsString();
+
+        String networkValuesJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "network/networkValues.json").readAllBytes());
+        NetworkValues networkValues = objectMapper.readValue(networkValuesJson, NetworkValues.class);
+        networkValues.setNetworkId(networkUUID);
+
+        String expectNetworkValuesJson = objectMapper.writeValueAsString(networkValues);
+        LOGGER.info("expect network values = " + expectNetworkValuesJson);
+        LOGGER.info("result network values = " +  resultNetworkValuesJson);
+
+        assertEquals(objectMapper.readTree(expectNetworkValuesJson), objectMapper.readTree(resultNetworkValuesJson));
 
         Mockito.verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
 

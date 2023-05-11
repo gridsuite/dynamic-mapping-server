@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.automata;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,10 +25,16 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class CurrentLimitAutomaton extends AbstractAutomaton {
+
+    @Schema(description = "Element watched by the automaton")
+    private String watchedElement;
+
     private String side;
 
     public CurrentLimitAutomaton(AutomatonEntity automatonEntity) {
         super(automatonEntity);
+
+        this.setWatchedElement(automatonEntity.getWatchedElement());
 
         // TODO Create generic function for all properties
         Optional<AutomatonPropertyEntity> foundSideProperty = automatonEntity.getProperties().stream().filter(property -> property.getName().equals("side")).findAny();
@@ -39,13 +46,17 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     @Override
     public ArrayList<BasicProperty> convertToBasicProperties() {
         ArrayList<BasicProperty> propertiesList = new ArrayList<>();
+        propertiesList.add(new BasicProperty("staticId", "\"" + watchedElement + "\""));
         propertiesList.add(new BasicProperty("side", side));
+
         return propertiesList;
     }
 
     @Override
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
         AutomatonEntity convertedAutomaton = super.convertAutomatonToEntity(parentMapping);
+
+        convertedAutomaton.setWatchedElement(this.getWatchedElement());
 
         // additional properties
         ArrayList<AutomatonPropertyEntity> convertedProperties = new ArrayList<>();

@@ -42,8 +42,10 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "set_group", nullable = false)
     private String setGroup;
 
-    @Column(name = "watched_element", nullable = false)
+    // begin fields for CurrentLimit model
+    @Column(name = "watched_element")
     private String watchedElement;
+    // end fields for CurrentLimit model
 
     // begin fields for TapChangerBlocking model
     @Column(name = "name")
@@ -79,8 +81,8 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.setGroup = automatonToCopy.getSetGroup();
         this.watchedElement = automatonToCopy.getWatchedElement();
         this.name = automatonToCopy.getName();
-        this.uMeasurements = new ArrayList<>(automatonToCopy.getUMeasurements());
-        this.transformers = new ArrayList<>(automatonToCopy.getTransformers());
+        this.uMeasurements = automatonToCopy.getUMeasurements() != null ? new ArrayList<>(automatonToCopy.getUMeasurements()) : null;
+        this.transformers = automatonToCopy.getTransformers() != null ? new ArrayList<>(automatonToCopy.getTransformers()) : null;
         this.properties = automatonToCopy.getProperties().stream().map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity)).collect(Collectors.toList());
 
     }
