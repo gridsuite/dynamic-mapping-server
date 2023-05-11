@@ -11,12 +11,12 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 
     @Override
     public String convertToDatabaseColumn(List<String> attribute) {
-        return Methods.convertListToString(attribute == null ? List.of() : attribute);
+        return attribute != null ? Methods.convertListToString(attribute) : null;
     }
 
     @Override
     public List<String> convertToEntityAttribute(String dbData) {
-        return Methods.convertStringToList(StringUtils.isBlank(dbData) ? "" : dbData);
+        return !StringUtils.isBlank(dbData) ? Methods.convertStringToList(dbData) : null;
     }
 }
 

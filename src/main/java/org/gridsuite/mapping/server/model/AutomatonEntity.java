@@ -42,11 +42,10 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "set_group", nullable = false)
     private String setGroup;
 
-    // fields for CurrentLimitAutomaton model
-    @Column(name = "watched_element")
+    @Column(name = "watched_element", nullable = false)
     private String watchedElement;
 
-    // fields for TapChangerBlocking model
+    // begin fields for TapChangerBlocking model
     @Column(name = "name")
     private String name;
 
@@ -57,6 +56,7 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "transformer", columnDefinition = "CLOB")
     @Convert(converter = StringListConverter.class)
     private List<String> transformers;
+    // end fields for TapChangerBlocking model
 
     @OneToMany(targetEntity = AutomatonPropertyEntity.class, mappedBy = "automaton", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AutomatonPropertyEntity> properties;

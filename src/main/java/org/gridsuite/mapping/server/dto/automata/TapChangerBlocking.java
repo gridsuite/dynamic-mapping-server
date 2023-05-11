@@ -29,11 +29,11 @@ public class TapChangerBlocking extends AbstractAutomaton {
     @Schema(description = "Name")
     private String name;
 
-    @Schema(description = "U Measurement by the automaton")
+    @Schema(description = "U Measurement")
     @JsonProperty("uMeasurements")
     private List<String> uMeasurements;
 
-    @Schema(description = "Transformers by the automaton")
+    @Schema(description = "Transformers ")
     private List<String> transformers;
 
     public TapChangerBlocking(AutomatonEntity automatonEntity) {

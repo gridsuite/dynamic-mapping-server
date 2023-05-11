@@ -18,7 +18,6 @@ import org.gridsuite.mapping.server.utils.AutomatonFamily;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,13 +42,17 @@ public abstract class AbstractAutomaton {
     @Schema(description = "Mapped Parameters Set Group ID")
     private String setGroup;
 
+    @Schema(description = "Element watched by the automaton")
+    private String watchedElement;
+
+    public abstract List<BasicProperty> convertToBasicProperties();
+
     protected AbstractAutomaton(AutomatonEntity automatonEntity) {
         this.setFamily(automatonEntity.getFamily());
         this.setModel(automatonEntity.getModel());
         this.setSetGroup(automatonEntity.getSetGroup());
+        this.setWatchedElement(automatonEntity.getWatchedElement());
     }
-
-    public abstract List<BasicProperty> convertToBasicProperties();
 
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
         UUID createdId = UUID.randomUUID();
@@ -58,6 +61,7 @@ public abstract class AbstractAutomaton {
         convertedAutomaton.setFamily(this.getFamily());
         convertedAutomaton.setModel(this.getModel());
         convertedAutomaton.setSetGroup(this.getSetGroup());
+        convertedAutomaton.setWatchedElement(this.getWatchedElement());
 
         convertedAutomaton.setMapping(parentMapping);
         return convertedAutomaton;

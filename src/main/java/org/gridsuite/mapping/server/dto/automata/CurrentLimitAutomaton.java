@@ -25,14 +25,11 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class CurrentLimitAutomaton extends AbstractAutomaton {
-
-    @Schema(description = "Element watched by the automaton")
-    private String watchedElement;
     private String side;
 
     public CurrentLimitAutomaton(AutomatonEntity automatonEntity) {
         super(automatonEntity);
-        this.setWatchedElement(automatonEntity.getWatchedElement());
+
         // TODO Create generic function for all properties
         Optional<AutomatonPropertyEntity> foundSideProperty = automatonEntity.getProperties().stream().filter(property -> property.getName().equals("side")).findAny();
         if (foundSideProperty.isPresent()) {
@@ -50,9 +47,6 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     @Override
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
         AutomatonEntity convertedAutomaton = super.convertAutomatonToEntity(parentMapping);
-
-        // model properties
-        convertedAutomaton.setWatchedElement(this.getWatchedElement());
 
         // additional properties
         ArrayList<AutomatonPropertyEntity> convertedProperties = new ArrayList<>();
