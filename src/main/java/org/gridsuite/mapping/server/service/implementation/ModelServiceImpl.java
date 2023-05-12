@@ -31,6 +31,7 @@ public class ModelServiceImpl implements ModelService {
 
     public static final String MODEL_NOT_FOUND = "Model not found: ";
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
+
     private final ModelRepository modelRepository;
     private final ModelVariableRepository modelVariableRepository;
     private final ModelVariablesSetRepository modelVariablesSetRepository;
@@ -130,6 +131,7 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
+    // --- BEGIN variable-related service methods --- //
     @Override
     @Transactional
     public Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions) {
@@ -396,5 +398,7 @@ public class ModelServiceImpl implements ModelService {
         }
         return variablesSetNames;
     }
+    // --- END variable-related service methods --- //
+
 }
 

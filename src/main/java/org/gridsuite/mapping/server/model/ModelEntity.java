@@ -41,10 +41,10 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
-    @ManyToMany(fetch = FetchType.EAGER, targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
-    @ManyToMany(fetch = FetchType.EAGER, targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
 
     @Override

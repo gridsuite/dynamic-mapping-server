@@ -28,6 +28,7 @@ public interface ModelService {
 
     ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName);
 
+    // --- BEGIN variable-related service methods --- //
     Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions);
 
     Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames);
@@ -57,4 +58,5 @@ public interface ModelService {
     List<String> deleteVariableDefinitions(List<String> variableDefinitionNames);
 
     List<String> deleteVariablesSets(List<String> variablesSetNames);
+    // --- BEGIN variable-related service methods --- //
 }

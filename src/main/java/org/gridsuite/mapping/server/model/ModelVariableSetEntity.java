@@ -33,7 +33,7 @@ public class ModelVariableSetEntity implements Serializable {
     @Column(name = "variable_set_name")
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "variablesSet", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "variablesSet", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ModelVariableDefinitionEntity> variableDefinitions;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})

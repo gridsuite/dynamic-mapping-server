@@ -92,6 +92,7 @@ public class ModelController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
     }
 
+    // --- BEGIN variable-related endpoints --- //
     @PostMapping(value = "/{modelName}/variables")
     @Operation(summary = "Add new variable definitions to model")
     @ApiResponses(value = {
@@ -211,5 +212,6 @@ public class ModelController {
     public ResponseEntity<List<String>> deleteVariablesSets(@RequestBody List<String> variablesSetNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteVariablesSets(variablesSetNames));
     }
+    // --- END variable-related endpoints --- //
 
 }
