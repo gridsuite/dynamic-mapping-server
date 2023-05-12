@@ -152,6 +152,14 @@ public class ScriptControllerTest {
                 "      \"setGroup\": \"automaton_model\",\n" +
                 "      \"watchedElement\": \"element_id\",\n" +
                 "      \"side\": \"Branch.Side.ONE\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"family\": \"VOLTAGE\",\n" +
+                "      \"model\": \"automaton_model_2\",\n" +
+                "      \"setGroup\": \"automaton_group_2\",\n" +
+                "      \"name\": \"automaton_name\",\n" +
+                "      \"uMeasurements\": [\"bus_id_1\", \"bus_id_2\"],\n" +
+                "      \"transformers\": [\"load_id_1\", \"load_id_2\"]\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"controlledParameters\": false" +
@@ -166,7 +174,14 @@ public class ScriptControllerTest {
                 "     parameterSetId \\\"automaton_model\\\"\n" +
                 "     staticId \\\"element_id\\\"\n" +
                 "     side Branch.Side.ONE\n" +
-                "}\",\"current\": true, \"parametersFile\": null}";
+                "}\n\n" +
+                "TapChangerBlockingAutomaton {\n" +
+                "     dynamicModelId \\\"automaton_name\\\"\n" +
+                "     parameterSetId \\\"automaton_group_2\\\"\n" +
+                "     uMeasurements \\\"bus_id_1\\\", \\\"bus_id_2\\\"\n" +
+                "     transformers \\\"load_id_1\\\", \\\"load_id_2\\\"\n" +
+                "}" +
+                "\",\"current\": true, \"parametersFile\": null}";
     }
 
     @Test
