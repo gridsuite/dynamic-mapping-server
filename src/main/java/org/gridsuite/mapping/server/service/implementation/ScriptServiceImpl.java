@@ -334,12 +334,13 @@ public class ScriptServiceImpl implements ScriptService {
     private class AutomatonIdProviderImpl implements AutomatonIdProvider {
         @Override
         public String getId(AbstractAutomaton automaton) {
+            String id = automaton.getModel();
             if (automaton instanceof CurrentLimitAutomaton) {
-                return String.format("%s_%s", automaton.getModel(), ((CurrentLimitAutomaton) automaton).getWatchedElement());
+                id = String.format("%s_%s", automaton.getModel(), ((CurrentLimitAutomaton) automaton).getWatchedElement());
             } else if (automaton instanceof TapChangerBlockingAutomaton) {
-                return ((TapChangerBlockingAutomaton) automaton).getName();
+                id = ((TapChangerBlockingAutomaton) automaton).getName();
             }
-            return automaton.getModel();
+            return id;
         }
     }
 }
