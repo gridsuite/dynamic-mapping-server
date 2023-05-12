@@ -10,6 +10,7 @@ import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
+import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.repository.MappingRepository;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
 
@@ -133,9 +135,19 @@ public class MappingServiceImpl implements MappingService {
         Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingName);
         MappingEntity mapping = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name : " + mappingName));
 
+        // models used by rule
         List<RuleEntity> ruleEntities = mapping.getRules();
-        Set<String> mappedModelNames = ruleEntities.stream().map(RuleEntity::getMappedModel).collect(Collectors.toSet());
+        Set<String> ruleModelNames = ruleEntities.stream().map(RuleEntity::getMappedModel).collect(Collectors.toSet());
 
+        // model used by automaton
+        List<AutomatonEntity> automatonEntities = mapping.getAutomata();
+        Set<String> automatonModelNames = automatonEntities.stream().map(AutomatonEntity::getModel).collect(Collectors.toSet());
+
+        // concat models used by rule and models used by automaton
+        Set<String> mappedModelNames = Stream.concat(ruleModelNames.stream(), automatonModelNames.stream())
+                .collect(Collectors.toSet());
+
+        // get model by name from db and convert to dtos
         List<Model> mappedModels = mappedModelNames.stream()
                 .map(mappedModelName -> modelRepository.findById(mappedModelName)
                         .map(Model::new)
