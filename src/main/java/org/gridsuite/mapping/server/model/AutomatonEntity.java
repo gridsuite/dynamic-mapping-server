@@ -8,12 +8,12 @@ package org.gridsuite.mapping.server.model;
 
 import lombok.*;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
-import org.gridsuite.mapping.server.utils.StringListConverter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -42,24 +42,6 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "set_group", nullable = false)
     private String setGroup;
 
-    // begin fields for CurrentLimit model
-    @Column(name = "watched_element")
-    private String watchedElement;
-    // end fields for CurrentLimit model
-
-    // begin fields for TapChangerBlocking model
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "u_measurement", columnDefinition = "CLOB")
-    @Convert(converter = StringListConverter.class)
-    private List<String> uMeasurements;
-
-    @Column(name = "transformer", columnDefinition = "CLOB")
-    @Convert(converter = StringListConverter.class)
-    private List<String> transformers;
-    // end fields for TapChangerBlocking model
-
     @OneToMany(targetEntity = AutomatonPropertyEntity.class, mappedBy = "automaton", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AutomatonPropertyEntity> properties;
 
@@ -79,11 +61,31 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.family = automatonToCopy.getFamily();
         this.model = automatonToCopy.getModel();
         this.setGroup = automatonToCopy.getSetGroup();
-        this.watchedElement = automatonToCopy.getWatchedElement();
-        this.name = automatonToCopy.getName();
-        this.uMeasurements = automatonToCopy.getUMeasurements() != null ? new ArrayList<>(automatonToCopy.getUMeasurements()) : null;
-        this.transformers = automatonToCopy.getTransformers() != null ? new ArrayList<>(automatonToCopy.getTransformers()) : null;
         this.properties = automatonToCopy.getProperties().stream().map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity)).collect(Collectors.toList());
 
+    }
+
+    public String getProperty(String name) {
+        return properties.stream()
+                .filter(property -> property.getName().equals(name))
+                .map(AutomatonPropertyEntity::getValue)
+                .findAny()
+                .orElse(null);
+    }
+
+    public <T> T getProperty(String name, Function<String, T> converter) {
+        return properties.stream()
+                .filter(property -> property.getName().equals(name))
+                .map(AutomatonPropertyEntity::getValue)
+                .map(converter::apply)
+                .findAny()
+                .orElse(null);
+    }
+
+    public void addProperty(AutomatonPropertyEntity property) {
+        if (properties == null) {
+            properties = new ArrayList<>();
+        }
+        properties.add(property);
     }
 }

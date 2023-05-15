@@ -9,8 +9,6 @@ package org.gridsuite.mapping.server.service.implementation;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
-import org.gridsuite.mapping.server.dto.automata.CurrentLimitAutomaton;
-import org.gridsuite.mapping.server.dto.automata.TapChangerBlockingAutomaton;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
@@ -57,7 +55,7 @@ public class ScriptServiceImpl implements ScriptService {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get()));
-            String createdScript = Templater.mappingToScript(sortedMapping, new AutomatonIdProviderImpl());
+            String createdScript = Templater.mappingToScript(sortedMapping);
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
             String createdPar = null;
@@ -328,19 +326,6 @@ public class ScriptServiceImpl implements ScriptService {
         public InstantiatedModel(AutomatonEntity automaton) {
             this.model = automaton.getModel();
             this.setGroup = automaton.getSetGroup();
-        }
-    }
-
-    private class AutomatonIdProviderImpl implements AutomatonIdProvider {
-        @Override
-        public String getId(AbstractAutomaton automaton) {
-            String id = automaton.getModel();
-            if (automaton instanceof CurrentLimitAutomaton) {
-                id = String.format("%s_%s", automaton.getModel(), ((CurrentLimitAutomaton) automaton).getWatchedElement());
-            } else if (automaton instanceof TapChangerBlockingAutomaton) {
-                id = ((TapChangerBlockingAutomaton) automaton).getName();
-            }
-            return id;
         }
     }
 }

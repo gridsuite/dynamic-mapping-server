@@ -39,7 +39,7 @@ public final class Templater {
         return flattenedComposition[0];
     }
 
-    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping, AutomatonIdProvider automatonIdProvider) {
+    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping) {
         String scriptTemplate;
         String sortedRulesTemplate;
         String ruleTemplate;
@@ -91,7 +91,7 @@ public final class Templater {
             imports.add(MappingConstants.AUTOMATON_IMPORT);
             ST automatonScript = new ST(automatonTemplate);
             automatonScript.add("familyModel", familyModel);
-            automatonScript.add("automatonId", automatonIdProvider.getId(automaton));
+            automatonScript.add("automatonId", automaton.getId());
             automatonScript.add("parameterSetId", automaton.getSetGroup());
             String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);

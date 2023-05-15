@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.automata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -41,6 +42,9 @@ public abstract class AbstractAutomaton {
 
     @Schema(description = "Mapped Parameters Set Group ID")
     private String setGroup;
+
+    @JsonIgnore
+    public abstract String getId();
 
     public abstract List<BasicProperty> convertToBasicProperties();
 

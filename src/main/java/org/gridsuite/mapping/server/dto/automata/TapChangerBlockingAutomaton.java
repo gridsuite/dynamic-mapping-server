@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.AutomatonPropertyEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
+import org.gridsuite.mapping.server.utils.Methods;
+import org.gridsuite.mapping.server.utils.PropertyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,43 +29,57 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class TapChangerBlockingAutomaton extends AbstractAutomaton {
 
-    @Schema(description = "Name")
+    public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_U_MEASUREMENTS = "uMeasurements";
+    public static final String PROPERTY_TRANSFORMERS = "transformers";
+
+    @Schema(description = "Name property")
+    @JsonProperty(PROPERTY_NAME)
     private String name;
 
-    @Schema(description = "U Measurement")
-    @JsonProperty("uMeasurements")
+    @Schema(description = "U Measurement property")
+    @JsonProperty(PROPERTY_U_MEASUREMENTS)
     private List<String> uMeasurements;
 
-    @Schema(description = "Transformers ")
+    @Schema(description = "Transformers property")
+    @JsonProperty(PROPERTY_TRANSFORMERS)
     private List<String> transformers;
 
     public TapChangerBlockingAutomaton(AutomatonEntity automatonEntity) {
         super(automatonEntity);
-        this.setName(automatonEntity.getName());
-        this.setUMeasurements(new ArrayList<>(automatonEntity.getUMeasurements()));
-        this.setTransformers(new ArrayList<>(automatonEntity.getTransformers()));
+
+        name = automatonEntity.getProperty(PROPERTY_NAME);
+        uMeasurements = automatonEntity.getProperty(PROPERTY_U_MEASUREMENTS, Methods::convertStringToList);
+        transformers = automatonEntity.getProperty(PROPERTY_TRANSFORMERS, Methods::convertStringToList);
+    }
+
+    @Override
+    public String getId() {
+        return name;
     }
 
     @Override
     public ArrayList<BasicProperty> convertToBasicProperties() {
-        ArrayList<BasicProperty> propertiesList = new ArrayList<>();
-        propertiesList.add(new BasicProperty("uMeasurements", uMeasurements.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
-        propertiesList.add(new BasicProperty("transformers", transformers.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
-        return propertiesList;
+        ArrayList<BasicProperty> properties = new ArrayList<>();
+        properties.add(new BasicProperty(PROPERTY_U_MEASUREMENTS,
+                uMeasurements.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
+        properties.add(new BasicProperty(PROPERTY_TRANSFORMERS,
+                transformers.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
+        return properties;
     }
 
     @Override
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
         AutomatonEntity convertedAutomaton = super.convertAutomatonToEntity(parentMapping);
 
-        // model properties
-        convertedAutomaton.setName(this.getName());
-        convertedAutomaton.setUMeasurements(this.getUMeasurements());
-        convertedAutomaton.setTransformers(this.getTransformers());
+        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
+                PROPERTY_NAME, this.getName(), PropertyType.STRING, convertedAutomaton));
 
-        // additional properties
-        ArrayList<AutomatonPropertyEntity> convertedProperties = new ArrayList<>();
-        convertedAutomaton.setProperties(convertedProperties);
+        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
+                PROPERTY_U_MEASUREMENTS, Methods.convertListToString(this.getUMeasurements()), PropertyType.STRING, convertedAutomaton));
+
+        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
+                PROPERTY_TRANSFORMERS, Methods.convertListToString(this.getTransformers()), PropertyType.STRING, convertedAutomaton));
 
         return convertedAutomaton;
     }

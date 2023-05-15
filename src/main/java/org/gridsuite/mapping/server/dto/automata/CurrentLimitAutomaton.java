@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.automata;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,6 @@ import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.utils.PropertyType;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -26,49 +26,48 @@ import java.util.Optional;
 @NoArgsConstructor
 public class CurrentLimitAutomaton extends AbstractAutomaton {
 
+    public static final String PROPERTY_WATCHED_ELEMENT = "watchedElement";
+    public static final String PROPERTY_SIDE = "side";
+    public static final String PROPERTY_STATIC_ID = "staticId";
+
     @Schema(description = "Element watched by the automaton")
+    @JsonProperty(PROPERTY_WATCHED_ELEMENT)
     private String watchedElement;
 
+    @Schema(description = "Side of the automaton")
+    @JsonProperty(PROPERTY_SIDE)
     private String side;
 
     public CurrentLimitAutomaton(AutomatonEntity automatonEntity) {
         super(automatonEntity);
 
-        this.setWatchedElement(automatonEntity.getWatchedElement());
+        watchedElement = automatonEntity.getProperty(PROPERTY_WATCHED_ELEMENT);
+        side = automatonEntity.getProperty(PROPERTY_SIDE);
+    }
 
-        // TODO Create generic function for all properties
-        Optional<AutomatonPropertyEntity> foundSideProperty = automatonEntity.getProperties().stream().filter(property -> property.getName().equals("side")).findAny();
-        if (foundSideProperty.isPresent()) {
-            side = foundSideProperty.get().getValue();
-        }
+    @Override
+    public String getId() {
+        return String.format("%s_%s", this.getModel(), watchedElement);
     }
 
     @Override
     public ArrayList<BasicProperty> convertToBasicProperties() {
-        ArrayList<BasicProperty> propertiesList = new ArrayList<>();
-        propertiesList.add(new BasicProperty("staticId", "\"" + watchedElement + "\""));
-        propertiesList.add(new BasicProperty("side", side));
+        ArrayList<BasicProperty> properties = new ArrayList<>();
+        properties.add(new BasicProperty(PROPERTY_STATIC_ID, "\"" + watchedElement + "\""));
+        properties.add(new BasicProperty(PROPERTY_SIDE, side));
 
-        return propertiesList;
+        return properties;
     }
 
     @Override
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
         AutomatonEntity convertedAutomaton = super.convertAutomatonToEntity(parentMapping);
 
-        convertedAutomaton.setWatchedElement(this.getWatchedElement());
+        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
+                PROPERTY_WATCHED_ELEMENT, this.getWatchedElement(), PropertyType.STRING, convertedAutomaton));
 
-        // additional properties
-        ArrayList<AutomatonPropertyEntity> convertedProperties = new ArrayList<>();
-        convertedAutomaton.setProperties(convertedProperties);
-
-        // side property
-        AutomatonPropertyEntity convertedProperty = new AutomatonPropertyEntity();
-        convertedProperty.setAutomatonId(convertedAutomaton.getAutomatonId());
-        convertedProperty.setName("side");
-        convertedProperty.setValue(this.getSide());
-        convertedProperty.setType(PropertyType.STRING);
-        convertedProperties.add(convertedProperty);
+        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
+                PROPERTY_SIDE, this.getSide(), PropertyType.STRING, convertedAutomaton));
 
         return convertedAutomaton;
     }
