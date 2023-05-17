@@ -37,5 +37,36 @@
       "originName": "angle_pu"
     }
   ],
-  "setsGroups": []
+  "setsGroups": [],
+  "variableDefinitions": [
+    {
+      "name": "load_PPu",
+      "type": "DOUBLE",
+      "unit": "MW",
+      "factor": 100
+    },
+    {
+      "name": "load_PRefPu",
+      "type": "DOUBLE",
+      "unit": "MW",
+      "factor": 100
+    },
+    {
+      "name": "load_QPu",
+      "type": "DOUBLE",
+      "unit": "MW",
+      "factor": 100
+    },
+    {
+      "name": "load_QRefPu",
+      "type": "DOUBLE",
+      "unit": "MW",
+      "factor": 100
+    },
+    {
+      "name": "load_running_value",
+      "type": "BOOL"
+    }
+  ],
+  "variablesSets": []
 }
