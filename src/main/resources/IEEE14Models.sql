@@ -840,7 +840,7 @@ VALUES ('TapChangerBlocking', 'tapChangerBlocking_UMin', 2, NULL, 2),
 INSERT INTO model_sets_group (model_name, name, type)
 VALUES ('TapChangerBlocking', 'TCB', 0),
        ('TapChangerBlocking', 'TCB_2_4', 0),
-       ('TapChangerBlocking', 'TCB_2_5', 0),;
+       ('TapChangerBlocking', 'TCB_2_5', 0);
 
 INSERT INTO model_parameter_sets (group_name, group_type, model_name, name)
 VALUES ('TCB', 0, 'TapChangerBlocking', 'TCB'),
