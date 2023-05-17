@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import java.util.*;
 
-public abstract class PluggableTypeRegistrationModule<D, E> extends SimpleModule {
+public abstract class AbstractPluggableTypeRegistrationModule<D, E> extends SimpleModule {
 
-    protected PluggableTypeRegistrationModule(ObjectMapper objectMapper) {
+    protected AbstractPluggableTypeRegistrationModule(ObjectMapper objectMapper) {
         super();
         registerTypes(objectMapper);
     }
