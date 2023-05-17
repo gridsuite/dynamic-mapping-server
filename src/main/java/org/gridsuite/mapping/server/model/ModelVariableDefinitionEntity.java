@@ -10,12 +10,14 @@ package org.gridsuite.mapping.server.model;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
 import org.gridsuite.mapping.server.utils.VariableType;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
+
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -60,11 +62,13 @@ public class ModelVariableDefinitionEntity implements Serializable {
         this(variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(), variablesSet, null, null);
     }
 
-    @CreationTimestamp
+    @CreatedDate
+    @Temporal(TIMESTAMP)
     @Column(name = "created_date", updatable = false)
     private Date createdDate;
 
-    @UpdateTimestamp
+    @LastModifiedDate
+    @Temporal(TIMESTAMP)
     @Column(name = "updated_date")
     private Date updatedDate;
 
