@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -63,7 +64,7 @@ public class ScriptControllerTest {
         cleanDB();
 
         // Prepare models
-        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, null, null);
+        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, null, null, Set.of(), Set.of());
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
@@ -90,13 +91,13 @@ public class ScriptControllerTest {
         loadModel.setParameterDefinitions(definitions);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null);
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
         generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), null, SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
-        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null);
+        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorFourGroups = new ArrayList<>();
         generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", generatorFourModel.getModelName(), null, SetGroupType.PREFIX, generatorFourModel));
         generatorFourModel.setSetsGroups(generatorFourGroups);

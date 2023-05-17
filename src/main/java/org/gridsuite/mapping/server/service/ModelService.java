@@ -27,4 +27,36 @@ public interface ModelService {
     Model saveModel(Model model);
 
     ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName);
+
+    // --- BEGIN variable-related service methods --- //
+    Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions);
+
+    Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames);
+
+    Model removeExistingVariableDefinitionsFromModel(String modelName, List<String> variableDefinitionNames);
+
+    List<ModelVariableDefinition> saveNewVariableDefinitions(List<ModelVariableDefinition> variableDefinitions);
+
+    Model removeAllVariableDefinitionsOnModel(String modelName);
+
+    VariablesSet saveNewVariablesSet(VariablesSet variableSet);
+
+    VariablesSet addNewVariableDefinitionToVariablesSet(String variableSetName, List<ModelVariableDefinition> variableDefinitions);
+
+    VariablesSet removeExistingVariableDefinitionFromVariablesSet(String variableSetName, List<String> variableDefinitionNames);
+
+    VariablesSet removeAllVariableDefinitionOnVariablesSet(String variableSetName);
+
+    Model addNewVariablesSetsToModel(String modelName, List<VariablesSet> variableSets);
+
+    Model addExistingVariablesSetsToModel(String modelName, List<String> variablesSetNames);
+
+    Model removeExistingVariablesSetsFromModel(String modelName, List<String> variablesSetNames);
+
+    Model removeAllExistingVariablesSetsFromModel(String modelName);
+
+    List<String> deleteVariableDefinitions(List<String> variableDefinitionNames);
+
+    List<String> deleteVariablesSets(List<String> variablesSetNames);
+    // --- BEGIN variable-related service methods --- //
 }

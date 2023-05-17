@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="phamquy (generated)" id="1683122034984-1">
+        <createTable tableName="model_variable_definitions">
+            <column name="variable_definition_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_variable_definitionsPK"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="factor" type="FLOAT8"/>
+            <column name="type" type="INT"/>
+            <column name="unit" type="VARCHAR(255)"/>
+            <column name="updated_date" type="TIMESTAMP"/>
+            <column name="variable_set_name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-2">
+        <createTable tableName="model_variable_sets">
+            <column name="variable_set_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_variable_setsPK"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP"/>
+            <column name="updated_date" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-3">
+        <createTable tableName="models_model_variable_definitions">
+            <column name="variable_definition_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="model_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-4">
+        <createTable tableName="models_model_variable_sets">
+            <column name="variable_set_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="model_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-5">
+        <createIndex indexName="model_variable_definitions_variable_set_name_index" tableName="model_variable_definitions">
+            <column name="variable_set_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-6">
+        <addForeignKeyConstraint baseColumnNames="variable_definition_name" baseTableName="models_model_variable_definitions" constraintName="FK6g02cyln3imgb2p3fddypajlo" deferrable="false" initiallyDeferred="false" referencedColumnNames="variable_definition_name" referencedTableName="model_variable_definitions" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-7">
+        <addForeignKeyConstraint baseColumnNames="variable_set_name" baseTableName="models_model_variable_sets" constraintName="FKjvfj6xfa6dkcb6nmwai4mptj5" deferrable="false" initiallyDeferred="false" referencedColumnNames="variable_set_name" referencedTableName="model_variable_sets" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-8">
+        <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="models_model_variable_sets" constraintName="FKlrhrr57uws4p83vqu6rmqtgyf" deferrable="false" initiallyDeferred="false" referencedColumnNames="model_name" referencedTableName="models" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-9">
+        <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="models_model_variable_definitions" constraintName="FKpcsk322r85939sco8895x1apn" deferrable="false" initiallyDeferred="false" referencedColumnNames="model_name" referencedTableName="models" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1683122034984-10">
+        <addForeignKeyConstraint baseColumnNames="variable_set_name" baseTableName="model_variable_definitions" constraintName="variable_set_variable_definition_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="variable_set_name" referencedTableName="model_variable_sets" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

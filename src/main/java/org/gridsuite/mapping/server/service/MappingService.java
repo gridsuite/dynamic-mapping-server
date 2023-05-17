@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.service;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
+import org.gridsuite.mapping.server.dto.models.Model;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface MappingService {
     RenameObject renameMapping(String oldName, String newName);
 
     InputMapping copyMapping(String originalName, String copyName);
+
+    List<Model> getMappedModelsList(String mappingName);
 }

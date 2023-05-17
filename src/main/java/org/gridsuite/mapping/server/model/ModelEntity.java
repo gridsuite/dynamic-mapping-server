@@ -12,8 +12,7 @@ import org.gridsuite.mapping.server.utils.EquipmentType;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +41,12 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
+    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
+
+    @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
+
     @Override
     public String getId() {
         return modelName;
@@ -50,8 +55,31 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
-        parameterDefinitions = modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList());
-        setsGroups = modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList());
+        parameterDefinitions = modelToConvert.getParameterDefinitions() != null ? modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList()) : null;
+        setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
+        variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(this, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
+        variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(this, variablesSet)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
+    }
+
+    // --- utils methods --- //
+    public void addVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+        variableDefinitions.forEach(variableDefinition -> variableDefinition.getModels().add(this));
+        this.variableDefinitions.addAll(variableDefinitions);
+    }
+
+    public void removeVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+        variableDefinitions.forEach(variableDefinition -> variableDefinition.getModels().remove(this));
+        this.variableDefinitions.removeAll(variableDefinitions);
+    }
+
+    public void addVariablesSets(Collection<ModelVariableSetEntity> variablesSets) {
+        variablesSets.forEach(variablesSet -> variablesSet.getModels().add(this));
+        this.variableSets.addAll(variablesSets);
+    }
+
+    public void removeVariablesSets(Collection<ModelVariableSetEntity> variablesSets) {
+        variablesSets.forEach(variablesSet -> variablesSet.getModels().remove(this));
+        this.variableSets.removeAll(variablesSets);
     }
 
 }
