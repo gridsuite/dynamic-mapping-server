@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.gridsuite.mapping.server.plugins.automaton.AutomatonPluggableTypesProvider;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
@@ -28,7 +29,6 @@ import java.util.UUID;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT"),
-    @JsonSubTypes.Type(value = TapChangerBlockingAutomaton.class, name = "VOLTAGE"),
 })
 @Data
 @NoArgsConstructor
@@ -69,10 +69,12 @@ public abstract class AbstractAutomaton {
     public static AbstractAutomaton instantiateFromEntity(AutomatonEntity automatonEntity) {
         if (automatonEntity.getFamily() == AutomatonFamily.CURRENT_LIMIT) {
             return new CurrentLimitAutomaton(automatonEntity);
-        } else if (automatonEntity.getFamily() == AutomatonFamily.VOLTAGE) {
-            return new TapChangerBlockingAutomaton(automatonEntity);
         } else {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+            try {
+                return (new AutomatonPluggableTypesProvider()).fromEntity(automatonEntity);
+            } catch (Exception e) {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+            }
         }
     }
 }
