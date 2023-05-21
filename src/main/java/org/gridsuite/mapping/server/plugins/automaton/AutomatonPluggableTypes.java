@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-public class AutomatonPluggableTypes {
+public final class AutomatonPluggableTypes {
     // declare all automaton pluggable types through this map
     public static final Map<String, Class<?>> TYPES = Map.of(
             "VOLTAGE", TapChangerBlockingAutomaton.class
