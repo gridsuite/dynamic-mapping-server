@@ -79,15 +79,7 @@ public final class Templater {
 
         // Automata
         String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
-            String familyModel = "";
-            switch (automaton.getFamily()) {
-                case CURRENT_LIMIT:
-                    familyModel = MappingConstants.CURRENT_LIMIT_MODEL_CLASS;
-                    break;
-                case VOLTAGE:
-                    familyModel = MappingConstants.VOLTAGE_MODEL_CLASS;
-                    break;
-            }
+            String familyModel = automaton.getExportedClassName();
             imports.add(MappingConstants.AUTOMATON_IMPORT);
             ST automatonScript = new ST(automatonTemplate);
             automatonScript.add("familyModel", familyModel);

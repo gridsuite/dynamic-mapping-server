@@ -26,6 +26,8 @@ import java.util.ArrayList;
 @NoArgsConstructor
 public class CurrentLimitAutomaton extends AbstractAutomaton {
 
+    public static final String MODEL_CLASS = "CurrentLimitAutomaton";
+
     public static final String PROPERTY_WATCHED_ELEMENT = "watchedElement";
     public static final String PROPERTY_SIDE = "side";
     public static final String PROPERTY_STATIC_ID = "staticId";
@@ -51,6 +53,11 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     }
 
     @Override
+    public String getExportedClassName() {
+        return MODEL_CLASS;
+    }
+
+    @Override
     public ArrayList<BasicProperty> convertToBasicProperties() {
         ArrayList<BasicProperty> properties = new ArrayList<>();
         properties.add(new BasicProperty(PROPERTY_STATIC_ID, "\"" + watchedElement + "\""));
@@ -60,8 +67,8 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
-        AutomatonEntity convertedAutomaton = super.convertAutomatonToEntity(parentMapping);
+    public AutomatonEntity toEntity(MappingEntity parentMappingEntity) {
+        AutomatonEntity convertedAutomaton = super.toEntity(parentMappingEntity);
 
         convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
                 PROPERTY_WATCHED_ELEMENT, this.getWatchedElement(), PropertyType.STRING, convertedAutomaton));

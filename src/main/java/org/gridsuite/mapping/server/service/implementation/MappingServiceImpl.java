@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
+import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonPluggableTypesPlugin;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
@@ -37,21 +38,24 @@ public class MappingServiceImpl implements MappingService {
 
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
+    private final AutomatonPluggableTypesPlugin automatonPluggableTypesPlugin;
 
     @Autowired
     public MappingServiceImpl(
             MappingRepository mappingRepository,
-            ModelRepository modelRepository
+            ModelRepository modelRepository,
+            AutomatonPluggableTypesPlugin automatonPluggableTypesPlugin
     ) {
         this.modelRepository = modelRepository;
         this.mappingRepository = mappingRepository;
+        this.automatonPluggableTypesPlugin = automatonPluggableTypesPlugin;
     }
 
     @Override
     public List<InputMapping> getMappingList() {
         List<MappingEntity> mappingEntities = mappingRepository.findAll();
 
-        return mappingEntities.stream().map(InputMapping::new).collect(Collectors.toList());
+        return mappingEntities.stream().map(entity -> new InputMapping(entity, automatonPluggableTypesPlugin)).collect(Collectors.toList());
     }
 
     @Override
@@ -121,7 +125,7 @@ public class MappingServiceImpl implements MappingService {
             MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy.get());
             try {
                 mappingRepository.save(copiedMapping);
-                return new InputMapping(copiedMapping);
+                return new InputMapping(copiedMapping, automatonPluggableTypesPlugin);
             } catch (DataIntegrityViolationException ex) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
             }

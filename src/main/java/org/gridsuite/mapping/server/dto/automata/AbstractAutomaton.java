@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.plugins.automaton.AutomatonPluggableTypesProvider;
+import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonPluggableTypesPlugin;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
@@ -46,6 +46,9 @@ public abstract class AbstractAutomaton {
     @JsonIgnore
     public abstract String getId();
 
+    @JsonIgnore
+    public abstract String getExportedClassName();
+
     public abstract List<BasicProperty> convertToBasicProperties();
 
     protected AbstractAutomaton(AutomatonEntity automatonEntity) {
@@ -54,7 +57,7 @@ public abstract class AbstractAutomaton {
         this.setSetGroup(automatonEntity.getSetGroup());
     }
 
-    public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
+    public AutomatonEntity toEntity(MappingEntity parentMappingEntity) {
         UUID createdId = UUID.randomUUID();
         AutomatonEntity convertedAutomaton = new AutomatonEntity();
         convertedAutomaton.setAutomatonId(createdId);
@@ -62,16 +65,17 @@ public abstract class AbstractAutomaton {
         convertedAutomaton.setModel(this.getModel());
         convertedAutomaton.setSetGroup(this.getSetGroup());
 
-        convertedAutomaton.setMapping(parentMapping);
+        convertedAutomaton.setMapping(parentMappingEntity);
         return convertedAutomaton;
     }
 
-    public static AbstractAutomaton instantiateFromEntity(AutomatonEntity automatonEntity) {
+    public static AbstractAutomaton fromEntity(AutomatonEntity automatonEntity, AutomatonPluggableTypesPlugin automatonPluggableTypesPlugin) {
         if (automatonEntity.getFamily() == AutomatonFamily.CURRENT_LIMIT) {
             return new CurrentLimitAutomaton(automatonEntity);
         } else {
             try {
-                return (new AutomatonPluggableTypesProvider()).fromEntity(automatonEntity);
+                return automatonPluggableTypesPlugin
+                        .fromEntity(automatonEntity);
             } catch (Exception e) {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
             }

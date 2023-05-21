@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package org.gridsuite.mapping.server.common.plugins;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,14 +12,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import java.util.*;
 
-public abstract class AbstractPluggableTypeRegistrationModule<D, E> extends SimpleModule {
+/**
+ * @author Thang PHAM <quyet-thang.pham at rte-france.com>
+ */
+public abstract class AbstractPluggableTypesPlugin<D, E> extends SimpleModule implements PluggableTypesPlugin<D, E> {
 
-    protected AbstractPluggableTypeRegistrationModule(ObjectMapper objectMapper) {
+    protected AbstractPluggableTypesPlugin(ObjectMapper objectMapper) {
         super();
         registerTypes(objectMapper);
     }
-
-    public abstract PluggableTypesProvider<D, E> getPluggableTypesProvider();
 
     private void registerTypes(ObjectMapper objectMapper) {
 
@@ -21,9 +28,7 @@ public abstract class AbstractPluggableTypeRegistrationModule<D, E> extends Simp
         List<NamedType> pluggableTypes = new ArrayList<>();
 
         // Add the additional subtype
-        getPluggableTypesProvider()
-                .getPluggableTypes()
-                .forEach((k, v) -> pluggableTypes.add(new NamedType(v, k)));
+        getPluggableTypes().forEach((k, v) -> pluggableTypes.add(new NamedType(v, k)));
 
         // Register the merged subtypes with the ObjectMapper
         objectMapper

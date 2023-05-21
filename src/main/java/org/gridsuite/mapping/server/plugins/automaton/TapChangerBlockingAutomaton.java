@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class TapChangerBlockingAutomaton extends AbstractAutomaton {
 
+    public static final String MODEL_CLASS = "TapChangerBlockingAutomaton";
+
     public static final String PROPERTY_NAME = "name";
     public static final String PROPERTY_U_MEASUREMENTS = "uMeasurements";
     public static final String PROPERTY_TRANSFORMERS = "transformers";
@@ -61,6 +63,11 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
     }
 
     @Override
+    public String getExportedClassName() {
+        return MODEL_CLASS;
+    }
+
+    @Override
     public ArrayList<BasicProperty> convertToBasicProperties() {
         ArrayList<BasicProperty> properties = new ArrayList<>();
         properties.add(new BasicProperty(PROPERTY_U_MEASUREMENTS,
@@ -71,8 +78,8 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
-        AutomatonEntity convertedAutomaton = super.convertAutomatonToEntity(parentMapping);
+    public AutomatonEntity toEntity(MappingEntity parentMappingEntity) {
+        AutomatonEntity convertedAutomaton = super.toEntity(parentMappingEntity);
 
         convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
                 PROPERTY_NAME, this.getName(), PropertyType.STRING, convertedAutomaton));
