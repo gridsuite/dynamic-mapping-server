@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonPluggableTypesPlugin;
+import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
@@ -27,9 +27,7 @@ import java.util.UUID;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT"),
-})
+@JsonSubTypes({ })
 @Data
 @NoArgsConstructor
 public abstract class AbstractAutomaton {
@@ -44,7 +42,7 @@ public abstract class AbstractAutomaton {
     private String setGroup;
 
     @JsonIgnore
-    public abstract String getId();
+    public abstract String getExportedId();
 
     @JsonIgnore
     public abstract String getExportedClassName();
@@ -69,16 +67,11 @@ public abstract class AbstractAutomaton {
         return convertedAutomaton;
     }
 
-    public static AbstractAutomaton fromEntity(AutomatonEntity automatonEntity, AutomatonPluggableTypesPlugin automatonPluggableTypesPlugin) {
-        if (automatonEntity.getFamily() == AutomatonFamily.CURRENT_LIMIT) {
-            return new CurrentLimitAutomaton(automatonEntity);
-        } else {
-            try {
-                return automatonPluggableTypesPlugin
-                        .fromEntity(automatonEntity);
-            } catch (Exception e) {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-            }
+    public static AbstractAutomaton fromEntity(AutomatonEntity automatonEntity, AutomatonSubtypesRegister automatonSubtypesRegister) {
+        try {
+            return automatonSubtypesRegister.fromEntity(automatonEntity);
+        } catch (Exception e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }

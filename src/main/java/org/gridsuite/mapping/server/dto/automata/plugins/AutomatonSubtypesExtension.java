@@ -6,12 +6,8 @@
  */
 package org.gridsuite.mapping.server.dto.automata.plugins;
 
-import org.gridsuite.mapping.server.common.plugins.PluggableTypesPlugin;
-import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
-import org.gridsuite.mapping.server.model.AutomatonEntity;
-
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-public interface AutomatonPluggableTypesPlugin extends PluggableTypesPlugin<AbstractAutomaton, AutomatonEntity> {
+public interface AutomatonSubtypesExtension {
 }

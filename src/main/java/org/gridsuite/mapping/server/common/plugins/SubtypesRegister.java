@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-public interface PluggableTypesPlugin<D, E> {
-    Map<String, Class<?>> getPluggableTypes();
+public interface SubtypesRegister<D, E> {
+    Map<String, Class<?>> getSubtypes();
 
     D fromEntity(E entity) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException;
 }

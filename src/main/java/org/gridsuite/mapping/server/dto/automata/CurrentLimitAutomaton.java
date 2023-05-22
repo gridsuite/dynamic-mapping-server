@@ -48,7 +48,7 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public String getId() {
+    public String getExportedId() {
         return String.format("%s_%s", this.getModel(), watchedElement);
     }
 

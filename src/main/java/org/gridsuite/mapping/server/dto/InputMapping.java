@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonPluggableTypesPlugin;
+import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.model.MappingEntity;
 
 import java.util.List;
@@ -46,10 +46,10 @@ public class InputMapping implements Mapping {
         return convertedMapping;
     }
 
-    public InputMapping(MappingEntity mappingEntity, AutomatonPluggableTypesPlugin automatonPluggableTypesPlugin) {
+    public InputMapping(MappingEntity mappingEntity, AutomatonSubtypesRegister automatonSubtypesRegister) {
         name = mappingEntity.getName();
         controlledParameters = mappingEntity.isControlledParameters();
         rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
-        automata = mappingEntity.getAutomata().stream().map(automatonEntity -> AbstractAutomaton.fromEntity(automatonEntity, automatonPluggableTypesPlugin)).collect(Collectors.toList());
+        automata = mappingEntity.getAutomata().stream().map(automatonEntity -> AbstractAutomaton.fromEntity(automatonEntity, automatonSubtypesRegister)).collect(Collectors.toList());
     }
 }

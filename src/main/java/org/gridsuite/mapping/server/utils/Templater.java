@@ -83,7 +83,7 @@ public final class Templater {
             imports.add(MappingConstants.AUTOMATON_IMPORT);
             ST automatonScript = new ST(automatonTemplate);
             automatonScript.add("familyModel", familyModel);
-            automatonScript.add("automatonId", automaton.getId());
+            automatonScript.add("automatonId", automaton.getExportedId());
             automatonScript.add("parameterSetId", automaton.getSetGroup());
             String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);

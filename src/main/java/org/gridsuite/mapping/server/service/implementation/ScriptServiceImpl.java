@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server.service.implementation;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonPluggableTypesPlugin;
+import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
@@ -38,18 +38,18 @@ public class ScriptServiceImpl implements ScriptService {
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
     private final ScriptRepository scriptRepository;
-    private final AutomatonPluggableTypesPlugin automatonPluggableTypesPlugin;
+    private final AutomatonSubtypesRegister automatonSubtypesRegister;
 
     public ScriptServiceImpl(
             MappingRepository mappingRepository,
             ScriptRepository scriptRepository,
             ModelRepository modelRepository,
-            AutomatonPluggableTypesPlugin automatonPluggableTypesPlugin
+            AutomatonSubtypesRegister automatonSubtypesRegister
     ) {
         this.modelRepository = modelRepository;
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
-        this.automatonPluggableTypesPlugin = automatonPluggableTypesPlugin;
+        this.automatonSubtypesRegister = automatonSubtypesRegister;
     }
 
     String noModelFoundErrorMessage = "No model found with this name";
@@ -58,7 +58,7 @@ public class ScriptServiceImpl implements ScriptService {
     public Script createFromMapping(String mappingName, boolean isPersistent) {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
-            SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get(), automatonPluggableTypesPlugin));
+            SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get(), automatonSubtypesRegister));
             String createdScript = Templater.mappingToScript(sortedMapping);
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
