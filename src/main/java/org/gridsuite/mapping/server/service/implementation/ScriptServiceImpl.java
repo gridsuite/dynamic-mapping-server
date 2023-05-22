@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server.service.implementation;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.*;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesRegister;
+import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;

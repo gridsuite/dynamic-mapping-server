@@ -8,7 +8,7 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesRegister;
+import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.AutomatonEntity;

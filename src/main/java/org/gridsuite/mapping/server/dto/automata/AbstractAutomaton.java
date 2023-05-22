@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesRegister;
+import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;

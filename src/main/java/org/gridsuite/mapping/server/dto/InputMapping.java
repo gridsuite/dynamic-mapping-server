@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesRegister;
+import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.model.MappingEntity;
 
 import java.util.List;

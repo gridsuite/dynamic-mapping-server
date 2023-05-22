@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package org.gridsuite.mapping.server.dto.automata.plugins;
+package org.gridsuite.mapping.server.dto.automata.extensions;
 
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 

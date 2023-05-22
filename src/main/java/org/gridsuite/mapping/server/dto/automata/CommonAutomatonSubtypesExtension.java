@@ -7,8 +7,8 @@
 package org.gridsuite.mapping.server.dto.automata;
 
 import com.google.auto.service.AutoService;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypes;
-import org.gridsuite.mapping.server.dto.automata.plugins.AutomatonSubtypesExtension;
+import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypes;
+import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesExtension;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>

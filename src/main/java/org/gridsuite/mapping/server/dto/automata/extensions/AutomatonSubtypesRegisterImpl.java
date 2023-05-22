@@ -4,11 +4,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.gridsuite.mapping.server.dto.automata.plugins;
+package org.gridsuite.mapping.server.dto.automata.extensions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import org.gridsuite.mapping.server.common.plugins.AbstractSubtypesRegister;
+import org.gridsuite.mapping.server.common.extensions.AbstractSubtypesRegister;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.springframework.beans.factory.annotation.Autowired;
