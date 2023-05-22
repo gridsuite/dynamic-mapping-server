@@ -12,5 +12,9 @@ package org.gridsuite.mapping.server.utils;
 public enum EquipmentType {
     GENERATOR,
     LOAD,
-    CURRENT_LIMIT
+    CURRENT_LIMIT,
+    VOLTAGE,
+    BUS,
+    LINE,
+    TWO_WINDINGS_TRANSFORMER,
 }

@@ -33,6 +33,9 @@ public final class Methods {
     }
 
     public static String convertListToString(List<String> array) {
+        if (array == null) {
+            return null;
+        }
         return array.stream().map(value -> value.replace(",", ESCAPED_COMMA)).collect(Collectors.joining(", "));
     }
 

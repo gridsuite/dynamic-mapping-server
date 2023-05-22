@@ -34,5 +34,4 @@ public final class MappingConstants {
     // Loads
     public static final String LOAD_TYPE_PROPERTY = "loadType";
 
-    public static final String CURRENT_LIMIT_MODEL_CLASS = "CurrentLimitAutomaton";
 }
