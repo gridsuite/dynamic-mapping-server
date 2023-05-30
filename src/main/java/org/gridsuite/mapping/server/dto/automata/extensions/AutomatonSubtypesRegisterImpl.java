@@ -115,14 +115,10 @@ public class AutomatonSubtypesRegisterImpl
     public AutomatonEntity toEntity(AbstractAutomaton dto) throws IllegalAccessException {
         UUID createdId = UUID.randomUUID();
         AutomatonEntity automatonEntity = new AutomatonEntity();
+        automatonEntity.setAutomatonId(createdId);
+        Class<?> dtoClass = dto.getClass();
 
         // enrich non-meta attributes
-        automatonEntity.setAutomatonId(createdId);
-        automatonEntity.setFamily(dto.getFamily());
-        automatonEntity.setModel(dto.getModel());
-        automatonEntity.setSetGroup(dto.getSetGroup());
-
-        Class<?> dtoClass = dto.getClass();
         List<Field> entityPropertyFields = FieldUtils.getFieldsListWithAnnotation(dtoClass, EntityProperty.class);
         List<Field> nonMetaFields = entityPropertyFields.stream().filter(field -> !field.getAnnotation(EntityProperty.class).meta()).collect(Collectors.toList());
 
