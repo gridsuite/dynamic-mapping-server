@@ -12,7 +12,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesRegister;
+import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,12 +40,21 @@ public class InputMapping implements Mapping {
     @Schema(description = "Mapping should control its parameters")
     private boolean controlledParameters;
 
-    public MappingEntity convertMappingToEntity() {
+    public MappingEntity convertMappingToEntity(AutomatonSubtypesRegister automatonSubtypesRegister) {
         MappingEntity convertedMapping = new MappingEntity();
         convertedMapping.setName(name);
         convertedMapping.setControlledParameters(controlledParameters);
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
-        convertedMapping.setAutomata(automata.stream().map(automaton -> automaton.toEntity(convertedMapping)).collect(Collectors.toList()));
+        convertedMapping.setAutomata(automata.stream().map(automaton -> {
+            try {
+                AutomatonEntity automatonEntity;
+                automatonEntity = automatonSubtypesRegister.toEntity(automaton);
+                automatonEntity.setMapping(convertedMapping);
+                return automatonEntity;
+            } catch (Exception e) {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+            }
+        }).collect(Collectors.toList()));
         return convertedMapping;
     }
 
@@ -50,6 +62,12 @@ public class InputMapping implements Mapping {
         name = mappingEntity.getName();
         controlledParameters = mappingEntity.isControlledParameters();
         rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
-        automata = mappingEntity.getAutomata().stream().map(automatonEntity -> AbstractAutomaton.fromEntity(automatonEntity, automatonSubtypesRegister)).collect(Collectors.toList());
+        automata = mappingEntity.getAutomata().stream().map(elem -> {
+            try {
+                return automatonSubtypesRegister.fromEntity(elem);
+            } catch (Exception e) {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+            }
+        }).collect(Collectors.toList());
     }
 }

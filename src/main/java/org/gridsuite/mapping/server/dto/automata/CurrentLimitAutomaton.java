@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.model.AutomatonEntity;
-import org.gridsuite.mapping.server.model.AutomatonPropertyEntity;
-import org.gridsuite.mapping.server.model.MappingEntity;
-import org.gridsuite.mapping.server.utils.PropertyType;
+import org.gridsuite.mapping.server.dto.automata.extensions.EntityProperty;
 
 import java.util.ArrayList;
 
@@ -34,18 +31,13 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
 
     @Schema(description = "Element watched by the automaton")
     @JsonProperty(PROPERTY_WATCHED_ELEMENT)
+    @EntityProperty(value = PROPERTY_WATCHED_ELEMENT, meta = true)
     private String watchedElement;
 
     @Schema(description = "Side of the automaton")
     @JsonProperty(PROPERTY_SIDE)
+    @EntityProperty(value = PROPERTY_SIDE, meta = true)
     private String side;
-
-    public CurrentLimitAutomaton(AutomatonEntity automatonEntity) {
-        super(automatonEntity);
-
-        watchedElement = automatonEntity.getProperty(PROPERTY_WATCHED_ELEMENT);
-        side = automatonEntity.getProperty(PROPERTY_SIDE);
-    }
 
     @Override
     public String getExportedId() {
@@ -64,19 +56,6 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
         properties.add(new BasicProperty(PROPERTY_SIDE, side));
 
         return properties;
-    }
-
-    @Override
-    public AutomatonEntity toEntity(MappingEntity parentMappingEntity) {
-        AutomatonEntity convertedAutomaton = super.toEntity(parentMappingEntity);
-
-        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
-                PROPERTY_WATCHED_ELEMENT, this.getWatchedElement(), PropertyType.STRING, convertedAutomaton));
-
-        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
-                PROPERTY_SIDE, this.getSide(), PropertyType.STRING, convertedAutomaton));
-
-        return convertedAutomaton;
     }
 }
 

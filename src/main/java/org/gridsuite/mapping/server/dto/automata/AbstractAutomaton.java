@@ -13,15 +13,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesRegister;
-import org.gridsuite.mapping.server.model.AutomatonEntity;
-import org.gridsuite.mapping.server.model.MappingEntity;
+
+import org.gridsuite.mapping.server.dto.automata.extensions.EntityProperty;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -33,12 +29,15 @@ import java.util.UUID;
 public abstract class AbstractAutomaton {
     @Schema(description = "Automaton family")
     @JsonProperty
+    @EntityProperty
     private AutomatonFamily family;
 
     @Schema(description = "Mapped Model Instance ID")
+    @EntityProperty
     private String model;
 
     @Schema(description = "Mapped Parameters Set Group ID")
+    @EntityProperty
     private String setGroup;
 
     @JsonIgnore
@@ -49,30 +48,5 @@ public abstract class AbstractAutomaton {
 
     public abstract List<BasicProperty> convertToBasicProperties();
 
-    protected AbstractAutomaton(AutomatonEntity automatonEntity) {
-        this.setFamily(automatonEntity.getFamily());
-        this.setModel(automatonEntity.getModel());
-        this.setSetGroup(automatonEntity.getSetGroup());
-    }
-
-    public AutomatonEntity toEntity(MappingEntity parentMappingEntity) {
-        UUID createdId = UUID.randomUUID();
-        AutomatonEntity convertedAutomaton = new AutomatonEntity();
-        convertedAutomaton.setAutomatonId(createdId);
-        convertedAutomaton.setFamily(this.getFamily());
-        convertedAutomaton.setModel(this.getModel());
-        convertedAutomaton.setSetGroup(this.getSetGroup());
-
-        convertedAutomaton.setMapping(parentMappingEntity);
-        return convertedAutomaton;
-    }
-
-    public static AbstractAutomaton fromEntity(AutomatonEntity automatonEntity, AutomatonSubtypesRegister automatonSubtypesRegister) {
-        try {
-            return automatonSubtypesRegister.fromEntity(automatonEntity);
-        } catch (Exception e) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
 }
 

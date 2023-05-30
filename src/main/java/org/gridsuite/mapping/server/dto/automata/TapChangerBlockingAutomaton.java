@@ -11,11 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.model.AutomatonEntity;
-import org.gridsuite.mapping.server.model.AutomatonPropertyEntity;
-import org.gridsuite.mapping.server.model.MappingEntity;
-import org.gridsuite.mapping.server.utils.Methods;
-import org.gridsuite.mapping.server.utils.PropertyType;
+import org.gridsuite.mapping.server.dto.automata.extensions.EntityProperty;
+import org.gridsuite.mapping.server.utils.StringListConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,23 +34,18 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
 
     @Schema(description = "Name property")
     @JsonProperty(PROPERTY_NAME)
+    @EntityProperty(value = PROPERTY_NAME, meta = true)
     private String name;
 
     @Schema(description = "U Measurement property")
     @JsonProperty(PROPERTY_U_MEASUREMENTS)
+    @EntityProperty(value = PROPERTY_U_MEASUREMENTS, meta = true, converter = StringListConverter.class)
     private List<String> uMeasurements;
 
     @Schema(description = "Transformers property")
     @JsonProperty(PROPERTY_TRANSFORMERS)
+    @EntityProperty(value = PROPERTY_TRANSFORMERS, meta = true, converter = StringListConverter.class)
     private List<String> transformers;
-
-    public TapChangerBlockingAutomaton(AutomatonEntity automatonEntity) {
-        super(automatonEntity);
-
-        name = automatonEntity.getProperty(PROPERTY_NAME);
-        uMeasurements = automatonEntity.getProperty(PROPERTY_U_MEASUREMENTS, Methods::convertStringToList);
-        transformers = automatonEntity.getProperty(PROPERTY_TRANSFORMERS, Methods::convertStringToList);
-    }
 
     @Override
     public String getExportedId() {
@@ -73,21 +65,5 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
         properties.add(new BasicProperty(PROPERTY_TRANSFORMERS,
                 transformers.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
         return properties;
-    }
-
-    @Override
-    public AutomatonEntity toEntity(MappingEntity parentMappingEntity) {
-        AutomatonEntity convertedAutomaton = super.toEntity(parentMappingEntity);
-
-        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
-                PROPERTY_NAME, this.getName(), PropertyType.STRING, convertedAutomaton));
-
-        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
-                PROPERTY_U_MEASUREMENTS, Methods.convertListToString(this.getUMeasurements()), PropertyType.STRING, convertedAutomaton));
-
-        convertedAutomaton.addProperty(new AutomatonPropertyEntity(convertedAutomaton.getAutomatonId(),
-                PROPERTY_TRANSFORMERS, Methods.convertListToString(this.getTransformers()), PropertyType.STRING, convertedAutomaton));
-
-        return convertedAutomaton;
     }
 }

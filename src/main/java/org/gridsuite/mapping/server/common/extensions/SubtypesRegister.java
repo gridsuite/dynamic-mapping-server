@@ -16,4 +16,6 @@ public interface SubtypesRegister<D, E> {
     Map<String, Class<?>> getSubtypes();
 
     D fromEntity(E entity) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException;
+
+    E toEntity(D dto) throws IllegalAccessException;
 }

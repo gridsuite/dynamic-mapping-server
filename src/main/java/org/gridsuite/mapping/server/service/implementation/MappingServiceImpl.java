@@ -60,7 +60,7 @@ public class MappingServiceImpl implements MappingService {
 
     @Override
     public InputMapping createMapping(String mappingName, InputMapping mapping) {
-        MappingEntity mappingToSave = mapping.convertMappingToEntity();
+        MappingEntity mappingToSave = mapping.convertMappingToEntity(automatonSubtypesRegister);
         mappingToSave.markNotNew();
         if (mappingToSave.isControlledParameters()) {
             try {
