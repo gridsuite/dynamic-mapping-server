@@ -35,8 +35,8 @@ public class ModelVariableSetEntity implements Serializable {
     @Column(name = "variable_set_name")
     private String name;
 
-    @OneToMany(mappedBy = "variablesSet", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private List<ModelVariableDefinitionEntity> variableDefinitions;
+    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "variablesSets", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
@@ -59,17 +59,17 @@ public class ModelVariableSetEntity implements Serializable {
     public ModelVariableSetEntity(ModelEntity model, VariablesSet variablesSet) {
         this.models = model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>();
         this.name = variablesSet.getName();
-        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this, variableDefinition)).collect(Collectors.toList());
+        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this, variableDefinition)).collect(Collectors.toSet());
     }
 
     // --- utils methods --- //
     public void addVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
-        variableDefinitions.forEach(variableDefinition -> variableDefinition.setVariablesSet(this));
+        variableDefinitions.forEach(variableDefinition -> variableDefinition.getVariablesSets().add(this));
         this.variableDefinitions.addAll(variableDefinitions);
     }
 
     public void removeVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
-        variableDefinitions.forEach(variableDefinition -> variableDefinition.setVariablesSet(null));
+        variableDefinitions.forEach(variableDefinition -> variableDefinition.getVariablesSets().remove(this));
         this.variableDefinitions.removeAll(variableDefinitions);
     }
 }

@@ -28,7 +28,7 @@ import static javax.persistence.TemporalType.TIMESTAMP;
 @Getter
 @Setter
 @Entity
-@Table(name = "model_variable_definitions", indexes = {@Index(name = "model_variable_definitions_variable_set_name_index", columnList = "variable_set_name")})
+@Table(name = "model_variable_definitions")
 public class ModelVariableDefinitionEntity implements Serializable {
     @Id
     @EqualsAndHashCode.Include
@@ -54,12 +54,16 @@ public class ModelVariableDefinitionEntity implements Serializable {
     )
     private Set<ModelEntity> models;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "variable_set_name", foreignKey = @ForeignKey(name = "variable_set_variable_definition_fk"), updatable = false)
-    private ModelVariableSetEntity variablesSet;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(name = "model_variable_sets_model_variable_definitions",
+            joinColumns = {@JoinColumn(name = "variable_definition_name")},
+            inverseJoinColumns = {@JoinColumn(name = "variable_set_name")})
+    private Set<ModelVariableSetEntity> variablesSets;
 
     public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
-        this(variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(), model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(), variablesSet, null, null);
+        this(variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(),
+                model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(),
+                new LinkedHashSet<>(Arrays.asList(variablesSet)), null, null);
     }
 
     @CreatedDate

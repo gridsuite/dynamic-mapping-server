@@ -393,10 +393,23 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public List<String> deleteVariablesSets(List<String> variablesSetNames) {
+
         if (variablesSetNames != null && !variablesSetNames.isEmpty()) {
-            modelVariablesSetRepository.deleteAllById(variablesSetNames);
+
+            // cleanup associations
+            List<ModelVariableSetEntity> foundVariablesSetEntities = modelVariablesSetRepository.findAllById(variablesSetNames);
+            for (ModelVariableSetEntity variableSetEntity : foundVariablesSetEntities) {
+                variableSetEntity.removeVariableDefinitions(variableSetEntity.getVariableDefinitions());
+            }
+
+            // delete entity
+            List<String> foundVariablesSetNames = foundVariablesSetEntities.stream().map(ModelVariableSetEntity::getName).collect(Collectors.toList());
+            modelVariablesSetRepository.deleteAllById(foundVariablesSetNames);
+
+            return foundVariablesSetNames;
         }
-        return variablesSetNames;
+
+        return List.of();
     }
     // --- END variable-related service methods --- //
 
