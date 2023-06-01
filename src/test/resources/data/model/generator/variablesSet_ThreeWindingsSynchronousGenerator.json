@@ -1,0 +1,15 @@
+{
+  "name": "ThreeWindingsSynchronousGenerator",
+  "variableDefinitions": [
+    {
+      "name": "generator_IRotorPu_value",
+      "type": "DOUBLE",
+      "unit": "pu"
+    },
+    {
+      "name": "generator_IStatorPu_value",
+      "type": "DOUBLE",
+      "unit": "pu"
+    }
+  ]
+}

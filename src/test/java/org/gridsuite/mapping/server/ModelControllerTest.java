@@ -459,6 +459,44 @@ public class ModelControllerTest {
 
     @Test
     @Transactional
+    public void testSaveNewVariablesSetsWhichShareVariableDefinitions() throws Exception {
+        String newVariablesSetJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_ThreeWindingsSynchronousGenerator.json");
+        String newVariablesSet2Json = readFileAsString("src/test/resources/data/model/generator/variablesSet_FourWindingsSynchronousGenerator.json");
+
+        cleanDB();
+
+        // --- Put the first variables set with 2 variable definitions --- //
+        MvcResult mvcResult = mvc.perform(post("/models/variables-sets")
+                        .content(newVariablesSetJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // Get initial variable definitions
+        VariablesSet variablesSet = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
+        List<ModelVariableDefinition> variableDefinitions = variablesSet.getVariableDefinitions();
+
+        // Check result
+        assertEquals(2, variableDefinitions.size());
+
+        // --- Put the second variables set with 3 variable definitions in which 2 ones are identical to first variables set --- //
+        MvcResult mvcResult2 = mvc.perform(post("/models/variables-sets")
+                        .content(newVariablesSet2Json)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // Get initial variable definitions
+        VariablesSet variablesSet2 = objectMapper.readValue(mvcResult2.getResponse().getContentAsString(), VariablesSet.class);
+        List<ModelVariableDefinition> variableDefinitions2 = variablesSet2.getVariableDefinitions();
+
+        // Check result
+        assertEquals(3, variableDefinitions2.size());
+
+        // cross-check between two variables set
+        variableDefinitions2.containsAll(variableDefinitions);
+    }
+
+    @Test
+    @Transactional
     public void testSaveGeneratorModel() throws Exception {
         String modelName = "GeneratorSynchronousThreeWindingsProportionalRegulations";
         String newModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
