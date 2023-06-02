@@ -35,15 +35,19 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @Column(name = "equipment_type")
     private EquipmentType equipmentType;
 
+    @Builder.Default
     @OneToMany(targetEntity = ModelParameterDefinitionEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterDefinitionEntity> parameterDefinitions = new ArrayList<>(0);
 
+    @Builder.Default
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
+    @Builder.Default
     @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
+    @Builder.Default
     @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
 
