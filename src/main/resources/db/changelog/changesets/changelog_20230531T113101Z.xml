@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="phamquy (generated)" id="1685532668516-1">
+        <createTable tableName="model_variable_sets_model_variable_definitions">
+            <column name="variable_definition_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="variable_set_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685532668516-2">
+        <addForeignKeyConstraint baseColumnNames="variable_set_name" baseTableName="model_variable_sets_model_variable_definitions" constraintName="FK89h6ur75jxqn50oc8jwtvah0y" deferrable="false" initiallyDeferred="false" referencedColumnNames="variable_set_name" referencedTableName="model_variable_sets" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685532668516-3">
+        <addForeignKeyConstraint baseColumnNames="variable_definition_name" baseTableName="model_variable_sets_model_variable_definitions" constraintName="FKnywtbqa1d5xaj421ofq0xbmvj" deferrable="false" initiallyDeferred="false" referencedColumnNames="variable_definition_name" referencedTableName="model_variable_definitions" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685532668516-4">
+        <dropForeignKeyConstraint baseTableName="MODEL_VARIABLE_DEFINITIONS" constraintName="VARIABLE_SET_VARIABLE_DEFINITION_FK"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685532668516-5">
+        <dropColumn columnName="VARIABLE_SET_NAME" tableName="MODEL_VARIABLE_DEFINITIONS"/>
+    </changeSet>
+</databaseChangeLog>
