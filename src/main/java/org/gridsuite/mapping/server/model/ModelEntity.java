@@ -79,16 +79,6 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
 
     // --- utils methods --- //
 
-    public void addSetsGroup(Collection<ModelSetsGroupEntity> setsGroups) {
-        setsGroups.forEach(setsGroup -> setsGroup.setModel(this));
-        this.setsGroups.addAll(setsGroups);
-    }
-
-    public void removeSetsGroup(Collection<ModelSetsGroupEntity> setsGroups) {
-        setsGroups.forEach(setsGroup -> setsGroup.setModel(null));
-        this.setsGroups.removeAll(setsGroups);
-    }
-
     public void addParameterDefinitions(Collection<ModelParameterDefinitionEntity> parameterDefinitions) {
         parameterDefinitions.forEach(parameterDefinition -> parameterDefinition.getModels().add(this));
         this.parameterDefinitions.addAll(parameterDefinitions);

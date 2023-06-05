@@ -148,7 +148,7 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Date createdDate = new ArrayList<>(modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets()).get(0).getCreatedDate();
+        Date setCreationDate = modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
 
         // Update data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -156,9 +156,9 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Date updatedDate = new ArrayList<>(modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets()).get(0).getUpdatedDate();
+        Date setUpdateDate = modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
 
-        assertThat(createdDate.compareTo(updatedDate) < 0);
+        assertThat(setCreationDate.compareTo(setUpdateDate) < 0);
     }
 
     @Test
@@ -216,20 +216,27 @@ public class ModelControllerTest {
 
         // Prepare models
         ModelEntity loadModel = modelRepository.findById("LoadAlphaBeta").get();
-        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", SetGroupType.FIXED, new LinkedHashSet<>(), loadModel, null, null);
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", new ArrayList<>(), loadGroup, null, null);
-        List<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", "1.5", setToSave, null, null));
-        setParameters.add(new ModelParameterEntity("load_beta", "2.5", setToSave, null, null));
-        setToSave.addParameters(setParameters);
-        loadGroup.addSets(Set.of(setToSave));
-        loadModel.addSetsGroup(Set.of(loadGroup));
+        List<ModelSetsGroupEntity> loadGroups = loadModel.getSetsGroups();
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
+        ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(), loadGroup.getType(),
+                null,
+                new Date(),
+                loadGroup);
+        ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
+        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "2.5", setToSave));
+        setToSave.setParameters(setParameters);
+        groupSets.add(setToSave);
+        loadGroup.setSets(groupSets);
+        loadGroups.add(loadGroup);
+        loadModel.setSetsGroups(loadGroups);
         modelRepository.save(loadModel);
 
         ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, Set.of(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
-        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", SetGroupType.PREFIX, null, generatorThreeModel, null, null));
-        generatorThreeModel.addSetsGroup(generatorThreeGroups);
+        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
+        generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
         mvc.perform(get("/models/")
@@ -251,7 +258,6 @@ public class ModelControllerTest {
         String modelName = "LoadAlphaBeta";
         String newModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
         String newParameterDefinitionsJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta_parameter_definitions.json");
-
 
         cleanDB();
         // Put data first time with initial parameter definitions

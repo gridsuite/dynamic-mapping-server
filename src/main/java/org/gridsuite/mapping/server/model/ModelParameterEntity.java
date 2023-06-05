@@ -6,54 +6,68 @@
  */
 package org.gridsuite.mapping.server.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelParameter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-
-import static javax.persistence.TemporalType.TIMESTAMP;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Inheritance
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "model_parameters", indexes = {@Index(name = "model_parameter_set_index", columnList = "set_name")})
+@IdClass(ModelParameterId.class)
 public class ModelParameterEntity implements Serializable {
 
     @Id
-    @EqualsAndHashCode.Include
     @Column(name = "name")
     private String name;
+
+    @Id
+    @Column(name = "model_name")
+    private String modelName;
+
+    @Id
+    @Column(name = "group_name")
+    private String groupName;
+
+    @Id
+    @Column(name = "group_type")
+    private SetGroupType groupType;
+
+    @Id
+    @Column(name = "set_name")
+    private String setName;
 
     @Column(name = "value_")
     private String value;
 
-    @Id
-    @EqualsAndHashCode.Include
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "set_name", referencedColumnName = "name", foreignKey = @ForeignKey(name = "parameter_set_parameter_fk"), updatable = false)
-    private ModelParameterSetEntity parameterSet;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns(foreignKey = @ForeignKey(name = "parameter_set_fk"), value = {
+        @JoinColumn(name = "set_name", referencedColumnName = "name", insertable = false, updatable = false),
+        @JoinColumn(name = "group_name", referencedColumnName = "group_name", insertable = false, updatable = false),
+        @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
+        @JoinColumn(name = "group_type", referencedColumnName = "group_type", insertable = false, updatable = false)
+    })
+    private ModelParameterSetEntity set;
 
-    public ModelParameterEntity(ModelParameterSetEntity parameterSet, ModelParameter parameter) {
-        this(parameter.getName(), parameter.getValue(), parameterSet, null, null);
+    public ModelParameterEntity(ModelParameterSetEntity set, ModelParameter parameter) {
+        this.set = set;
+        name = parameter.getName();
+        groupName = set.getGroup().getName();
+        groupType = set.getGroup().getType();
+        modelName = set.getGroup().getModelName();
+        setName = set.getName();
+        value = parameter.getValue();
     }
-
-    @CreatedDate
-    @Temporal(TIMESTAMP)
-    @Column(name = "created_date", updatable = false)
-    private Date createdDate;
-
-    @LastModifiedDate
-    @Temporal(TIMESTAMP)
-    @Column(name = "updated_date")
-    private Date updatedDate;
 }

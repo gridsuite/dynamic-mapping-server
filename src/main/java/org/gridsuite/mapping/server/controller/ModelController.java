@@ -60,7 +60,6 @@ public class ModelController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, false));
     }
 
-
     @PostMapping(value = "/")
     @Operation(summary = "Post a model")
     @ApiResponses(value = {
@@ -76,7 +75,6 @@ public class ModelController {
     public ResponseEntity<ParametersSetsGroup> deleteSet(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType, @PathVariable("setName") String setName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
     }
-
 
     @GetMapping(value = "/")
     @Operation(summary = "get models names")

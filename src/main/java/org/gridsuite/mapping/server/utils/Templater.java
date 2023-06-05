@@ -69,7 +69,7 @@ public final class Templater {
             String[] rulesScripts = sortedRules.getRules().stream().map(flatRule -> {
                 ST ruleScript = new ST(ruleTemplate);
                 ruleScript.add("composition", flatRule.getComposition());
-                ruleScript.add("modelName", flatRule.getMappedModel().getModel().getModelName());
+                ruleScript.add("modelName", flatRule.getMappedModel().getModelName());
                 ruleScript.add("parameterSetId", modelToParamSetId(flatRule.getMappedModel()));
                 return ruleScript.render();
             }).toArray(String[]::new);

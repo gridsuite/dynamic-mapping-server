@@ -33,6 +33,6 @@ public class ParametersSetsGroup {
         name = setsGroupEntity.getName();
         type = setsGroupEntity.getType();
         sets = setsGroupEntity.getSets().stream().map(ParametersSet::new).collect(Collectors.toList());
-        modelName = setsGroupEntity.getModel().getModelName();
+        modelName = setsGroupEntity.getModelName();
     }
 }

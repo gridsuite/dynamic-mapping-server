@@ -27,7 +27,7 @@ public class ParametersSet {
     public ParametersSet(ModelParameterSetEntity modelParameterSetEntity) {
         name = modelParameterSetEntity.getName();
         parameters = modelParameterSetEntity.getParameters().stream().map(ModelParameter::new).collect(Collectors.toList());
-        lastModifiedDate = modelParameterSetEntity.getUpdatedDate();
+        lastModifiedDate = modelParameterSetEntity.getLastModifiedDate();
     }
 
     public ParametersSet(String name, List<ModelParameter> parameters) {

@@ -78,7 +78,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelSetsGroupEntity> savedGroups = modelToUpdate.getSetsGroups();
             ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName().equals(setsGroup.getName())).findAny().orElse(null);
             ModelSetsGroupEntity groupToAdd = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
-            groupToAdd.getSets().forEach(set -> set.setUpdatedDate(new Date()));
+            groupToAdd.getSets().forEach(set -> set.setLastModifiedDate(new Date()));
 
             if (previousGroup == null) {
                 savedGroups.add(groupToAdd);
@@ -115,8 +115,8 @@ public class ModelServiceImpl implements ModelService {
                     .filter(setGroup -> setGroup.getName().equals(groupName) && setGroup.getType().equals(groupType))
                     .findAny()
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No group found"));
-            Set<ModelParameterSetEntity> sets = setsGroup.getSets();
-            setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toSet()));
+            List<ModelParameterSetEntity> sets = setsGroup.getSets();
+            setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toList()));
             modelRepository.save(modelToEdit);
             return new ParametersSetsGroup(setsGroup);
         } else {

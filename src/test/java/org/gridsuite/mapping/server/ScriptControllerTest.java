@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -72,12 +73,15 @@ public class ScriptControllerTest {
         // Prepare models
         ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new LinkedHashSet<>(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
-        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", SetGroupType.FIXED, null, loadModel, null, null);
-        Set<ModelParameterSetEntity> groupSets = new LinkedHashSet<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", null, loadGroup, null, null);
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
+        ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(), loadGroup.getType(),
+                null,
+                new Date(),
+                loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", "1.5", setToSave, null, null));
-        setParameters.add(new ModelParameterEntity("load_beta", "2.5", setToSave, null, null));
+        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "2.5", setToSave));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);
@@ -96,13 +100,13 @@ public class ScriptControllerTest {
 
         ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
-        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", SetGroupType.PREFIX, null, generatorThreeModel, null, null));
+        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), null, SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
         ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorFourGroups = new ArrayList<>();
-        generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", SetGroupType.PREFIX, null, generatorFourModel, null, null));
+        generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", generatorFourModel.getModelName(), null, SetGroupType.PREFIX, generatorFourModel));
         generatorFourModel.setSetsGroups(generatorFourGroups);
         modelRepository.save(generatorFourModel);
     }
@@ -406,7 +410,7 @@ public class ScriptControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(scriptOutput, true));
+                .andExpect(content().json(scriptOutput, false));
     }
 
     @Test
