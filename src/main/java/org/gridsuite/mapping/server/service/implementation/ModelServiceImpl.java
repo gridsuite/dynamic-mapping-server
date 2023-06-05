@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.*;
+import org.gridsuite.mapping.server.repository.ModelParameterDefinitionRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ModelVariableRepository;
 import org.gridsuite.mapping.server.repository.ModelVariablesSetRepository;
@@ -33,29 +34,21 @@ public class ModelServiceImpl implements ModelService {
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
 
     private final ModelRepository modelRepository;
+    private final ModelParameterDefinitionRepository modelParameterDefinitionRepository;
     private final ModelVariableRepository modelVariableRepository;
     private final ModelVariablesSetRepository modelVariablesSetRepository;
 
     @Autowired
     public ModelServiceImpl(
             ModelRepository modelRepository,
+            ModelParameterDefinitionRepository modelParameterDefinitionRepository,
             ModelVariableRepository modelVariableRepository,
             ModelVariablesSetRepository modelVariablesSetRepository
     ) {
         this.modelRepository = modelRepository;
+        this.modelParameterDefinitionRepository = modelParameterDefinitionRepository;
         this.modelVariableRepository = modelVariableRepository;
         this.modelVariablesSetRepository = modelVariablesSetRepository;
-    }
-
-    @Override
-    public List<ModelParameterDefinition> getParametersDefinitionsFromModelName(String modelName) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
-        if (foundModel.isPresent()) {
-            Model modelToSend = new Model(foundModel.get());
-            return modelToSend.getParameterDefinitions();
-        } else {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        }
     }
 
     @Override
@@ -85,7 +78,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelSetsGroupEntity> savedGroups = modelToUpdate.getSetsGroups();
             ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName().equals(setsGroup.getName())).findAny().orElse(null);
             ModelSetsGroupEntity groupToAdd = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
-            groupToAdd.getSets().forEach(set -> set.setLastModifiedDate(new Date()));
+            groupToAdd.getSets().forEach(set -> set.setUpdatedDate(new Date()));
 
             if (previousGroup == null) {
                 savedGroups.add(groupToAdd);
@@ -122,14 +115,131 @@ public class ModelServiceImpl implements ModelService {
                     .filter(setGroup -> setGroup.getName().equals(groupName) && setGroup.getType().equals(groupType))
                     .findAny()
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No group found"));
-            List<ModelParameterSetEntity> sets = setsGroup.getSets();
-            setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toList()));
+            Set<ModelParameterSetEntity> sets = setsGroup.getSets();
+            setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toSet()));
             modelRepository.save(modelToEdit);
             return new ParametersSetsGroup(setsGroup);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
         }
     }
+
+    // --- BEGIN parameter definition-related service methods --- //
+    @Override
+    public List<ModelParameterDefinition> getParameterDefinitionsFromModel(String modelName) {
+        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        if (foundModel.isPresent()) {
+            Model modelToSend = new Model(foundModel.get());
+            return modelToSend.getParameterDefinitions();
+        } else {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override
+    public Model addNewParameterDefinitionsToModel(String modelName, List<ModelParameterDefinition> parameterDefinitions) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        // do merge with the list of parameter definitions
+        if (parameterDefinitions != null && !parameterDefinitions.isEmpty()) {
+            // do merge with existing list
+            List<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream()
+                    .map(parameterDefinition -> new ModelParameterDefinitionEntity(modelToUpdate, parameterDefinition))
+                    .collect(Collectors.toList());
+            modelToUpdate.addParameterDefinitions(parameterDefinitionEntities);
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    public Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        // do merge with the list of parameter definitions
+        if (parameterDefinitionNames != null && !parameterDefinitionNames.isEmpty()) {
+            // find existing parameter definitions
+            List<ModelParameterDefinitionEntity> foundParameterDefinitionEntities = modelParameterDefinitionRepository.findAllById(parameterDefinitionNames);
+
+            // check whether found all
+            if (foundParameterDefinitionEntities.size() != parameterDefinitionNames.size()) {
+                List<String> foundNames = foundParameterDefinitionEntities.stream().map(ModelParameterDefinitionEntity::getName).collect(Collectors.toList());
+                List<String> notFoundNames = parameterDefinitionNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
+                throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some parameter definition not found: " + notFoundNames);
+            }
+
+            // do merge with existing list
+            modelToUpdate.addParameterDefinitions(foundParameterDefinitionEntities);
+
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    public Model removeExistingParameterDefinitionsFromModel(String modelName, List<String> parameterDefinitionNames) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        // do remove in the list of parameter definitions
+        if (parameterDefinitionNames != null && !parameterDefinitionNames.isEmpty()) {
+            // find existing variable definitions
+            List<ModelParameterDefinitionEntity> foundParameterDefinitionEntities = modelParameterDefinitionRepository.findAllById(parameterDefinitionNames);
+
+            // remove in existing list
+            modelToUpdate.removeParameterDefinitions(foundParameterDefinitionEntities);
+
+            // save modified existing model entity
+            ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+            return new Model(savedModelEntity);
+        } else {
+            return new Model(modelToUpdate);
+        }
+    }
+
+    @Override
+    public Model removeAllParameterDefinitionsOnModel(String modelName) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+
+        // clear the existing list
+        modelToUpdate.removeParameterDefinitions(modelToUpdate.getParameterDefinitions());
+
+        // save modified existing model entity
+        ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);
+        return new Model(savedModelEntity);
+    }
+
+    @Override
+    public List<ModelParameterDefinition> saveNewParameterDefinitions(List<ModelParameterDefinition> parameterDefinitions) {
+        if (parameterDefinitions != null && !parameterDefinitions.isEmpty()) {
+            Set<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream().map(variableDefinition -> new ModelParameterDefinitionEntity(null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new));
+            List<ModelParameterDefinitionEntity> savedParameterDefinitionEntities = modelParameterDefinitionRepository.saveAll(parameterDefinitionEntities);
+            return savedParameterDefinitionEntities.stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> deleteParameterDefinitions(List<String> parameterDefinitionNames) {
+        if (parameterDefinitionNames != null && !parameterDefinitionNames.isEmpty()) {
+            modelParameterDefinitionRepository.deleteAllById(parameterDefinitionNames);
+        }
+        return parameterDefinitionNames;
+    }
+    // --- END parameter definition-related service methods --- //
 
     // --- BEGIN variable-related service methods --- //
     @Override
@@ -142,7 +252,9 @@ public class ModelServiceImpl implements ModelService {
         // do merge with the list of variable definitions
         if (variableDefinitions != null && !variableDefinitions.isEmpty()) {
             // do merge with existing list
-            List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(modelToUpdate, null, variableDefinition)).collect(Collectors.toList());
+            List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream()
+                    .map(variableDefinition -> new ModelVariableDefinitionEntity(modelToUpdate, null, variableDefinition))
+                    .collect(Collectors.toList());
             modelToUpdate.addVariableDefinitions(variableDefinitionEntities);
             // save modified existing model entity
             ModelEntity savedModelEntity = modelRepository.save(modelToUpdate);

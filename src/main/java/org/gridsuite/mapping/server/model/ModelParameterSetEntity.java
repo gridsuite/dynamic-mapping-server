@@ -6,69 +6,70 @@
  */
 package org.gridsuite.mapping.server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
-import org.gridsuite.mapping.server.utils.SetGroupType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@Inheritance
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "model_parameter_sets", indexes = {@Index(name = "model_parameter_sets_group_name_index", columnList = "group_name")})
-@IdClass(ModelParameterSetId.class)
+@Table(name = "model_parameter_sets")
 public class ModelParameterSetEntity implements Serializable {
 
     @Id
+    @EqualsAndHashCode.Include
     @Column(name = "name")
     private String name;
 
-    @Id
-    @Column(name = "group_name")
-    private String groupName;
-
-    @Id
-    @Column(name = "model_name")
-    private String modelName;
-
-    @Id
-    @Column(name = "group_type")
-    private SetGroupType groupType;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "set", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parameterSet", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ModelParameterEntity> parameters;
 
-    @Column(name = "last_modified_date")
-    private Date lastModifiedDate;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns(foreignKey = @ForeignKey(name = "model_parameter_sets_fk"), value = {
-        @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
-        @JoinColumn(name = "group_name", referencedColumnName = "name", insertable = false, updatable = false),
-        @JoinColumn(name = "group_type", referencedColumnName = "type", insertable = false, updatable = false)
+            @JoinColumn(name = "group_name", referencedColumnName = "name", insertable = false, updatable = false),
+            @JoinColumn(name = "group_type", referencedColumnName = "type", insertable = false, updatable = false)
     })
     private ModelSetsGroupEntity group;
 
     public ModelParameterSetEntity(ModelSetsGroupEntity group, ParametersSet set) {
-        this.group = group;
-        this.name = set.getName();
-        this.groupName = group.getName();
-        this.groupType = group.getType();
-        this.modelName = group.getModelName();
-        this.parameters = set.getParameters().stream().map(parameter -> new ModelParameterEntity(this, parameter)).collect(Collectors.toList());
-        this.lastModifiedDate = set.getLastModifiedDate();
+        this(set.getName(), null, group,
+                null, null);
+        this.parameters = set.getParameters().stream().map(parameter -> new ModelParameterEntity(this, parameter))
+                .collect(Collectors.toList());
+    }
+
+    @CreatedDate
+    @Temporal(TIMESTAMP)
+    @Column(name = "created_date", updatable = false)
+    private Date createdDate;
+
+    @LastModifiedDate
+    @Temporal(TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
+
+    // --- utils methods --- //
+    public void addParameters(Collection<ModelParameterEntity> parameters) {
+        parameters.forEach(parameter -> parameter.setParameterSet(this));
+        this.parameters.addAll(parameters);
+    }
+
+    public void removeParameters(Collection<ModelParameterEntity> parameters) {
+        parameters.forEach(parameter -> parameter.setParameterSet(null));
+        this.parameters.removeAll(parameters);
     }
 }

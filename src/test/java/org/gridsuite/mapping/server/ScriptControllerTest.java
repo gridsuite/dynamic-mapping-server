@@ -6,7 +6,9 @@
  */
 package org.gridsuite.mapping.server;
 
+import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.model.*;
+import org.gridsuite.mapping.server.repository.ModelParameterDefinitionRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ScriptRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -25,7 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -47,16 +49,20 @@ public class ScriptControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    private void cleanDB() {
-        scriptRepository.deleteAll();
-        modelRepository.deleteAll();
-    }
-
     @Autowired
     private ModelRepository modelRepository;
 
+    @Autowired
+    private ModelParameterDefinitionRepository modelParameterDefinitionRepository;
+
+    private void cleanDB() {
+        scriptRepository.deleteAll();
+        modelParameterDefinitionRepository.deleteAll();
+        modelRepository.deleteAll();
+    }
+
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
-        return new ModelParameterDefinitionEntity(name, model.getModelName(), type, origin, originName, null, model);
+        return new ModelParameterDefinitionEntity(model, new ModelParameterDefinition(name, type, origin, originName, null));
     }
 
     @Before
@@ -64,17 +70,14 @@ public class ScriptControllerTest {
         cleanDB();
 
         // Prepare models
-        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, null, null, Set.of(), Set.of());
+        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new LinkedHashSet<>(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
-        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
-        ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(), loadGroup.getType(),
-                null,
-                new Date(),
-                loadGroup);
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", SetGroupType.FIXED, null, loadModel, null, null);
+        Set<ModelParameterSetEntity> groupSets = new LinkedHashSet<>();
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", null, loadGroup, null, null);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity("load_alpha", "1.5", setToSave, null, null));
+        setParameters.add(new ModelParameterEntity("load_beta", "2.5", setToSave, null, null));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);
@@ -88,18 +91,18 @@ public class ScriptControllerTest {
         definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", loadModel));
         definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", loadModel));
         definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", loadModel));
-        loadModel.setParameterDefinitions(definitions);
+        loadModel.addParameterDefinitions(definitions);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null);
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
-        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), null, SetGroupType.PREFIX, generatorThreeModel));
+        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", SetGroupType.PREFIX, null, generatorThreeModel, null, null));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
-        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null, null, null);
+        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorFourGroups = new ArrayList<>();
-        generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", generatorFourModel.getModelName(), null, SetGroupType.PREFIX, generatorFourModel));
+        generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", SetGroupType.PREFIX, null, generatorFourModel, null, null));
         generatorFourModel.setSetsGroups(generatorFourGroups);
         modelRepository.save(generatorFourModel);
     }
