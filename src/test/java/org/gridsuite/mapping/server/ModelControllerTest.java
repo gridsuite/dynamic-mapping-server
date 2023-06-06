@@ -270,6 +270,16 @@ public class ModelControllerTest {
         List<ModelParameterDefinition> parameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getParameterDefinitions();
         assertEquals(6, parameterDefinitions.size());
 
+        // Get initial parameter definitions from GET endpoint
+        MvcResult mvcResult1 = mvc.perform(get("/models/" + modelName + "/parameters/definitions"))
+                .andExpect(status().isOk()).andReturn();
+        List<ModelParameterDefinition> parameterDefinitions1 = objectMapper.readValue(mvcResult1.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
+        assertEquals(6, parameterDefinitions1.size());
+
+        // Try to get parameter definitions from unknown model
+        mvc.perform(get("/models/" + modelName + "_unknown" + "/parameters/definitions"))
+                .andExpect(status().isNotFound());
+
         // Put data second time which add only a parameter definition
         MvcResult mvcResult2 = mvc.perform(post("/models/" + modelName + "/parameters/definitions")
                         .content(newParameterDefinitionsJson)
