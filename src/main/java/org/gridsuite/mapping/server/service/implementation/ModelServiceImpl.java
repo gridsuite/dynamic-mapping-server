@@ -52,8 +52,12 @@ public class ModelServiceImpl implements ModelService {
         this.modelVariablesSetRepository = modelVariablesSetRepository;
     }
 
-    private ModelEntity getModelToUpdate(String modelName, Optional<ModelEntity> foundModelOpt) {
+    private ModelEntity getModelFromOptional(String modelName, Optional<ModelEntity> foundModelOpt) {
         return foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+    }
+
+    private ModelVariableSetEntity getVariableSetFromOptional(String variableSetName, Optional<ModelVariableSetEntity> foundVariableSetOpt) {
+        return foundVariableSetOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
     }
 
     @Override
@@ -134,7 +138,7 @@ public class ModelServiceImpl implements ModelService {
     public List<ModelParameterDefinition> getParameterDefinitionsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelEntity = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelEntity = getModelFromOptional(modelName, foundModelOpt);
 
         Model modelToSend = new Model(modelEntity);
         return modelToSend.getParameterDefinitions();
@@ -145,7 +149,7 @@ public class ModelServiceImpl implements ModelService {
     public Model addNewParameterDefinitionsToModel(String modelName, List<ModelParameterDefinition> parameterDefinitions) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do merge with the list of parameter definitions
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
@@ -166,7 +170,7 @@ public class ModelServiceImpl implements ModelService {
     public Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do merge with the list of parameter definitions
         if (!CollectionUtils.isEmpty(parameterDefinitionNames)) {
@@ -196,7 +200,7 @@ public class ModelServiceImpl implements ModelService {
     public Model removeExistingParameterDefinitionsFromModel(String modelName, List<String> parameterDefinitionNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do remove in the list of parameter definitions
         if (!CollectionUtils.isEmpty(parameterDefinitionNames)) {
@@ -219,7 +223,7 @@ public class ModelServiceImpl implements ModelService {
     public Model removeAllParameterDefinitionsOnModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // clear the existing list
         modelToUpdate.removeParameterDefinitions(modelToUpdate.getParameterDefinitions());
@@ -250,6 +254,16 @@ public class ModelServiceImpl implements ModelService {
         }
         return parameterDefinitionNames;
     }
+
+    @Override
+    public List<ModelVariableDefinition> getVariableDefinitionsFromModel(String modelName) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelEntity = getModelFromOptional(modelName, foundModelOpt);
+
+        Model modelToSend = new Model(modelEntity);
+        return modelToSend.getVariableDefinitions();
+    }
     // --- END parameter definition-related service methods --- //
 
     // --- BEGIN variable-related service methods --- //
@@ -258,7 +272,7 @@ public class ModelServiceImpl implements ModelService {
     public Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do merge with the list of variable definitions
         if (!CollectionUtils.isEmpty(variableDefinitions)) {
@@ -280,7 +294,7 @@ public class ModelServiceImpl implements ModelService {
     public Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do merge with the list of variable definitions
         if (!CollectionUtils.isEmpty(variableDefinitionNames)) {
@@ -309,7 +323,7 @@ public class ModelServiceImpl implements ModelService {
     public Model removeExistingVariableDefinitionsFromModel(String modelName, List<String> variableDefinitionNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do remove in the list of variable definitions
         if (!CollectionUtils.isEmpty(variableDefinitionNames)) {
@@ -342,7 +356,7 @@ public class ModelServiceImpl implements ModelService {
     public Model removeAllVariableDefinitionsOnModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
          // clear the existing list
         modelToUpdate.removeVariableDefinitions(modelToUpdate.getVariableDefinitions());
@@ -354,6 +368,16 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    public List<VariablesSet> getVariablesSetsFromModel(String modelName) {
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelEntity = getModelFromOptional(modelName, foundModelOpt);
+
+        Model modelToSend = new Model(modelEntity);
+        return modelToSend.getVariablesSets();
+    }
+
+    @Override
     @Transactional
     public VariablesSet saveNewVariablesSet(VariablesSet variableSet) {
         ModelVariableSetEntity variableSetEntity = new ModelVariableSetEntity(null, variableSet);
@@ -362,11 +386,21 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    public List<ModelVariableDefinition> getVariableDefinitionsFromVariablesSet(String variableSetName) {
+        Optional<ModelVariableSetEntity> foundVariableSetOpt = modelVariablesSetRepository.findById(variableSetName);
+
+        ModelVariableSetEntity variableSetEntity = getVariableSetFromOptional(variableSetName, foundVariableSetOpt);
+
+        VariablesSet variablesSet = new VariablesSet(variableSetEntity);
+        return variablesSet.getVariableDefinitions();
+    }
+
+    @Override
     @Transactional
     public VariablesSet addNewVariableDefinitionToVariablesSet(String variableSetName, List<ModelVariableDefinition> variableDefinitions) {
-        Optional<ModelVariableSetEntity> foundModelOpt = modelVariablesSetRepository.findById(variableSetName);
+        Optional<ModelVariableSetEntity> foundVariableSetOpt = modelVariablesSetRepository.findById(variableSetName);
 
-        ModelVariableSetEntity variableSetToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
+        ModelVariableSetEntity variableSetToUpdate = getVariableSetFromOptional(variableSetName, foundVariableSetOpt);
 
         if (!CollectionUtils.isEmpty(variableDefinitions)) {
             // do merge with existing list
@@ -382,9 +416,9 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public VariablesSet removeExistingVariableDefinitionFromVariablesSet(String variableSetName, List<String> variableDefinitionNames) {
-        Optional<ModelVariableSetEntity> foundModelOpt = modelVariablesSetRepository.findById(variableSetName);
+        Optional<ModelVariableSetEntity> foundVariableSetOpt = modelVariablesSetRepository.findById(variableSetName);
 
-        ModelVariableSetEntity variableSetToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
+        ModelVariableSetEntity variableSetToUpdate = getVariableSetFromOptional(variableSetName, foundVariableSetOpt);
 
         if (!CollectionUtils.isEmpty(variableDefinitionNames)) {
             // find existing variable definitions
@@ -404,9 +438,9 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public VariablesSet removeAllVariableDefinitionOnVariablesSet(String variableSetName) {
-        Optional<ModelVariableSetEntity> foundModelOpt = modelVariablesSetRepository.findById(variableSetName);
+        Optional<ModelVariableSetEntity> foundVariableSetOpt = modelVariablesSetRepository.findById(variableSetName);
 
-        ModelVariableSetEntity variableSetToUpdate = foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
+        ModelVariableSetEntity variableSetToUpdate = getVariableSetFromOptional(variableSetName, foundVariableSetOpt);
 
         // clear the existing list
         variableSetToUpdate.removeVariableDefinitions(variableSetToUpdate.getVariableDefinitions());
@@ -422,7 +456,7 @@ public class ModelServiceImpl implements ModelService {
     public Model addNewVariablesSetsToModel(String modelName, List<VariablesSet> variableSets) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do merge with the list of variables set
         if (!CollectionUtils.isEmpty(variableSets)) {
@@ -441,7 +475,7 @@ public class ModelServiceImpl implements ModelService {
     public Model addExistingVariablesSetsToModel(String modelName, List<String> variablesSetNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do merge with the list of variables set
         if (!CollectionUtils.isEmpty(variablesSetNames)) {
@@ -468,7 +502,7 @@ public class ModelServiceImpl implements ModelService {
     public Model removeExistingVariablesSetsFromModel(String modelName, List<String> variablesSetNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // do merge with the list of variables set
         if (!CollectionUtils.isEmpty(variablesSetNames)) {
@@ -487,7 +521,7 @@ public class ModelServiceImpl implements ModelService {
     public Model removeAllExistingVariablesSetsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-        ModelEntity modelToUpdate = getModelToUpdate(modelName, foundModelOpt);
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         modelToUpdate.removeVariablesSets(modelToUpdate.getVariableSets());
 

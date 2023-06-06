@@ -143,6 +143,14 @@ public class ModelController {
     // --- END parameter definition-related endpoints --- //
 
     // --- BEGIN variable-related endpoints --- //
+    @GetMapping(value = "/{modelName}/variables")
+    @Operation(summary = "get variable definitions for a given model")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "variable definitions of the model")})
+    public ResponseEntity<List<ModelVariableDefinition>> getVariablesFromModel(@PathVariable("modelName") String modelName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitionsFromModel(modelName));
+    }
+
     @PostMapping(value = "/{modelName}/variables")
     @Operation(summary = "Add new variable definitions to model")
     @ApiResponses(value = {
@@ -175,6 +183,14 @@ public class ModelController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllVariableDefinitionsOnModel(modelName));
     }
 
+    @GetMapping(value = "/variables-sets/{variableSetName}/variables")
+    @Operation(summary = "Add variable definitions from variables set")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "variable definitions of variables set")})
+    public ResponseEntity<List<ModelVariableDefinition>> getVariablesFromVariablesSet(@PathVariable("variableSetName") String variableSetName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitionsFromVariablesSet(variableSetName));
+    }
+
     @PostMapping(value = "/variables-sets/{variableSetName}/variables")
     @Operation(summary = "Add new variable definitions to variables set")
     @ApiResponses(value = {
@@ -197,6 +213,14 @@ public class ModelController {
             @ApiResponse(responseCode = "200", description = "saved variables set")})
     public ResponseEntity<VariablesSet> removeAllVariableDefinitionOnVariablesSet(@PathVariable("variableSetName") String variableSetName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllVariableDefinitionOnVariablesSet(variableSetName));
+    }
+
+    @GetMapping(value = "/{modelName}/variables-sets")
+    @Operation(summary = "get variable sets for a given model")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "variable sets of the model")})
+    public ResponseEntity<List<VariablesSet>> getVariablesSetsFromModel(@PathVariable("modelName") String modelName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariablesSetsFromModel(modelName));
     }
 
     @PostMapping(value = "/{modelName}/variables-sets")
