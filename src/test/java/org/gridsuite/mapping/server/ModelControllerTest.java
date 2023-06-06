@@ -260,7 +260,7 @@ public class ModelControllerTest {
         String newParameterDefinitionsJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta_parameter_definitions.json");
 
         cleanDB();
-        // Put data first time with initial parameter definitions
+        // --- Put data first time with initial parameter definitions --- //
         MvcResult mvcResult = mvc.perform(post("/models/")
                         .content(newModelJson)
                         .contentType(APPLICATION_JSON))
@@ -270,17 +270,17 @@ public class ModelControllerTest {
         List<ModelParameterDefinition> parameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getParameterDefinitions();
         assertEquals(6, parameterDefinitions.size());
 
-        // Get initial parameter definitions from GET endpoint
+        // --- Get initial parameter definitions from GET endpoint --- //
         MvcResult mvcResult1 = mvc.perform(get("/models/" + modelName + "/parameters/definitions"))
                 .andExpect(status().isOk()).andReturn();
         List<ModelParameterDefinition> parameterDefinitions1 = objectMapper.readValue(mvcResult1.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
         assertEquals(6, parameterDefinitions1.size());
 
-        // Try to get parameter definitions from unknown model
+        // --- Try to get parameter definitions from unknown model --- //
         mvc.perform(get("/models/" + modelName + "_unknown" + "/parameters/definitions"))
                 .andExpect(status().isNotFound());
 
-        // Put data second time which add only a parameter definition
+        // --- Put data second time which add only a parameter definition --- //
         MvcResult mvcResult2 = mvc.perform(post("/models/" + modelName + "/parameters/definitions")
                         .content(newParameterDefinitionsJson)
                         .contentType(APPLICATION_JSON))
@@ -296,7 +296,7 @@ public class ModelControllerTest {
         assertEquals(1, parameterDefinitions2.size() - parameterDefinitions.size());
         assertTrue(parameterDefinitions2.containsAll(parameterDefinitions));
 
-        // Remove an existing variable definition
+        // --- Remove an existing variable definition --- //
         MvcResult mvcResult3 = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/remove")
                         .content(objectMapper.writeValueAsString(List.of(parameterDefinitions2.get(5).getName())))
                         .contentType(APPLICATION_JSON))
@@ -312,7 +312,7 @@ public class ModelControllerTest {
         assertEquals(1, parameterDefinitions2.size() - parameterDefinitions3.size());
         assertTrue(parameterDefinitions2.containsAll(parameterDefinitions3));
 
-        // remove all parameter definitions
+        // --- Remove all parameter definitions --- //
         MvcResult mvcResult4 = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/remove-all")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
@@ -324,7 +324,7 @@ public class ModelControllerTest {
         // must have no parameter definition
         assertEquals(0, parameterDefinitions4.size());
 
-        // save new parameter definition
+        // --- Save new parameter definition --- //
         List<ModelParameterDefinition> parameterDefinitionList = objectMapper.readValue(newParameterDefinitionsJson, new TypeReference<List<ModelParameterDefinition>>() { });
         parameterDefinitionList.get(0).setName("load_UPhase0_3");
         MvcResult mvcResult5 = mvc.perform(post("/models/parameters/definitions")
@@ -337,7 +337,7 @@ public class ModelControllerTest {
         // must have the same number of input variable definitions
         assertEquals(parameterDefinitionList.size(), savedParameterDefinitionList.size());
 
-        // add existing parameter definition to model
+        // --- Add existing parameter definition to model --- //
         MvcResult mvcResult6 = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add")
                         .content(objectMapper.writeValueAsString(savedParameterDefinitionList.stream().map(ModelParameterDefinition::getName)))
                         .contentType(APPLICATION_JSON))
@@ -349,7 +349,13 @@ public class ModelControllerTest {
         // must have the same number of above input parameter definitions
         assertEquals(savedParameterDefinitionList.size(), parameterDefinitions6.size());
 
-        // --- delete definitively a parameter definition --- //
+        // --- Add unknown existing parameter definition to model => must fail fast --- //
+        mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add")
+                        .content(objectMapper.writeValueAsString(List.of("parameter_definition_unknown")))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        // --- Delete definitively a parameter definition --- //
         mvcResult = mvc.perform(delete("/models/parameters/definitions")
                         .content(objectMapper.writeValueAsString(List.of(parameterDefinitions.get(4).getName())))
                         .contentType(APPLICATION_JSON))
@@ -371,7 +377,7 @@ public class ModelControllerTest {
 
         cleanDB();
 
-        // Put data first time with initial variable definitions
+        // --- Put data first time with initial variable definitions --- //
         MvcResult mvcResult = mvc.perform(post("/models/")
                         .content(newModelJson)
                         .contentType(APPLICATION_JSON))
@@ -381,7 +387,7 @@ public class ModelControllerTest {
         List<ModelVariableDefinition> variableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
         assertEquals(5, variableDefinitions.size());
 
-        // Put data second time which add only a variable definition
+        // --- Put data second time which add only a variable definition --- //
         MvcResult mvcResult2 = mvc.perform(post("/models/" + modelName + "/variables")
                         .content(newVariableDefinitionsJson)
                         .contentType(APPLICATION_JSON))
@@ -397,7 +403,7 @@ public class ModelControllerTest {
         assertEquals(1, variableDefinitions2.size() - variableDefinitions.size());
         assertTrue(variableDefinitions2.containsAll(variableDefinitions));
 
-        // Remove an existing variable definition
+        // --- Remove an existing variable definition --- //
         MvcResult mvcResult3 = mvc.perform(patch("/models/" + modelName + "/variables/remove")
                         .content(objectMapper.writeValueAsString(List.of(variableDefinitions2.get(5).getName())))
                         .contentType(APPLICATION_JSON))
@@ -409,11 +415,11 @@ public class ModelControllerTest {
         LOGGER.info("Removed variable definitions = " + variableDefinitions3);
 
         // check result
-        // final model's variable definition must contains all ones of model
+        // final model's variable definition must contain all ones of model
         assertEquals(1, variableDefinitions2.size() - variableDefinitions3.size());
         assertTrue(variableDefinitions2.containsAll(variableDefinitions3));
 
-        // remove all variable definitions
+        // --- Remove all variable definitions --- //
         MvcResult mvcResult4 = mvc.perform(patch("/models/" + modelName + "/variables/remove-all")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
@@ -425,7 +431,7 @@ public class ModelControllerTest {
         // must have no variable definition
         assertEquals(0, variableDefinitions4.size());
 
-        // save new variable definition
+        // --- Save new variable definition --- //
         List<ModelVariableDefinition> variableDefinitionList = objectMapper.readValue(newVariableDefinitionsJson, new TypeReference<List<ModelVariableDefinition>>() { });
         variableDefinitionList.get(0).setName("load_running_value_3");
         MvcResult mvcResult5 = mvc.perform(post("/models/variables")
@@ -438,7 +444,7 @@ public class ModelControllerTest {
         // must have the same number of input variable definitions
         assertEquals(variableDefinitionList.size(), savedVariableDefinitionList.size());
 
-        // add existing variable definition to model
+        // --- Add existing variable definition to model --- //
         MvcResult mvcResult6 = mvc.perform(patch("/models/" + modelName + "/variables/add")
                         .content(objectMapper.writeValueAsString(savedVariableDefinitionList.stream().map(ModelVariableDefinition::getName)))
                         .contentType(APPLICATION_JSON))
@@ -450,7 +456,13 @@ public class ModelControllerTest {
         // must have the same number of above input variable definitions
         assertEquals(variableDefinitionList.size(), variableDefinitions6.size());
 
-        // --- delete definitively a variable definition --- //
+        // --- add unknown existing variable definition to model => must fail fast --- //
+        mvc.perform(patch("/models/" + modelName + "/variables/add")
+                        .content(objectMapper.writeValueAsString(List.of("variable_definition_unknown")))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        // --- Delete definitively a variable definition --- //
         mvcResult = mvc.perform(delete("/models/variables")
                         .content(objectMapper.writeValueAsString(List.of(variableDefinitions.get(4).getName())))
                         .contentType(APPLICATION_JSON))
@@ -639,7 +651,7 @@ public class ModelControllerTest {
         assertEquals(1, variableDefinitionsOfVoltageRegulatorSet.size());
         assertEquals(2, variableDefinitionsOfRegulator2Set.size());
 
-        // --- remove an existing variables set --- //
+        // --- Remove an existing variables set --- //
         mvcResult = mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/remove")
                         .content(objectMapper.writeValueAsString(List.of(variablesSet2.get(2).getName())))
                         .contentType(APPLICATION_JSON))
@@ -654,7 +666,7 @@ public class ModelControllerTest {
         // must contains all variables sets after removing
         assertTrue(variablesSet2.containsAll(variablesSet3));
 
-        // --- remove all variables set --- //
+        // --- Remove all variables set --- //
         mvcResult = mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/remove-all")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
@@ -666,7 +678,7 @@ public class ModelControllerTest {
         // Check result
         assertEquals(0, variablesSet4.size());
 
-        // --- add an existing variables set --- //
+        // --- Add an existing variables set --- //
         mvcResult = mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/add")
                         .content(objectMapper.writeValueAsString(List.of(variablesSet2.get(2).getName())))
                         .contentType(APPLICATION_JSON))
@@ -679,7 +691,13 @@ public class ModelControllerTest {
         // Check result
         assertEquals(1, variablesSet5.size());
 
-        // --- delete definitively a variables set --- //
+        // --- Add an unknown existing variables set => must fail fast --- //
+        mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/add")
+                        .content(objectMapper.writeValueAsString(List.of("variable_set_unknown")))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        // --- Delete definitively a variables set --- //
         mvcResult = mvc.perform(delete("/models/variables-sets")
                         .content(objectMapper.writeValueAsString(List.of(variablesSet2.get(2).getName())))
                         .contentType(APPLICATION_JSON))

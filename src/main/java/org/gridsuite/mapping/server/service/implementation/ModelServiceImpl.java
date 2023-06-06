@@ -141,6 +141,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public Model addNewParameterDefinitionsToModel(String modelName, List<ModelParameterDefinition> parameterDefinitions) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -161,6 +162,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -190,6 +192,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public Model removeExistingParameterDefinitionsFromModel(String modelName, List<String> parameterDefinitionNames) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -212,6 +215,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public Model removeAllParameterDefinitionsOnModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -227,6 +231,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public List<ModelParameterDefinition> saveNewParameterDefinitions(List<ModelParameterDefinition> parameterDefinitions) {
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             Set<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream().map(variableDefinition -> new ModelParameterDefinitionEntity(null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -238,6 +243,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public List<String> deleteParameterDefinitions(List<String> parameterDefinitionNames) {
         if (!CollectionUtils.isEmpty(parameterDefinitionNames)) {
             modelParameterDefinitionRepository.deleteAllById(parameterDefinitionNames);
