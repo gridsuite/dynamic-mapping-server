@@ -58,8 +58,8 @@ public class ScriptControllerTest {
 
     private void cleanDB() {
         scriptRepository.deleteAll();
-        modelParameterDefinitionRepository.deleteAll();
         modelRepository.deleteAll();
+        modelParameterDefinitionRepository.deleteAll();
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
