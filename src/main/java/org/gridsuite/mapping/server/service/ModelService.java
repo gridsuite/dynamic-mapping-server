@@ -44,6 +44,8 @@ public interface ModelService {
     // --- END parameter definition-related service methods --- //
 
     // --- BEGIN variable-related service methods --- //
+    List<ModelVariableDefinition> getVariableDefinitionsFromModel(String modelName);
+
     Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions);
 
     Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames);
@@ -54,7 +56,11 @@ public interface ModelService {
 
     Model removeAllVariableDefinitionsOnModel(String modelName);
 
+    List<VariablesSet> getVariablesSetsFromModel(String modelName);
+
     VariablesSet saveNewVariablesSet(VariablesSet variableSet);
+
+    List<ModelVariableDefinition> getVariableDefinitionsFromVariablesSet(String variableSetName);
 
     VariablesSet addNewVariableDefinitionToVariablesSet(String variableSetName, List<ModelVariableDefinition> variableDefinitions);
 

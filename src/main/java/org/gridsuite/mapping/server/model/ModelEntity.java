@@ -30,7 +30,7 @@ import static javax.persistence.TemporalType.TIMESTAMP;
 @Setter
 @Entity
 @Table(name = "models")
-public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String> implements Serializable {
+public class ModelEntity implements Serializable {
 
     // Could be replaced with UUID, but we lose the ease of use of names
     @Id
@@ -41,22 +41,28 @@ public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String
     @Column(name = "equipment_type")
     private EquipmentType equipmentType;
 
-    @ManyToMany(targetEntity = ModelParameterDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "models_model_parameter_definitions",
+            joinColumns = {@JoinColumn(name = "model_name")},
+            inverseJoinColumns = {@JoinColumn(name = "parameter_definition_name", referencedColumnName = "name")}
+    )
     private Set<ModelParameterDefinitionEntity> parameterDefinitions = new LinkedHashSet<>(0);
 
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
-    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    // must exclude CascadeType.REMOVE to avoid unexpected cascade on delete a ModelVariableDefinitionEntity
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "models_model_variable_definitions",
+            joinColumns = {@JoinColumn(name = "model_name")},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_name")}
+    )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
     @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
-
-    @Override
-    public String getId() {
-        return modelName;
-    }
 
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();

@@ -53,11 +53,9 @@ public class ModelParameterDefinitionEntity implements Serializable {
     @Column(name = "fixed_value")
     private String fixedValue;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinTable(
-            name = "models_model_parameter_definitions",
-            joinColumns = {@JoinColumn(name = "parameter_definition_name", referencedColumnName = "name")},
-            inverseJoinColumns = {@JoinColumn(name = "model_name")}
+    @ManyToMany(
+        mappedBy = "parameterDefinitions",
+        cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
     )
     private Set<ModelEntity> models;
 

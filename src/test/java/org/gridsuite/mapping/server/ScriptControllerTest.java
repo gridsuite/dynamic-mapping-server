@@ -57,8 +57,8 @@ public class ScriptControllerTest {
 
     private void cleanDB() {
         scriptRepository.deleteAll();
-        modelParameterDefinitionRepository.deleteAll();
         modelRepository.deleteAll();
+        modelParameterDefinitionRepository.deleteAll();
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
@@ -84,7 +84,7 @@ public class ScriptControllerTest {
         loadGroups.add(loadGroup);
         loadModel.setSetsGroups(loadGroups);
 
-        ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
+        Set<ModelParameterDefinitionEntity> definitions = new LinkedHashSet<>();
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
         definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu", loadModel));
@@ -383,12 +383,12 @@ public class ScriptControllerTest {
         String parFile = "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>\n" +
                 "<parametersSet xmlns=\\\"http://www.rte-france.com/dynawo\\\">\n" +
                 "    <set id=\\\"LAB\\\">\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_U0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"v_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_Q0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"q_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_UPhase0\\\" origData=\\\"IIDM\\\" origName=\\\"angle_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_P0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"p_pu\\\"/>\n" +
                 "        <par type=\\\"DOUBLE\\\" name=\\\"load_alpha\\\" value=\\\"1.5\\\"/>\n" +
                 "        <par type=\\\"DOUBLE\\\" name=\\\"load_beta\\\" value=\\\"2.5\\\"/>\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_P0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"p_pu\\\"/>\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_Q0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"q_pu\\\"/>\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_U0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"v_pu\\\"/>\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_UPhase0\\\" origData=\\\"IIDM\\\" origName=\\\"angle_pu\\\"/>\n" +
                 "    </set>\n" +
                 "</parametersSet>";
 
