@@ -81,30 +81,34 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public ParametersSetsGroup saveParametersSetsGroup(String modelName, ParametersSetsGroup setsGroup, Boolean strict) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
-        if (foundModel.isPresent()) {
-            ModelEntity modelToUpdate = foundModel.get();
-            List<ModelSetsGroupEntity> savedGroups = modelToUpdate.getSetsGroups();
-            ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName().equals(setsGroup.getName())).findAny().orElse(null);
-            ModelSetsGroupEntity groupToAdd = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
-            groupToAdd.getSets().forEach(set -> set.setUpdatedDate(new Date()));
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-            if (previousGroup == null) {
-                savedGroups.add(groupToAdd);
-            } else {
-                // If additional checks are required here, ensure that set erasure cannot happen here with sets merging.
-                groupToAdd.getSets().forEach(set ->
-                        previousGroup.getSets().add(set)
-                );
-            }
-            if (new Model(modelToUpdate).isParameterSetGroupValid(setsGroup.getName(), strict)) {
-                modelRepository.save(modelToUpdate);
-                return setsGroup;
-            } else {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-            }
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
+
+        /*
+        List<ModelSetsGroupEntity> savedGroups = modelToUpdate.getSetsGroups();
+        ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName().equals(setsGroup.getName())).findAny().orElse(null);
+        ModelSetsGroupEntity groupToAdd = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
+        groupToAdd.getSets().forEach(set -> set.setUpdatedDate(new Date()));
+
+        if (previousGroup == null) {
+            savedGroups.add(groupToAdd);
         } else {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+            // If additional checks are required here, ensure that set erasure cannot happen here with sets merging.
+            groupToAdd.getSets().forEach(set ->
+                    previousGroup.getSets().add(set)
+            );
+        }*/
+
+        // do merge with the list of set group
+        ModelSetsGroupEntity newSetsGroupEntity = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
+        modelToUpdate.addSetsGroup(List.of(newSetsGroupEntity));
+
+        if (new Model(modelToUpdate).isParameterSetGroupValid(setsGroup.getName(), strict)) {
+            modelRepository.save(modelToUpdate);
+            return setsGroup;
+        } else {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
     }
 

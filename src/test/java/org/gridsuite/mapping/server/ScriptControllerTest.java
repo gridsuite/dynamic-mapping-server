@@ -71,7 +71,7 @@ public class ScriptControllerTest {
 
         // Prepare models
         ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new LinkedHashSet<>(), null, Set.of(), Set.of(), null, null);
-        ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
+        Set<ModelSetsGroupEntity> loadGroups = new LinkedHashSet<>();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", SetGroupType.FIXED, null, loadModel, null, null);
         Set<ModelParameterSetEntity> groupSets = new LinkedHashSet<>();
         ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", null, loadGroup, null, null);
@@ -95,13 +95,13 @@ public class ScriptControllerTest {
         modelRepository.save(loadModel);
 
         ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
-        ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
+        Set<ModelSetsGroupEntity> generatorThreeGroups = new LinkedHashSet<>();
         generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", SetGroupType.PREFIX, null, generatorThreeModel, null, null));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
         ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
-        ArrayList<ModelSetsGroupEntity> generatorFourGroups = new ArrayList<>();
+        Set<ModelSetsGroupEntity> generatorFourGroups = new LinkedHashSet<>();
         generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", SetGroupType.PREFIX, null, generatorFourModel, null, null));
         generatorFourModel.setSetsGroups(generatorFourGroups);
         modelRepository.save(generatorFourModel);

@@ -50,7 +50,7 @@ public class ModelEntity implements Serializable {
     private Set<ModelParameterDefinitionEntity> parameterDefinitions = new LinkedHashSet<>(0);
 
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
+    private Set<ModelSetsGroupEntity> setsGroups = new LinkedHashSet<>(0);
 
     // must exclude CascadeType.REMOVE to avoid unexpected cascade on delete a ModelVariableDefinitionEntity
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
@@ -68,7 +68,7 @@ public class ModelEntity implements Serializable {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
         parameterDefinitions = modelToConvert.getParameterDefinitions() != null ? modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(this, parameterDefinition)).collect(Collectors.toSet()) : null;
-        setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
+        setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
         variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(this, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
         variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(this, variablesSet)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
     }

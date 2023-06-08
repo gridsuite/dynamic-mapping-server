@@ -1,0 +1,78 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="phamquy (generated)" id="1685968018795-1">
+        <addColumn tableName="model_parameter_sets">
+            <column name="created_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-2">
+        <addColumn tableName="model_parameters">
+            <column name="created_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-3">
+        <addColumn tableName="model_sets_group">
+            <column name="created_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-4">
+        <addColumn tableName="model_parameter_sets">
+            <column name="updated_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-5">
+        <addColumn tableName="model_parameters">
+            <column name="updated_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-6">
+        <addColumn tableName="model_sets_group">
+            <column name="updated_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-7">
+        <dropForeignKeyConstraint baseTableName="model_parameter_sets" constraintName="model_parameter_sets_fk"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-8">
+        <dropForeignKeyConstraint baseTableName="MODEL_PARAMETERS" constraintName="PARAMETER_SET_FK"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-9">
+        <dropColumn columnName="LAST_MODIFIED_DATE" tableName="MODEL_PARAMETER_SETS"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-10">
+        <dropPrimaryKey tableName="model_parameter_sets"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-11">
+        <dropColumn columnName="MODEL_NAME" tableName="model_parameter_sets"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-12">
+        <dropPrimaryKey tableName="model_parameters"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-13">
+        <dropColumn columnName="GROUP_NAME" tableName="model_parameters"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-14">
+        <dropColumn columnName="GROUP_TYPE" tableName="model_parameters"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-15">
+        <dropColumn columnName="MODEL_NAME" tableName="model_parameters"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-16">
+        <addPrimaryKey columnNames="name" constraintName="model_parameter_setsPK" tableName="model_parameter_sets"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-17">
+        <addPrimaryKey columnNames="set_name, name" constraintName="model_parametersPK" tableName="model_parameters"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-18">
+        <dropPrimaryKey tableName="model_sets_group"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-19">
+        <addPrimaryKey columnNames="type, name" constraintName="model_sets_groupPK" tableName="model_sets_group"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-20">
+        <addForeignKeyConstraint baseColumnNames="group_type,group_name" baseTableName="model_parameter_sets" constraintName="model_parameter_sets_fk" referencedColumnNames="type,name" referencedTableName="model_sets_group"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685968018795-21">
+        <addForeignKeyConstraint baseColumnNames="set_name" baseTableName="model_parameters" constraintName="parameter_set_parameter_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="model_parameter_sets" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

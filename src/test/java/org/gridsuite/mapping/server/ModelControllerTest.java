@@ -94,7 +94,7 @@ public class ModelControllerTest {
 
         // prepare token model
         ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD,
-                new LinkedHashSet<>(), new ArrayList<>(), Set.of(), Set.of(), null, null);
+                new LinkedHashSet<>(), new LinkedHashSet<>(), Set.of(), Set.of(), null, null);
         ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
@@ -150,7 +150,8 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Date createdDate = new ArrayList<>(modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets()).get(0).getCreatedDate();
+        Date createdDate = new ArrayList<>(new ArrayList<>(modelRepository.findById(modelName).get().getSetsGroups()).get(0)
+                .getSets()).get(0).getCreatedDate();
 
         // Update data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -158,7 +159,8 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Date updatedDate = new ArrayList<>(modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets()).get(0).getUpdatedDate();
+        Date updatedDate = new ArrayList<>(new ArrayList<>(modelRepository.findById(modelName).get().getSetsGroups()).get(0)
+                .getSets()).get(0).getUpdatedDate();
 
         assertThat(createdDate.compareTo(updatedDate) < 0);
     }
