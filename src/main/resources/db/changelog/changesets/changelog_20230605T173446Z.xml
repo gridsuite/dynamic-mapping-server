@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="phamquy (generated)" id="1685986494875-3">
+        <createTable tableName="models_model_parameter_definitions">
+            <column name="parameter_definition_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="model_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-4">
+        <addColumn tableName="model_parameter_definitions">
+            <column name="created_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-5">
+        <addColumn tableName="models">
+            <column name="created_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-6">
+        <addColumn tableName="model_parameter_definitions">
+            <column name="updated_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-7">
+        <addColumn tableName="models">
+            <column name="updated_date" type="timestamp"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-1">
+        <dropPrimaryKey tableName="model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-11">
+        <dropForeignKeyConstraint baseTableName="MODEL_PARAMETER_DEFINITIONS" constraintName="MODEL_PARAMETER_DEFINITION_FK"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-12">
+        <dropColumn columnName="MODEL_NAME" tableName="model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-2">
+        <addPrimaryKey columnNames="name" constraintName="model_parameter_definitionsPK" tableName="model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-9">
+        <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="models_model_parameter_definitions" constraintName="FK1i2ywabny2p26y729k7umat5o" deferrable="false" initiallyDeferred="false" referencedColumnNames="model_name" referencedTableName="models" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1685986494875-10">
+        <addForeignKeyConstraint baseColumnNames="parameter_definition_name" baseTableName="models_model_parameter_definitions" constraintName="FK4cibfv1ro6thr2rc9repn16ki" deferrable="false" initiallyDeferred="false" referencedColumnNames="name" referencedTableName="model_parameter_definitions" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
