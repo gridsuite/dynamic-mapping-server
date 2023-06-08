@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
@@ -76,10 +77,11 @@ public class ModelControllerTest {
     ObjectMapper objectMapper;
 
     public void cleanDB() {
-        modelVariableRepository.deleteAll();
-        modelVariablesSetRepository.deleteAll();
-        modelParameterDefinitionRepository.deleteAll();
+        // delete from parent to child
         modelRepository.deleteAll();
+        modelVariablesSetRepository.deleteAll();
+        modelVariableRepository.deleteAll();
+        modelParameterDefinitionRepository.deleteAll();
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
@@ -556,7 +558,6 @@ public class ModelControllerTest {
     }
 
     @Test
-    @Transactional
     public void testSaveNewVariablesSetsWhichShareVariableDefinitions() throws Exception {
         String newVariablesSetJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_ThreeWindingsSynchronousGenerator.json");
         String newVariablesSet2Json = readFileAsString("src/test/resources/data/model/generator/variablesSet_FourWindingsSynchronousGenerator.json");
@@ -570,21 +571,7 @@ public class ModelControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         // Get initial variable definitions
-        VariablesSet variablesSet = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
-        List<ModelVariableDefinition> variableDefinitions = variablesSet.getVariableDefinitions();
-
-        // Check result
-        assertEquals(2, variableDefinitions.size());
-
-        // --- Get initial variable definition from GET endpoint --- //
-        mvcResult = mvc.perform(get("/models/variables-sets/" + variablesSet.getName() + "/variables"))
-                .andExpect(status().isOk()).andReturn();
-        List<ModelVariableDefinition> variableDefinitions1 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(2, variableDefinitions1.size());
-
-        // --- Try to get variable definition from unknown variables set --- //
-        mvc.perform(get("/models/variables-sets/" + "variable_set_unknown" + "/variables"))
-                .andExpect(status().isNotFound());
+        VariablesSet threeWindingVariablesSet = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
 
         // --- Put the second variables set with 3 variable definitions in which 2 ones are identical to first variables set --- //
         mvcResult = mvc.perform(post("/models/variables-sets")
@@ -593,14 +580,88 @@ public class ModelControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         // Get initial variable definitions
-        VariablesSet variablesSet2 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
-        List<ModelVariableDefinition> variableDefinitions2 = variablesSet2.getVariableDefinitions();
+        VariablesSet fourWindingVariablesSet = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
 
-        // Check result
-        assertEquals(3, variableDefinitions2.size());
+        // --- Get initial variable definition from GET endpoint --- //
+        mvcResult = mvc.perform(get("/models/variables-sets/" + threeWindingVariablesSet.getName() + "/variables"))
+                .andExpect(status().isOk()).andReturn();
+        List<ModelVariableDefinition> threeWindingVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+        assertEquals(2, threeWindingVariableDefinitions.size());
+
+        // --- Try to get variable definition from unknown variables set --- //
+        mvc.perform(get("/models/variables-sets/" + "variable_set_unknown" + "/variables"))
+                .andExpect(status().isNotFound());
+
+        // --- Get initial variable definition from GET endpoint --- //
+        mvcResult = mvc.perform(get("/models/variables-sets/" + fourWindingVariablesSet.getName() + "/variables"))
+                .andExpect(status().isOk()).andReturn();
+
+        List<ModelVariableDefinition> fourWindingVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+        assertEquals(3, fourWindingVariableDefinitions.size());
 
         // cross-check between two variables set
-        variableDefinitions2.containsAll(variableDefinitions);
+        Sets.SetView<ModelVariableDefinition> intersectionVariableDefinitions = Sets.intersection(new HashSet<>(fourWindingVariableDefinitions), new HashSet<>(threeWindingVariableDefinitions));
+        assertEquals(2, intersectionVariableDefinitions.size());
+    }
+
+    @Test
+    public void testSaveNewLoadModelsWhichShareParameterDefinitionsAndVariableDefinitions() throws Exception {
+        String newLoadAlphaBetaModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
+        String newLoadPQModelJson = readFileAsString("src/test/resources/data/model/load/loadPQ.json");
+
+        cleanDB();
+
+
+        // *** LOAD ALPHA BETA *** //
+        // --- Put data first time with initial parameter/variable definitions --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newLoadAlphaBetaModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        String loadAlphaBetaModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // *** LOAD PQ *** //
+        // --- Put data first time with initial parameter/variable definitions --- //
+        mvcResult = mvc.perform(post("/models/")
+                        .content(newLoadPQModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        String loadPQModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Get variable definitions from GET endpoint --- //
+        mvcResult = mvc.perform(get("/models/" + loadAlphaBetaModelName + "/variables"))
+                .andExpect(status().isOk()).andReturn();
+        List<ModelVariableDefinition> loadAlphaBetaVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+        assertEquals(5, loadAlphaBetaVariableDefinitions.size());
+
+        // --- Get initial parameter definitions from GET endpoint --- //
+        mvcResult = mvc.perform(get("/models/" + loadAlphaBetaModelName + "/parameters/definitions"))
+                .andExpect(status().isOk()).andReturn();
+        List<ModelParameterDefinition> loadAlphaBetaParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
+        assertEquals(6, loadAlphaBetaParameterDefinitions.size());
+
+        // --- Get variable definitions from GET endpoint --- //
+        mvcResult = mvc.perform(get("/models/" + loadPQModelName + "/variables"))
+                .andExpect(status().isOk()).andReturn();
+        List<ModelVariableDefinition> loadPQVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+        assertEquals(3, loadPQVariableDefinitions.size());
+
+        // --- Get initial parameter definitions from GET endpoint --- //
+        mvcResult = mvc.perform(get("/models/" + loadPQModelName + "/parameters/definitions"))
+                .andExpect(status().isOk()).andReturn();
+        List<ModelParameterDefinition> loadPQParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
+        assertEquals(4, loadPQParameterDefinitions.size());
+
+        // cross-check variable definitions between two models
+        Sets.SetView<ModelVariableDefinition> intersectionVariableDefinitions = Sets.intersection(new HashSet<>(loadAlphaBetaVariableDefinitions), new HashSet<>(loadPQVariableDefinitions));
+        assertEquals(3, intersectionVariableDefinitions.size());
+
+        // cross-check parameter definitions between two models
+        Sets.SetView<ModelParameterDefinition> intersectionParameterDefinitions = Sets.intersection(new HashSet<>(loadAlphaBetaParameterDefinitions), new HashSet<>(loadPQParameterDefinitions));
+        assertEquals(4, intersectionParameterDefinitions.size());
+
     }
 
     @Test
