@@ -611,7 +611,6 @@ public class ModelControllerTest {
 
         cleanDB();
 
-
         // *** LOAD ALPHA BETA *** //
         // --- Put data first time with initial parameter/variable definitions --- //
         MvcResult mvcResult = mvc.perform(post("/models/")
