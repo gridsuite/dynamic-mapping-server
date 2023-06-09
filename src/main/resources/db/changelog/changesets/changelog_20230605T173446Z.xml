@@ -3,15 +3,15 @@
     <changeSet author="phamquy (generated)" id="1685986494875-0">
         <comment>Clear any existing legacy data in tables</comment>
         <sql splitStatements="true">
-            TRUNCATE TABLE model_parameters;
-            TRUNCATE TABLE model_parameter_sets;
-            TRUNCATE TABLE model_sets_group;
-            TRUNCATE TABLE model_parameter_definitions;
-            TRUNCATE TABLE models_model_variable_sets
-            TRUNCATE TABLE models_model_variable_definitions;
-            TRUNCATE TABLE model_variable_sets;
-            TRUNCATE TABLE model_variable_definitions;
-            TRUNCATE TABLE models;
+            DELETE FROM model_parameters;
+            DELETE FROM model_parameter_sets;
+            DELETE FROM model_sets_group;
+            DELETE FROM model_parameter_definitions;
+            DELETE FROM models_model_variable_sets;
+            DELETE FROM models_model_variable_definitions;
+            DELETE FROM model_variable_sets;
+            DELETE FROM model_variable_definitions;
+            DELETE FROM models;
         </sql>
     </changeSet>
     <changeSet author="phamquy (generated)" id="1685986494875-3">
