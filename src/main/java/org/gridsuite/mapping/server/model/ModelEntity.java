@@ -30,7 +30,7 @@ import static javax.persistence.TemporalType.TIMESTAMP;
 @Setter
 @Entity
 @Table(name = "models")
-public class ModelEntity implements Serializable {
+public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String> implements Serializable {
 
     // Could be replaced with UUID, but we lose the ease of use of names
     @Id
@@ -63,6 +63,11 @@ public class ModelEntity implements Serializable {
 
     @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
+
+    @Override
+    public String getId() {
+        return modelName;
+    }
 
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();

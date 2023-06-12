@@ -221,7 +221,7 @@ public class ModelControllerTest {
         // Prepare models
         ModelEntity loadModel = modelRepository.findById("LoadAlphaBeta").get();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", SetGroupType.FIXED, new LinkedHashSet<>(), loadModel, null, null);
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", new ArrayList<>(), loadGroup, null, null);
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", new LinkedHashSet<>(), loadGroup, null, null);
         List<ModelParameterEntity> setParameters = new ArrayList<>();
         setParameters.add(new ModelParameterEntity("load_alpha", "1.5", setToSave, null, null));
         setParameters.add(new ModelParameterEntity("load_beta", "2.5", setToSave, null, null));

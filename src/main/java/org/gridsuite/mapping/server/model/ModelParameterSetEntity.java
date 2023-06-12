@@ -36,7 +36,7 @@ public class ModelParameterSetEntity implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "parameterSet", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private List<ModelParameterEntity> parameters;
+    private Set<ModelParameterEntity> parameters;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumns(foreignKey = @ForeignKey(name = "model_parameter_sets_fk"), value = {
@@ -48,7 +48,7 @@ public class ModelParameterSetEntity implements Serializable {
     public ModelParameterSetEntity(ModelSetsGroupEntity group, ParametersSet set) {
         this(set.getName(), null, group, null, null);
         this.parameters = set.getParameters().stream().map(parameter -> new ModelParameterEntity(this, parameter))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     @CreatedDate

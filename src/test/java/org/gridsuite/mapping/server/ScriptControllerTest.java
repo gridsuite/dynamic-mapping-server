@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -70,19 +71,15 @@ public class ScriptControllerTest {
         cleanDB();
 
         // Prepare models
-        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new LinkedHashSet<>(), null, Set.of(), Set.of(), null, null);
-        Set<ModelSetsGroupEntity> loadGroups = new LinkedHashSet<>();
-        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", SetGroupType.FIXED, null, loadModel, null, null);
-        Set<ModelParameterSetEntity> groupSets = new LinkedHashSet<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", null, loadGroup, null, null);
+        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), null, null);
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", SetGroupType.FIXED, new LinkedHashSet<>(), loadModel, null, null);
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", new LinkedHashSet<>(), loadGroup, null, null);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
         setParameters.add(new ModelParameterEntity("load_alpha", "1.5", setToSave, null, null));
         setParameters.add(new ModelParameterEntity("load_beta", "2.5", setToSave, null, null));
-        setToSave.setParameters(setParameters);
-        groupSets.add(setToSave);
-        loadGroup.setSets(groupSets);
-        loadGroups.add(loadGroup);
-        loadModel.setSetsGroups(loadGroups);
+        setToSave.addParameters(setParameters);
+        //loadGroup.addSets(List.of(setToSave));
+        loadModel.addSetsGroup(List.of(loadGroup));
 
         Set<ModelParameterDefinitionEntity> definitions = new LinkedHashSet<>();
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
@@ -94,16 +91,12 @@ public class ScriptControllerTest {
         loadModel.addParameterDefinitions(definitions);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
-        Set<ModelSetsGroupEntity> generatorThreeGroups = new LinkedHashSet<>();
-        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", SetGroupType.PREFIX, null, generatorThreeModel, null, null));
-        generatorThreeModel.setSetsGroups(generatorThreeGroups);
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), null, null);
+        generatorThreeModel.addSetsGroup(List.of(new ModelSetsGroupEntity("GSTWPR", SetGroupType.PREFIX, new LinkedHashSet<>(), generatorThreeModel, null, null)));
         modelRepository.save(generatorThreeModel);
 
-        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
-        Set<ModelSetsGroupEntity> generatorFourGroups = new LinkedHashSet<>();
-        generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", SetGroupType.PREFIX, null, generatorFourModel, null, null));
-        generatorFourModel.setSetsGroups(generatorFourGroups);
+        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), new LinkedHashSet<>(), null, null);
+        generatorFourModel.addSetsGroup(List.of(new ModelSetsGroupEntity("GSFWPR", SetGroupType.PREFIX, new LinkedHashSet<>(), generatorFourModel, null, null)));
         modelRepository.save(generatorFourModel);
     }
 
