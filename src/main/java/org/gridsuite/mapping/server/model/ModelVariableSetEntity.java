@@ -35,7 +35,11 @@ public class ModelVariableSetEntity implements Serializable {
     @Column(name = "variable_set_name")
     private String name;
 
-    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "variablesSets", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(name = "model_variable_sets_model_variable_definitions",
+            joinColumns = {@JoinColumn(name = "variable_set_name")},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_name")}
+    )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})

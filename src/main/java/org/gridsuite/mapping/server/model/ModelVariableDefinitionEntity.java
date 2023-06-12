@@ -45,19 +45,15 @@ public class ModelVariableDefinitionEntity implements Serializable {
     @Column(name = "factor")
     private Double factor;
 
-    // must exclude CascadeType.REMOVE to avoid unexpected cascade on delete a ModelVariableDefinitionEntity
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinTable(
-            name = "models_model_variable_definitions",
-            joinColumns = {@JoinColumn(name = "variable_definition_name")},
-            inverseJoinColumns = {@JoinColumn(name = "model_name")}
-    )
+    @ManyToMany(
+        mappedBy = "variableDefinitions",
+        cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelEntity> models;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinTable(name = "model_variable_sets_model_variable_definitions",
-            joinColumns = {@JoinColumn(name = "variable_definition_name")},
-            inverseJoinColumns = {@JoinColumn(name = "variable_set_name")})
+    @ManyToMany(
+            mappedBy = "variableDefinitions",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
+    )
     private Set<ModelVariableSetEntity> variablesSets;
 
     public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
