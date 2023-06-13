@@ -57,19 +57,19 @@
   "automata": [
     {
       "family": "CURRENT_LIMIT",
-      "family": "CURRENT_LIMIT",
       "model": "CurrentLimitAutomaton",
       "setGroup": "CLA_2_4",
       "watchedElement": "_BUS____2-BUS____4-1_AC",
-      "side": "Branch.Side.TWO"
+      "side": "Branch.Side.TWO",
+      "controlledQuadripole": "_BUS____2-BUS____4-1_AC"
     },
     {
-      "family": "CURRENT_LIMIT",
       "family": "CURRENT_LIMIT",
       "model": "CurrentLimitAutomaton",
       "setGroup": "CLA_2_5",
       "watchedElement": "_BUS____2-BUS____5-1_AC",
-      "side": "Branch.Side.TWO"
+      "side": "Branch.Side.TWO",
+      "controlledQuadripole": "_BUS____2-BUS____5-1_AC"
     }
   ],
   "controlledParameters": true
