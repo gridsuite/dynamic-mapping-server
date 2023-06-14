@@ -179,7 +179,8 @@ public class ModelServiceImpl implements ModelService {
 
             // check whether found all, fail fast
             if (foundParameterDefinitionEntities.size() != parameterDefinitionNames.size()) {
-                List<String> foundNames = foundParameterDefinitionEntities.stream().map(ModelParameterDefinitionEntity::getName).collect(Collectors.toList());
+                List<String> foundNames = foundParameterDefinitionEntities.stream()
+                        .map(ModelParameterDefinitionEntity::getName).collect(Collectors.toList());
                 List<String> notFoundNames = parameterDefinitionNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
                 throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some parameter definition not found: " + notFoundNames);
             }
@@ -238,7 +239,9 @@ public class ModelServiceImpl implements ModelService {
     @Transactional
     public List<ModelParameterDefinition> saveNewParameterDefinitions(List<ModelParameterDefinition> parameterDefinitions) {
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
-            Set<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream().map(variableDefinition -> new ModelParameterDefinitionEntity(null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream()
+                    .map(variableDefinition -> new ModelParameterDefinitionEntity(null, variableDefinition))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelParameterDefinitionEntity> savedParameterDefinitionEntities = modelParameterDefinitionRepository.saveAll(parameterDefinitionEntities);
             return savedParameterDefinitionEntities.stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
         }
@@ -255,6 +258,9 @@ public class ModelServiceImpl implements ModelService {
         return parameterDefinitionNames;
     }
 
+    // --- END parameter definition-related service methods --- //
+
+    // --- BEGIN variable-related service methods --- //
     @Override
     public List<ModelVariableDefinition> getVariableDefinitionsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
@@ -264,9 +270,7 @@ public class ModelServiceImpl implements ModelService {
         Model modelToSend = new Model(modelEntity);
         return modelToSend.getVariableDefinitions();
     }
-    // --- END parameter definition-related service methods --- //
 
-    // --- BEGIN variable-related service methods --- //
     @Override
     @Transactional
     public Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions) {
@@ -303,7 +307,8 @@ public class ModelServiceImpl implements ModelService {
 
             // check whether found all, fail fast
             if (foundVariableDefinitionEntities.size() != variableDefinitionNames.size()) {
-                List<String> foundNames = foundVariableDefinitionEntities.stream().map(ModelVariableDefinitionEntity::getName).collect(Collectors.toList());
+                List<String> foundNames = foundVariableDefinitionEntities.stream()
+                        .map(ModelVariableDefinitionEntity::getName).collect(Collectors.toList());
                 List<String> notFoundNames = variableDefinitionNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
                 throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some variable definition not found: " + notFoundNames);
             }
@@ -344,7 +349,9 @@ public class ModelServiceImpl implements ModelService {
     @Transactional
     public List<ModelVariableDefinition> saveNewVariableDefinitions(List<ModelVariableDefinition> variableDefinitions) {
         if (!CollectionUtils.isEmpty(variableDefinitions)) {
-            Set<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(null, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream()
+                    .map(variableDefinition -> new ModelVariableDefinitionEntity(null, null, variableDefinition))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelVariableDefinitionEntity> savedVariableDefinitionEntities = modelVariableRepository.saveAll(variableDefinitionEntities);
             return savedVariableDefinitionEntities.stream().map(ModelVariableDefinition::new).collect(Collectors.toList());
         }
@@ -404,7 +411,9 @@ public class ModelServiceImpl implements ModelService {
 
         if (!CollectionUtils.isEmpty(variableDefinitions)) {
             // do merge with existing list
-            List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream().map(variableDefinition -> new ModelVariableDefinitionEntity(null, variableSetToUpdate, variableDefinition)).collect(Collectors.toList());
+            List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream()
+                    .map(variableDefinition -> new ModelVariableDefinitionEntity(null, variableSetToUpdate, variableDefinition))
+                    .collect(Collectors.toList());
             variableSetToUpdate.addVariableDefinitions(variableDefinitionEntities);
             // save modified existing variables set entity
             modelVariablesSetRepository.save(variableSetToUpdate);
@@ -428,7 +437,6 @@ public class ModelServiceImpl implements ModelService {
             variableSetToUpdate.removeVariableDefinitions(foundVariableDefinitionEntities);
 
             // save modified existing variables set entity
-            // variable definitions are systematically deleted via orphanRemoval = true
             modelVariablesSetRepository.save(variableSetToUpdate);
         }
 
@@ -446,7 +454,6 @@ public class ModelServiceImpl implements ModelService {
         variableSetToUpdate.removeVariableDefinitions(variableSetToUpdate.getVariableDefinitions());
 
         // save modified existing variables set entity
-        // variable definitions are systematically deleted via orphanRemoval = true
         modelVariablesSetRepository.save(variableSetToUpdate);
         return new VariablesSet(variableSetToUpdate);
     }
@@ -461,7 +468,9 @@ public class ModelServiceImpl implements ModelService {
         // do merge with the list of variables set
         if (!CollectionUtils.isEmpty(variableSets)) {
             // do merge with existing list
-            List<ModelVariableSetEntity> variablesSetEntities = variableSets.stream().map(variablesSet -> new ModelVariableSetEntity(modelToUpdate, variablesSet)).collect(Collectors.toList());
+            List<ModelVariableSetEntity> variablesSetEntities = variableSets.stream()
+                    .map(variablesSet -> new ModelVariableSetEntity(modelToUpdate, variablesSet))
+                    .collect(Collectors.toList());
             modelToUpdate.addVariablesSets(variablesSetEntities);
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -544,20 +553,8 @@ public class ModelServiceImpl implements ModelService {
     @Override
     @Transactional
     public List<String> deleteVariablesSets(List<String> variablesSetNames) {
-
         if (!CollectionUtils.isEmpty(variablesSetNames)) {
-
-            // cleanup associations
-            List<ModelVariableSetEntity> foundVariablesSetEntities = modelVariablesSetRepository.findAllById(variablesSetNames);
-            for (ModelVariableSetEntity variableSetEntity : foundVariablesSetEntities) {
-                variableSetEntity.removeVariableDefinitions(variableSetEntity.getVariableDefinitions());
-            }
-
-            // delete entity
-            List<String> foundVariablesSetNames = foundVariablesSetEntities.stream().map(ModelVariableSetEntity::getName).collect(Collectors.toList());
-            modelVariablesSetRepository.deleteAllById(foundVariablesSetNames);
-
-            return foundVariablesSetNames;
+            modelVariablesSetRepository.deleteAllById(variablesSetNames);
         }
 
         return variablesSetNames;
