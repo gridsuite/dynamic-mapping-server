@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.service.implementation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelParameterDefinitionRepository;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +33,7 @@ public class ModelServiceImpl implements ModelService {
 
     public static final String MODEL_NOT_FOUND = "Model not found: ";
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
+    public static final String SETS_GROUP_NOT_FOUND = "Sets group not found: ";
 
     private final ModelRepository modelRepository;
     private final ModelParameterDefinitionRepository modelParameterDefinitionRepository;
@@ -52,12 +53,16 @@ public class ModelServiceImpl implements ModelService {
         this.modelVariablesSetRepository = modelVariablesSetRepository;
     }
 
-    private ModelEntity getModelFromOptional(String modelName, Optional<ModelEntity> foundModelOpt) {
-        return foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelName));
+    private ModelEntity getModelFromOptional(String modelInfo, Optional<ModelEntity> foundModelOpt) {
+        return foundModelOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND + modelInfo));
     }
 
-    private ModelVariableSetEntity getVariableSetFromOptional(String variableSetName, Optional<ModelVariableSetEntity> foundVariableSetOpt) {
-        return foundVariableSetOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetName));
+    private ModelVariableSetEntity getVariableSetFromOptional(String variableSetInfo, Optional<ModelVariableSetEntity> foundVariableSetOpt) {
+        return foundVariableSetOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, VARIABLES_SET_NOT_FOUND + variableSetInfo));
+    }
+
+    private ModelSetsGroupEntity getSetsGroupFromOptional(String setsGroupInfo, Optional<ModelSetsGroupEntity> foundSetsGroupOpt) {
+        return foundSetsGroupOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, SETS_GROUP_NOT_FOUND + setsGroupInfo));
     }
 
     @Override
@@ -67,44 +72,43 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
-        if (foundModel.isPresent()) {
-            try {
-                return foundModel.get().getSetsGroups().stream().map(ParametersSetsGroup::new).filter(parametersSetsGroup -> parametersSetsGroup.getName().equals(groupName) && parametersSetsGroup.getType() == groupType).findAny().orElseThrow().getSets();
-            } catch (NoSuchElementException e) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No group found with this type");
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
-        }
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelEntity = getModelFromOptional(modelName, foundModelOpt);
+
+        Optional<ModelSetsGroupEntity> modelSetsGroupOpt = modelEntity.getSetsGroups().stream()
+                .filter(setGroup -> StringUtils.equals(setGroup.getName(), groupName) && setGroup.getType() == groupType)
+                .findAny();
+        ModelSetsGroupEntity setsGroup = getSetsGroupFromOptional("[" + groupName + "," + groupType.name() + "]", modelSetsGroupOpt);
+
+        return setsGroup.getSets().stream().map(ParametersSet::new).collect(Collectors.toList());
     }
 
     @Override
     public ParametersSetsGroup saveParametersSetsGroup(String modelName, ParametersSetsGroup setsGroup, Boolean strict) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
-        if (foundModel.isPresent()) {
-            ModelEntity modelToUpdate = foundModel.get();
-            List<ModelSetsGroupEntity> savedGroups = modelToUpdate.getSetsGroups();
-            ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName().equals(setsGroup.getName())).findAny().orElse(null);
-            ModelSetsGroupEntity groupToAdd = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
-            groupToAdd.getSets().forEach(set -> set.setLastModifiedDate(new Date()));
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
-            if (previousGroup == null) {
-                savedGroups.add(groupToAdd);
-            } else {
-                // If additional checks are required here, ensure that set erasure cannot happen here with sets merging.
-                groupToAdd.getSets().forEach(set ->
-                        previousGroup.getSets().add(set)
-                );
-            }
-            if (new Model(modelToUpdate).isParameterSetGroupValid(setsGroup.getName(), strict)) {
-                modelRepository.save(modelToUpdate);
-                return setsGroup;
-            } else {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-            }
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
+
+        List<ModelSetsGroupEntity> savedGroups = modelToUpdate.getSetsGroups();
+        ModelSetsGroupEntity previousGroup = savedGroups.stream().filter(savedGroup -> savedGroup.getName().equals(setsGroup.getName())).findAny().orElse(null);
+        ModelSetsGroupEntity groupToAdd = new ModelSetsGroupEntity(modelToUpdate, setsGroup);
+        groupToAdd.getSets().forEach(set -> set.setLastModifiedDate(new Date()));
+
+        if (previousGroup == null) {
+            savedGroups.add(groupToAdd);
         } else {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+            // If additional checks are required here, ensure that set erasure cannot happen here with sets merging.
+            groupToAdd.getSets().forEach(set ->
+                    previousGroup.getSets().add(set)
+            );
+        }
+
+        if (new Model(modelToUpdate).isParameterSetGroupValid(setsGroup.getName(), strict)) {
+            modelRepository.save(modelToUpdate);
+            return setsGroup;
+        } else {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -117,20 +121,19 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
-        if (foundModel.isPresent()) {
-            ModelEntity modelToEdit = foundModel.get();
-            ModelSetsGroupEntity setsGroup = modelToEdit.getSetsGroups().stream()
-                    .filter(setGroup -> setGroup.getName().equals(groupName) && setGroup.getType().equals(groupType))
-                    .findAny()
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No group found"));
-            List<ModelParameterSetEntity> sets = setsGroup.getSets();
-            setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toList()));
-            modelRepository.save(modelToEdit);
-            return new ParametersSetsGroup(setsGroup);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
-        }
+        Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
+
+        ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
+
+        Optional<ModelSetsGroupEntity> modelSetsGroupOpt = modelToUpdate.getSetsGroups().stream()
+                .filter(setGroup -> StringUtils.equals(setGroup.getName(), groupName) && setGroup.getType() == groupType)
+                .findAny();
+        ModelSetsGroupEntity setsGroup = getSetsGroupFromOptional("[" + groupName + "," + groupType.name() + "]", modelSetsGroupOpt);
+        List<ModelParameterSetEntity> sets = setsGroup.getSets();
+        setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toList()));
+
+        modelRepository.save(modelToUpdate);
+        return new ParametersSetsGroup(setsGroup);
     }
 
     // --- BEGIN parameter definition-related service methods --- //
