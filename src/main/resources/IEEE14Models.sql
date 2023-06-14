@@ -779,12 +779,12 @@ VALUES ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations',
        ('IEEE14', 1, 'GeneratorSynchronousThreeWindingsProportionalRegulations', 'generator_UPhase0', 'IEEE14_GEN____8_SM');
 
 -- variables for LoadAlphaBeta model
-INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, variable_set_name, created_date, updated_date)
-VALUES ('load_PPu', 2, 'MW', 100, NULL, now()::timestamp, now()::timestamp),
-       ('load_PRefPu', 2, 'MW', 100, NULL, now()::timestamp, now()::timestamp),
-       ('load_QPu', 2, 'MW', 100, NULL, now()::timestamp, now()::timestamp),
-       ('load_QRefPu', 2, 'MW', 100, NULL, now()::timestamp, now()::timestamp),
-       ('load_running_value', 1, NULL, NULL, NULL, now()::timestamp, now()::timestamp);
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, created_date, updated_date)
+VALUES ('load_PPu', 2, 'MW', 100, now()::timestamp, now()::timestamp),
+       ('load_PRefPu', 2, 'MW', 100, now()::timestamp, now()::timestamp),
+       ('load_QPu', 2, 'MW', 100, now()::timestamp, now()::timestamp),
+       ('load_QRefPu', 2, 'MW', 100, now()::timestamp, now()::timestamp),
+       ('load_running_value', 1, NULL, NULL, now()::timestamp, now()::timestamp);
 
 INSERT INTO models_model_variable_definitions (model_name, variable_definition_name)
 VALUES ('LoadAlphaBeta', 'load_PPu'),
@@ -798,14 +798,23 @@ VALUES ('Generator', now()::timestamp, now()::timestamp),
        ('VoltageRegulator', now()::timestamp, now()::timestamp);
 
 -- variables grouped in sets used in generator models
-INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, variable_set_name, created_date, updated_date)
-VALUES ('generator_omegaPu', 2, 'pu', NULL, 'Generator', now()::timestamp, now()::timestamp),
-       ('generator_PGen', 2, 'MW', NULL, 'Generator', now()::timestamp, now()::timestamp),
-       ('generator_QGen', 2, 'MW', NULL, 'Generator', now()::timestamp, now()::timestamp),
-       ('generator_UStatorPu', 2, 'pu', NULL, 'Generator', now()::timestamp, now()::timestamp);
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, created_date, updated_date)
+VALUES ('generator_omegaPu', 2, 'pu', NULL, now()::timestamp, now()::timestamp),
+       ('generator_PGen', 2, 'MW', NULL, now()::timestamp, now()::timestamp),
+       ('generator_QGen', 2, 'MW', NULL, now()::timestamp, now()::timestamp),
+       ('generator_UStatorPu', 2, 'pu', NULL, now()::timestamp, now()::timestamp);
 
-INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, variable_set_name, created_date, updated_date)
-VALUES ('voltageRegulator_EfdPu', 2, 'pu', NULL, 'VoltageRegulator', now()::timestamp, now()::timestamp);
+INSERT INTO model_variable_sets_model_variable_definitions (variable_definition_name, variable_set_name)
+VALUES ('generator_omegaPu', 'Generator'),
+       ('generator_PGen', 'Generator'),
+       ('generator_QGen', 'Generator'),
+       ('generator_UStatorPu', 'Generator');
+
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, created_date, updated_date)
+VALUES ('voltageRegulator_EfdPu', 2, 'pu', NULL, now()::timestamp, now()::timestamp);
+
+INSERT INTO model_variable_sets_model_variable_definitions (variable_definition_name, variable_set_name)
+VALUES ('voltageRegulator_EfdPu', 'VoltageRegulator');
 
 -- variables sets for GeneratorSynchronousThreeWindings model
 INSERT INTO models_model_variable_sets (model_name, variable_set_name)
