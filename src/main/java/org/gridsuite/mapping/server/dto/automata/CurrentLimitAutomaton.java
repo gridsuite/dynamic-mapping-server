@@ -11,9 +11,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.dto.automata.extensions.EntityProperty;
+import org.gridsuite.mapping.server.utils.PropertyType;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -31,12 +34,10 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
 
     @Schema(description = "Element watched by the automaton")
     @JsonProperty(PROPERTY_WATCHED_ELEMENT)
-    @EntityProperty(value = PROPERTY_WATCHED_ELEMENT, meta = true)
     private String watchedElement;
 
     @Schema(description = "Side of the automaton")
     @JsonProperty(PROPERTY_SIDE)
-    @EntityProperty(value = PROPERTY_SIDE, meta = true)
     private String side;
 
     @Override
@@ -50,12 +51,28 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public ArrayList<BasicProperty> convertToBasicProperties() {
+    public ArrayList<BasicProperty> getExportedProperties() {
         ArrayList<BasicProperty> properties = new ArrayList<>();
-        properties.add(new BasicProperty(PROPERTY_STATIC_ID, "\"" + watchedElement + "\""));
-        properties.add(new BasicProperty(PROPERTY_SIDE, side));
+        properties.add(new BasicProperty(PROPERTY_STATIC_ID, "\"" + watchedElement + "\"", PropertyType.STRING));
+        properties.add(new BasicProperty(PROPERTY_SIDE, side, PropertyType.STRING));
 
         return properties;
+    }
+
+    @Override
+    public List<BasicProperty> toPersistedProperties() {
+        ArrayList<BasicProperty> properties = new ArrayList<>();
+        properties.add(new BasicProperty(PROPERTY_WATCHED_ELEMENT, watchedElement, PropertyType.STRING));
+        properties.add(new BasicProperty(PROPERTY_SIDE, side, PropertyType.STRING));
+        return properties;
+    }
+
+    @Override
+    public void fromPersistedProperties(List<BasicProperty> properties) {
+        Map<String, BasicProperty> propertiesMap = properties.stream()
+                .collect(Collectors.toMap(BasicProperty::getName, elem -> elem));
+        this.watchedElement = propertiesMap.get(PROPERTY_WATCHED_ELEMENT).getValue();
+        this.side = propertiesMap.get(PROPERTY_SIDE).getValue();
     }
 }
 

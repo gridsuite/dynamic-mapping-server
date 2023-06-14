@@ -11,11 +11,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.dto.automata.extensions.EntityProperty;
-import org.gridsuite.mapping.server.utils.StringListConverter;
+import org.gridsuite.mapping.server.utils.Methods;
+import org.gridsuite.mapping.server.utils.PropertyType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -34,17 +35,14 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
 
     @Schema(description = "Name property")
     @JsonProperty(PROPERTY_NAME)
-    @EntityProperty(value = PROPERTY_NAME, meta = true)
     private String name;
 
     @Schema(description = "U Measurement property")
     @JsonProperty(PROPERTY_U_MEASUREMENTS)
-    @EntityProperty(value = PROPERTY_U_MEASUREMENTS, meta = true, converter = StringListConverter.class)
     private List<String> uMeasurements;
 
     @Schema(description = "Transformers property")
     @JsonProperty(PROPERTY_TRANSFORMERS)
-    @EntityProperty(value = PROPERTY_TRANSFORMERS, meta = true, converter = StringListConverter.class)
     private List<String> transformers;
 
     @Override
@@ -58,12 +56,32 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public ArrayList<BasicProperty> convertToBasicProperties() {
+    public ArrayList<BasicProperty> getExportedProperties() {
         ArrayList<BasicProperty> properties = new ArrayList<>();
         properties.add(new BasicProperty(PROPERTY_U_MEASUREMENTS,
-                uMeasurements.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
+                uMeasurements.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", ")), PropertyType.STRING));
         properties.add(new BasicProperty(PROPERTY_TRANSFORMERS,
-                transformers.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", "))));
+                transformers.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", ")), PropertyType.STRING));
         return properties;
+    }
+
+    @Override
+    public List<BasicProperty> toPersistedProperties() {
+        ArrayList<BasicProperty> properties = new ArrayList<>();
+        properties.add(new BasicProperty(PROPERTY_NAME, name, PropertyType.STRING));
+        properties.add(new BasicProperty(PROPERTY_U_MEASUREMENTS,
+                uMeasurements != null ? Methods.convertListToString(uMeasurements) : null, PropertyType.STRING));
+        properties.add(new BasicProperty(PROPERTY_TRANSFORMERS,
+                transformers != null ? Methods.convertListToString(transformers) : null, PropertyType.STRING));
+        return properties;
+    }
+
+    @Override
+    public void fromPersistedProperties(List<BasicProperty> properties) {
+        Map<String, BasicProperty> propertiesMap = properties.stream()
+                .collect(Collectors.toMap(BasicProperty::getName, elem -> elem));
+        this.name = propertiesMap.get(PROPERTY_NAME).getValue();
+        this.uMeasurements = Methods.convertStringToList(propertiesMap.get(PROPERTY_U_MEASUREMENTS).getValue());
+        this.transformers = Methods.convertStringToList(propertiesMap.get(PROPERTY_TRANSFORMERS).getValue());
     }
 }

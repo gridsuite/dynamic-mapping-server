@@ -47,8 +47,7 @@ public class InputMapping implements Mapping {
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
         convertedMapping.setAutomata(automata.stream().map(automaton -> {
             try {
-                AutomatonEntity automatonEntity;
-                automatonEntity = automatonSubtypesRegister.toEntity(automaton);
+                AutomatonEntity automatonEntity = automatonSubtypesRegister.toEntity(automaton);
                 automatonEntity.setMapping(convertedMapping);
                 return automatonEntity;
             } catch (Exception e) {
@@ -62,9 +61,9 @@ public class InputMapping implements Mapping {
         name = mappingEntity.getName();
         controlledParameters = mappingEntity.isControlledParameters();
         rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
-        automata = mappingEntity.getAutomata().stream().map(elem -> {
+        automata = mappingEntity.getAutomata().stream().map(automaton -> {
             try {
-                return automatonSubtypesRegister.fromEntity(elem);
+                return automatonSubtypesRegister.fromEntity(automaton);
             } catch (Exception e) {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
             }
