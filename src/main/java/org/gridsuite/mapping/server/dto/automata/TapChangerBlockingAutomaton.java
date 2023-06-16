@@ -58,7 +58,7 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
     @Override
     public ArrayList<BasicProperty> getExportedProperties() {
         ArrayList<BasicProperty> properties = new ArrayList<>();
-        properties.add(new BasicProperty(PROPERTY_U_MEASUREMENTS,
+        properties.add(new BasicProperty("uMeasurement",
                 uMeasurements.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", ")), PropertyType.STRING));
         properties.add(new BasicProperty(PROPERTY_TRANSFORMERS,
                 transformers.stream().map(elem -> "\"" + elem + "\"").collect(Collectors.joining(", ")), PropertyType.STRING));
