@@ -836,40 +836,40 @@ INSERT INTO models_model_variable_sets (model_name, variable_set_name)
 VALUES ('GeneratorSynchronousFourWindingsProportionalRegulations', 'Generator'),
        ('GeneratorSynchronousFourWindingsProportionalRegulations', 'VoltageRegulator');
 
---- model TapChangerBlocking for VOLTAGE Equipment type
+--- model TapChangerBlockingAutomaton for VOLTAGE Equipment type
 INSERT INTO models (model_name, equipment_type)
-VALUES ('TapChangerBlocking', 3);
+VALUES ('TapChangerBlockingAutomaton', 3);
 
 INSERT INTO model_parameter_definitions (model_name, name, origin, origin_name, type)
-VALUES ('TapChangerBlocking', 'tapChangerBlocking_UMin', 2, NULL, 2),
-       ('TapChangerBlocking', 'tapChangerBlocking_tLagBeforeBlocked', 2, NULL, 2),
-       ('TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedD', 2, NULL, 2),
-       ('TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedT', 2, NULL, 2);
+VALUES ('TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 2, NULL, 2),
+       ('TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 2, NULL, 2),
+       ('TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 2, NULL, 2),
+       ('TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 2, NULL, 2);
 
 INSERT INTO model_sets_group (model_name, name, type)
-VALUES ('TapChangerBlocking', 'TCB', 0),
-       ('TapChangerBlocking', 'TCB_2_4', 0),
-       ('TapChangerBlocking', 'TCB_2_5', 0);
+VALUES ('TapChangerBlockingAutomaton', 'TCB', 0),
+       ('TapChangerBlockingAutomaton', 'TCB_2_4', 0),
+       ('TapChangerBlockingAutomaton', 'TCB_2_5', 0);
 
 INSERT INTO model_parameter_sets (group_name, group_type, model_name, name)
-VALUES ('TCB', 0, 'TapChangerBlocking', 'TCB'),
-       ('TCB_2_4', 0, 'TapChangerBlocking', 'TCB_2_4'),
-       ('TCB_2_5', 0, 'TapChangerBlocking', 'TCB_2_5');
+VALUES ('TCB', 0, 'TapChangerBlockingAutomaton', 'TCB'),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'TCB_2_4'),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'TCB_2_5');
 
 INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
-VALUES ('TCB', 0, 'TapChangerBlocking', 'tapChangerBlocking_UMin', 'TCB', 10.),
-       ('TCB', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB', 100.),
-       ('TCB', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedD', 'TCB', 1000.),
-       ('TCB', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedT', 'TCB', 10.);
+VALUES ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 'TCB', 10.),
+       ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB', 100.),
+       ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 'TCB', 1000.),
+       ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 'TCB', 10.);
 
 INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
-VALUES ('TCB_2_4', 0, 'TapChangerBlocking', 'tapChangerBlocking_UMin', 'TCB_2_4', 14.),
-       ('TCB_2_4', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB_2_4', 104.),
-       ('TCB_2_4', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedD', 'TCB_2_4', 1004.),
-       ('TCB_2_4', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedT', 'TCB_2_4', 14.);
+VALUES ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 'TCB_2_4', 14.),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB_2_4', 104.),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 'TCB_2_4', 1004.),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 'TCB_2_4', 14.);
 
 INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
-VALUES ('TCB_2_5', 0, 'TapChangerBlocking', 'tapChangerBlocking_UMin', 'TCB_2_5', 15.),
-       ('TCB_2_5', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB_2_5', 105.),
-       ('TCB_2_5', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedD', 'TCB_2_5', 1005.),
-       ('TCB_2_5', 0, 'TapChangerBlocking', 'tapChangerBlocking_tLagTransBlockedT', 'TCB_2_5', 15.);
+VALUES ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 'TCB_2_5', 15.),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB_2_5', 105.),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 'TCB_2_5', 1005.),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 'TCB_2_5', 15.);
