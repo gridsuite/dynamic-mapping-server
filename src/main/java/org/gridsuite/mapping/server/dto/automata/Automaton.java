@@ -6,10 +6,7 @@
  */
 package org.gridsuite.mapping.server.dto.automata;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,16 +14,15 @@ import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
-@JsonSubTypes({ })
 @Data
 @NoArgsConstructor
-public abstract class AbstractAutomaton {
+public class Automaton {
     @Schema(description = "Automaton family")
     @JsonProperty
     private AutomatonFamily family;
@@ -37,24 +33,17 @@ public abstract class AbstractAutomaton {
     @Schema(description = "Mapped Parameters Set Group ID")
     private String setGroup;
 
-    public void build(AutomatonEntity entity) {
-        this.family = entity.getFamily();
-        this.model = entity.getModel();
-        this.setGroup = entity.getSetGroup();
+    @Schema(description = "Properties of automaton model")
+    private List<BasicProperty> properties;
+
+    public Automaton(AutomatonEntity automatonEntity) {
+        this.family = automatonEntity.getFamily();
+        this.model = automatonEntity.getModel();
+        this.setGroup = automatonEntity.getSetGroup();
+        this.properties = new ArrayList<>();
+        automatonEntity.getProperties().forEach(propertyEntity -> {
+            this.properties.add(new BasicProperty(propertyEntity.getName(), propertyEntity.getValue(), propertyEntity.getType()));
+        });
     }
-
-    @JsonIgnore
-    public abstract String getExportedId();
-
-    @JsonIgnore
-    public abstract String getExportedClassName();
-
-    @JsonIgnore
-    public abstract List<BasicProperty> getExportedProperties();
-
-    public abstract List<BasicProperty> toPersistedProperties();
-
-    public abstract void fromPersistedProperties(List<BasicProperty> properties);
-
 }
 

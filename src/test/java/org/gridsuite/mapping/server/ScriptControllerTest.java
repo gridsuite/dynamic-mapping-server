@@ -149,18 +149,42 @@ public class ScriptControllerTest {
                 "  \"automata\": [\n" +
                 "    {\n" +
                 "      \"family\": \"CURRENT_LIMIT\",\n" +
-                "      \"model\": \"automaton_model\",\n" +
-                "      \"setGroup\": \"automaton_model\",\n" +
-                "      \"watchedElement\": \"element_id\",\n" +
-                "      \"side\": \"Branch.Side.ONE\"\n" +
-                "    },\n" +
+                "      \"model\": \"CurrentLimitAutomaton\",\n" +
+                "      \"setGroup\": \"automaton_group\",\n" +
+                "      \"properties\": [\n" +
+                "           {\n" +
+                "               \"name\": \"staticId\",\n" +
+                "               \"value\": \"element_id\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"side\",\n" +
+                "               \"value\": \"Branch.Side.ONE\",\n" +
+                "               \"type\": \"ENUM\"\n" +
+                "           }\n" +
+                "       ]\n" +
+                "     },\n" +
                 "    {\n" +
                 "      \"family\": \"VOLTAGE\",\n" +
-                "      \"model\": \"automaton_model_2\",\n" +
+                "      \"model\": \"TapChangerBlockingAutomaton\",\n" +
                 "      \"setGroup\": \"automaton_group_2\",\n" +
-                "      \"name\": \"automaton_name\",\n" +
-                "      \"uMeasurements\": [\"bus_id_1\", \"bus_id_2\"],\n" +
-                "      \"transformers\": [\"load_id_1\", \"load_id_2\"]\n" +
+                "      \"properties\": [\n" +
+                "           {\n" +
+                "               \"name\": \"name\",\n" +
+                "               \"value\": \"automaton_name\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"uMeasurements\",\n" +
+                "               \"value\": \"bus_id_1, bus_id_2\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"transformers\",\n" +
+                "               \"value\": \"load_id_1, load_id_2\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           }\n" +
+                "       ]\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"controlledParameters\": false" +
@@ -171,8 +195,8 @@ public class ScriptControllerTest {
     String scriptOutput(String scriptName, String parentName) {
         return "{\"name\":\"" + scriptName + "\",\"parentName\":\"" + parentName + "\",\"script\":\"/**\n * Copyright (c) 2021, RTE (http://www.rte-france.com)\n * This Source Code Form is subject to the terms of the Mozilla Public\n * License, v. 2.0. If a copy of the MPL was not distributed with this\n * file, You can obtain one at http://mozilla.org/MPL/2.0/.\n */\n\nimport com.powsybl.iidm.network.Generator\nimport com.powsybl.dynawaltz.models.automatons.CurrentLimitAutomaton\nimport com.powsybl.iidm.network.Branch\n\nfor (Generator equipment : network.generators) {\n          if (equipment.id.equals(\\\"test\\\") && equipment.minP > 3.000000 && [\\\"HYDRO\\\", \\\"OTHERS\\\"].contains(equipment.energySource) && equipment.voltageRegulatorOn != true) {\n                 GeneratorFourWindings {\n                     staticId equipment.id\n                     parameterSetId  \\\"GSFWPR\\\" + equipment.id\n                 }\n    }\n}\n\n" +
                 "CurrentLimitAutomaton {\n" +
-                "     dynamicModelId \\\"automaton_model_element_id\\\"\n" +
-                "     parameterSetId \\\"automaton_model\\\"\n" +
+                "     dynamicModelId \\\"CurrentLimitAutomaton-1\\\"\n" +
+                "     parameterSetId \\\"automaton_group\\\"\n" +
                 "     staticId \\\"element_id\\\"\n" +
                 "     side Branch.Side.ONE\n" +
                 "}\n\n" +

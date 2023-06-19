@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.utils;
 
 import org.apache.commons.io.IOUtils;
 import org.gridsuite.mapping.server.MappingConstants;
+import org.gridsuite.mapping.server.dto.automata.BasicProperty;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
 import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.service.implementation.ScriptServiceImpl;
@@ -16,9 +17,8 @@ import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -77,18 +77,44 @@ public final class Templater {
             return sortedRulesScript.render();
         }).toArray(String[]::new);
 
+        Map<String, Integer> automatonIdGenerator = new HashMap<>();
         // Automata
         String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
-            String familyModel = automaton.getExportedClassName();
+            String familyModel = automaton.getModel();
+
+            List<BasicProperty> automatonProperties = automaton.getProperties();
+            Map<String, BasicProperty> automatonPropertiesByName = automatonProperties.stream()
+                    .collect(Collectors.toMap(BasicProperty::getName, elem -> elem, (t, t2) -> t, LinkedHashMap::new));
+
+            // lookup the "name" property, if defined then use name's value as id, otherwise auto-generate
+            String id = "";
+            BasicProperty nameProperty = automatonPropertiesByName.get("name");
+            if (nameProperty != null) {
+                id = nameProperty.getValue();
+                automatonPropertiesByName.remove("name");
+            } else {
+                // auto generate id, indexed with model as base
+                automatonIdGenerator.put(familyModel, automatonIdGenerator.get(familyModel) != null ?
+                        automatonIdGenerator.get(familyModel) + 1 : 1);
+                id = familyModel + "-" + automatonIdGenerator.get(familyModel);
+            }
+
             imports.add(MappingConstants.AUTOMATON_IMPORT);
             ST automatonScript = new ST(automatonTemplate);
             automatonScript.add("familyModel", familyModel);
-            automatonScript.add("automatonId", automaton.getExportedId());
+            automatonScript.add("automatonId", id);
             automatonScript.add("parameterSetId", automaton.getSetGroup());
-            String[] propertiesScripts = automaton.getExportedProperties().stream().map(property -> {
+            String[] propertiesScripts = automatonPropertiesByName.values().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);
                 propertyScript.add("name", property.getName());
-                propertyScript.add("value", property.getValue());
+                String value = property.getValue();
+                // value =>  "value" when export string value
+                if (property.getType() == PropertyType.STRING) {
+                    value = Methods.convertStringToList(value).stream()
+                            .map(elem -> "\"" + elem + "\"")
+                            .collect(Collectors.joining(", "));
+                }
+                propertyScript.add("value", value);
                 return propertyScript.render();
             }).toArray(String[]::new);
             automatonScript.add("properties", propertiesScripts);

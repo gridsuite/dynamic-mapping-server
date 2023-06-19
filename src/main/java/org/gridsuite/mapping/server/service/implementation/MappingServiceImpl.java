@@ -8,7 +8,6 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
-import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesRegister;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
@@ -38,29 +37,26 @@ public class MappingServiceImpl implements MappingService {
 
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
-    private final AutomatonSubtypesRegister automatonSubtypesRegister;
 
     @Autowired
     public MappingServiceImpl(
             MappingRepository mappingRepository,
-            ModelRepository modelRepository,
-            AutomatonSubtypesRegister automatonSubtypesRegister
+            ModelRepository modelRepository
     ) {
         this.modelRepository = modelRepository;
         this.mappingRepository = mappingRepository;
-        this.automatonSubtypesRegister = automatonSubtypesRegister;
     }
 
     @Override
     public List<InputMapping> getMappingList() {
         List<MappingEntity> mappingEntities = mappingRepository.findAll();
 
-        return mappingEntities.stream().map(entity -> new InputMapping(entity, automatonSubtypesRegister)).collect(Collectors.toList());
+        return mappingEntities.stream().map(entity -> new InputMapping(entity)).collect(Collectors.toList());
     }
 
     @Override
     public InputMapping createMapping(String mappingName, InputMapping mapping) {
-        MappingEntity mappingToSave = mapping.convertMappingToEntity(automatonSubtypesRegister);
+        MappingEntity mappingToSave = mapping.convertMappingToEntity();
         mappingToSave.markNotNew();
         if (mappingToSave.isControlledParameters()) {
             try {
@@ -125,7 +121,7 @@ public class MappingServiceImpl implements MappingService {
             MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy.get());
             try {
                 mappingRepository.save(copiedMapping);
-                return new InputMapping(copiedMapping, automatonSubtypesRegister);
+                return new InputMapping(copiedMapping);
             } catch (DataIntegrityViolationException ex) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
             }

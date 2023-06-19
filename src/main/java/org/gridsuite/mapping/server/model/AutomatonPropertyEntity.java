@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.gridsuite.mapping.server.dto.automata.BasicProperty;
 import org.gridsuite.mapping.server.utils.PropertyType;
 
 import javax.persistence.*;
@@ -54,7 +55,13 @@ public class AutomatonPropertyEntity implements Serializable {
         this.name = automatonPropertyEntity.getName();
         this.type = automatonPropertyEntity.getType();
         this.value = automatonPropertyEntity.getValue();
+    }
 
+    public AutomatonPropertyEntity(UUID automatonId, BasicProperty basicProperty) {
+        this.automatonId = automatonId;
+        this.name = basicProperty.getName();
+        this.type = basicProperty.getType();
+        this.value = basicProperty.getValue();
     }
 
 }

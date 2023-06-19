@@ -7,7 +7,7 @@
 package org.gridsuite.mapping.server.model;
 
 import lombok.*;
-import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
+import org.gridsuite.mapping.server.dto.automata.Automaton;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
 
 import javax.persistence.*;
@@ -54,12 +54,16 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         return automatonId;
     }
 
-    public AutomatonEntity(AbstractAutomaton automaton) {
+    public AutomatonEntity(MappingEntity mapping, Automaton automaton) {
         UUID newID = UUID.randomUUID();
         this.automatonId = newID;
+        this.mapping = mapping;
         this.family = automaton.getFamily();
         this.model = automaton.getModel();
         this.setGroup = automaton.getSetGroup();
+        this.properties = automaton.getProperties() != null ? automaton.getProperties().stream()
+                .map(basicProperty -> new AutomatonPropertyEntity(newID, basicProperty))
+                .collect(Collectors.toList()) : null;
     }
 
     public AutomatonEntity(MappingEntity mapping, AutomatonEntity automatonToCopy) {
