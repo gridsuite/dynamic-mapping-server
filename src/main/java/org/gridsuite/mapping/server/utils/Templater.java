@@ -77,7 +77,6 @@ public final class Templater {
             return sortedRulesScript.render();
         }).toArray(String[]::new);
 
-        Map<String, Integer> automatonIdGenerator = new HashMap<>();
         // Automata
         String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
             String familyModel = automaton.getModel();
@@ -86,17 +85,12 @@ public final class Templater {
             Map<String, BasicProperty> automatonPropertiesByName = automatonProperties.stream()
                     .collect(Collectors.toMap(BasicProperty::getName, elem -> elem, (t, t2) -> t, LinkedHashMap::new));
 
-            // lookup the "name" property, if defined then use name's value as id, otherwise auto-generate
+            // lookup the "name" property, if defined then use name's value as id
             String id = "";
             BasicProperty nameProperty = automatonPropertiesByName.get("name");
             if (nameProperty != null) {
                 id = nameProperty.getValue();
                 automatonPropertiesByName.remove("name");
-            } else {
-                // auto generate id, indexed with model as base
-                automatonIdGenerator.put(familyModel, automatonIdGenerator.get(familyModel) != null ?
-                        automatonIdGenerator.get(familyModel) + 1 : 1);
-                id = familyModel + "-" + automatonIdGenerator.get(familyModel);
             }
 
             imports.add(MappingConstants.AUTOMATON_IMPORT);

@@ -116,9 +116,14 @@ public class MappingControllerTest {
                 "  \"automata\": [\n" +
                 "    {\n" +
                 "      \"family\": \"CURRENT_LIMIT\",\n" +
-                "      \"model\": \"automaton_model\",\n" +
+                "      \"model\": \"CurrentLimitAutomaton\",\n" +
                 "      \"setGroup\": \"automaton_group\",\n" +
                 "      \"properties\": [\n" +
+                "           {\n" +
+                "               \"name\": \"name\",\n" +
+                "               \"value\": \"cla_automaton_name\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
                 "           {\n" +
                 "               \"name\": \"staticId\",\n" +
                 "               \"value\": \"element_id\",\n" +
@@ -133,12 +138,12 @@ public class MappingControllerTest {
                 "     },\n" +
                 "    {\n" +
                 "      \"family\": \"VOLTAGE\",\n" +
-                "      \"model\": \"automaton_model_2\",\n" +
+                "      \"model\": \"TapChangerBlockingAutomaton\",\n" +
                 "      \"setGroup\": \"automaton_group_2\",\n" +
                 "      \"properties\": [\n" +
                 "           {\n" +
                 "               \"name\": \"name\",\n" +
-                "               \"value\": \"automaton_name\",\n" +
+                "               \"value\": \"tcb_automaton_name\",\n" +
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +
                 "           {\n" +
