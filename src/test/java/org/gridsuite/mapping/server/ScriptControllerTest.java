@@ -179,7 +179,7 @@ public class ScriptControllerTest {
                 "TapChangerBlockingAutomaton {\n" +
                 "     dynamicModelId \\\"automaton_name\\\"\n" +
                 "     parameterSetId \\\"automaton_group_2\\\"\n" +
-                "     uMeasurements \\\"bus_id_1\\\", \\\"bus_id_2\\\"\n" +
+                "     uMeasurement \\\"bus_id_1\\\", \\\"bus_id_2\\\"\n" +
                 "     transformers \\\"load_id_1\\\", \\\"load_id_2\\\"\n" +
                 "}" +
                 "\",\"current\": true, \"parametersFile\": null}";
