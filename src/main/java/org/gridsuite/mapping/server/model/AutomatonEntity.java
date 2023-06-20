@@ -11,7 +11,6 @@ import org.gridsuite.mapping.server.dto.automata.Automaton;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -76,12 +75,5 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.properties = automatonToCopy.getProperties().stream()
                 .map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity))
                 .collect(Collectors.toList());
-    }
-
-    public void addProperty(AutomatonPropertyEntity property) {
-        if (properties == null) {
-            properties = new ArrayList<>();
-        }
-        properties.add(property);
     }
 }

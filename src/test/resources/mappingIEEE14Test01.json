@@ -59,6 +59,7 @@
       "family": "CURRENT_LIMIT",
       "model": "CurrentLimitAutomaton",
       "setGroup": "CLA_2_4",
+      "name": "CLA_1",
       "staticId": "_BUS____2-BUS____4-1_AC",
       "side": "Branch.Side.TWO"
     },
@@ -66,6 +67,7 @@
       "family": "CURRENT_LIMIT",
       "model": "CurrentLimitAutomaton",
       "setGroup": "CLA_2_5",
+      "name": "CLA_2",
       "staticId": "_BUS____2-BUS____5-1_AC",
       "side": "Branch.Side.TWO"
     }
