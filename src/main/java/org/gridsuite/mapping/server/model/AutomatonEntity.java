@@ -7,9 +7,11 @@
 package org.gridsuite.mapping.server.model;
 
 import lombok.*;
+import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,9 +42,6 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "set_group", nullable = false)
     private String setGroup;
 
-    @Column(name = "watched_element", nullable = false)
-    private String watchedElement;
-
     @OneToMany(targetEntity = AutomatonPropertyEntity.class, mappedBy = "automaton", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AutomatonPropertyEntity> properties;
 
@@ -55,6 +54,14 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         return automatonId;
     }
 
+    public AutomatonEntity(AbstractAutomaton automaton) {
+        UUID newID = UUID.randomUUID();
+        this.automatonId = newID;
+        this.family = automaton.getFamily();
+        this.model = automaton.getModel();
+        this.setGroup = automaton.getSetGroup();
+    }
+
     public AutomatonEntity(MappingEntity mapping, AutomatonEntity automatonToCopy) {
         UUID newID = UUID.randomUUID();
         this.automatonId = newID;
@@ -62,8 +69,15 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.family = automatonToCopy.getFamily();
         this.model = automatonToCopy.getModel();
         this.setGroup = automatonToCopy.getSetGroup();
-        this.watchedElement = automatonToCopy.getWatchedElement();
-        this.properties = automatonToCopy.getProperties().stream().map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity)).collect(Collectors.toList());
+        this.properties = automatonToCopy.getProperties().stream()
+                .map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity))
+                .collect(Collectors.toList());
+    }
 
+    public void addProperty(AutomatonPropertyEntity property) {
+        if (properties == null) {
+            properties = new ArrayList<>();
+        }
+        properties.add(property);
     }
 }

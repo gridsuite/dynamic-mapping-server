@@ -116,10 +116,18 @@ public class MappingControllerTest {
                 "  \"automata\": [\n" +
                 "    {\n" +
                 "      \"family\": \"CURRENT_LIMIT\",\n" +
-                "      \"model\": \"automaton_model\",\n" +
+                "      \"model\": \"CurrentLimitAutomaton\",\n" +
                 "      \"setGroup\": \"automaton_group\",\n" +
                 "      \"watchedElement\": \"element_id\",\n" +
                 "      \"side\": \"Branch.Side.ONE\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"family\": \"VOLTAGE\",\n" +
+                "      \"model\": \"TapChangerBlockingAutomaton\",\n" +
+                "      \"setGroup\": \"automaton_group_2\",\n" +
+                "      \"name\": \"automaton_name\",\n" +
+                "      \"uMeasurements\": [\"bus_id_1\", \"bus_id_2\"],\n" +
+                "      \"transformers\": [\"load_id_1\", \"load_id_2\"]\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"controlledParameters\": false" +

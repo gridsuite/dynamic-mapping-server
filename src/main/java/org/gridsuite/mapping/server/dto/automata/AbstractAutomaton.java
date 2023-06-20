@@ -6,26 +6,25 @@
  */
 package org.gridsuite.mapping.server.dto.automata;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.gridsuite.mapping.server.model.AutomatonEntity;
-import org.gridsuite.mapping.server.model.MappingEntity;
-import org.gridsuite.mapping.server.utils.AutomatonFamily;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
+import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
+import org.gridsuite.mapping.server.utils.AutomatonFamily;
+
+import java.util.List;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT")})
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "model", visible = true)
+@JsonSubTypes({ })
 @Data
+@NoArgsConstructor
 public abstract class AbstractAutomaton {
     @Schema(description = "Automaton family")
     @JsonProperty
@@ -37,19 +36,18 @@ public abstract class AbstractAutomaton {
     @Schema(description = "Mapped Parameters Set Group ID")
     private String setGroup;
 
-    @Schema(description = "Element watched by the automaton")
-    private String watchedElement;
+    @JsonIgnore
+    public abstract String getExportedId();
 
-    public abstract ArrayList<BasicProperty> convertToBasicProperties();
+    @JsonIgnore
+    public abstract String getExportedClassName();
 
-    public abstract AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping);
+    @JsonIgnore
+    public abstract List<BasicProperty> getExportedProperties();
 
-    public static AbstractAutomaton instantiateFromEntity(AutomatonEntity automatonEntity) {
-        if (automatonEntity.getFamily() == AutomatonFamily.CURRENT_LIMIT) {
-            return new CurrentLimitAutomaton(automatonEntity);
-        } else {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        }
-    }
+    public abstract List<BasicProperty> toProperties();
+
+    public abstract void fromProperties(List<BasicProperty> properties);
+
 }
 
