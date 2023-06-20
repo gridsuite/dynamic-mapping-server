@@ -71,8 +71,8 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     public void fromProperties(List<BasicProperty> properties) {
         Map<String, BasicProperty> propertiesMap = properties.stream()
                 .collect(Collectors.toMap(BasicProperty::getName, elem -> elem));
-        this.watchedElement = propertiesMap.get(PROPERTY_WATCHED_ELEMENT).getValue();
-        this.side = propertiesMap.get(PROPERTY_SIDE).getValue();
+        this.watchedElement = propertiesMap.get(PROPERTY_WATCHED_ELEMENT) != null ? propertiesMap.get(PROPERTY_WATCHED_ELEMENT).getValue() : null;
+        this.side = propertiesMap.get(PROPERTY_SIDE) != null ? propertiesMap.get(PROPERTY_SIDE).getValue() : null;
     }
 }
 

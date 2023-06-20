@@ -81,7 +81,7 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
         Map<String, BasicProperty> propertiesMap = properties.stream()
                 .collect(Collectors.toMap(BasicProperty::getName, elem -> elem));
         this.name = propertiesMap.get(PROPERTY_NAME).getValue();
-        this.uMeasurements = Methods.convertStringToList(propertiesMap.get(PROPERTY_U_MEASUREMENTS).getValue());
-        this.transformers = Methods.convertStringToList(propertiesMap.get(PROPERTY_TRANSFORMERS).getValue());
+        this.uMeasurements = Methods.convertStringToList(propertiesMap.get(PROPERTY_U_MEASUREMENTS) != null ? propertiesMap.get(PROPERTY_U_MEASUREMENTS).getValue() : "");
+        this.transformers = Methods.convertStringToList(propertiesMap.get(PROPERTY_TRANSFORMERS) != null ? propertiesMap.get(PROPERTY_TRANSFORMERS).getValue() : "");
     }
 }
