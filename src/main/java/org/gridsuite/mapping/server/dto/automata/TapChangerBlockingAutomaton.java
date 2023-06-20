@@ -66,7 +66,7 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public List<BasicProperty> toPersistedProperties() {
+    public List<BasicProperty> toProperties() {
         ArrayList<BasicProperty> properties = new ArrayList<>();
         properties.add(new BasicProperty(PROPERTY_NAME, name, PropertyType.STRING));
         properties.add(new BasicProperty(PROPERTY_U_MEASUREMENTS,
@@ -77,7 +77,7 @@ public class TapChangerBlockingAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public void fromPersistedProperties(List<BasicProperty> properties) {
+    public void fromProperties(List<BasicProperty> properties) {
         Map<String, BasicProperty> propertiesMap = properties.stream()
                 .collect(Collectors.toMap(BasicProperty::getName, elem -> elem));
         this.name = propertiesMap.get(PROPERTY_NAME).getValue();

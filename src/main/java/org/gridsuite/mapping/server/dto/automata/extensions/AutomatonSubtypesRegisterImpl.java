@@ -55,12 +55,17 @@ public class AutomatonSubtypesRegisterImpl
 
     @Override
     public AbstractAutomaton fromEntity(AutomatonEntity automatonEntity) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Class<?> dtoClass = getSubtypes().get(automatonEntity.getFamily().name());
+        Class<?> dtoClass = getSubtypes().get(automatonEntity.getModel());
         Constructor<?> constructor = dtoClass.getConstructor();
         AbstractAutomaton abstractAutomaton = (AbstractAutomaton) constructor.newInstance();
 
-        abstractAutomaton.build(automatonEntity);
-        abstractAutomaton.fromPersistedProperties(automatonEntity.getProperties().stream()
+        // build automaton common fields
+        abstractAutomaton.setFamily(automatonEntity.getFamily());
+        abstractAutomaton.setModel(automatonEntity.getModel());
+        abstractAutomaton.setSetGroup(automatonEntity.getSetGroup());
+
+        // build automaton particular fields
+        abstractAutomaton.fromProperties(automatonEntity.getProperties().stream()
                 .map(elem -> new BasicProperty(elem.getName(), elem.getValue(), elem.getType()))
                 .collect(Collectors.toList()));
 
@@ -70,9 +75,9 @@ public class AutomatonSubtypesRegisterImpl
     @Override
     public AutomatonEntity toEntity(AbstractAutomaton dto) {
         AutomatonEntity automatonEntity = new AutomatonEntity(dto);
-        List<BasicProperty> persistedProperties = dto.toPersistedProperties();
+        List<BasicProperty> properties = dto.toProperties();
 
-        persistedProperties.forEach(elem -> automatonEntity.addProperty(new AutomatonPropertyEntity(automatonEntity.getAutomatonId(),
+        properties.forEach(elem -> automatonEntity.addProperty(new AutomatonPropertyEntity(automatonEntity.getAutomatonId(),
                 elem.getName(), elem.getValue(), elem.getType(), automatonEntity)));
 
         return automatonEntity;

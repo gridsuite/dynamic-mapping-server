@@ -14,8 +14,8 @@ import org.gridsuite.mapping.server.dto.automata.extensions.AutomatonSubtypesExt
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @AutomatonSubtypes({
-        @AutomatonSubtypes.Type(value = CurrentLimitAutomaton.class, name = "CURRENT_LIMIT"),
-        @AutomatonSubtypes.Type(value = TapChangerBlockingAutomaton.class, name = "VOLTAGE")
+        @AutomatonSubtypes.Type(value = CurrentLimitAutomaton.class, name = CurrentLimitAutomaton.MODEL_CLASS),
+        @AutomatonSubtypes.Type(value = TapChangerBlockingAutomaton.class, name = TapChangerBlockingAutomaton.MODEL_CLASS)
 })
 @AutoService(AutomatonSubtypesExtension.class)
 public class CommonAutomatonSubtypesExtension implements AutomatonSubtypesExtension {

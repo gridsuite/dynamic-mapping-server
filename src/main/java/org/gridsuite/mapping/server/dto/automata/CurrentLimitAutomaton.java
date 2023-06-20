@@ -60,7 +60,7 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public List<BasicProperty> toPersistedProperties() {
+    public List<BasicProperty> toProperties() {
         ArrayList<BasicProperty> properties = new ArrayList<>();
         properties.add(new BasicProperty(PROPERTY_WATCHED_ELEMENT, watchedElement, PropertyType.STRING));
         properties.add(new BasicProperty(PROPERTY_SIDE, side, PropertyType.STRING));
@@ -68,7 +68,7 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
     }
 
     @Override
-    public void fromPersistedProperties(List<BasicProperty> properties) {
+    public void fromProperties(List<BasicProperty> properties) {
         Map<String, BasicProperty> propertiesMap = properties.stream()
                 .collect(Collectors.toMap(BasicProperty::getName, elem -> elem));
         this.watchedElement = propertiesMap.get(PROPERTY_WATCHED_ELEMENT).getValue();

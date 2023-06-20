@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
 
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.List;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "family", visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "model", visible = true)
 @JsonSubTypes({ })
 @Data
 @NoArgsConstructor
@@ -37,12 +36,6 @@ public abstract class AbstractAutomaton {
     @Schema(description = "Mapped Parameters Set Group ID")
     private String setGroup;
 
-    public void build(AutomatonEntity entity) {
-        this.family = entity.getFamily();
-        this.model = entity.getModel();
-        this.setGroup = entity.getSetGroup();
-    }
-
     @JsonIgnore
     public abstract String getExportedId();
 
@@ -52,9 +45,9 @@ public abstract class AbstractAutomaton {
     @JsonIgnore
     public abstract List<BasicProperty> getExportedProperties();
 
-    public abstract List<BasicProperty> toPersistedProperties();
+    public abstract List<BasicProperty> toProperties();
 
-    public abstract void fromPersistedProperties(List<BasicProperty> properties);
+    public abstract void fromProperties(List<BasicProperty> properties);
 
 }
 
