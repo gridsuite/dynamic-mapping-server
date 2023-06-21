@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -40,10 +40,9 @@ public class Automaton {
         this.family = automatonEntity.getFamily();
         this.model = automatonEntity.getModel();
         this.setGroup = automatonEntity.getSetGroup();
-        this.properties = new ArrayList<>();
-        automatonEntity.getProperties().forEach(propertyEntity -> {
-            this.properties.add(new BasicProperty(propertyEntity.getName(), propertyEntity.getValue(), propertyEntity.getType()));
-        });
+        this.properties = automatonEntity.getProperties().stream()
+                .map(propertyEntity -> new BasicProperty(propertyEntity.getName(), propertyEntity.getValue(), propertyEntity.getType()))
+                .collect(Collectors.toList());
     }
 }
 
