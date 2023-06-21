@@ -27,9 +27,12 @@ import java.util.UUID;
 public class CurrentLimitAutomaton extends AbstractAutomaton {
     private String side;
 
+    private String controlledQuadripole;
+
     public ArrayList<BasicProperty> convertToBasicProperties() {
         ArrayList<BasicProperty> propertiesList = new ArrayList<>();
-        propertiesList.add(new BasicProperty("side", side));
+        propertiesList.add(new BasicProperty("iMeasurementSide", side));
+        propertiesList.add(new BasicProperty("controlledQuadripole", "\"" + controlledQuadripole + "\""));
         return propertiesList;
     }
 
@@ -43,6 +46,11 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
         if (foundSideProperty.isPresent()) {
             side = foundSideProperty.get().getValue();
         }
+
+        Optional<AutomatonPropertyEntity> foundControlledQuadripoleProperty = automatonEntity.getProperties().stream().filter(property -> property.getName().equals("controlledQuadripole")).findAny();
+        if (foundControlledQuadripoleProperty.isPresent()) {
+            controlledQuadripole = foundControlledQuadripoleProperty.get().getValue();
+        }
     }
 
     public AutomatonEntity convertAutomatonToEntity(MappingEntity parentMapping) {
@@ -55,12 +63,21 @@ public class CurrentLimitAutomaton extends AbstractAutomaton {
         convertedAutomaton.setWatchedElement(this.getWatchedElement());
         convertedAutomaton.setMapping(parentMapping);
         ArrayList<AutomatonPropertyEntity> convertedProperties = new ArrayList<>();
+
         AutomatonPropertyEntity convertedProperty = new AutomatonPropertyEntity();
         convertedProperty.setAutomatonId(createdId);
         convertedProperty.setName("side");
         convertedProperty.setValue(this.getSide());
         convertedProperty.setType(PropertyType.STRING);
         convertedProperties.add(convertedProperty);
+
+        convertedProperty = new AutomatonPropertyEntity();
+        convertedProperty.setAutomatonId(createdId);
+        convertedProperty.setName("controlledQuadripole");
+        convertedProperty.setValue(this.getControlledQuadripole());
+        convertedProperty.setType(PropertyType.STRING);
+        convertedProperties.add(convertedProperty);
+
         convertedAutomaton.setProperties(convertedProperties);
         return convertedAutomaton;
     }

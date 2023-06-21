@@ -119,7 +119,8 @@ public class MappingControllerTest {
                 "      \"model\": \"automaton_model\",\n" +
                 "      \"setGroup\": \"automaton_group\",\n" +
                 "      \"watchedElement\": \"element_id\",\n" +
-                "      \"side\": \"Branch.Side.ONE\"\n" +
+                "      \"side\": \"Branch.Side.ONE\",\n" +
+                "      \"controlledQuadripole\": \"element_id\"\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"controlledParameters\": false" +
