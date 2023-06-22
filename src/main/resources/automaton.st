@@ -1,5 +1,5 @@
 <familyModel> {
-     staticId "<watchedElement>"
+     iMeasurement "<watchedElement>"
      dynamicModelId "<automatonId>"
      parameterSetId "<parameterSetId>"
      <properties; separator="\n">
