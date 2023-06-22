@@ -35,10 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -98,6 +95,23 @@ public class ModelControllerTest {
         definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", modelToSave));
         modelToSave.setParameterDefinitions(definitions);
         modelRepository.save(modelToSave);
+    }
+
+    @Test
+    public void testGetAutomatonDefinitions() throws Exception {
+        MvcResult mvcResult = mvc.perform(get("/models/automaton-definitions")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        String automatonJson = mvcResult.getResponse().getContentAsString();
+
+        List<Object> automatons = objectMapper.readValue(automatonJson, new TypeReference<List<Object>>() { });
+
+        LOGGER.info("Automatons JSON Array = \n" + automatonJson);
+
+        assertEquals(2, automatons.size());
     }
 
     @Test

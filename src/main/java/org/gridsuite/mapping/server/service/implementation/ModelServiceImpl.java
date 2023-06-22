@@ -13,21 +13,35 @@ import org.gridsuite.mapping.server.repository.ModelVariableRepository;
 import org.gridsuite.mapping.server.repository.ModelVariablesSetRepository;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.utils.SetGroupType;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Service
 public class ModelServiceImpl implements ModelService {
+
+    public static final String AUTOMATON_DIR = "/automaton";
+    public static final String PATH_SEPARATOR = "/";
+
+    @Value("${gridsuite.services.dynamic-mapping-server.external-resources}")
+    String externalResources;
 
     public static final String MODEL_NOT_FOUND = "Model not found: ";
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
@@ -45,6 +59,44 @@ public class ModelServiceImpl implements ModelService {
         this.modelRepository = modelRepository;
         this.modelVariableRepository = modelVariableRepository;
         this.modelVariablesSetRepository = modelVariablesSetRepository;
+    }
+
+    @Override
+    public List<Object> getAutomatonDefinitions() {
+        JSONArray automatonJsonArray = new JSONArray();
+
+        // read json file from internal resources
+        String automatonFolder = getClass().getResource(AUTOMATON_DIR).getPath();
+        try (Stream<Path> pathStream = Files.list(Paths.get(automatonFolder))) {
+            pathStream.filter(path -> !Files.isDirectory(path))
+                    .forEach(path -> {
+                        try {
+                            automatonJsonArray.put(new JSONObject(new String(
+                                    getClass().getResourceAsStream(AUTOMATON_DIR + PATH_SEPARATOR + path.getFileName().toString()).readAllBytes())));
+                        } catch (IOException e) {
+                            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No automaton found " + path.getFileName().toString());
+                        }
+                    });
+        } catch (IOException e) {
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No resource automaton found");
+        }
+
+        // read json file from external resources
+        try (Stream<Path> pathStream = Files.list(Paths.get(externalResources + AUTOMATON_DIR))) {
+            pathStream.filter(path -> !Files.isDirectory(path))
+                    .forEach(path -> {
+                        try {
+                            automatonJsonArray.put(new JSONObject(new String(
+                                    new FileInputStream(externalResources + AUTOMATON_DIR + PATH_SEPARATOR + path.getFileName().toString()).readAllBytes())));
+                        } catch (IOException e) {
+                            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No automaton found " + path.getFileName().toString());
+                        }
+                    });
+        } catch (IOException e) {
+            // do nothing, no extension automatons in external resources
+        }
+
+        return automatonJsonArray.toList();
     }
 
     @Override

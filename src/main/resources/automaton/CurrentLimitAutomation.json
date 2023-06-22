@@ -1,0 +1,35 @@
+{
+  "CurrentLimitAutomaton": {
+    "name": {
+      "type": "STRING",
+      "label": "Name",
+      "isRequired": true
+    },
+    "staticId": {
+      "type": "STRING",
+      "label": "On equipment",
+      "mapping": {
+        "equipmentType": [
+          "LINE"
+        ],
+        "equipmentProperty": "id"
+      },
+      "isRequired": true
+    },
+    "side": {
+      "type": "ENUM",
+      "label": "Side",
+      "values": [
+        {
+          "value": "Branch.Side.ONE",
+          "label": "One"
+        },
+        {
+          "value": "Branch.Side.TWO",
+          "label": "Two"
+        }
+      ],
+      "isRequired": true
+    }
+  }
+}

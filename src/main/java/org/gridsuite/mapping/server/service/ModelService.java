@@ -16,6 +16,8 @@ import java.util.List;
  */
 public interface ModelService {
 
+    List<Object> getAutomatonDefinitions();
+
     List<ModelParameterDefinition> getParametersDefinitionsFromModelName(String modelName);
 
     List<SimpleModel> getModels();
