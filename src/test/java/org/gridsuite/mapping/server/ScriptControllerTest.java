@@ -158,14 +158,19 @@ public class ScriptControllerTest {
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +
                 "           {\n" +
-                "               \"name\": \"staticId\",\n" +
+                "               \"name\": \"iMeasurement\",\n" +
                 "               \"value\": \"element_id\",\n" +
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +
                 "           {\n" +
-                "               \"name\": \"side\",\n" +
+                "               \"name\": \"iMeasurementSide\",\n" +
                 "               \"value\": \"Branch.Side.ONE\",\n" +
                 "               \"type\": \"ENUM\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"controlledQuadripole\",\n" +
+                "               \"value\": \"element_id\",\n" +
+                "               \"type\": \"STRING\"\n" +
                 "           }\n" +
                 "       ]\n" +
                 "     },\n" +
@@ -202,8 +207,9 @@ public class ScriptControllerTest {
                 "CurrentLimitAutomaton {\n" +
                 "     dynamicModelId \\\"cla_automaton_name\\\"\n" +
                 "     parameterSetId \\\"automaton_group\\\"\n" +
-                "     staticId \\\"element_id\\\"\n" +
-                "     side Branch.Side.ONE\n" +
+                "     iMeasurement \\\"element_id\\\"\n" +
+                "     iMeasurementSide Branch.Side.ONE\n" +
+                "     controlledQuadripole \\\"element_id\\\"\n" +
                 "}\n\n" +
                 "TapChangerBlockingAutomaton {\n" +
                 "     dynamicModelId \\\"tcb_automaton_name\\\"\n" +

@@ -125,13 +125,18 @@ public class MappingControllerTest {
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +
                 "           {\n" +
-                "               \"name\": \"staticId\",\n" +
+                "               \"name\": \"iMeasurement\",\n" +
                 "               \"value\": \"element_id\",\n" +
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +
                 "           {\n" +
-                "               \"name\": \"side\",\n" +
+                "               \"name\": \"iMeasurementSide\",\n" +
                 "               \"value\": \"Branch.Side.ONE\",\n" +
+                "               \"type\": \"ENUM\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"controlledQuadripole\",\n" +
+                "               \"value\": \"element_id\",\n" +
                 "               \"type\": \"ENUM\"\n" +
                 "           }\n" +
                 "       ]\n" +

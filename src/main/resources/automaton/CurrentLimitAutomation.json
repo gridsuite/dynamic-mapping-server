@@ -5,7 +5,7 @@
       "label": "Name",
       "isRequired": true
     },
-    "staticId": {
+    "iMeasurement": {
       "type": "STRING",
       "label": "On equipment",
       "mapping": {
@@ -16,7 +16,7 @@
       },
       "isRequired": true
     },
-    "side": {
+    "iMeasurementSide": {
       "type": "ENUM",
       "label": "Side",
       "values": [
@@ -29,6 +29,17 @@
           "label": "Two"
         }
       ],
+      "isRequired": true
+    },
+    "controlledQuadripole": {
+      "type": "STRING",
+      "label": "On equipment",
+      "mapping": {
+        "equipmentType": [
+          "LINE"
+        ],
+        "equipmentProperty": "id"
+      },
       "isRequired": true
     }
   }
