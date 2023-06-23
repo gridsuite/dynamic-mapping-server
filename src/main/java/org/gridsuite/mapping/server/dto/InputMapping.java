@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.dto.automata.Automaton;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,13 +42,7 @@ public class InputMapping implements Mapping {
         convertedMapping.setName(name);
         convertedMapping.setControlledParameters(controlledParameters);
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
-        convertedMapping.setAutomata(automata.stream().map(automaton -> {
-            try {
-                return new AutomatonEntity(convertedMapping, automaton);
-            } catch (Exception e) {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-            }
-        }).collect(Collectors.toList()));
+        convertedMapping.setAutomata(automata.stream().map(automaton -> new AutomatonEntity(convertedMapping, automaton)).collect(Collectors.toList()));
         return convertedMapping;
     }
 
@@ -58,12 +50,6 @@ public class InputMapping implements Mapping {
         name = mappingEntity.getName();
         controlledParameters = mappingEntity.isControlledParameters();
         rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
-        automata = mappingEntity.getAutomata().stream().map(automaton -> {
-            try {
-                return new Automaton(automaton);
-            } catch (Exception e) {
-                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-            }
-        }).collect(Collectors.toList());
+        automata = mappingEntity.getAutomata().stream().map(Automaton::new).collect(Collectors.toList());
     }
 }
