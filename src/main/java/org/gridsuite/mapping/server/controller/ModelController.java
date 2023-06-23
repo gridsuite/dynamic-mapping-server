@@ -40,7 +40,7 @@ public class ModelController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "automaton definitions in json format")
     })
-    public ResponseEntity<List<Object>> getAutomatonDefinitions() {
+    public ResponseEntity<String> getAutomatonDefinitions() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getAutomatonDefinitions());
     }
 

@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
@@ -105,13 +106,14 @@ public class ModelControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
 
-        String automatonJson = mvcResult.getResponse().getContentAsString();
+        String automatonsJsonResult = mvcResult.getResponse().getContentAsString();
 
-        List<Object> automatons = objectMapper.readValue(automatonJson, new TypeReference<List<Object>>() { });
+        LOGGER.info("Automatons result in Json array = \n" + automatonsJsonResult);
 
-        LOGGER.info("Automatons JSON Array = \n" + automatonJson);
-
-        assertEquals(2, automatons.size());
+        // Check result
+        JsonNode jsonNode = objectMapper.readTree(automatonsJsonResult);
+        assertEquals(true, jsonNode.isArray());
+        assertEquals(2, jsonNode.size());
     }
 
     @Test
