@@ -61,7 +61,7 @@
       "setGroup": "CLA_2_4",
       "properties": [
         {
-          "name": "name",
+          "name": "dynamicModelId",
           "value": "CLA_1",
           "type": "STRING"
         },
@@ -88,7 +88,7 @@
       "setGroup": "CLA_2_5",
       "properties": [
         {
-          "name": "name",
+          "name": "dynamicModelId",
           "value": "CLA_2",
           "type": "STRING"
         },

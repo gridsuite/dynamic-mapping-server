@@ -51,7 +51,7 @@ public class MappingServiceImpl implements MappingService {
     public List<InputMapping> getMappingList() {
         List<MappingEntity> mappingEntities = mappingRepository.findAll();
 
-        return mappingEntities.stream().map(entity -> new InputMapping(entity)).collect(Collectors.toList());
+        return mappingEntities.stream().map(InputMapping::new).collect(Collectors.toList());
     }
 
     @Override

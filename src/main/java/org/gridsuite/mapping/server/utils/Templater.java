@@ -79,30 +79,21 @@ public final class Templater {
 
         // Automata
         String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
-            String familyModel = automaton.getModel();
+            String model = automaton.getModel();
 
             List<BasicProperty> automatonProperties = automaton.getProperties();
             Map<String, BasicProperty> automatonPropertiesByName = automatonProperties.stream()
                     .collect(Collectors.toMap(BasicProperty::getName, elem -> elem, (t, t2) -> t, LinkedHashMap::new));
 
-            // lookup the "name" property, if defined then use name's value as id
-            String id = "";
-            BasicProperty nameProperty = automatonPropertiesByName.get("name");
-            if (nameProperty != null) {
-                id = nameProperty.getValue();
-                automatonPropertiesByName.remove("name");
-            }
-
             imports.add(MappingConstants.AUTOMATON_IMPORT);
             ST automatonScript = new ST(automatonTemplate);
-            automatonScript.add("familyModel", familyModel);
-            automatonScript.add("automatonId", id);
+            automatonScript.add("automatonModel", model);
             automatonScript.add("parameterSetId", automaton.getSetGroup());
             String[] propertiesScripts = automatonPropertiesByName.values().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);
                 propertyScript.add("name", property.getName());
                 String value = property.getValue();
-                // value =>  "value" when export string value
+                // value =>  "value" when export groovy string value
                 if (property.getType() == PropertyType.STRING) {
                     value = Methods.convertStringToList(value).stream()
                             .map(elem -> "\"" + elem + "\"")

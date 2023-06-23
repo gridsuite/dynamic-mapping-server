@@ -120,7 +120,7 @@ public class MappingControllerTest {
                 "      \"setGroup\": \"automaton_group\",\n" +
                 "      \"properties\": [\n" +
                 "           {\n" +
-                "               \"name\": \"name\",\n" +
+                "               \"name\": \"dynamicModelId\",\n" +
                 "               \"value\": \"cla_automaton_name\",\n" +
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +
@@ -147,12 +147,12 @@ public class MappingControllerTest {
                 "      \"setGroup\": \"automaton_group_2\",\n" +
                 "      \"properties\": [\n" +
                 "           {\n" +
-                "               \"name\": \"name\",\n" +
+                "               \"name\": \"dynamicModelId\",\n" +
                 "               \"value\": \"tcb_automaton_name\",\n" +
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +
                 "           {\n" +
-                "               \"name\": \"uMeasurements\",\n" +
+                "               \"name\": \"uMeasurement\",\n" +
                 "               \"value\": \"bus_id_1, bus_id_2\",\n" +
                 "               \"type\": \"STRING\"\n" +
                 "           },\n" +

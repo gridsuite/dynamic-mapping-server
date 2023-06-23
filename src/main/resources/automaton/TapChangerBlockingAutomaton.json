@@ -1,11 +1,11 @@
 {
   "TapChangerBlockingAutomaton": {
-    "name": {
+    "dynamicModelId": {
       "type": "STRING",
       "label": "Name",
       "isRequired": true
     },
-    "uMeasurements": {
+    "uMeasurement": {
       "type": "STRING",
       "label": "U Measurement",
       "mapping": {

@@ -1,6 +1,6 @@
 {
   "CurrentLimitAutomaton": {
-    "name": {
+    "dynamicModelId": {
       "type": "STRING",
       "label": "Name",
       "isRequired": true
