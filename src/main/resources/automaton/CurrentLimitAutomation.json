@@ -9,7 +9,7 @@
       "type": "STRING",
       "label": "On equipment",
       "mapping": {
-        "equipmentType": [
+        "equipmentTypes": [
           "LINE"
         ],
         "equipmentProperty": "id"
@@ -35,7 +35,7 @@
       "type": "STRING",
       "label": "On equipment",
       "mapping": {
-        "equipmentType": [
+        "equipmentTypes": [
           "LINE"
         ],
         "equipmentProperty": "id"
