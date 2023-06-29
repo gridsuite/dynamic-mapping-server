@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -53,6 +54,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
+@TestPropertySource(properties = {"ex-resources.automaton = src/test/resources/data/ex-automaton"})
 public class ModelControllerTest {
 
     public static Logger LOGGER = LoggerFactory.getLogger(ModelControllerTest.class);
@@ -113,7 +115,7 @@ public class ModelControllerTest {
         // Check result
         JsonNode jsonNode = objectMapper.readTree(automatonsJsonResult);
         assertEquals(true, jsonNode.isArray());
-        assertEquals(2, jsonNode.size());
+        assertEquals(3, jsonNode.size());
     }
 
     @Test

@@ -1,0 +1,35 @@
+{
+  "TapChangerBlockingAutomaton2": {
+    "dynamicModelId": {
+      "type": "STRING",
+      "label": "Name",
+      "isRequired": true
+    },
+    "uMeasurement": {
+      "type": "STRING",
+      "label": "U Measurement",
+      "mapping": {
+        "equipmentTypes": [
+          "BUS"
+        ],
+        "equipmentProperty": "id"
+      },
+      "max": 5,
+      "multiple": true,
+      "isRequired": true
+    },
+    "transformers": {
+      "type": "STRING",
+      "label": "Transformers",
+      "mapping": {
+        "equipmentTypes": [
+          "LOAD",
+          "TWO_WINDINGS_TRANSFORMER"
+        ],
+        "equipmentProperty": "id"
+      },
+      "multiple": true,
+      "isRequired": true
+    }
+  }
+}

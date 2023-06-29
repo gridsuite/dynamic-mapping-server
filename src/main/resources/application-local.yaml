@@ -14,8 +14,6 @@ powsybl-ws:
   database:
     host: localhost
 
-gridsuite:
-  services:
-    dynamic-mapping-server:
-      external-resources: ~/Projects/gridsuite/gridsuite-dynamic-mapping-rte
+ex-resources:
+  automaton:
 

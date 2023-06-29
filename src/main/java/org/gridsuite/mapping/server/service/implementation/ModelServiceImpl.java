@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelRepository;
@@ -41,10 +42,9 @@ import java.util.stream.Stream;
 public class ModelServiceImpl implements ModelService {
 
     public static final String AUTOMATON_DIR = "/automaton";
-    public static final String PATH_SEPARATOR = "/";
 
-    @Value("${gridsuite.services.dynamic-mapping-server.external-resources}")
-    String externalResources;
+    @Value("${ex-resources.automaton}")
+    String exResourcesAutomaton;
 
     public static final String MODEL_NOT_FOUND = "Model not found: ";
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
@@ -74,15 +74,18 @@ public class ModelServiceImpl implements ModelService {
         // read json file from internal resources
         List<Path> automatonPaths = new ArrayList<>();
 
-        // internal resources
+        // automation definitions from Internal resources
         try (Stream<Path> streamPaths = Files.list(Paths.get(getClass().getResource(AUTOMATON_DIR).getPath()))) {
             automatonPaths.addAll(streamPaths.toList());
         } catch (IOException e) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No resource automaton found");
         }
 
-        // external resources
-        try (Stream<Path> streamPaths = Files.list(Paths.get(externalResources + AUTOMATON_DIR))) {
+        // automation definitions from External resources
+        try (Stream<Path> streamPaths = !StringUtils.isEmpty(exResourcesAutomaton) ?
+                Files.list(Paths.get(exResourcesAutomaton)) :
+                Stream.empty()
+        ) {
             automatonPaths.addAll(streamPaths.toList());
         } catch (IOException e) {
             // do nothing, external resources is optional
@@ -90,10 +93,10 @@ public class ModelServiceImpl implements ModelService {
 
         // aggregate all automaton json file, support both single object and array object json
         automatonPaths.stream().filter(path -> !Files.isDirectory(path))
+                .filter(path -> path.getFileName().toString().endsWith("json"))
                 .forEach(path -> {
                     try {
-                        JsonNode jsonNode = objectMapper.readTree(
-                                getClass().getResourceAsStream(AUTOMATON_DIR + PATH_SEPARATOR + path.getFileName().toString()));
+                        JsonNode jsonNode = objectMapper.readTree(Files.newInputStream(path));
                         automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
                     } catch (StreamReadException e) {
                         throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Invalid Json " + e.getMessage());
