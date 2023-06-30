@@ -33,7 +33,7 @@
     },
     "controlledQuadripole": {
       "type": "STRING",
-      "label": "On equipment",
+      "label": "Controlled quadripole",
       "mapping": {
         "equipmentTypes": [
           "LINE"
