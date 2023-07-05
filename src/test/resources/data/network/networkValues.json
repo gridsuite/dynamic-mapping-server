@@ -66,6 +66,23 @@
           "FRANCE"
         ]
       }
+    },
+    {
+      "type": "SHUNT_COMPENSATOR",
+      "values": {
+        "terminal.voltageLevel.nominalV": [
+          "400.0"
+        ],
+        "terminal.voltageLevel.substation.country.name": [
+          "FRANCE"
+        ]
+      }
+    },
+    {
+      "type": "HVDC_LINE",
+      "values": {
+
+      }
     }
   ]
 }

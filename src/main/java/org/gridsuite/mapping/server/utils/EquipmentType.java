@@ -17,4 +17,6 @@ public enum EquipmentType {
     BUS,
     LINE,
     TWO_WINDINGS_TRANSFORMER,
+    SHUNT_COMPENSATOR,
+    HVDC_LINE,
 }
