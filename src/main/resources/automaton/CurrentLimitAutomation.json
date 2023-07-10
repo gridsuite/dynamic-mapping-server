@@ -10,7 +10,8 @@
       "label": "On equipment",
       "mapping": {
         "equipmentTypes": [
-          "LINE"
+          "LINE",
+          "TWO_WINDINGS_TRANSFORMER"
         ],
         "equipmentProperty": "id"
       },
@@ -36,7 +37,8 @@
       "label": "Controlled quadripole",
       "mapping": {
         "equipmentTypes": [
-          "LINE"
+          "LINE",
+          "TWO_WINDINGS_TRANSFORMER"
         ],
         "equipmentProperty": "id"
       },
