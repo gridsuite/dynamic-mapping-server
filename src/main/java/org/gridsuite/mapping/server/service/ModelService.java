@@ -18,8 +18,6 @@ public interface ModelService {
 
     String getAutomatonDefinitions();
 
-    List<ModelParameterDefinition> getParametersDefinitionsFromModelName(String modelName);
-
     List<SimpleModel> getModels();
 
     List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType);

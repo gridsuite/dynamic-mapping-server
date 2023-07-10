@@ -126,17 +126,6 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public List<ModelParameterDefinition> getParametersDefinitionsFromModelName(String modelName) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
-        if (foundModel.isPresent()) {
-            Model modelToSend = new Model(foundModel.get());
-            return modelToSend.getParameterDefinitions();
-        } else {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @Override
     public List<SimpleModel> getModels() {
         return modelRepository.findAll().stream().map(modelEntity -> new SimpleModel(new Model(modelEntity))).collect(Collectors.toList());
     }
