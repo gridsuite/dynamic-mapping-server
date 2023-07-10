@@ -16,8 +16,6 @@ import java.util.List;
  */
 public interface ModelService {
 
-    List<ModelParameterDefinition> getParametersDefinitionsFromModelName(String modelName);
-
     List<SimpleModel> getModels();
 
     List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType);
@@ -28,7 +26,26 @@ public interface ModelService {
 
     ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName);
 
+    // --- BEGIN parameter definition-related service methods --- //
+    List<ModelParameterDefinition> getParameterDefinitionsFromModel(String modelName);
+
+    Model addNewParameterDefinitionsToModel(String modelName, List<ModelParameterDefinition> parameterDefinitions);
+
+    Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames);
+
+    Model removeExistingParameterDefinitionsFromModel(String modelName, List<String> parameterDefinitionNames);
+
+    Model removeAllParameterDefinitionsOnModel(String modelName);
+
+    List<ModelParameterDefinition> saveNewParameterDefinitions(List<ModelParameterDefinition> parameterDefinitions);
+
+    List<String> deleteParameterDefinitions(List<String> parameterDefinitionNames);
+
+    // --- END parameter definition-related service methods --- //
+
     // --- BEGIN variable-related service methods --- //
+    List<ModelVariableDefinition> getVariableDefinitionsFromModel(String modelName);
+
     Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions);
 
     Model addExistingVariableDefinitionsToModel(String modelName, List<String> variableDefinitionNames);
@@ -39,7 +56,11 @@ public interface ModelService {
 
     Model removeAllVariableDefinitionsOnModel(String modelName);
 
+    List<VariablesSet> getVariablesSetsFromModel(String modelName);
+
     VariablesSet saveNewVariablesSet(VariablesSet variableSet);
+
+    List<ModelVariableDefinition> getVariableDefinitionsFromVariablesSet(String variableSetName);
 
     VariablesSet addNewVariableDefinitionToVariablesSet(String variableSetName, List<ModelVariableDefinition> variableDefinitions);
 
@@ -58,5 +79,6 @@ public interface ModelService {
     List<String> deleteVariableDefinitions(List<String> variableDefinitionNames);
 
     List<String> deleteVariablesSets(List<String> variablesSetNames);
+
     // --- BEGIN variable-related service methods --- //
 }

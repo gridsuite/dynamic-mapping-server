@@ -9,59 +9,92 @@ package org.gridsuite.mapping.server.model;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static javax.persistence.TemporalType.TIMESTAMP;
+
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@Getter
-@Setter
-@Table(name = "models")
-@Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelEntity extends AbstractManuallyAssignedIdentifierEntity<String> implements Serializable {
+@Getter
+@Setter
+@Entity
+@Table(name = "models")
+public class ModelEntity implements Serializable {
 
     // Could be replaced with UUID, but we lose the ease of use of names
     @Id
+    @EqualsAndHashCode.Include
     @Column(name = "model_name")
     private String modelName;
 
     @Column(name = "equipment_type")
     private EquipmentType equipmentType;
 
-    @OneToMany(targetEntity = ModelParameterDefinitionEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ModelParameterDefinitionEntity> parameterDefinitions = new ArrayList<>(0);
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "models_model_parameter_definitions",
+            joinColumns = {@JoinColumn(name = "model_name")},
+            inverseJoinColumns = {@JoinColumn(name = "parameter_definition_name", referencedColumnName = "name")}
+    )
+    private Set<ModelParameterDefinitionEntity> parameterDefinitions = new LinkedHashSet<>(0);
 
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
 
-    @ManyToMany(targetEntity = ModelVariableDefinitionEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    // must exclude CascadeType.REMOVE to avoid unexpected cascade on delete a ModelVariableDefinitionEntity
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "models_model_variable_definitions",
+            joinColumns = {@JoinColumn(name = "model_name")},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_name")}
+    )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
     @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
 
-    @Override
-    public String getId() {
-        return modelName;
-    }
-
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
-        parameterDefinitions = modelToConvert.getParameterDefinitions() != null ? modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition.getName(), modelToConvert.getModelName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), this)).collect(Collectors.toList()) : null;
+        parameterDefinitions = modelToConvert.getParameterDefinitions() != null ? modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(this, parameterDefinition)).collect(Collectors.toSet()) : null;
         setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
         variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(this, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
         variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(this, variablesSet)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
     }
 
+    @CreatedDate
+    @Temporal(TIMESTAMP)
+    @Column(name = "created_date", updatable = false)
+    private Date createdDate;
+
+    @LastModifiedDate
+    @Temporal(TIMESTAMP)
+    @Column(name = "updated_date")
+    private Date updatedDate;
+
     // --- utils methods --- //
+
+    public void addParameterDefinitions(Collection<ModelParameterDefinitionEntity> parameterDefinitions) {
+        parameterDefinitions.forEach(parameterDefinition -> parameterDefinition.getModels().add(this));
+        this.parameterDefinitions.addAll(parameterDefinitions);
+    }
+
+    public void removeParameterDefinitions(Collection<ModelParameterDefinitionEntity> parameterDefinitions) {
+        parameterDefinitions.forEach(parameterDefinition -> parameterDefinition.getModels().remove(this));
+        this.parameterDefinitions.removeAll(parameterDefinitions);
+    }
+
     public void addVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
         variableDefinitions.forEach(variableDefinition -> variableDefinition.getModels().add(this));
         this.variableDefinitions.addAll(variableDefinitions);

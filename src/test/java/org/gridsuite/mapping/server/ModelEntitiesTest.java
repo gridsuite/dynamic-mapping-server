@@ -6,7 +6,6 @@
  */
 package org.gridsuite.mapping.server;
 
-import org.gridsuite.mapping.server.model.ModelParameterDefinitionId;
 import org.gridsuite.mapping.server.model.ModelParameterId;
 import org.gridsuite.mapping.server.model.ModelParameterSetId;
 import org.gridsuite.mapping.server.model.ModelSetsGroupId;
@@ -25,16 +24,6 @@ import static org.junit.Assert.assertNotEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ModelEntitiesTest {
-    @Test
-    public void parameterDefinitionIdTestEqualHashCode() {
-        ModelParameterDefinitionId id = new ModelParameterDefinitionId("name", "modelName");
-        ModelParameterDefinitionId id2 = new ModelParameterDefinitionId("name", "modelName");
-
-        assertEquals(id, id);
-        assertEquals(id, id2);
-        assertNotEquals(null, id);
-        assertNotEquals("id", id);
-    }
 
     @Test
     public void parameterIdTestEqualHashCode() {
