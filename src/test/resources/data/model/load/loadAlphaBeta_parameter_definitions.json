@@ -1,0 +1,8 @@
+[
+  {
+    "name": "load_UPhase0_2",
+    "type": "DOUBLE",
+    "origin": "NETWORK",
+    "originName": "angle_pu"
+  }
+]
