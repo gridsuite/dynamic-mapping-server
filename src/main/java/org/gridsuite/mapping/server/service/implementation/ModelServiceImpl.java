@@ -92,6 +92,36 @@ public class ModelServiceImpl implements ModelService {
         return foundSetsGroupOpt.orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, SETS_GROUP_NOT_FOUND + setsGroupInfo));
     }
 
+    private ArrayNode readAutomatonFromResources(Resource[] resources) {
+        ArrayNode automatonArrayNode = objectMapper.createArrayNode();
+        for (Resource resource : resources) {
+            try (InputStream is = resource.getInputStream()) {
+                JsonNode jsonNode = objectMapper.readTree(is);
+                automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
+            } catch (StreamReadException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+            } catch (IOException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+            }
+        }
+        return automatonArrayNode;
+    }
+
+    private ArrayNode readAutomatonFromFilePath(List<Path> jsonFilePaths) {
+        ArrayNode automatonArrayNode = objectMapper.createArrayNode();
+        for (Path jsonFilePath : jsonFilePaths) {
+            try (InputStream is = Files.newInputStream(jsonFilePath)) {
+                JsonNode jsonNode = objectMapper.readTree(is);
+                automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
+            } catch (StreamReadException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+            } catch (IOException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+            }
+        }
+        return automatonArrayNode;
+    }
+
     @Override
     public String getAutomatonDefinitions() {
 
@@ -106,16 +136,7 @@ public class ModelServiceImpl implements ModelService {
             throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_DIRECTORY + e.getMessage());
         }
 
-        for (Resource resource : resources) {
-            try (InputStream is = resource.getInputStream()) {
-                JsonNode jsonNode = objectMapper.readTree(is);
-                automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
-            } catch (StreamReadException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
-            } catch (IOException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
-            }
-        }
+        automatonArrayNode.addAll(readAutomatonFromResources(resources));
 
         // read automation definitions from External resources
         List<Path> jsonFilePaths = new ArrayList<>();
@@ -130,16 +151,7 @@ public class ModelServiceImpl implements ModelService {
             // do nothing, external resources is optional
         }
 
-        for (Path jsonFilePath : jsonFilePaths) {
-            try (InputStream is = Files.newInputStream(jsonFilePath)) {
-                JsonNode jsonNode = objectMapper.readTree(is);
-                automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
-            } catch (StreamReadException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
-            } catch (IOException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
-            }
-        }
+        automatonArrayNode.addAll(readAutomatonFromFilePath(jsonFilePaths));
 
         return automatonArrayNode.toPrettyString();
     }
