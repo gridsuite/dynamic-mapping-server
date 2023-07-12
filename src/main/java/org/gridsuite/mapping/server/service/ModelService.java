@@ -16,6 +16,8 @@ import java.util.List;
  */
 public interface ModelService {
 
+    String getAutomatonDefinitions();
+
     List<SimpleModel> getModels();
 
     List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType);
@@ -80,5 +82,5 @@ public interface ModelService {
 
     List<String> deleteVariablesSets(List<String> variablesSetNames);
 
-    // --- BEGIN variable-related service methods --- //
+    // --- END variable-related service methods --- //
 }

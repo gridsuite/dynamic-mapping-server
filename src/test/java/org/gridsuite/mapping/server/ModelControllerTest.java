@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import org.gridsuite.mapping.server.dto.models.Model;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -55,6 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
+@TestPropertySource(properties = {"ex-resources.automaton = src/test/resources/data/ex-automaton"})
 public class ModelControllerTest {
 
     public static Logger LOGGER = LoggerFactory.getLogger(ModelControllerTest.class);
@@ -104,6 +107,24 @@ public class ModelControllerTest {
         definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", modelToSave));
         modelToSave.addParameterDefinitions(definitions);
         modelRepository.save(modelToSave);
+    }
+
+    @Test
+    public void testGetAutomatonDefinitions() throws Exception {
+        MvcResult mvcResult = mvc.perform(get("/models/automaton-definitions")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        String automatonsJsonResult = mvcResult.getResponse().getContentAsString();
+
+        LOGGER.info("Automatons result in Json array = \n" + automatonsJsonResult);
+
+        // Check result
+        JsonNode jsonNode = objectMapper.readTree(automatonsJsonResult);
+        assertEquals(true, jsonNode.isArray());
+        assertEquals(3, jsonNode.size());
     }
 
     @Test

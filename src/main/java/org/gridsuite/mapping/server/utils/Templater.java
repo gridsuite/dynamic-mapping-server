@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.utils;
 
 import org.apache.commons.io.IOUtils;
 import org.gridsuite.mapping.server.MappingConstants;
+import org.gridsuite.mapping.server.dto.automata.BasicProperty;
 import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
 import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.service.implementation.ScriptServiceImpl;
@@ -16,9 +17,8 @@ import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -39,7 +39,7 @@ public final class Templater {
         return flattenedComposition[0];
     }
 
-    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping, AutomatonIdProvider automatonIdProvider) {
+    public static String mappingToScript(ScriptServiceImpl.SortedMapping sortedMapping) {
         String scriptTemplate;
         String sortedRulesTemplate;
         String ruleTemplate;
@@ -79,21 +79,27 @@ public final class Templater {
 
         // Automata
         String[] automataScripts = sortedMapping.getAutomata().stream().map(automaton -> {
-            String familyModel = "";
-            switch (automaton.getFamily()) {
-                case CURRENT_LIMIT:
-                    familyModel = MappingConstants.CURRENT_LIMIT_MODEL_CLASS;
-            }
+            String model = automaton.getModel();
+
+            List<BasicProperty> automatonProperties = automaton.getProperties();
+            Map<String, BasicProperty> automatonPropertiesByName = automatonProperties.stream()
+                    .collect(Collectors.toMap(BasicProperty::getName, elem -> elem, (t, t2) -> t, LinkedHashMap::new));
+
             imports.add(MappingConstants.AUTOMATON_IMPORT);
             ST automatonScript = new ST(automatonTemplate);
-            automatonScript.add("familyModel", familyModel);
-            automatonScript.add("watchedElement", automaton.getWatchedElement());
-            automatonScript.add("automatonId", automatonIdProvider.getId(automaton));
+            automatonScript.add("automatonModel", model);
             automatonScript.add("parameterSetId", automaton.getSetGroup());
-            String[] propertiesScripts = automaton.convertToBasicProperties().stream().map(property -> {
+            String[] propertiesScripts = automatonPropertiesByName.values().stream().map(property -> {
                 ST propertyScript = new ST(automatonPropertyTemplate);
                 propertyScript.add("name", property.getName());
-                propertyScript.add("value", property.getValue());
+                String value = property.getValue();
+                // value =>  "value" when export groovy string value
+                if (property.getType() == PropertyType.STRING) {
+                    value = Methods.convertStringToList(value).stream()
+                            .map(elem -> "\"" + elem + "\"")
+                            .collect(Collectors.joining(", "));
+                }
+                propertyScript.add("value", value);
                 return propertyScript.render();
             }).toArray(String[]::new);
             automatonScript.add("properties", propertiesScripts);

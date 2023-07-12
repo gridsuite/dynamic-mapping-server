@@ -98,6 +98,21 @@ public class NetworkServiceImpl implements NetworkService {
         EquipmentValues loadsEquipmentValues = getLoadsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
         equipmentValuesList.add(loadsEquipmentValues);
 
+        EquipmentValues busesEquipmentValues = getBusesEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
+        equipmentValuesList.add(busesEquipmentValues);
+
+        EquipmentValues linesEquipmentValues = getLinesEquipmentValues(network);
+        equipmentValuesList.add(linesEquipmentValues);
+
+        EquipmentValues twoWindingsTransformersEquipmentValues = getTwoWindingsTransformersEquipmentValues(network, substationsPropertyValues);
+        equipmentValuesList.add(twoWindingsTransformersEquipmentValues);
+
+        EquipmentValues shuntCompensatorsEquipmentValues = getShuntCompensatorsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
+        equipmentValuesList.add(shuntCompensatorsEquipmentValues);
+
+        EquipmentValues hdvcLinesEquipmentValues = getHvdcLinesEquipmentValues(network);
+        equipmentValuesList.add(hdvcLinesEquipmentValues);
+
         return new NetworkValues(networkUuid, equipmentValuesList);
     }
 
@@ -168,6 +183,57 @@ public class NetworkServiceImpl implements NetworkService {
         return new EquipmentValues(EquipmentType.LOAD, loadValuesMap);
     }
 
+    private EquipmentValues getBusesEquipmentValues(Network network, HashMap<String, Set<String>> voltageLevelsPropertyValues, HashMap<String, Set<String>> substationsPropertyValues) {
+        HashMap<String, Set<String>> busValuesMap = new HashMap<>();
+        // Own properties
+        network.getBusBreakerView().getBuses().forEach(bus -> setPropertyMap(busValuesMap, bus.getId(), ID_PROPERTY));
+
+        // Parent properties, Bus is in a substation/voltageLevel
+        busValuesMap.putAll(voltageLevelsPropertyValues);
+        busValuesMap.putAll(substationsPropertyValues);
+
+        return new EquipmentValues(EquipmentType.BUS, busValuesMap);
+    }
+
+    private EquipmentValues getLinesEquipmentValues(Network network) {
+        HashMap<String, Set<String>> lineValuesMap = new HashMap<>();
+        // Own properties
+        network.getLines().forEach(line -> setPropertyMap(lineValuesMap, line.getId(), ID_PROPERTY));
+
+        return new EquipmentValues(EquipmentType.LINE, lineValuesMap);
+    }
+
+    private EquipmentValues getTwoWindingsTransformersEquipmentValues(Network network, HashMap<String, Set<String>> substationsPropertyValues) {
+        HashMap<String, Set<String>> twoWindingsTransformersValuesMap = new HashMap<>();
+        // Own properties
+        network.getTwoWindingsTransformers().forEach(twoWindingsTransformer -> setPropertyMap(twoWindingsTransformersValuesMap, twoWindingsTransformer.getId(), ID_PROPERTY));
+
+        // Parent properties, Two Winding transformer is in a substation
+        twoWindingsTransformersValuesMap.putAll(substationsPropertyValues);
+
+        return new EquipmentValues(EquipmentType.TWO_WINDINGS_TRANSFORMER, twoWindingsTransformersValuesMap);
+    }
+
+    private EquipmentValues getShuntCompensatorsEquipmentValues(Network network, HashMap<String, Set<String>> voltageLevelsPropertyValues, HashMap<String, Set<String>> substationsPropertyValues) {
+        HashMap<String, Set<String>> shuntCompensatorsValuesMap = new HashMap<>();
+        // Own properties
+        network.getShuntCompensators().forEach(shuntCompensator -> setPropertyMap(shuntCompensatorsValuesMap, shuntCompensator.getId(), ID_PROPERTY));
+
+        // Parent properties, Shunt compensator is in a substation/voltageLevel
+        shuntCompensatorsValuesMap.putAll(voltageLevelsPropertyValues);
+        shuntCompensatorsValuesMap.putAll(substationsPropertyValues);
+
+        return new EquipmentValues(EquipmentType.SHUNT_COMPENSATOR, shuntCompensatorsValuesMap);
+    }
+
+    private EquipmentValues getHvdcLinesEquipmentValues(Network network) {
+        HashMap<String, Set<String>> hvdcLineValuesMap = new HashMap<>();
+        // Own properties
+        network.getHvdcLines().forEach(hvdcLine -> setPropertyMap(hvdcLineValuesMap, hvdcLine.getId(), ID_PROPERTY));
+
+        return new EquipmentValues(EquipmentType.HVDC_LINE, hvdcLineValuesMap);
+    }
+
     @Override
     public NetworkValues getNetworkValues(MultipartFile multipartFile) {
         HttpHeaders headers = new HttpHeaders();
@@ -211,7 +277,9 @@ public class NetworkServiceImpl implements NetworkService {
 
     @Override
     public List<OutputNetwork> getNetworks() {
-        return networkRepository.findAll().stream().map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getNetworkName())).collect(Collectors.toList());
+        return networkRepository.findAll().stream()
+                .map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getNetworkName()))
+                .collect(Collectors.toList());
     }
 
     private HashMap<String, HashMap<String, String>> getPropertyValuesBySubstations(Network network) {
@@ -292,7 +360,9 @@ public class NetworkServiceImpl implements NetworkService {
                 getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues) :
                 getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
 
-        return correspondingValues.stream().map(equipment -> matchEquipmentToRule(equipment, rule)).filter(Objects::nonNull).collect(Collectors.toList());
+        return correspondingValues.stream()
+                .map(equipment -> matchEquipmentToRule(equipment, rule))
+                .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     private String matchEquipmentToRule(HashMap<String, String> equipment, RuleToMatch rule) {

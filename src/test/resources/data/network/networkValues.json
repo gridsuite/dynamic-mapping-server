@@ -1,0 +1,88 @@
+{
+  "networkId": "c2f524f3-0c24-44eb-b828-db73d8d8c2ef",
+  "propertyValues": [
+    {
+      "type": "GENERATOR",
+      "values": {
+        "terminal.voltageLevel.nominalV": [
+          "400.0"
+        ],
+        "terminal.voltageLevel.substation.country.name": [
+          "FRANCE"
+        ],
+        "id": [
+          "generator1"
+        ],
+        "energySource": [
+          "NUCLEAR"
+        ],
+        "voltageRegulatorOn": [
+          "true"
+        ]
+      }
+    },
+    {
+      "type": "LOAD",
+      "values": {
+        "loadType": [
+          "UNDEFINED"
+        ],
+        "terminal.voltageLevel.nominalV": [
+          "400.0"
+        ],
+        "terminal.voltageLevel.substation.country.name": [
+          "FRANCE"
+        ],
+        "id": [
+          "load1"
+        ]
+      }
+    },
+    {
+      "type": "BUS",
+      "values": {
+        "terminal.voltageLevel.nominalV": [
+          "400.0"
+        ],
+        "terminal.voltageLevel.substation.country.name": [
+          "FRANCE"
+        ],
+        "id": [
+          "voltageLevel1_0",
+          "voltageLevel1_1"
+        ]
+      }
+    },
+    {
+      "type": "LINE",
+      "values": {
+
+      }
+    },
+    {
+      "type": "TWO_WINDINGS_TRANSFORMER",
+      "values": {
+        "terminal.voltageLevel.substation.country.name": [
+          "FRANCE"
+        ]
+      }
+    },
+    {
+      "type": "SHUNT_COMPENSATOR",
+      "values": {
+        "terminal.voltageLevel.nominalV": [
+          "400.0"
+        ],
+        "terminal.voltageLevel.substation.country.name": [
+          "FRANCE"
+        ]
+      }
+    },
+    {
+      "type": "HVDC_LINE",
+      "values": {
+
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "CurrentLimitAutomaton": {
+    "dynamicModelId": {
+      "type": "STRING",
+      "label": "Name",
+      "isRequired": true
+    },
+    "iMeasurement": {
+      "type": "STRING",
+      "label": "On equipment",
+      "mapping": {
+        "equipmentTypes": [
+          "LINE",
+          "TWO_WINDINGS_TRANSFORMER"
+        ],
+        "equipmentProperty": "id"
+      },
+      "isRequired": true
+    },
+    "iMeasurementSide": {
+      "type": "ENUM",
+      "label": "Side",
+      "values": [
+        {
+          "value": "Branch.Side.ONE",
+          "label": "One"
+        },
+        {
+          "value": "Branch.Side.TWO",
+          "label": "Two"
+        }
+      ],
+      "isRequired": true
+    },
+    "controlledQuadripole": {
+      "type": "STRING",
+      "label": "Controlled quadripole",
+      "mapping": {
+        "equipmentTypes": [
+          "LINE",
+          "TWO_WINDINGS_TRANSFORMER"
+        ],
+        "equipmentProperty": "id"
+      },
+      "isRequired": true
+    }
+  }
+}

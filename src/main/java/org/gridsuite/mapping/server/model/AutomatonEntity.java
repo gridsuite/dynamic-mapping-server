@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server.model;
 
 import lombok.*;
+import org.gridsuite.mapping.server.dto.automata.Automaton;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
 
 import javax.persistence.*;
@@ -40,9 +41,6 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     @Column(name = "set_group", nullable = false)
     private String setGroup;
 
-    @Column(name = "watched_element", nullable = false)
-    private String watchedElement;
-
     @OneToMany(targetEntity = AutomatonPropertyEntity.class, mappedBy = "automaton", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AutomatonPropertyEntity> properties;
 
@@ -55,6 +53,18 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         return automatonId;
     }
 
+    public AutomatonEntity(MappingEntity mapping, Automaton automaton) {
+        UUID newID = UUID.randomUUID();
+        this.automatonId = newID;
+        this.mapping = mapping;
+        this.family = automaton.getFamily();
+        this.model = automaton.getModel();
+        this.setGroup = automaton.getSetGroup();
+        this.properties = automaton.getProperties() != null ? automaton.getProperties().stream()
+                .map(basicProperty -> new AutomatonPropertyEntity(newID, basicProperty))
+                .collect(Collectors.toList()) : null;
+    }
+
     public AutomatonEntity(MappingEntity mapping, AutomatonEntity automatonToCopy) {
         UUID newID = UUID.randomUUID();
         this.automatonId = newID;
@@ -62,8 +72,8 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.family = automatonToCopy.getFamily();
         this.model = automatonToCopy.getModel();
         this.setGroup = automatonToCopy.getSetGroup();
-        this.watchedElement = automatonToCopy.getWatchedElement();
-        this.properties = automatonToCopy.getProperties().stream().map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity)).collect(Collectors.toList());
-
+        this.properties = automatonToCopy.getProperties().stream()
+                .map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity))
+                .collect(Collectors.toList());
     }
 }

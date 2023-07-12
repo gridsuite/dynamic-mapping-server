@@ -35,11 +35,19 @@ public class ModelController {
 
     private final ModelService modelService;
 
+    @GetMapping(value = "/automaton-definitions")
+    @Operation(summary = "get all automaton definitions")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "automaton definitions in json format")
+    })
+    public ResponseEntity<String> getAutomatonDefinitions() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getAutomatonDefinitions());
+    }
+
     @GetMapping(value = "/{modelName}/parameters/sets/{groupName}/{groupType}")
     @Operation(summary = "get all parameters sets for a given group")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter sets of the group")})
-
     public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName, groupType));
     }

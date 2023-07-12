@@ -59,17 +59,55 @@
       "family": "CURRENT_LIMIT",
       "model": "CurrentLimitAutomaton",
       "setGroup": "CLA_2_4",
-      "watchedElement": "_BUS____2-BUS____4-1_AC",
-      "side": "Branch.Side.TWO",
-      "controlledQuadripole": "_BUS____2-BUS____4-1_AC"
+      "properties": [
+        {
+          "name": "dynamicModelId",
+          "value": "CLA_1",
+          "type": "STRING"
+        },
+        {
+          "name": "iMeasurement",
+          "value": "_BUS____2-BUS____4-1_AC",
+          "type": "STRING"
+        },
+        {
+          "name": "iMeasurementSide",
+          "value": "Branch.Side.TWO",
+          "type": "ENUM"
+        },
+        {
+          "name": "controlledQuadripole",
+          "value": "_BUS____2-BUS____4-1_AC",
+          "type": "STRING"
+        }
+      ]
     },
     {
       "family": "CURRENT_LIMIT",
       "model": "CurrentLimitAutomaton",
       "setGroup": "CLA_2_5",
-      "watchedElement": "_BUS____2-BUS____5-1_AC",
-      "side": "Branch.Side.TWO",
-      "controlledQuadripole": "_BUS____2-BUS____5-1_AC"
+      "properties": [
+        {
+          "name": "dynamicModelId",
+          "value": "CLA_2",
+          "type": "STRING"
+        },
+        {
+          "name": "iMeasurement",
+          "value": "_BUS____2-BUS____5-1_AC",
+          "type": "STRING"
+        },
+        {
+          "name": "iMeasurementSide",
+          "value": "Branch.Side.TWO",
+          "type": "ENUM"
+        },
+        {
+          "name": "controlledQuadripole",
+          "value": "_BUS____2-BUS____5-1_AC",
+          "type": "STRING"
+        }
+      ]
     }
   ],
   "controlledParameters": false

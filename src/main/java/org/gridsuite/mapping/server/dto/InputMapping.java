@@ -9,7 +9,9 @@ package org.gridsuite.mapping.server.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
+import lombok.NoArgsConstructor;
+import org.gridsuite.mapping.server.dto.automata.Automaton;
+import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @Data
 @Schema(description = "Mapping")
 @AllArgsConstructor
+@NoArgsConstructor
 public class InputMapping implements Mapping {
     @Schema(description = "Name")
     private String name;
@@ -29,7 +32,7 @@ public class InputMapping implements Mapping {
     private List<Rule> rules;
 
     @Schema(description = "Mapping automata")
-    private List<AbstractAutomaton> automata;
+    private List<Automaton> automata;
 
     @Schema(description = "Mapping should control its parameters")
     private boolean controlledParameters;
@@ -39,7 +42,7 @@ public class InputMapping implements Mapping {
         convertedMapping.setName(name);
         convertedMapping.setControlledParameters(controlledParameters);
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
-        convertedMapping.setAutomata(automata.stream().map(automaton -> automaton.convertAutomatonToEntity(convertedMapping)).collect(Collectors.toList()));
+        convertedMapping.setAutomata(automata.stream().map(automaton -> new AutomatonEntity(convertedMapping, automaton)).collect(Collectors.toList()));
         return convertedMapping;
     }
 
@@ -47,6 +50,6 @@ public class InputMapping implements Mapping {
         name = mappingEntity.getName();
         controlledParameters = mappingEntity.isControlledParameters();
         rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
-        automata = mappingEntity.getAutomata().stream().map(AbstractAutomaton::instantiateFromEntity).collect(Collectors.toList());
+        automata = mappingEntity.getAutomata().stream().map(Automaton::new).collect(Collectors.toList());
     }
 }

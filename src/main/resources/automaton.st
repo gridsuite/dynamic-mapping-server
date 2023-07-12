@@ -1,6 +1,4 @@
-<familyModel> {
-     iMeasurement "<watchedElement>"
-     dynamicModelId "<automatonId>"
+<automatonModel> {
      parameterSetId "<parameterSetId>"
      <properties; separator="\n">
 }

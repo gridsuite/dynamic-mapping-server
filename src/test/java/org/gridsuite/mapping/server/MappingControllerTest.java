@@ -116,11 +116,52 @@ public class MappingControllerTest {
                 "  \"automata\": [\n" +
                 "    {\n" +
                 "      \"family\": \"CURRENT_LIMIT\",\n" +
-                "      \"model\": \"automaton_model\",\n" +
+                "      \"model\": \"CurrentLimitAutomaton\",\n" +
                 "      \"setGroup\": \"automaton_group\",\n" +
-                "      \"watchedElement\": \"element_id\",\n" +
-                "      \"side\": \"Branch.Side.ONE\",\n" +
-                "      \"controlledQuadripole\": \"element_id\"\n" +
+                "      \"properties\": [\n" +
+                "           {\n" +
+                "               \"name\": \"dynamicModelId\",\n" +
+                "               \"value\": \"cla_automaton_name\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"iMeasurement\",\n" +
+                "               \"value\": \"element_id\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"iMeasurementSide\",\n" +
+                "               \"value\": \"Branch.Side.ONE\",\n" +
+                "               \"type\": \"ENUM\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"controlledQuadripole\",\n" +
+                "               \"value\": \"element_id\",\n" +
+                "               \"type\": \"ENUM\"\n" +
+                "           }\n" +
+                "       ]\n" +
+                "     },\n" +
+                "    {\n" +
+                "      \"family\": \"VOLTAGE\",\n" +
+                "      \"model\": \"TapChangerBlockingAutomaton\",\n" +
+                "      \"setGroup\": \"automaton_group_2\",\n" +
+                "      \"properties\": [\n" +
+                "           {\n" +
+                "               \"name\": \"dynamicModelId\",\n" +
+                "               \"value\": \"tcb_automaton_name\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"uMeasurement\",\n" +
+                "               \"value\": \"bus_id_1, bus_id_2\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           },\n" +
+                "           {\n" +
+                "               \"name\": \"transformers\",\n" +
+                "               \"value\": \"load_id_1, load_id_2\",\n" +
+                "               \"type\": \"STRING\"\n" +
+                "           }\n" +
+                "       ]\n" +
                 "    }\n" +
                 "  ],\n" +
                 "  \"controlledParameters\": false" +

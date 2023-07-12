@@ -8,7 +8,7 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import lombok.*;
 import org.gridsuite.mapping.server.dto.*;
-import org.gridsuite.mapping.server.dto.automata.AbstractAutomaton;
+import org.gridsuite.mapping.server.dto.automata.Automaton;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
@@ -41,8 +41,7 @@ public class ScriptServiceImpl implements ScriptService {
     public ScriptServiceImpl(
             MappingRepository mappingRepository,
             ScriptRepository scriptRepository,
-            ModelRepository modelRepository
-    ) {
+            ModelRepository modelRepository) {
         this.modelRepository = modelRepository;
         this.mappingRepository = mappingRepository;
         this.scriptRepository = scriptRepository;
@@ -55,7 +54,7 @@ public class ScriptServiceImpl implements ScriptService {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             SortedMapping sortedMapping = new SortedMapping(new InputMapping(foundMapping.get()));
-            String createdScript = Templater.mappingToScript(sortedMapping, new AutomatonIdProviderImpl());
+            String createdScript = Templater.mappingToScript(sortedMapping);
             // TODO: Add Date or randomise to ensure uniqueness
             String savedScriptName = sortedMapping.getName() + "-script";
             String createdPar = null;
@@ -219,11 +218,11 @@ public class ScriptServiceImpl implements ScriptService {
     public class SortedMapping implements Mapping {
         private String name;
         private ArrayList<SortedRules> sortedRules;
-        private ArrayList<AbstractAutomaton> automata;
+        private ArrayList<Automaton> automata;
 
         public SortedMapping(InputMapping mapping) {
             name = mapping.getName();
-            automata = (ArrayList<AbstractAutomaton>) mapping.getAutomata();
+            automata = (ArrayList<Automaton>) mapping.getAutomata();
             sortedRules = new ArrayList<>();
             Map<EquipmentType, List<Rule>> sortingRules = mapping.getRules().stream().collect(groupingBy(Rule::getEquipmentType));
             for (Map.Entry<EquipmentType, List<Rule>> sortingRulesEntry : sortingRules.entrySet()) {
@@ -326,13 +325,6 @@ public class ScriptServiceImpl implements ScriptService {
         public InstantiatedModel(AutomatonEntity automaton) {
             this.model = automaton.getModel();
             this.setGroup = automaton.getSetGroup();
-        }
-    }
-
-    private class AutomatonIdProviderImpl implements AutomatonIdProvider {
-        @Override
-        public String getId(AbstractAutomaton automaton) {
-            return String.format("%s_%s", automaton.getModel(), automaton.getWatchedElement());
         }
     }
 }

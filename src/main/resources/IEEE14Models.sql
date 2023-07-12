@@ -907,3 +907,47 @@ VALUES ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'Generator')
 INSERT INTO models_model_variable_sets (model_name, variable_set_name)
 VALUES ('GeneratorSynchronousFourWindingsProportionalRegulations', 'Generator'),
        ('GeneratorSynchronousFourWindingsProportionalRegulations', 'VoltageRegulator');
+
+--- model TapChangerBlockingAutomaton for VOLTAGE Equipment type
+INSERT INTO models (model_name, equipment_type, created_date)
+VALUES ('TapChangerBlockingAutomaton', 3, now()::timestamp);
+
+INSERT INTO model_sets_group (model_name, name, type)
+VALUES ('TapChangerBlockingAutomaton', 'TCB', 0),
+       ('TapChangerBlockingAutomaton', 'TCB_2_4', 0),
+       ('TapChangerBlockingAutomaton', 'TCB_2_5', 0);
+
+INSERT INTO model_parameter_sets (group_name, group_type, model_name, name)
+VALUES ('TCB', 0, 'TapChangerBlockingAutomaton', 'TCB'),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'TCB_2_4'),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'TCB_2_5');
+
+INSERT INTO model_parameter_definitions (name, origin, origin_name, type, fixed_value, created_date)
+VALUES ('tapChangerBlocking_UMin', 2, NULL, 2, NULL, now()::timestamp),
+       ('tapChangerBlocking_tLagBeforeBlocked', 2, NULL, 2, NULL, now()::timestamp),
+       ('tapChangerBlocking_tLagTransBlockedD', 2, NULL, 2, NULL, now()::timestamp),
+       ('tapChangerBlocking_tLagTransBlockedT', 2, NULL, 2, NULL, now()::timestamp);
+
+INSERT INTO models_model_parameter_definitions (model_name, parameter_definition_name)
+VALUES ('TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin'),
+       ('TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked'),
+       ('TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD'),
+       ('TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT');
+
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
+VALUES ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 'TCB', 10.),
+       ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB', 100.),
+       ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 'TCB', 1000.),
+       ('TCB', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 'TCB', 10.);
+
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
+VALUES ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 'TCB_2_4', 14.),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB_2_4', 104.),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 'TCB_2_4', 1004.),
+       ('TCB_2_4', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 'TCB_2_4', 14.);
+
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
+VALUES ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 'TCB_2_5', 15.),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB_2_5', 105.),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 'TCB_2_5', 1005.),
+       ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 'TCB_2_5', 15.);

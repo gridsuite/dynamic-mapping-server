@@ -13,3 +13,9 @@ powsybl:
 powsybl-ws:
   database:
     host: localhost
+
+# when perform a local test, fill by the path that contains external automaton resource files in json format
+# e.g. /home/<user>/dynamic-mapping-resources/automaton
+ex-resources:
+  automaton:
+

@@ -11,4 +11,5 @@ package org.gridsuite.mapping.server.utils;
  */
 public enum AutomatonFamily {
     CURRENT_LIMIT,
+    VOLTAGE,
 }
