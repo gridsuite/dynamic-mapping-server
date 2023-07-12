@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.*;
@@ -20,6 +21,8 @@ import org.gridsuite.mapping.server.repository.ModelVariableRepository;
 import org.gridsuite.mapping.server.repository.ModelVariablesSetRepository;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.utils.SetGroupType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -44,10 +47,12 @@ import java.util.stream.Stream;
 @Service
 public class ModelServiceImpl implements ModelService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceImpl.class);
+
     public static final String AUTOMATON_DIR_SCAN_PATTERN = "classpath*:automaton/*.json";
-    public static final String INVALID_AUTOMATON_JSON_FORMAT = "Invalid automaton json format: ";
-    public static final String CAN_NOT_READ_AUTOMATON_FILE = "Can not read automaton file: ";
-    public static final String CAN_NOT_READ_AUTOMATON_DIRECTORY = "Can not read automaton directory: ";
+    public static final String INVALID_AUTOMATON_JSON_FORMAT = "Invalid automaton json format";
+    public static final String CAN_NOT_READ_AUTOMATON_FILE = "Can not read automaton file";
+    public static final String CAN_NOT_READ_AUTOMATON_DIRECTORY = "Can not read automaton directory";
 
     public static final String MODEL_NOT_FOUND = "Model not found: ";
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
@@ -99,9 +104,9 @@ public class ModelServiceImpl implements ModelService {
                 JsonNode jsonNode = objectMapper.readTree(is);
                 automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
             } catch (StreamReadException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+                LOGGER.error(INVALID_AUTOMATON_JSON_FORMAT, e);
             } catch (IOException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+                LOGGER.error(CAN_NOT_READ_AUTOMATON_FILE, e);
             }
         }
         return automatonArrayNode;
@@ -114,9 +119,9 @@ public class ModelServiceImpl implements ModelService {
                 JsonNode jsonNode = objectMapper.readTree(is);
                 automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
             } catch (StreamReadException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+                LOGGER.error(INVALID_AUTOMATON_JSON_FORMAT, e);
             } catch (IOException e) {
-                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+                LOGGER.error(CAN_NOT_READ_AUTOMATON_FILE, e);
             }
         }
         return automatonArrayNode;
@@ -129,14 +134,16 @@ public class ModelServiceImpl implements ModelService {
         ArrayNode automatonArrayNode = objectMapper.createArrayNode();
 
         // read automation definitions from Internal resources
-        Resource[] resources;
+        Resource[] resources = new Resource[0];
         try {
             resources = resourcePatternResolver.getResources(AUTOMATON_DIR_SCAN_PATTERN);
         } catch (IOException e) {
-            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_DIRECTORY + e.getMessage());
+            LOGGER.error(CAN_NOT_READ_AUTOMATON_DIRECTORY, e);
         }
 
-        automatonArrayNode.addAll(readAutomatonFromResources(resources));
+        if (!ArrayUtils.isEmpty(resources)) {
+            automatonArrayNode.addAll(readAutomatonFromResources(resources));
+        }
 
         // read automation definitions from External resources
         List<Path> jsonFilePaths = new ArrayList<>();
