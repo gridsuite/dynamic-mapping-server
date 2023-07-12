@@ -22,6 +22,8 @@ import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,15 +44,19 @@ import java.util.stream.Stream;
 @Service
 public class ModelServiceImpl implements ModelService {
 
-    public static final String AUTOMATON_DIR = "/automaton";
-
-    @Value("${ex-resources.automaton}")
-    String exResourcesAutomaton;
+    public static final String AUTOMATON_DIR_SCAN_PATTERN = "classpath*:automaton/*.json";
+    public static final String INVALID_AUTOMATON_JSON_FORMAT = "Invalid automaton json format: ";
+    public static final String CAN_NOT_READ_AUTOMATON_FILE = "Can not read automaton file: ";
+    public static final String CAN_NOT_READ_AUTOMATON_DIRECTORY = "Can not read automaton directory: ";
 
     public static final String MODEL_NOT_FOUND = "Model not found: ";
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
     public static final String SETS_GROUP_NOT_FOUND = "Sets group not found: ";
 
+    @Value("${ex-resources.automaton}")
+    String exResourcesAutomaton;
+
+    private final ResourcePatternResolver resourcePatternResolver;
     private final ObjectMapper objectMapper;
     private final ModelRepository modelRepository;
     private final ModelParameterDefinitionRepository modelParameterDefinitionRepository;
@@ -59,12 +65,14 @@ public class ModelServiceImpl implements ModelService {
 
     @Autowired
     public ModelServiceImpl(
+            ResourcePatternResolver resourcePatternResolver,
             ObjectMapper objectMapper,
             ModelRepository modelRepository,
             ModelParameterDefinitionRepository modelParameterDefinitionRepository,
             ModelVariableRepository modelVariableRepository,
             ModelVariablesSetRepository modelVariablesSetRepository
     ) {
+        this.resourcePatternResolver = resourcePatternResolver;
         this.objectMapper = objectMapper;
         this.modelRepository = modelRepository;
         this.modelParameterDefinitionRepository = modelParameterDefinitionRepository;
@@ -86,41 +94,48 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public String getAutomatonDefinitions() {
+
+        // read json file from resources into a Json ArrayNode, support both single object and array object json
         ArrayNode automatonArrayNode = objectMapper.createArrayNode();
 
-        // read json file from internal resources
-        List<Path> automatonPaths = new ArrayList<>();
-
-        // automation definitions from Internal resources
-        try (Stream<Path> streamPaths = Files.list(Paths.get(getClass().getResource(AUTOMATON_DIR).getPath()))) {
-            automatonPaths.addAll(streamPaths.toList());
+        // read automation definitions from Internal resources
+        try {
+            Resource[] resources = resourcePatternResolver.getResources(AUTOMATON_DIR_SCAN_PATTERN);
+            for (Resource resource : resources) {
+                try (InputStream is = resource.getInputStream()) {
+                    JsonNode jsonNode = objectMapper.readTree(is);
+                    automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
+                } catch (StreamReadException e) {
+                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+                } catch (IOException e) {
+                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+                }
+            }
         } catch (IOException e) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No resource automaton found");
+            throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_DIRECTORY + e.getMessage());
         }
 
-        // automation definitions from External resources
+        // read automation definitions from External resources
         try (Stream<Path> streamPaths = !StringUtils.isEmpty(exResourcesAutomaton) ?
                 Files.list(Paths.get(exResourcesAutomaton)) :
                 Stream.empty()
         ) {
-            automatonPaths.addAll(streamPaths.toList());
+            List<Path> jsonFilePaths = streamPaths.filter(path -> !Files.isDirectory(path))
+                    .filter(path -> path.getFileName().toString().endsWith("json")).toList();
+
+            for (Path jsonFilePath : jsonFilePaths) {
+                try (InputStream is = Files.newInputStream(jsonFilePath)) {
+                    JsonNode jsonNode = objectMapper.readTree(is);
+                    automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
+                } catch (StreamReadException e) {
+                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+                } catch (IOException e) {
+                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+                }
+            }
         } catch (IOException e) {
             // do nothing, external resources is optional
         }
-
-        // aggregate all automaton json file, support both single object and array object json
-        automatonPaths.stream().filter(path -> !Files.isDirectory(path))
-                .filter(path -> path.getFileName().toString().endsWith("json"))
-                .forEach(path -> {
-                    try {
-                        JsonNode jsonNode = objectMapper.readTree(Files.newInputStream(path));
-                        automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
-                    } catch (StreamReadException e) {
-                        throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Invalid Json " + e.getMessage());
-                    } catch (IOException e) {
-                        throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "No automaton found " + path.getFileName().toString());
-                    }
-                });
 
         return automatonArrayNode.toPrettyString();
     }
