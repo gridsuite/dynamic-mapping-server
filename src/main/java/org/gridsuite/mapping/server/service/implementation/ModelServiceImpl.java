@@ -99,42 +99,46 @@ public class ModelServiceImpl implements ModelService {
         ArrayNode automatonArrayNode = objectMapper.createArrayNode();
 
         // read automation definitions from Internal resources
+        Resource[] resources;
         try {
-            Resource[] resources = resourcePatternResolver.getResources(AUTOMATON_DIR_SCAN_PATTERN);
-            for (Resource resource : resources) {
-                try (InputStream is = resource.getInputStream()) {
-                    JsonNode jsonNode = objectMapper.readTree(is);
-                    automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
-                } catch (StreamReadException e) {
-                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
-                } catch (IOException e) {
-                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
-                }
-            }
+            resources = resourcePatternResolver.getResources(AUTOMATON_DIR_SCAN_PATTERN);
         } catch (IOException e) {
             throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_DIRECTORY + e.getMessage());
         }
 
+        for (Resource resource : resources) {
+            try (InputStream is = resource.getInputStream()) {
+                JsonNode jsonNode = objectMapper.readTree(is);
+                automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
+            } catch (StreamReadException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+            } catch (IOException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+            }
+        }
+
         // read automation definitions from External resources
+        List<Path> jsonFilePaths = new ArrayList<>();
         try (Stream<Path> streamPaths = !StringUtils.isEmpty(exResourcesAutomaton) ?
                 Files.list(Paths.get(exResourcesAutomaton)) :
                 Stream.empty()
         ) {
-            List<Path> jsonFilePaths = streamPaths.filter(path -> !Files.isDirectory(path))
-                    .filter(path -> path.getFileName().toString().endsWith("json")).toList();
+            jsonFilePaths.addAll(streamPaths.filter(path -> !Files.isDirectory(path))
+                    .filter(path -> path.getFileName().toString().endsWith("json")).toList());
 
-            for (Path jsonFilePath : jsonFilePaths) {
-                try (InputStream is = Files.newInputStream(jsonFilePath)) {
-                    JsonNode jsonNode = objectMapper.readTree(is);
-                    automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
-                } catch (StreamReadException e) {
-                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
-                } catch (IOException e) {
-                    throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
-                }
-            }
         } catch (IOException e) {
             // do nothing, external resources is optional
+        }
+
+        for (Path jsonFilePath : jsonFilePaths) {
+            try (InputStream is = Files.newInputStream(jsonFilePath)) {
+                JsonNode jsonNode = objectMapper.readTree(is);
+                automatonArrayNode.addAll(jsonNode.isArray() ? IterableUtils.toList(jsonNode) : Arrays.asList(jsonNode));
+            } catch (StreamReadException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, INVALID_AUTOMATON_JSON_FORMAT + e.getMessage());
+            } catch (IOException e) {
+                throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, CAN_NOT_READ_AUTOMATON_FILE + e.getMessage());
+            }
         }
 
         return automatonArrayNode.toPrettyString();
