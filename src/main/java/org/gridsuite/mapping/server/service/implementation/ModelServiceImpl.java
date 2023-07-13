@@ -58,7 +58,7 @@ public class ModelServiceImpl implements ModelService {
     public static final String VARIABLES_SET_NOT_FOUND = "Variables set not found: ";
     public static final String SETS_GROUP_NOT_FOUND = "Sets group not found: ";
 
-    @Value("${ex-resources.automaton}")
+    @Value("${ex-resources.automaton:}")
     String exResourcesAutomaton;
 
     private final ResourcePatternResolver resourcePatternResolver;
