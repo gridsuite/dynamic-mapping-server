@@ -692,7 +692,7 @@ public class ModelControllerTest {
 
         // the last parameter definition of load alpha beta model must be NETWORK
         ModelParameterDefinition lastParameterDefinitionInLoadAlphaBetaModel = loadAlphaBetaParameterDefinitions.stream().reduce((first, second) -> second).get();
-        assertEquals( ParameterOrigin.NETWORK, lastParameterDefinitionInLoadAlphaBetaModel.getOrigin());
+        assertEquals(ParameterOrigin.NETWORK, lastParameterDefinitionInLoadAlphaBetaModel.getOrigin());
 
         // the last parameter definition of load PQ model must be USER
         ModelParameterDefinition lastParameterDefinitionInLoadPQModel = loadPQParameterDefinitions.stream().reduce((first, second) -> second).get();
