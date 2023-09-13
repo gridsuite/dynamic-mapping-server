@@ -688,7 +688,23 @@ public class ModelControllerTest {
 
         // cross-check parameter definitions between two models
         Sets.SetView<ModelParameterDefinition> intersectionParameterDefinitions = Sets.intersection(new HashSet<>(loadAlphaBetaParameterDefinitions), new HashSet<>(loadPQParameterDefinitions));
-        assertEquals(4, intersectionParameterDefinitions.size());
+        assertEquals(3, intersectionParameterDefinitions.size());
+
+        // the last parameter definition of load alpha beta model must be NETWORK
+        ModelParameterDefinition lastParameterDefinitionInLoadAlphaBetaModel = loadAlphaBetaParameterDefinitions.stream().reduce((first, second) -> second).get();
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getOrigin(), ParameterOrigin.NETWORK);
+
+        // the last parameter definition of load PQ model must be USER
+        ModelParameterDefinition lastParameterDefinitionInLoadPQModel = loadPQParameterDefinitions.stream().reduce((first, second) -> second).get();
+        assertEquals(lastParameterDefinitionInLoadPQModel.getOrigin(), ParameterOrigin.USER);
+
+        // two last parameter definitions in two models must be the same name, type, originName and fixedValue
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getName(), lastParameterDefinitionInLoadPQModel.getName());
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getType(), lastParameterDefinitionInLoadPQModel.getType());
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getOriginName(), lastParameterDefinitionInLoadPQModel.getOriginName());
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getFixedValue(), lastParameterDefinitionInLoadPQModel.getFixedValue());
+
+
 
     }
 

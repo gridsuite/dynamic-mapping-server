@@ -9,6 +9,7 @@
             DELETE FROM model_parameters;
             DELETE FROM model_parameter_sets;
             DELETE FROM model_sets_group;
+            DELETE FROM models_model_parameter_definitions;
             DELETE FROM model_parameter_definitions;
             DELETE FROM models_model_variable_sets;
             DELETE FROM models_model_variable_definitions;
