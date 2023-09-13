@@ -1,14 +1,11 @@
 package org.gridsuite.mapping.server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
 import javax.persistence.*;
-import java.util.Objects;
 
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -19,10 +16,12 @@ public class ModelModelParameterDefinitionEntity {
     @EmbeddedId
     private ModelModelParameterDefinitionId id;
 
+    @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("modelName")
     private ModelEntity model;
 
+    @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @MapsId("parameterDefinitionName")
     private ModelParameterDefinitionEntity parameterDefinition;
@@ -37,20 +36,4 @@ public class ModelModelParameterDefinitionEntity {
         this.id = new ModelModelParameterDefinitionId(model.getModelName(), parameterDefinition.getName());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ModelModelParameterDefinitionEntity that = (ModelModelParameterDefinitionEntity) o;
-        return Objects.equals(model, that.model) && Objects.equals(parameterDefinition, that.parameterDefinition);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(model, parameterDefinition);
-    }
 }

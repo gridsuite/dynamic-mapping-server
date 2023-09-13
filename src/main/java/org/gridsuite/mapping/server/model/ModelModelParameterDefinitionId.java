@@ -1,41 +1,24 @@
 package org.gridsuite.mapping.server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
-import java.util.Objects;
 
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Embeddable
 public class ModelModelParameterDefinitionId implements Serializable {
+    @EqualsAndHashCode.Include
     @Column(name = "model_name")
     private String modelName;
 
+    @EqualsAndHashCode.Include
     @Column(name = "parameter_definition_name")
     private String parameterDefinitionName;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ModelModelParameterDefinitionId that = (ModelModelParameterDefinitionId) o;
-        return Objects.equals(modelName, that.modelName) && Objects.equals(parameterDefinitionName, that.parameterDefinitionName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(modelName, parameterDefinitionName);
-    }
 }
