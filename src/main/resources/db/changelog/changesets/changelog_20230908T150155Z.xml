@@ -1,0 +1,98 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="phamquy (generated)" id="1694185324695-0">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="models" columnName="model_name"/>
+        </preConditions>
+        <comment>Clear any existing legacy data in model-related tables to allow the next step which drops the column model_name in primary key of table models</comment>
+        <sql splitStatements="true">
+            DELETE FROM model_parameters;
+            DELETE FROM model_parameter_sets;
+            DELETE FROM model_sets_group;
+            DELETE FROM model_parameter_definitions;
+            DELETE FROM models_model_variable_sets;
+            DELETE FROM models_model_variable_definitions;
+            DELETE FROM model_variable_sets_model_variable_definitions;
+            DELETE FROM model_variable_sets;
+            DELETE FROM model_variable_definitions;
+            DELETE FROM models;
+        </sql>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-17">
+        <addColumn tableName="models">
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-18">
+        <addColumn tableName="models_model_parameter_definitions">
+            <column name="origin" type="int4"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-19">
+        <createIndex indexName="IX_modelsPK" tableName="models" unique="true">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-20">
+        <createIndex indexName="IX_models_model_parameter_definitionsPK" tableName="models_model_parameter_definitions" unique="true">
+            <column name="model_name"/>
+            <column name="parameter_definition_name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-23">
+        <dropColumn columnName="ORIGIN" tableName="MODEL_PARAMETER_DEFINITIONS"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-1">
+        <dropForeignKeyConstraint baseTableName="models_model_parameter_definitions" constraintName="FK1i2ywabny2p26y729k7umat5o"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-3">
+        <dropForeignKeyConstraint baseTableName="models_model_variable_sets" constraintName="FKlrhrr57uws4p83vqu6rmqtgyf"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-5">
+        <dropForeignKeyConstraint baseTableName="models_model_variable_definitions" constraintName="FKpcsk322r85939sco8895x1apn"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-7">
+        <dropForeignKeyConstraint baseTableName="model_sets_group" constraintName="model_sets_groups_fk"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-9">
+        <dropPrimaryKey tableName="model_variable_sets_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-11">
+        <dropPrimaryKey tableName="models_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-15">
+        <dropPrimaryKey tableName="models_model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-13">
+        <dropPrimaryKey tableName="models"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-24">
+        <dropColumn columnName="MODEL_NAME" tableName="models"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-14">
+        <addPrimaryKey columnNames="name" constraintName="modelsPK" tableName="models"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-2">
+        <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="models_model_parameter_definitions" constraintName="FK1i2ywabny2p26y729k7umat5o" referencedColumnNames="name" referencedTableName="models"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-4">
+        <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="models_model_variable_sets" constraintName="FKlrhrr57uws4p83vqu6rmqtgyf" referencedColumnNames="name" referencedTableName="models"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-6">
+        <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="models_model_variable_definitions" constraintName="FKpcsk322r85939sco8895x1apn" referencedColumnNames="name" referencedTableName="models"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-8">
+        <addForeignKeyConstraint baseColumnNames="model_name" baseTableName="model_sets_group" constraintName="model_sets_groups_fk" referencedColumnNames="name" referencedTableName="models"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-10">
+        <addPrimaryKey columnNames="variable_set_name, variable_definition_name" tableName="model_variable_sets_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-12">
+        <addPrimaryKey columnNames="model_name, variable_definition_name" tableName="models_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1694185324695-16">
+        <addPrimaryKey columnNames="model_name, parameter_definition_name" constraintName="models_model_parameter_definitionsPK" tableName="models_model_parameter_definitions"/>
+    </changeSet>
+</databaseChangeLog>

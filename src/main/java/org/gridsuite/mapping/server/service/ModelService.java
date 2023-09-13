@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server.service;
 
 import org.gridsuite.mapping.server.dto.models.*;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface ModelService {
 
     Model addNewParameterDefinitionsToModel(String modelName, List<ModelParameterDefinition> parameterDefinitions);
 
-    Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames);
+    Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames, ParameterOrigin origin);
 
     Model removeExistingParameterDefinitionsFromModel(String modelName, List<String> parameterDefinitionNames);
 

@@ -38,7 +38,9 @@ public class Model {
     public Model(ModelEntity modelEntity) {
         modelName = modelEntity.getModelName();
         equipmentType = modelEntity.getEquipmentType();
-        parameterDefinitions = modelEntity.getParameterDefinitions().stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
+        parameterDefinitions = modelEntity.getParameterDefinitions().stream()
+                .map(_parameterDefinition -> new ModelParameterDefinition(_parameterDefinition.getParameterDefinition(), _parameterDefinition.getOrigin()))
+                .collect(Collectors.toList());
         setsGroups = modelEntity.getSetsGroups().stream().map(ParametersSetsGroup::new).collect(Collectors.toList());
         variableDefinitions = modelEntity.getVariableDefinitions().stream().map(ModelVariableDefinition::new).collect(Collectors.toList());
         variablesSets = modelEntity.getVariableSets().stream().map(VariablesSet::new).collect(Collectors.toList());

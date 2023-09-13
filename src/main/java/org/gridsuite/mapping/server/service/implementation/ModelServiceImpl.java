@@ -20,6 +20,7 @@ import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.repository.ModelVariableRepository;
 import org.gridsuite.mapping.server.repository.ModelVariablesSetRepository;
 import org.gridsuite.mapping.server.service.ModelService;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,10 +256,8 @@ public class ModelServiceImpl implements ModelService {
         // do merge with the list of parameter definitions
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             // do merge with existing list
-            List<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream()
-                    .map(parameterDefinition -> new ModelParameterDefinitionEntity(modelToUpdate, parameterDefinition))
-                    .collect(Collectors.toList());
-            modelToUpdate.addParameterDefinitions(parameterDefinitionEntities);
+           parameterDefinitions.forEach(parameterDefinition ->
+                   modelToUpdate.addParameterDefinition(new ModelParameterDefinitionEntity(modelToUpdate, parameterDefinition), parameterDefinition.getOrigin()));
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
         }
@@ -268,7 +267,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     @Transactional
-    public Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames) {
+    public Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames, ParameterOrigin origin) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
         ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
@@ -287,7 +286,7 @@ public class ModelServiceImpl implements ModelService {
             }
 
             // do merge with existing list
-            modelToUpdate.addParameterDefinitions(foundParameterDefinitionEntities);
+            modelToUpdate.addParameterDefinitions(foundParameterDefinitionEntities, origin);
 
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -328,7 +327,8 @@ public class ModelServiceImpl implements ModelService {
         ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // clear the existing list
-        modelToUpdate.removeParameterDefinitions(modelToUpdate.getParameterDefinitions());
+        modelToUpdate.removeParameterDefinitions(modelToUpdate.getParameterDefinitions().stream()
+                .map(ModelModelParameterDefinitionEntity::getParameterDefinition).collect(Collectors.toList()));
 
         // save modified existing model entity
         modelRepository.save(modelToUpdate);
@@ -341,10 +341,10 @@ public class ModelServiceImpl implements ModelService {
     public List<ModelParameterDefinition> saveNewParameterDefinitions(List<ModelParameterDefinition> parameterDefinitions) {
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             Set<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream()
-                    .map(variableDefinition -> new ModelParameterDefinitionEntity(null, variableDefinition))
+                    .map(parameterDefinition -> new ModelParameterDefinitionEntity(null, parameterDefinition))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelParameterDefinitionEntity> savedParameterDefinitionEntities = modelParameterDefinitionRepository.saveAll(parameterDefinitionEntities);
-            return savedParameterDefinitionEntities.stream().map(ModelParameterDefinition::new).collect(Collectors.toList());
+            return savedParameterDefinitionEntities.stream().map(entity -> new ModelParameterDefinition(entity, null)).collect(Collectors.toList());
         }
 
         return Collections.emptyList();

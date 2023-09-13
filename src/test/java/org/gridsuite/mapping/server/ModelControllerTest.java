@@ -97,16 +97,36 @@ public class ModelControllerTest {
 
         // prepare token model
         ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD,
-                new LinkedHashSet<>(), new ArrayList<>(), Set.of(), Set.of(), null, null);
-        ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
+                new ArrayList<>(), new ArrayList<>(), Set.of(), Set.of(), null, null);
+        List<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
+
+        // add "USER" parameter definitions
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
+        modelToSave.addParameterDefinitions(definitions, ParameterOrigin.USER);
+
+        definitions.clear();
+
+        // add "NETWORK" parameter definitions
         definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu", modelToSave));
         definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", modelToSave));
         definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", modelToSave));
         definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", modelToSave));
-        modelToSave.addParameterDefinitions(definitions);
+        modelToSave.addParameterDefinitions(definitions, ParameterOrigin.NETWORK);
+
         modelRepository.save(modelToSave);
+
+        // check whether save succesfully in cascade
+//        Optional<ModelEntity> loadAlphaBetaModelOpt = modelRepository.findById("LoadAlphaBeta");
+//        if (loadAlphaBetaModelOpt.isPresent()) {
+//            ModelEntity modelEntity = loadAlphaBetaModelOpt.get();
+//            int size = modelEntity.getParameterDefinitions().size();
+//            LOGGER.info("number of saved parameter definitions = " + size);
+//            LOGGER.info("model entity");
+//        }
+//
+//        List<ModelParameterDefinitionEntity> parameterDefinitionEntities = modelParameterDefinitionRepository.findAll();
+//        LOGGER.info("parameter definition entities size = " + parameterDefinitionEntities.size());
     }
 
     @Test
@@ -256,7 +276,7 @@ public class ModelControllerTest {
         loadModel.setSetsGroups(loadGroups);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, Set.of(), null, Set.of(), Set.of(), null, null);
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, List.of(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
         generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);

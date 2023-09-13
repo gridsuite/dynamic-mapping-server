@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.service.implementation.ModelServiceImpl;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -113,8 +114,8 @@ public class ModelController {
     @Operation(summary = "Add existing parameter definitions to model")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "saved model")})
-    public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName, @RequestBody List<String> parameterDefinitionNames) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames));
+    public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName, @RequestParam("parameterOrigin") ParameterOrigin origin, @RequestBody List<String> parameterDefinitionNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames, origin));
     }
 
     @PatchMapping(value = "/{modelName}/parameters/definitions/remove")

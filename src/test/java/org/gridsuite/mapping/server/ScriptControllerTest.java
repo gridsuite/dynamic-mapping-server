@@ -26,10 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -71,7 +68,7 @@ public class ScriptControllerTest {
         cleanDB();
 
         // Prepare models
-        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new LinkedHashSet<>(), null, Set.of(), Set.of(), null, null);
+        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new ArrayList<>(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
@@ -88,14 +85,22 @@ public class ScriptControllerTest {
         loadGroups.add(loadGroup);
         loadModel.setSetsGroups(loadGroups);
 
-        Set<ModelParameterDefinitionEntity> definitions = new LinkedHashSet<>();
+        List<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
+
+        // add "USER" parameter definitions
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
+        loadModel.addParameterDefinitions(definitions, ParameterOrigin.USER);
+
+        definitions.clear();
+
+        // add "NETWORK" parameter definitions
         definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu", loadModel));
         definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", loadModel));
         definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", loadModel));
         definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", loadModel));
-        loadModel.addParameterDefinitions(definitions);
+        loadModel.addParameterDefinitions(definitions, ParameterOrigin.NETWORK);
+
         modelRepository.save(loadModel);
 
         ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
