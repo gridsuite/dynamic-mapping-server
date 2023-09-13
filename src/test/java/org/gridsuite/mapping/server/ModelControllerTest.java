@@ -692,19 +692,17 @@ public class ModelControllerTest {
 
         // the last parameter definition of load alpha beta model must be NETWORK
         ModelParameterDefinition lastParameterDefinitionInLoadAlphaBetaModel = loadAlphaBetaParameterDefinitions.stream().reduce((first, second) -> second).get();
-        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getOrigin(), ParameterOrigin.NETWORK);
+        assertEquals( ParameterOrigin.NETWORK, lastParameterDefinitionInLoadAlphaBetaModel.getOrigin());
 
         // the last parameter definition of load PQ model must be USER
         ModelParameterDefinition lastParameterDefinitionInLoadPQModel = loadPQParameterDefinitions.stream().reduce((first, second) -> second).get();
-        assertEquals(lastParameterDefinitionInLoadPQModel.getOrigin(), ParameterOrigin.USER);
+        assertEquals(ParameterOrigin.USER, lastParameterDefinitionInLoadPQModel.getOrigin());
 
         // two last parameter definitions in two models must be the same name, type, originName and fixedValue
         assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getName(), lastParameterDefinitionInLoadPQModel.getName());
         assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getType(), lastParameterDefinitionInLoadPQModel.getType());
         assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getOriginName(), lastParameterDefinitionInLoadPQModel.getOriginName());
         assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getFixedValue(), lastParameterDefinitionInLoadPQModel.getFixedValue());
-
-
 
     }
 
