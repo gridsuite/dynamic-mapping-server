@@ -442,12 +442,12 @@ public class ScriptControllerTest {
         String parFile = "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>\n" +
                 "<parametersSet xmlns=\\\"http://www.rte-france.com/dynawo\\\">\n" +
                 "    <set id=\\\"LAB\\\">\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_U0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"v_pu\\\"/>\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_Q0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"q_pu\\\"/>\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_UPhase0\\\" origData=\\\"IIDM\\\" origName=\\\"angle_pu\\\"/>\n" +
-                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_P0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"p_pu\\\"/>\n" +
                 "        <par type=\\\"DOUBLE\\\" name=\\\"load_alpha\\\" value=\\\"1.5\\\"/>\n" +
                 "        <par type=\\\"DOUBLE\\\" name=\\\"load_beta\\\" value=\\\"2.5\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_P0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"p_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_Q0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"q_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_U0Pu\\\" origData=\\\"IIDM\\\" origName=\\\"v_pu\\\"/>\n" +
+                "        <reference type=\\\"DOUBLE\\\" name=\\\"load_UPhase0\\\" origData=\\\"IIDM\\\" origName=\\\"angle_pu\\\"/>\n" +
                 "    </set>\n" +
                 "</parametersSet>";
 

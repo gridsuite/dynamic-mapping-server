@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.dto.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelParameterDefinitionEntity;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
@@ -16,6 +17,7 @@ import org.gridsuite.mapping.server.utils.ParameterType;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class ModelParameterDefinition {
 

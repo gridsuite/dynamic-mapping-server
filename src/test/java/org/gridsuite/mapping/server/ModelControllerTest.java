@@ -115,18 +115,6 @@ public class ModelControllerTest {
         modelToSave.addParameterDefinitions(definitions, ParameterOrigin.NETWORK);
 
         modelRepository.save(modelToSave);
-
-        // check whether save succesfully in cascade
-//        Optional<ModelEntity> loadAlphaBetaModelOpt = modelRepository.findById("LoadAlphaBeta");
-//        if (loadAlphaBetaModelOpt.isPresent()) {
-//            ModelEntity modelEntity = loadAlphaBetaModelOpt.get();
-//            int size = modelEntity.getParameterDefinitions().size();
-//            LOGGER.info("number of saved parameter definitions = " + size);
-//            LOGGER.info("model entity");
-//        }
-//
-//        List<ModelParameterDefinitionEntity> parameterDefinitionEntities = modelParameterDefinitionRepository.findAll();
-//        LOGGER.info("parameter definition entities size = " + parameterDefinitionEntities.size());
     }
 
     @Test
@@ -381,7 +369,7 @@ public class ModelControllerTest {
         assertEquals(parameterDefinitionList.size(), savedParameterDefinitionList.size());
 
         // --- Add existing parameter definition to model --- //
-        mvcResult = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add")
+        mvcResult = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add?origin=USER")
                         .content(objectMapper.writeValueAsString(savedParameterDefinitionList.stream().map(ModelParameterDefinition::getName)))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();

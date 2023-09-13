@@ -114,7 +114,9 @@ public class ModelController {
     @Operation(summary = "Add existing parameter definitions to model")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "saved model")})
-    public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName, @RequestParam("parameterOrigin") ParameterOrigin origin, @RequestBody List<String> parameterDefinitionNames) {
+    public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName,
+                                                                        @RequestParam(value = "origin", required = false) ParameterOrigin origin,
+                                                                        @RequestBody List<String> parameterDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames, origin));
     }
 
