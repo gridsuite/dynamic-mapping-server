@@ -256,8 +256,8 @@ public class ModelServiceImpl implements ModelService {
         // do merge with the list of parameter definitions
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             // do merge with existing list
-           parameterDefinitions.forEach(parameterDefinition ->
-                   modelToUpdate.addParameterDefinition(new ModelParameterDefinitionEntity(modelToUpdate, parameterDefinition), parameterDefinition.getOrigin()));
+            parameterDefinitions.forEach(parameterDefinition ->
+                modelToUpdate.addParameterDefinition(new ModelParameterDefinitionEntity(modelToUpdate, parameterDefinition), parameterDefinition.getOrigin()));
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
         }
