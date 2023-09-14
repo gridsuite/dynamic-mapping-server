@@ -110,6 +110,9 @@ public class NetworkServiceImpl implements NetworkService {
         EquipmentValues shuntCompensatorsEquipmentValues = getShuntCompensatorsEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
         equipmentValuesList.add(shuntCompensatorsEquipmentValues);
 
+        EquipmentValues staticVarCompensatorsEquipmentValues = getStaticVarCompensatorEquipmentValues(network, voltageLevelsPropertyValues, substationsPropertyValues);
+        equipmentValuesList.add(staticVarCompensatorsEquipmentValues);
+
         EquipmentValues hdvcLinesEquipmentValues = getHvdcLinesEquipmentValues(network);
         equipmentValuesList.add(hdvcLinesEquipmentValues);
 
@@ -224,6 +227,18 @@ public class NetworkServiceImpl implements NetworkService {
         shuntCompensatorsValuesMap.putAll(substationsPropertyValues);
 
         return new EquipmentValues(EquipmentType.SHUNT_COMPENSATOR, shuntCompensatorsValuesMap);
+    }
+
+    private EquipmentValues getStaticVarCompensatorEquipmentValues(Network network, HashMap<String, Set<String>> voltageLevelsPropertyValues, HashMap<String, Set<String>> substationsPropertyValues) {
+        HashMap<String, Set<String>> sVarValuesMap = new HashMap<>();
+        // Own properties
+        network.getStaticVarCompensators().forEach(svar -> setPropertyMap(sVarValuesMap, svar.getId(), ID_PROPERTY));
+
+        // Parent properties, Static var compensator is in a substation/voltageLevel
+        sVarValuesMap.putAll(voltageLevelsPropertyValues);
+        sVarValuesMap.putAll(substationsPropertyValues);
+
+        return new EquipmentValues(EquipmentType.STATIC_VAR_COMPENSATOR, sVarValuesMap);
     }
 
     private EquipmentValues getHvdcLinesEquipmentValues(Network network) {
@@ -352,13 +367,34 @@ public class NetworkServiceImpl implements NetworkService {
         return loads;
     }
 
+    private List<HashMap<String, String>> getPropertyValuesByStaticVarCompensator(Network network, HashMap<String, HashMap<String, String>> voltageLevelsValues, HashMap<String, HashMap<String, String>> substationsValues) {
+        List<HashMap<String, String>> svars = new ArrayList<>();
+        network.getStaticVarCompensators().forEach(svar -> {
+            final HashMap<String, String> svarMap = new HashMap<>();
+            svarMap.put(ID_PROPERTY, String.valueOf(svar.getId()));
+
+            String voltageLevelId = svar.getTerminal().getVoltageLevel().getId();
+            svarMap.putAll(voltageLevelsValues.get(voltageLevelId));
+
+            svar.getTerminal().getVoltageLevel().getSubstation().map(Substation::getId).ifPresent(subStationId -> {
+                svarMap.putAll(substationsValues.get(subStationId));
+            });
+
+            svars.add(svarMap);
+        });
+        return svars;
+    }
+
     private List<String> matchNetworkToRule(Network network, RuleToMatch rule) {
         HashMap<String, HashMap<String, String>> substationsValues = getPropertyValuesBySubstations(network);
         HashMap<String, HashMap<String, String>> voltageLevelsValues = getPropertyValuesByVoltageLevel(network);
 
-        List<HashMap<String, String>> correspondingValues = rule.getEquipmentType() == EquipmentType.GENERATOR ?
-                getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues) :
-                getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
+        List<HashMap<String, String>> correspondingValues = switch (rule.getEquipmentType()) {
+            case GENERATOR -> getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues);
+            case LOAD -> getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
+            case STATIC_VAR_COMPENSATOR ->  getPropertyValuesByStaticVarCompensator(network, voltageLevelsValues, substationsValues);
+            default -> throw new IllegalStateException();
+        };
 
         return correspondingValues.stream()
                 .map(equipment -> matchEquipmentToRule(equipment, rule))

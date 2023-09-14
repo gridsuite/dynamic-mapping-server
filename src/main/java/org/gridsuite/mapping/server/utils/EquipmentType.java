@@ -19,4 +19,5 @@ public enum EquipmentType {
     TWO_WINDINGS_TRANSFORMER,
     SHUNT_COMPENSATOR,
     HVDC_LINE,
+    STATIC_VAR_COMPENSATOR
 }
