@@ -341,7 +341,7 @@ public class ModelServiceImpl implements ModelService {
     public List<ModelParameterDefinition> saveNewParameterDefinitions(List<ModelParameterDefinition> parameterDefinitions) {
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             Set<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream()
-                    .map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition))
+                    .map(ModelParameterDefinitionEntity::new)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelParameterDefinitionEntity> savedParameterDefinitionEntities = modelParameterDefinitionRepository.saveAll(parameterDefinitionEntities);
             return savedParameterDefinitionEntities.stream().map(entity -> new ModelParameterDefinition(entity, null)).collect(Collectors.toList());
