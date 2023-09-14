@@ -4,6 +4,7 @@ import lombok.*;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "models_model_parameter_definitions")
-public class ModelModelParameterDefinitionEntity {
+public class ModelModelParameterDefinitionEntity implements Serializable {
     @EmbeddedId
     private ModelModelParameterDefinitionId id;
 

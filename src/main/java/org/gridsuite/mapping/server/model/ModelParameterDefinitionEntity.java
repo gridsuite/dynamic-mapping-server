@@ -45,7 +45,7 @@ public class ModelParameterDefinitionEntity implements Serializable {
     @Column(name = "fixed_value")
     private String fixedValue;
 
-    public ModelParameterDefinitionEntity(ModelEntity model, ModelParameterDefinition parameterDefinition) {
+    public ModelParameterDefinitionEntity(ModelParameterDefinition parameterDefinition) {
         this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), null, null);
     }
 

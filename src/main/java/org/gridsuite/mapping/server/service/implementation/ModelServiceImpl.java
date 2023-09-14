@@ -257,7 +257,7 @@ public class ModelServiceImpl implements ModelService {
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             // do merge with existing list
             parameterDefinitions.forEach(parameterDefinition ->
-                modelToUpdate.addParameterDefinition(new ModelParameterDefinitionEntity(modelToUpdate, parameterDefinition), parameterDefinition.getOrigin()));
+                modelToUpdate.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin()));
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
         }
@@ -341,7 +341,7 @@ public class ModelServiceImpl implements ModelService {
     public List<ModelParameterDefinition> saveNewParameterDefinitions(List<ModelParameterDefinition> parameterDefinitions) {
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             Set<ModelParameterDefinitionEntity> parameterDefinitionEntities = parameterDefinitions.stream()
-                    .map(parameterDefinition -> new ModelParameterDefinitionEntity(null, parameterDefinition))
+                    .map(parameterDefinition -> new ModelParameterDefinitionEntity(parameterDefinition))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelParameterDefinitionEntity> savedParameterDefinitionEntities = modelParameterDefinitionRepository.saveAll(parameterDefinitionEntities);
             return savedParameterDefinitionEntities.stream().map(entity -> new ModelParameterDefinition(entity, null)).collect(Collectors.toList());

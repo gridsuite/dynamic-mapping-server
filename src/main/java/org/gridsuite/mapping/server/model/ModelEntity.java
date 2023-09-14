@@ -64,7 +64,7 @@ public class ModelEntity implements Serializable {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
         if (modelToConvert.getParameterDefinitions() != null) {
-            modelToConvert.getParameterDefinitions().forEach(parameterDefinition -> this.addParameterDefinition(new ModelParameterDefinitionEntity(this, parameterDefinition), parameterDefinition.getOrigin()));
+            modelToConvert.getParameterDefinitions().forEach(parameterDefinition -> this.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin()));
         }
         setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
         variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(this, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;

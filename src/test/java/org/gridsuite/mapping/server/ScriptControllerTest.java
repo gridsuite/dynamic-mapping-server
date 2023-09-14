@@ -60,7 +60,7 @@ public class ScriptControllerTest {
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
-        return new ModelParameterDefinitionEntity(model, new ModelParameterDefinition(name, type, origin, originName, null));
+        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(name, type, origin, originName, null));
     }
 
     @Before
