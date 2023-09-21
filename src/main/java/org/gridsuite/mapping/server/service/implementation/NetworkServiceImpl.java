@@ -389,12 +389,20 @@ public class NetworkServiceImpl implements NetworkService {
         HashMap<String, HashMap<String, String>> substationsValues = getPropertyValuesBySubstations(network);
         HashMap<String, HashMap<String, String>> voltageLevelsValues = getPropertyValuesByVoltageLevel(network);
 
-        List<HashMap<String, String>> correspondingValues = switch (rule.getEquipmentType()) {
-            case GENERATOR -> getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues);
-            case LOAD -> getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
-            case STATIC_VAR_COMPENSATOR ->  getPropertyValuesByStaticVarCompensator(network, voltageLevelsValues, substationsValues);
-            default -> throw new IllegalStateException();
-        };
+        List<HashMap<String, String>> correspondingValues;
+        switch (rule.getEquipmentType()) {
+            case GENERATOR:
+                correspondingValues = getPropertyValuesByGenerators(network, voltageLevelsValues, substationsValues);
+                break;
+            case LOAD:
+                correspondingValues = getPropertyValuesByLoads(network, voltageLevelsValues, substationsValues);
+                break;
+            case STATIC_VAR_COMPENSATOR:
+                correspondingValues = getPropertyValuesByStaticVarCompensator(network, voltageLevelsValues, substationsValues);
+                break;
+            default:
+                throw new IllegalStateException();
+        }
 
         return correspondingValues.stream()
                 .map(equipment -> matchEquipmentToRule(equipment, rule))

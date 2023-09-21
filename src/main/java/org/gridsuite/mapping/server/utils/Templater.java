@@ -114,21 +114,33 @@ public final class Templater {
     }
 
     public static String equipmentTypeToCollectionName(EquipmentType equipmentType) {
-        return switch (equipmentType) {
-            case LOAD -> "loads";
-            case GENERATOR -> "generators";
-            case STATIC_VAR_COMPENSATOR -> "staticVarCompensators";
-            default -> "";
-        };
+        String equipmentCollection = "";
+        switch (equipmentType) {
+            case LOAD:
+                equipmentCollection = "loads";
+                break;
+            case GENERATOR:
+                equipmentCollection = "generators";
+                break;
+            case STATIC_VAR_COMPENSATOR:
+                equipmentCollection = "staticVarCompensators";
+        }
+        return equipmentCollection;
     }
 
     public static String equipmentTypeToClass(EquipmentType equipmentType) {
-        return switch (equipmentType) {
-            case LOAD -> "Load";
-            case GENERATOR -> "Generator";
-            case STATIC_VAR_COMPENSATOR -> "StaticVarCompensator";
-            default -> "";
-        };
+        String equipmentClass = "";
+        switch (equipmentType) {
+            case LOAD:
+                equipmentClass = "Load";
+                break;
+            case GENERATOR:
+                equipmentClass = "Generator";
+                break;
+            case STATIC_VAR_COMPENSATOR:
+                equipmentClass = "StaticVarCompensator";
+        }
+        return equipmentClass;
     }
 
     private static String modelToParamSetId(ModelSetsGroupEntity modelSetsGroupEntity) {
