@@ -13,7 +13,7 @@ import lombok.Setter;
 import org.gridsuite.mapping.server.dto.automata.BasicProperty;
 import org.gridsuite.mapping.server.utils.PropertyType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
