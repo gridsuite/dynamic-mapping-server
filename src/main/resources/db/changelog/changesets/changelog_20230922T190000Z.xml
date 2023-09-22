@@ -1,81 +1,81 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
     <changeSet author="harperjon" id="1689700000000-1">
+        <validCheckSum>8:45941e9fbcb035e0ee19b39e13a44910</validCheckSum>
         <modifyDataType columnName="type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="automata"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-2">
+        <validCheckSum>8:4483527312181898d659a2675ea7f701</validCheckSum>
         <modifyDataType columnName="type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="automaton_properties"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-3">
+        <validCheckSum>8:67941451371a17c3091bd2efb8692dab</validCheckSum>
         <modifyDataType columnName="operand"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="filters"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-4">
+        <validCheckSum>8:e23059d5df5d06edbfa505183066a6d0</validCheckSum>
         <modifyDataType columnName="type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="filters"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-5">
+        <validCheckSum>8:098c7268906dbdd7050a8f3120b0543c</validCheckSum>
         <modifyDataType columnName="origin"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="model_parameter_definitions"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-6">
+        <validCheckSum>8:79e1d29d87456ccab44fc78849a4410d</validCheckSum>
         <modifyDataType columnName="type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="model_parameter_definitions"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-7">
+        <validCheckSum>8:1b6c60118990b9a408dd6eb9084becb3</validCheckSum>
         <modifyDataType columnName="group_type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="model_parameter_sets"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-8">
+        <validCheckSum>8:aefaed186963e2da7b9f2d6de441e480</validCheckSum>
         <modifyDataType columnName="group_type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="model_parameters"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-9">
+        <validCheckSum>8:4b78efbc6aa67599ef7a4141358627fc</validCheckSum>
         <modifyDataType columnName="type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="model_sets_group"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-10">
+        <validCheckSum>8:595c13d8025b1c8b3a6aa45a5cc35674</validCheckSum>
         <modifyDataType columnName="type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="model_variable_definitions"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-11">
+        <validCheckSum>8:65a49512617e0bd24fcd2040c9d1b485</validCheckSum>
         <modifyDataType columnName="equipment_type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="models"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-12">
+        <validCheckSum>8:c26d4948bb161685649135649249e52b</validCheckSum>
         <modifyDataType columnName="type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="rules"/>
     </changeSet>
     <changeSet author="harperjon" id="1695394758000-13">
+        <validCheckSum>8:d641447b3e32fd215f9d8116a168bbaf</validCheckSum>
         <modifyDataType columnName="group_type"
                         newDataType="tinyint"
-                        schemaName="public"
                         tableName="rules"/>
     </changeSet>
 </databaseChangeLog>
