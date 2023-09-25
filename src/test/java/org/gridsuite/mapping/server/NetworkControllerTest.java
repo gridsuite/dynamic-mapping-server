@@ -408,7 +408,7 @@ public class NetworkControllerTest {
                         .content(ruleToMatch)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"ruleIndex\":" + ruleIndex + ",\"matchedIds\":[\""+ equipmentId + "\"]}",
+                .andExpect(content().json("{\"ruleIndex\":" + ruleIndex + ",\"matchedIds\":[\"" + equipmentId + "\"]}",
                         true));
 
     }

@@ -342,9 +342,9 @@ public class ScriptControllerTest {
                  * License, v. 2.0. If a copy of the MPL was not distributed with this
                  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
                  */
-                                
+
                 import com.powsybl.iidm.network.%s
-                                
+
                 for (%s equipment : network.%s) {
                           if (equipment.id.equals(\\"%s\\") || !equipment.terminal.voltageLevel.substation.country.name.equals(\\"FRANCE\\")) {
                                  StaticVarCompensator {
