@@ -196,7 +196,7 @@ public class ModelControllerTest {
     public void definitionTest() throws Exception {
         String modelName = "LoadAlphaBeta";
 
-        mvc.perform(get("/models/" + modelName + "/parameters/definitions/")
+        mvc.perform(get("/models/" + modelName + "/parameters/definitions")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))

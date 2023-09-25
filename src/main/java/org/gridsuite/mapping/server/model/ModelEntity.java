@@ -13,12 +13,12 @@ import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static javax.persistence.TemporalType.TIMESTAMP;
+import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
