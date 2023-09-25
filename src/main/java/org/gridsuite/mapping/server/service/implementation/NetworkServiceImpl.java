@@ -376,9 +376,8 @@ public class NetworkServiceImpl implements NetworkService {
             String voltageLevelId = svar.getTerminal().getVoltageLevel().getId();
             svarMap.putAll(voltageLevelsValues.get(voltageLevelId));
 
-            svar.getTerminal().getVoltageLevel().getSubstation().map(Substation::getId).ifPresent(subStationId -> {
-                svarMap.putAll(substationsValues.get(subStationId));
-            });
+            svar.getTerminal().getVoltageLevel().getSubstation().map(Substation::getId).ifPresent(subStationId ->
+                svarMap.putAll(substationsValues.get(subStationId)));
 
             svars.add(svarMap);
         });
@@ -401,7 +400,7 @@ public class NetworkServiceImpl implements NetworkService {
                 correspondingValues = getPropertyValuesByStaticVarCompensator(network, voltageLevelsValues, substationsValues);
                 break;
             default:
-                throw new IllegalStateException();
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid equipment type");
         }
 
         return correspondingValues.stream()

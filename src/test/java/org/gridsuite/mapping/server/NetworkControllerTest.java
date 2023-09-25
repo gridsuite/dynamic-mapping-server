@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.PowsyblException;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.test.NetworkTest1Factory;
+import com.powsybl.iidm.network.test.SvcTestCaseFactory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.NetworkValues;
@@ -69,8 +70,8 @@ public class NetworkControllerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkControllerTest.class);
 
-    public static final String RESOURCE_PATH_DELIMETER = "/";
-    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMETER + "data";
+    public static final String RESOURCE_PATH_DELIMITER = "/";
+    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -179,7 +180,7 @@ public class NetworkControllerTest {
 
         String resultNetworkValuesJson = mvcResult.getResponse().getContentAsString();
 
-        String networkValuesJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "network/networkValues.json").readAllBytes());
+        String networkValuesJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "network/networkValues.json").readAllBytes());
         NetworkValues networkValues = objectMapper.readValue(networkValuesJson, NetworkValues.class);
         networkValues.setNetworkId(networkUUID);
 
@@ -348,5 +349,67 @@ public class NetworkControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"ruleIndex\":" + loadIndex + ",\"matchedIds\":[\"load1\"]}", true));
+    }
+
+    @Test
+    public void sVarRuleMatchingTest() throws Exception {
+        UUID networkUUID = UUID.randomUUID();
+
+        Network testNetwork = SvcTestCaseFactory.create();
+        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
+
+        int ruleIndex = 2;
+        String equipmentId = "SVC2";
+        String ruleToMatch = """
+                {
+                  "ruleIndex": %s,
+                  "equipmentType": "STATIC_VAR_COMPENSATOR",
+                  "composition": "filter1 || filter2 || filter3 || filter4 || filter5 || filter6",
+                  "filters": [
+                    {
+                      "filterId": "filter1",
+                      "operand": "EQUALS",
+                      "property": "id",
+                      "value": ["%s"],
+                      "type": "STRING"
+                    },
+                    {
+                      "filterId": "filter2",
+                      "operand": "NOT_EQUALS",
+                      "property": "terminal.voltageLevel.substation.country.name",
+                      "value": ["FRANCE"],
+                      "type": "STRING"
+                    },
+                    {
+                      "filterId": "filter3",
+                      "operand": "STARTS_WITH",
+                      "property": "terminal.voltageLevel.substation.country.name",
+                      "value": ["GER"],
+                      "type": "STRING"
+                    },
+                    {
+                      "filterId": "filter4",
+                      "operand": "NOT_IN",
+                      "property": "terminal.voltageLevel.nominalV",
+                      "value": [60, 225, 400],
+                      "type": "NUMBER"
+                    },
+                    {
+                      "filterId": "filter5",
+                      "operand": "LOWER_OR_EQUALS",
+                      "property": "terminal.voltageLevel.nominalV",
+                      "value": [380],
+                      "type": "NUMBER"
+                    }
+                  ]
+                }""".formatted(ruleIndex, equipmentId);
+
+        mvc.perform(MockMvcRequestBuilders.post("/network/" + networkUUID + "/matches/rule")
+                        .content(ruleToMatch)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"ruleIndex\":" + ruleIndex + ",\"matchedIds\":[\""+ equipmentId + "\"]}",
+                        true));
+
     }
 }
