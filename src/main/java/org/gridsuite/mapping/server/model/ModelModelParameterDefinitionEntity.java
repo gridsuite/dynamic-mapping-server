@@ -3,7 +3,7 @@ package org.gridsuite.mapping.server.model;
 import lombok.*;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

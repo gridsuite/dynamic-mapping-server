@@ -28,7 +28,7 @@
     </changeSet>
     <changeSet author="phamquy (generated)" id="1694185324695-18">
         <addColumn tableName="models_model_parameter_definitions">
-            <column name="origin" type="int4"/>
+            <column name="origin" type="tinyint"/>
         </addColumn>
     </changeSet>
     <changeSet author="phamquy (generated)" id="1694185324695-19">

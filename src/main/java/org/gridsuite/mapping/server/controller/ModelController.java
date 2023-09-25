@@ -119,6 +119,7 @@ public class ModelController {
                                                                         @RequestBody List<String> parameterDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames, origin));
     }
+
     @PatchMapping(value = "/{modelName}/parameters/definitions/remove")
     @Operation(summary = "Remove existing parameter definitions from model")
     @ApiResponses(value = {
