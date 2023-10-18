@@ -244,8 +244,8 @@ public class ModelServiceImpl implements ModelService {
 
                 variableSets.forEach(variableSetEntity -> {
                     List<ModelVariableDefinitionEntity> variableDefinitionsInSet = variableSetEntity.getVariableDefinitions().stream().toList();
-                        variableSetEntity.removeAllVariableDefinition(variableDefinitionsInSet);
-                        allVariableDefinitions.addAll(variableDefinitionsInSet);
+                    variableSetEntity.removeAllVariableDefinition(variableDefinitionsInSet);
+                    allVariableDefinitions.addAll(variableDefinitionsInSet);
                 });
             });
 
@@ -262,7 +262,7 @@ public class ModelServiceImpl implements ModelService {
 
             // delete all variable sets which are not referenced by any model
             List<ModelVariableSetEntity> toDeleteVariableSets = allVariableSets.stream().filter(elem -> elem.getModels().size() == 0).toList();
-            if(!CollectionUtils.isEmpty(toDeleteVariableSets)) {
+            if (!CollectionUtils.isEmpty(toDeleteVariableSets)) {
                 modelVariablesSetRepository.deleteAllById(toDeleteVariableSets.stream()
                         .map(ModelVariableSetEntity::getName).toList());
             }
