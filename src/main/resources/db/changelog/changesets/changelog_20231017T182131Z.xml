@@ -1,0 +1,13 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="chuinetri (base generated)" id="1697566903091-1">
+        <dropPrimaryKey tableName="model_variable_sets_model_variable_definitions"/>
+        <dropPrimaryKey tableName="models_model_parameter_definitions"/>
+        <dropPrimaryKey tableName="models_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="chuinetri (base generated)" id="1697566903091-2">
+        <addPrimaryKey columnNames="variable_set_name, variable_definition_name" constraintName="model_variable_sets_model_variable_definitionsPK" tableName="model_variable_sets_model_variable_definitions"/>
+        <addPrimaryKey columnNames="model_name, parameter_definition_name" constraintName="models_model_parameter_definitionsPK" tableName="models_model_parameter_definitions"/>
+        <addPrimaryKey columnNames="model_name, variable_definition_name" constraintName="models_model_variable_definitionsPK" tableName="models_model_variable_definitions"/>
+    </changeSet>
+</databaseChangeLog>
