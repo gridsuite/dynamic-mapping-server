@@ -45,8 +45,11 @@ public class ModelParameterDefinitionEntity implements Serializable {
     @Column(name = "fixed_value")
     private String fixedValue;
 
+    @OneToMany(mappedBy = "parameterDefinition")
+    List<ModelModelParameterDefinitionEntity> models = new ArrayList<>();
+
     public ModelParameterDefinitionEntity(ModelParameterDefinition parameterDefinition) {
-        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), null, null);
+        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), null, null, null);
     }
 
     @CreatedDate

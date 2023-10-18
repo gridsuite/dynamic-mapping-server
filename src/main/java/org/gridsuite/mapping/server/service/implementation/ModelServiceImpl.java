@@ -219,6 +219,67 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
+    public List<String> deleteModels(List<String> modelNames) {
+        if (!CollectionUtils.isEmpty(modelNames)) {
+            List<ModelEntity> modelEntities = modelRepository.findAllById(modelNames);
+            List<ModelParameterDefinitionEntity> allParameterDefinitions = new ArrayList<>();
+            Set<ModelVariableDefinitionEntity> allVariableDefinitions = new HashSet<>();
+            Set<ModelVariableSetEntity> allVariableSets = new HashSet<>();
+
+            modelEntities.forEach(modelEntity -> {
+
+                List<ModelParameterDefinitionEntity> parameterDefinitions = modelEntity.getParameterDefinitions().stream()
+                        .map(ModelModelParameterDefinitionEntity::getParameterDefinition).toList();
+                modelEntity.removeAllParameterDefinition(parameterDefinitions);
+                allParameterDefinitions.addAll(parameterDefinitions);
+
+                List<ModelVariableDefinitionEntity> variableDefinitions = modelEntity.getVariableDefinitions().stream().toList();
+                modelEntity.removeAllVariableDefinition(variableDefinitions);
+                allVariableDefinitions.addAll(variableDefinitions);
+
+                List<ModelVariableSetEntity> variableSets = modelEntity.getVariableSets().stream().toList();
+                modelEntity.removeAllVariablesSet(variableSets);
+                allVariableSets.addAll(variableSets);
+
+                variableSets.forEach(variableSetEntity -> {
+                    List<ModelVariableDefinitionEntity> variableDefinitionsInSet = variableSetEntity.getVariableDefinitions().stream().toList();
+                        variableSetEntity.removeAllVariableDefinition(variableDefinitionsInSet);
+                        allVariableDefinitions.addAll(variableDefinitionsInSet);
+                });
+            });
+
+            // --- Perform delete cascade manually --- //
+            // delete model first
+            modelRepository.deleteAllById(modelNames);
+
+            // delete all parameter definitions which are not referenced by any model
+            List<ModelParameterDefinitionEntity> toDeleteParameterDefinitions = allParameterDefinitions.stream().filter(elem -> elem.getModels().size() == 0).toList();
+            if (!CollectionUtils.isEmpty(toDeleteParameterDefinitions)) {
+                modelParameterDefinitionRepository.deleteAllById(toDeleteParameterDefinitions.stream()
+                        .map(ModelParameterDefinitionEntity::getName).toList());
+            }
+
+            // delete all variable sets which are not referenced by any model
+            List<ModelVariableSetEntity> toDeleteVariableSets = allVariableSets.stream().filter(elem -> elem.getModels().size() == 0).toList();
+            if(!CollectionUtils.isEmpty(toDeleteVariableSets)) {
+                modelVariablesSetRepository.deleteAllById(toDeleteVariableSets.stream()
+                        .map(ModelVariableSetEntity::getName).toList());
+            }
+
+            // delete all variable definitions which are not referenced neither model nor variable set
+            List<ModelVariableDefinitionEntity> toDeleteVariableDefinitions = allVariableDefinitions.stream()
+                    .filter(elem -> elem.getModels().size() == 0 && elem.getVariablesSets().size() == 0).toList();
+            if (!CollectionUtils.isEmpty(toDeleteVariableDefinitions)) {
+                modelVariableRepository.deleteAllById(toDeleteVariableDefinitions.stream()
+                        .map(ModelVariableDefinitionEntity::getName).toList());
+            }
+        }
+
+        return modelNames;
+    }
+
+    @Override
     public ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 

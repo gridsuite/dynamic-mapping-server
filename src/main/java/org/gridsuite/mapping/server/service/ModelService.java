@@ -27,6 +27,8 @@ public interface ModelService {
 
     Model saveModel(Model model);
 
+    List<String> deleteModels(List<String> modelNames);
+
     ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName);
 
     // --- BEGIN parameter definition-related service methods --- //

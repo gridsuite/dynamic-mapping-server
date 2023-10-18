@@ -90,6 +90,7 @@ public class ModelEntity implements Serializable {
      */
     public void addParameterDefinition(ModelParameterDefinitionEntity parameterDefinition, ParameterOrigin origin) {
         ModelModelParameterDefinitionEntity modelModelParameterDefinitionEntity = new ModelModelParameterDefinitionEntity(this, parameterDefinition, origin);
+        parameterDefinition.getModels().add(modelModelParameterDefinitionEntity);
         this.parameterDefinitions.add(modelModelParameterDefinitionEntity);
     }
 
@@ -113,6 +114,7 @@ public class ModelEntity implements Serializable {
                 iter.remove();
                 modelModelParameterDefinitionEntity.setModel(null);
                 modelModelParameterDefinitionEntity.setParameterDefinition(null);
+                parameterDefinition.getModels().remove(modelModelParameterDefinitionEntity);
                 break;
             }
         }

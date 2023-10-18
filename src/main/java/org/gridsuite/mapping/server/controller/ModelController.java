@@ -86,11 +86,20 @@ public class ModelController {
     }
 
     @GetMapping(value = "/")
-    @Operation(summary = "get models names")
+    @Operation(summary = "Get models names")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "names of all models")})
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
+    }
+
+    @DeleteMapping(value = "/")
+    @Operation(summary = "Delete a list of models")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deleted models")
+    })
+    public ResponseEntity<List<String>> deleteModels(@RequestBody List<String> modelNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteModels(modelNames));
     }
 
     // --- BEGIN parameter definition-related endpoints --- //
