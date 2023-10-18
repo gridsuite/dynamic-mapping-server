@@ -49,7 +49,7 @@ public class ModelParameterDefinitionEntity implements Serializable {
     List<ModelModelParameterDefinitionEntity> models = new ArrayList<>();
 
     public ModelParameterDefinitionEntity(ModelParameterDefinition parameterDefinition) {
-        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), null, null, null);
+        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), new ArrayList<>(), null, null);
     }
 
     @CreatedDate
