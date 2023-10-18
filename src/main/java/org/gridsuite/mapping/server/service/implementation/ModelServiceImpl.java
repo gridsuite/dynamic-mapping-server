@@ -286,7 +286,7 @@ public class ModelServiceImpl implements ModelService {
             }
 
             // do merge with existing list
-            modelToUpdate.addParameterDefinitions(foundParameterDefinitionEntities, origin);
+            modelToUpdate.addAllParameterDefinition(foundParameterDefinitionEntities, origin);
 
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -309,7 +309,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelParameterDefinitionEntity> foundParameterDefinitionEntities = modelParameterDefinitionRepository.findAllById(parameterDefinitionNames);
 
             // remove in existing list
-            modelToUpdate.removeParameterDefinitions(foundParameterDefinitionEntities);
+            modelToUpdate.removeAllParameterDefinition(foundParameterDefinitionEntities);
 
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -327,7 +327,7 @@ public class ModelServiceImpl implements ModelService {
         ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
         // clear the existing list
-        modelToUpdate.removeParameterDefinitions(modelToUpdate.getParameterDefinitions().stream()
+        modelToUpdate.removeAllParameterDefinition(modelToUpdate.getParameterDefinitions().stream()
                 .map(ModelModelParameterDefinitionEntity::getParameterDefinition).collect(Collectors.toList()));
 
         // save modified existing model entity
@@ -385,7 +385,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream()
                     .map(variableDefinition -> new ModelVariableDefinitionEntity(modelToUpdate, null, variableDefinition))
                     .collect(Collectors.toList());
-            modelToUpdate.addVariableDefinitions(variableDefinitionEntities);
+            modelToUpdate.addAllVariableDefinition(variableDefinitionEntities);
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
         }
@@ -415,7 +415,7 @@ public class ModelServiceImpl implements ModelService {
             }
 
             // do merge with existing list
-            modelToUpdate.addVariableDefinitions(foundVariableDefinitionEntities);
+            modelToUpdate.addAllVariableDefinition(foundVariableDefinitionEntities);
 
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -437,7 +437,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelVariableDefinitionEntity> foundVariableDefinitionEntities = modelVariableRepository.findAllById(variableDefinitionNames);
 
             // remove in existing list
-            modelToUpdate.removeVariableDefinitions(foundVariableDefinitionEntities);
+            modelToUpdate.removeAllVariableDefinition(foundVariableDefinitionEntities);
 
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -467,7 +467,7 @@ public class ModelServiceImpl implements ModelService {
         ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
          // clear the existing list
-        modelToUpdate.removeVariableDefinitions(modelToUpdate.getVariableDefinitions());
+        modelToUpdate.removeAllVariableDefinition(modelToUpdate.getVariableDefinitions());
 
         // save modified existing model entity
         modelRepository.save(modelToUpdate);
@@ -515,7 +515,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream()
                     .map(variableDefinition -> new ModelVariableDefinitionEntity(null, variableSetToUpdate, variableDefinition))
                     .collect(Collectors.toList());
-            variableSetToUpdate.addVariableDefinitions(variableDefinitionEntities);
+            variableSetToUpdate.addAllVariableDefinition(variableDefinitionEntities);
             // save modified existing variables set entity
             modelVariablesSetRepository.save(variableSetToUpdate);
         }
@@ -535,7 +535,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelVariableDefinitionEntity> foundVariableDefinitionEntities = modelVariableRepository.findAllById(variableDefinitionNames);
 
             // remove in existing list
-            variableSetToUpdate.removeVariableDefinitions(foundVariableDefinitionEntities);
+            variableSetToUpdate.removeAllVariableDefinition(foundVariableDefinitionEntities);
 
             // save modified existing variables set entity
             modelVariablesSetRepository.save(variableSetToUpdate);
@@ -552,7 +552,7 @@ public class ModelServiceImpl implements ModelService {
         ModelVariableSetEntity variableSetToUpdate = getVariableSetFromOptional(variableSetName, foundVariableSetOpt);
 
         // clear the existing list
-        variableSetToUpdate.removeVariableDefinitions(variableSetToUpdate.getVariableDefinitions());
+        variableSetToUpdate.removeAllVariableDefinition(variableSetToUpdate.getVariableDefinitions());
 
         // save modified existing variables set entity
         modelVariablesSetRepository.save(variableSetToUpdate);
@@ -572,7 +572,7 @@ public class ModelServiceImpl implements ModelService {
             List<ModelVariableSetEntity> variablesSetEntities = variableSets.stream()
                     .map(variablesSet -> new ModelVariableSetEntity(modelToUpdate, variablesSet))
                     .collect(Collectors.toList());
-            modelToUpdate.addVariablesSets(variablesSetEntities);
+            modelToUpdate.addAllVariablesSet(variablesSetEntities);
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
         }
@@ -599,7 +599,7 @@ public class ModelServiceImpl implements ModelService {
                 throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some variables set not found: " + notFoundNames);
             }
 
-            modelToUpdate.addVariablesSets(foundVariablesSetEntities);
+            modelToUpdate.addAllVariablesSet(foundVariablesSetEntities);
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
         }
@@ -618,7 +618,7 @@ public class ModelServiceImpl implements ModelService {
         if (!CollectionUtils.isEmpty(variablesSetNames)) {
             // remove from existing list
             List<ModelVariableSetEntity> foundVariablesSetEntities = modelVariablesSetRepository.findAllById(variablesSetNames);
-            modelToUpdate.removeVariablesSets(foundVariablesSetEntities);
+            modelToUpdate.removeAllVariablesSet(foundVariablesSetEntities);
 
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -633,7 +633,7 @@ public class ModelServiceImpl implements ModelService {
 
         ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
-        modelToUpdate.removeVariablesSets(modelToUpdate.getVariableSets());
+        modelToUpdate.removeAllVariablesSet(modelToUpdate.getVariableSets());
 
         // save modified existing model entity
         modelRepository.save(modelToUpdate);

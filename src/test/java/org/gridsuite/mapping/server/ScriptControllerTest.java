@@ -90,7 +90,7 @@ public class ScriptControllerTest {
         // add "USER" parameter definitions
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, loadModel));
-        loadModel.addParameterDefinitions(definitions, ParameterOrigin.USER);
+        loadModel.addAllParameterDefinition(definitions, ParameterOrigin.USER);
 
         definitions.clear();
 
@@ -99,7 +99,7 @@ public class ScriptControllerTest {
         definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", loadModel));
         definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", loadModel));
         definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", loadModel));
-        loadModel.addParameterDefinitions(definitions, ParameterOrigin.NETWORK);
+        loadModel.addAllParameterDefinition(definitions, ParameterOrigin.NETWORK);
 
         modelRepository.save(loadModel);
 

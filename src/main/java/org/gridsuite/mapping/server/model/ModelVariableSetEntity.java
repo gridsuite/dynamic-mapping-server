@@ -67,12 +67,20 @@ public class ModelVariableSetEntity implements Serializable {
     }
 
     // --- utils methods --- //
-    public void addVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+    /**
+     * Add all the variable definitions in the given collection to relation with the variable set
+     * @param variableDefinitions collection containing variable definitions to be added
+     */
+    public void addAllVariableDefinition(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
         variableDefinitions.forEach(variableDefinition -> variableDefinition.getVariablesSets().add(this));
         this.variableDefinitions.addAll(variableDefinitions);
     }
 
-    public void removeVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+    /**
+     * Remove all the variable definitions in the given collection from relation with the variable set
+     * @param variableDefinitions collection containing variable definitions to be removed
+     */
+    public void removeAllVariableDefinition(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
         variableDefinitions.forEach(variableDefinition -> variableDefinition.getVariablesSets().remove(this));
         this.variableDefinitions.removeAll(variableDefinitions);
     }

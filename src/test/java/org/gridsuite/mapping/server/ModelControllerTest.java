@@ -103,7 +103,7 @@ public class ModelControllerTest {
         // add "USER" parameter definitions
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null));
-        modelToSave.addParameterDefinitions(definitions, ParameterOrigin.USER);
+        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.USER);
 
         definitions.clear();
 
@@ -112,7 +112,7 @@ public class ModelControllerTest {
         definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu"));
         definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu"));
         definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu"));
-        modelToSave.addParameterDefinitions(definitions, ParameterOrigin.NETWORK);
+        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.NETWORK);
 
         modelRepository.save(modelToSave);
     }
