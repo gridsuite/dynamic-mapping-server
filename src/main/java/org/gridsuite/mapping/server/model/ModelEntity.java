@@ -36,7 +36,7 @@ public class ModelEntity implements Serializable {
     // Could be replaced with UUID, but we lose the ease of use of names
     @Id
     @EqualsAndHashCode.Include
-    @Column(name = "name")
+    @Column(name = "model_name")
     private String modelName;
 
     @Column(name = "equipment_type")

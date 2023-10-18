@@ -19,11 +19,13 @@ public class ModelModelParameterDefinitionEntity implements Serializable {
 
     @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "model_name")
     @MapsId("modelName")
     private ModelEntity model;
 
     @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = "parameter_definition_name")
     @MapsId("parameterDefinitionName")
     private ModelParameterDefinitionEntity parameterDefinition;
 

@@ -1,6 +1,6 @@
 -- Temporary models values while no user interface for them is provided.
 
-INSERT INTO models (name, equipment_type, created_date)
+INSERT INTO models (model_name, equipment_type, created_date)
 VALUES ('GeneratorSynchronousThreeWindings', 0, now()::timestamp),
        ('GeneratorSynchronousFourWindings', 0, now()::timestamp),
        ('GeneratorSynchronousThreeWindingsProportionalRegulations', 0, now()::timestamp),
@@ -909,7 +909,7 @@ VALUES ('GeneratorSynchronousFourWindingsProportionalRegulations', 'Generator'),
        ('GeneratorSynchronousFourWindingsProportionalRegulations', 'VoltageRegulator');
 
 --- model TapChangerBlockingAutomaton for VOLTAGE Equipment type
-INSERT INTO models (name, equipment_type, created_date)
+INSERT INTO models (model_name, equipment_type, created_date)
 VALUES ('TapChangerBlockingAutomaton', 3, now()::timestamp);
 
 INSERT INTO model_sets_group (model_name, name, type)
