@@ -918,4 +918,112 @@ public class ModelControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[]", true));
     }
+
+    @Test
+    public void testDeleteLoadModelsWhichShareParameterDefinitionsAndVariableDefinitions() throws Exception {
+
+        // These model share 4 parameter definitions and 3 variable definitions
+        String newLoadAlphaBetaModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
+        String newLoadPQModelJson = readFileAsString("src/test/resources/data/model/load/loadPQ.json");
+
+        cleanDB();
+
+        // *** LOAD ALPHA BETA *** //
+        // --- Put data first time with initial parameter/variable definitions --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newLoadAlphaBetaModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        String loadAlphaBetaModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // *** LOAD PQ *** //
+        // --- Put data first time with initial parameter/variable definitions --- //
+        mvcResult = mvc.perform(post("/models/")
+                        .content(newLoadPQModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        String loadPQModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Delete LOAD ALPHA BETA --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(loadAlphaBetaModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model LOAD ALPHA BETA must be not exist in db
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(loadAlphaBetaModelName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // must delete only 2 parameter definitions which are only used by load alpha beta
+        // the rest 4 shared parameter definitions must be always present in db
+        List<ModelParameterDefinitionEntity> foundNoneExistingParameterDefinitions = modelParameterDefinitionRepository.findAllById(List.of("load_alpha", "load_beta"));
+        assertEquals(0, foundNoneExistingParameterDefinitions.size());
+        List<ModelParameterDefinitionEntity> foundExistingParameterDefinitions = modelParameterDefinitionRepository.findAllById(List.of("load_P0Pu", "load_Q0Pu", "load_U0Pu", "load_UPhase0"));
+        assertEquals(4, foundExistingParameterDefinitions.size());
+
+        // must delete only 2 variable definitions which are only used by load alpha beta
+        // the rest 3 shared variable definitions must be always present in db
+        List<ModelVariableDefinitionEntity> foundNoneExistingVariableDefinitions = modelVariableRepository.findAllById(List.of("load_PRefPu", "load_running_value"));
+        assertEquals(0, foundNoneExistingVariableDefinitions.size());
+        List<ModelVariableDefinitionEntity> foundExistingVariableDefinitions = modelVariableRepository.findAllById(List.of("load_PPu", "load_QPu", "load_QRefPu"));
+        assertEquals(3, foundExistingVariableDefinitions.size());
+
+        // --- Delete LOAD PQ --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(loadPQModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model LOAD PQ must be not exist in db
+        foundNoneExistingModelOpt = modelRepository.findById(loadPQModelName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // db must not contain any parameter definition
+        assertEquals(0, modelParameterDefinitionRepository.findAll().size());
+        // db must not contain any variable definition
+        assertEquals(0, modelVariableRepository.findAll().size());
+
+    }
+
+    @Test
+    public void testDeleteGeneratorModelsWithVariableSets() throws Exception {
+        String newGeneratorModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
+
+        cleanDB();
+
+        // --- Put first time with initial variables sets --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Check result --- //
+        // This model has two variable sets => must be present in the db
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("Generator", "VoltageRegulator"));
+        assertEquals(2, variableSets.size());
+        // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
+        assertEquals(5, modelVariableRepository.findAll().size());
+
+        // --- Delete model generator --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(generatorModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+
+        // --- Check result --- //
+        // model generator model must be not exist in db
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorModelName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // db must not contain any variable set
+        assertEquals(0, modelVariablesSetRepository.findAll().size());
+        // db must not contain any variable definition
+        assertEquals(0, modelVariableRepository.findAll().size());
+    }
 }
