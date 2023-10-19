@@ -318,12 +318,12 @@ public class NetworkControllerTest {
                         .content(generatorRuleToMatch)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(("""
+                .andExpect(content().json("""
                             {
                                 "ruleIndex": %d,
                                 "matchedIds":["generator1"]
                             }
-                        """)
+                        """
                         .formatted(generatorIndex), true));
 
         int loadIndex = 0;

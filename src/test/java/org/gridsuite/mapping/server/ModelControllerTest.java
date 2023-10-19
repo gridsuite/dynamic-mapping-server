@@ -243,7 +243,7 @@ public class ModelControllerTest {
                     "modelName": "%s",
                     "type": "FIXED",
                     "sets": [
-                        %s  
+                        %s
                     ]
                 }
             """
@@ -898,7 +898,7 @@ public class ModelControllerTest {
                   "modelName": "%s",
                   "type": "FIXED",
                   "sets": [
-                    %s  
+                    %s 
                   ]
                 }
             """
