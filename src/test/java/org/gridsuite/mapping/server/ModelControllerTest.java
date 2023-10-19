@@ -1015,7 +1015,6 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-
         // --- Check result --- //
         // model generator model must be not exist in db
         Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorModelName);
