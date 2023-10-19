@@ -117,100 +117,110 @@ public class ScriptControllerTest {
     }
 
     String mapping(String name, String modelName, String groupName) {
-        return "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"rules\": [\n" +
-                "    {\n" +
-                "      \"composition\": \"filter1 && filter2 && filter3 && filter4\",\n" +
-                "      \"equipmentType\": \"GENERATOR\",\n" +
-                "      \"filters\": [\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter1\",\n" +
-                "          \"operand\": \"EQUALS\",\n" +
-                "          \"property\": \"id\",\n" +
-                "          \"value\": [\"test\"],\n" +
-                "          \"type\": \"STRING\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter2\",\n" +
-                "          \"operand\": \"HIGHER\",\n" +
-                "          \"property\": \"minP\",\n" +
-                "          \"value\": [3.0],\n" +
-                "          \"type\": \"NUMBER\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter3\",\n" +
-                "          \"operand\": \"IN\",\n" +
-                "          \"property\": \"energySource\",\n" +
-                "          \"value\": [\"HYDRO\", \"OTHERS\"],\n" +
-                "          \"type\": \"STRING\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter4\",\n" +
-                "          \"operand\": \"NOT_EQUALS\",\n" +
-                "          \"property\": \"voltageRegulatorOn\",\n" +
-                "          \"value\": true,\n" +
-                "          \"type\": \"BOOLEAN\"\n" +
-                "        }\n" +
-                "      ],\n" +
-                "      \"mappedModel\": \"" + modelName + "\",\n" +
-                "      \"setGroup\": \"" + groupName + "\",\n" +
-                "      \"groupType\": \"PREFIX\"\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"automata\": [\n" +
-                "    {\n" +
-                "      \"family\": \"CURRENT_LIMIT\",\n" +
-                "      \"model\": \"CurrentLimitAutomaton\",\n" +
-                "      \"setGroup\": \"automaton_group\",\n" +
-                "      \"properties\": [\n" +
-                "           {\n" +
-                "               \"name\": \"dynamicModelId\",\n" +
-                "               \"value\": \"cla_automaton_name\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"iMeasurement\",\n" +
-                "               \"value\": \"element_id\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"iMeasurementSide\",\n" +
-                "               \"value\": \"Branch.Side.ONE\",\n" +
-                "               \"type\": \"ENUM\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"controlledQuadripole\",\n" +
-                "               \"value\": \"element_id\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           }\n" +
-                "       ]\n" +
-                "     },\n" +
-                "    {\n" +
-                "      \"family\": \"VOLTAGE\",\n" +
-                "      \"model\": \"TapChangerBlockingAutomaton\",\n" +
-                "      \"setGroup\": \"automaton_group_2\",\n" +
-                "      \"properties\": [\n" +
-                "           {\n" +
-                "               \"name\": \"dynamicModelId\",\n" +
-                "               \"value\": \"tcb_automaton_name\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"uMeasurement\",\n" +
-                "               \"value\": \"bus_id_1, bus_id_2\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"transformers\",\n" +
-                "               \"value\": \"load_id_1, load_id_2\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           }\n" +
-                "       ]\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"controlledParameters\": false" +
-                "}";
+        return """
+            {
+                "name":"%s",
+                "rules":[
+                    {
+                        "composition":"filter1 && filter2 && filter3 && filter4",
+                        "equipmentType":"GENERATOR",
+                        "filters":[
+                            {
+                                "filterId":"filter1",
+                                "operand":"EQUALS",
+                                "property":"id",
+                                "value":[
+                                    "test"
+                                ],
+                                "type":"STRING"
+                            },
+                            {
+                                "filterId":"filter2",
+                                "operand":"HIGHER",
+                                "property":"minP",
+                                "value":[
+                                    3.0
+                                ],
+                                "type":"NUMBER"
+                            },
+                            {
+                                "filterId":"filter3",
+                                "operand":"IN",
+                                "property":"energySource",
+                                "value":[
+                                    "HYDRO",
+                                    "OTHERS"
+                                ],
+                                "type":"STRING"
+                            },
+                            {
+                                "filterId":"filter4",
+                                "operand":"NOT_EQUALS",
+                                "property":"voltageRegulatorOn",
+                                "value":true,
+                                "type":"BOOLEAN"
+                            }
+                        ],
+                        "mappedModel":"%s",
+                        "setGroup":"%s",
+                        "groupType":"PREFIX"
+                    }
+                ],
+                "automata":[
+                    {
+                        "family":"CURRENT_LIMIT",
+                        "model":"CurrentLimitAutomaton",
+                        "setGroup":"automaton_group",
+                        "properties":[
+                            {
+                                "name":"dynamicModelId",
+                                "value":"cla_automaton_name",
+                                "type":"STRING"
+                            },
+                            {
+                                "name":"iMeasurement",
+                                "value":"element_id",
+                                "type":"STRING"
+                            },
+                            {
+                                "name":"iMeasurementSide",
+                                "value":"Branch.Side.ONE",
+                                "type":"ENUM"
+                            },
+                            {
+                                "name":"controlledQuadripole",
+                                "value":"element_id",
+                                "type":"STRING"
+                            }
+                        ]
+                    },
+                    {
+                        "family":"VOLTAGE",
+                        "model":"TapChangerBlockingAutomaton",
+                        "setGroup":"automaton_group_2",
+                        "properties":[
+                            {
+                                "name":"dynamicModelId",
+                                "value":"tcb_automaton_name",
+                                "type":"STRING"
+                            },
+                            {
+                                "name":"uMeasurement",
+                                "value":"bus_id_1, bus_id_2",
+                                "type":"STRING"
+                            },
+                            {
+                                "name":"transformers",
+                                "value":"load_id_1, load_id_2",
+                                "type":"STRING"
+                            }
+                        ]
+                    }
+                ],
+                "controlledParameters":false
+            }
+            """
+            .formatted(name, modelName, groupName);
 
     }
 
@@ -388,7 +398,16 @@ public class ScriptControllerTest {
     @Test
     public void testSaveAndDelete() throws Exception {
         String name = "simple";
-        String simpleScript = "{\"name\":\"" + name + "\",\"parentName\":\"\",\"script\":\"Script\",\"current\": true, \"parametersFile\": null}";
+        String simpleScript = """
+            {
+                "name":"%s",
+                "parentName":"",
+                "script":"Script",
+                "current":true,
+                "parametersFile":null
+            }
+            """
+            .formatted(name);
 
         // Put data
         mvc.perform(post("/scripts/" + name)
@@ -423,21 +442,24 @@ public class ScriptControllerTest {
         String name = "test";
         String modelName = "LoadAlphaBeta";
         String groupName = "LAB";
-        String mappingToTest = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"rules\": [\n" +
-                "    {\n" +
-                "      \"composition\": \"true\",\n" +
-                "      \"equipmentType\": \"LOAD\",\n" +
-                "      \"filters\": [],\n" +
-                "      \"mappedModel\": \"" + modelName + "\",\n" +
-                "      \"setGroup\": \"" + groupName + "\",\n" +
-                "      \"groupType\": \"FIXED\"\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"automata\": []," +
-                "  \"controlledParameters\": true" +
-                "}";
+        String mappingToTest = """
+            {
+                "name":"%s",
+                "rules":[
+                    {
+                        "composition":"true",
+                        "equipmentType":"LOAD",
+                        "filters":[],
+                        "mappedModel":"%s",
+                        "setGroup":"%s",
+                        "groupType":"FIXED"
+                    }
+                ],
+                "automata":[],
+                "controlledParameters":true
+            }
+            """
+            .formatted(name, modelName, groupName);
 
         String parFile = "<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>\n" +
                 "<parametersSet xmlns=\\\"http://www.rte-france.com/dynawo\\\">\n" +
@@ -474,45 +496,54 @@ public class ScriptControllerTest {
         String name = "test";
         String setName = "LAB";
         String modelName = "LoadAlphaBeta";
-        String mappingToTest = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"rules\": [\n" +
-                "    {\n" +
-                "      \"composition\": \"true\",\n" +
-                "      \"equipmentType\": \"LOAD\",\n" +
-                "      \"filters\": [],\n" +
-                "      \"mappedModel\": \"" + modelName + "\",\n" +
-                "      \"setGroup\": \"" + setName + "\",\n" +
-                "      \"groupType\": \"FIXED\"\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"automata\": []," +
-                "  \"controlledParameters\": true" +
-                "}";
+        String mappingToTest = """
+            {
+                "name":"%s",
+                "rules":[
+                    {
+                        "composition":"true",
+                        "equipmentType":"LOAD",
+                        "filters":[],
+                        "mappedModel":"%s",
+                        "setGroup":"%s",
+                        "groupType":"FIXED"
+                    }
+                ],
+                "automata":[],
+                "controlledParameters":true
+            }
+            """
+            .formatted(name, modelName, setName);
 
-        String set = "{\n" +
-                "  \"name\": \"" + setName + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"parameters\": [\n" +
-                "    {\n" +
-                "      \"name\": \"load_alpha\",\n" +
-                "      \"value\": \"1.5\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"name\": \"load_beta\",\n" +
-                "      \"value\": \"2.5\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+        String set = """
+            {
+                "name":"%s",
+                "modelName":"%s",
+                "parameters":[
+                    {
+                        "name":"load_alpha",
+                        "value":"1.5"
+                    },
+                    {
+                        "name":"load_beta",
+                        "value":"2.5"
+                    }
+                ]
+            }
+            """
+            .formatted(setName, modelName);
 
-        String setGroup = "{\n" +
-                "  \"name\": \"" + setName + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"type\": \"FIXED\",\n" +
-                "  \"sets\": [\n" +
-                set +
-                "  ]\n" +
-                "}";
+        String setGroup = """
+            {
+                "name":"%s",
+                "modelName":"%s",
+                "type":"FIXED",
+                "sets":[
+                    %s
+                ]
+            }
+            """
+            .formatted(setName, modelName, set);
         // Put data
         mvc.perform(post("/mappings/" + name)
                         .content(mappingToTest)

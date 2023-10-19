@@ -141,27 +141,33 @@ public class ModelControllerTest {
 
         String name = "setName";
         String modelName = "LoadAlphaBeta";
-        String set = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"parameters\": [\n" +
-                "    {\n" +
-                "      \"name\": \"load_alpha\",\n" +
-                "      \"value\": \"1.5\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"name\": \"load_beta\",\n" +
-                "      \"value\": \"2.5\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-        String setGroup = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"type\": \"FIXED\",\n" +
-                "  \"sets\": [\n" +
-                set +
-                "  ]\n" +
-                "}";
+        String set = """
+                {
+                    "name": "%s",
+                    "parameters": [
+                        {
+                            "name": "load_alpha",
+                            "value": "1.5"
+                        },
+                        {
+                            "name": "load_beta",
+                            "value": "2.5"
+                        }
+                    ]
+                }
+            """
+            .formatted(name);
+        String setGroup = """
+                {
+                    "name": "%s",
+                    "modelName": "%s",
+                    "type": "FIXED",
+                    "sets": [
+                        %s
+                    ]
+                }
+            """
+            .formatted(name, modelName, set);
 
         // Put data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -200,14 +206,16 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[\n" +
-                        "{\"name\":\"load_alpha\",\n \"type\":\"DOUBLE\",\"origin\":\"USER\",\"originName\":null,\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_beta\",\"type\":\"DOUBLE\",\"origin\":\"USER\",\"originName\":null,\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_P0Pu\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"p_pu\",\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_Q0Pu\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"q_pu\",\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_U0Pu\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"v_pu\",\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_UPhase0\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"angle_pu\",\"fixedValue\":null}\n" +
-                        "]", false));
+                .andExpect(content().json("""
+                    [
+                        {"name": "load_alpha", "type": "DOUBLE", "origin": "USER", "originName": null, "fixedValue": null},
+                        {"name": "load_beta", "type": "DOUBLE", "origin": "USER", "originName": null, "fixedValue": null},
+                        {"name": "load_P0Pu", "type": "DOUBLE", "origin": "NETWORK", "originName": "p_pu", "fixedValue": null},
+                        {"name": "load_Q0Pu", "type": "DOUBLE", "origin": "NETWORK", "originName": "q_pu", "fixedValue": null},
+                        {"name": "load_U0Pu", "type": "DOUBLE", "origin": "NETWORK", "originName": "v_pu", "fixedValue": null},
+                        {"name": "load_UPhase0", "type": "DOUBLE", "origin": "NETWORK", "originName": "angle_pu", "fixedValue": null}
+                    ]
+                """, false));
     }
 
     @Test
@@ -215,25 +223,31 @@ public class ModelControllerTest {
 
         String name = "errorSet";
         String modelName = "LoadAlphaBeta";
-        String set = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"parameters\": [\n" +
-                "    {\n" +
-                "      \"name\": \"load_alpha\",\n" +
-                "      \"value\": \"1.5\"\n" +
-                "    },\n" +
-                "  ]\n" +
-                "}";
+        String set = """
+                {
+                    "name": "%s",
+                    "modelName": "%s",
+                    "parameters": [
+                        {
+                            "name": "load_alpha",
+                            "value": "1.5"
+                        }
+                    ]
+                }
+            """
+            .formatted(name, modelName);
         // Put data
-        String setGroup = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"type\": \"FIXED\",\n" +
-                "  \"sets\": [\n" +
-                set +
-                "  ]\n" +
-                "}";
+        String setGroup = """
+                {
+                    "name": "%s",
+                    "modelName": "%s",
+                    "type": "FIXED",
+                    "sets": [
+                        %s
+                    ]
+                }
+            """
+            .formatted(name, modelName, set);
 
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
                         .content(setGroup)
@@ -274,10 +288,24 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[\n" +
-                        "{\"name\":\"LoadAlphaBeta\",\n \"type\":\"LOAD\",\"groups\":[{\"name\": \"LAB\", \"type\": \"FIXED\", \"setsNumber\": 1}]},\n" +
-                        "{\"name\":\"GeneratorThreeWindings\",\n \"type\":\"GENERATOR\",\"groups\":[{\"name\": \"GSTWPR\", \"type\": \"PREFIX\", \"setsNumber\": 0}]}\n" +
-                        "]", true));
+                .andExpect(content().json("""
+                    [
+                        {
+                            "name": "LoadAlphaBeta",
+                            "type": "LOAD",
+                            "groups": [
+                                {"name": "LAB", "type": "FIXED", "setsNumber": 1}
+                            ]
+                        },
+                        {
+                            "name": "GeneratorThreeWindings",
+                            "type": "GENERATOR",
+                            "groups": [
+                                {"name": "GSTWPR", "type": "PREFIX", "setsNumber": 0}
+                            ]
+                        }
+                    ]
+                """, true));
     }
 
     public static String readFileAsString(String file) throws Exception {
@@ -848,27 +876,33 @@ public class ModelControllerTest {
 
         String name = "setName";
         String modelName = "LoadAlphaBeta";
-        String set = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"parameters\": [\n" +
-                "    {\n" +
-                "      \"name\": \"load_alpha\",\n" +
-                "      \"value\": \"1.5\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"name\": \"load_beta\",\n" +
-                "      \"value\": \"2.5\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-        String setGroup = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"type\": \"FIXED\",\n" +
-                "  \"sets\": [\n" +
-                set +
-                "  ]\n" +
-                "}";
+        String set = """
+                {
+                  "name": "%s",
+                  "parameters": [
+                    {
+                      "name": "load_alpha",
+                      "value": "1.5"
+                    },
+                    {
+                      "name": "load_beta",
+                      "value": "2.5"
+                    }
+                  ]
+                }
+            """
+            .formatted(name);
+        String setGroup = """
+                {
+                  "name": "%s",
+                  "modelName": "%s",
+                  "type": "FIXED",
+                  "sets": [
+                    %s
+                  ]
+                }
+            """
+            .formatted(name, modelName, set);
 
         // Put data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -906,12 +940,15 @@ public class ModelControllerTest {
         mvc.perform(delete("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED" + "/" + name))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("{\n" +
-                        "  \"name\": \"" + name + "\",\n" +
-                        "  \"modelName\": \"" + modelName + "\",\n" +
-                        "  \"type\": \"FIXED\",\n" +
-                        "  \"sets\": []\n" +
-                        "}"));
+                .andExpect(content().json("""
+                    {
+                      "name": "%s",
+                      "modelName": "%s",
+                      "type": "FIXED",
+                      "sets": []
+                    }
+                """
+                .formatted(name, modelName)));
         mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())

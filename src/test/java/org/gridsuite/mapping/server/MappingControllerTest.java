@@ -72,100 +72,109 @@ public class MappingControllerTest {
     }
 
     String mapping(String name) {
-        return "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"rules\": [\n" +
-                "    {\n" +
-                "      \"composition\": \"filter1 && filter2 && filter3 && filter4\",\n" +
-                "      \"equipmentType\": \"GENERATOR\",\n" +
-                "      \"filters\": [\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter1\",\n" +
-                "          \"operand\": \"EQUALS\",\n" +
-                "          \"property\": \"id\",\n" +
-                "          \"value\": [\"test\"],\n" +
-                "          \"type\": \"STRING\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter2\",\n" +
-                "          \"operand\": \"HIGHER\",\n" +
-                "          \"property\": \"minP\",\n" +
-                "          \"value\": [3.0],\n" +
-                "          \"type\": \"NUMBER\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter3\",\n" +
-                "          \"operand\": \"IN\",\n" +
-                "          \"property\": \"energySource\",\n" +
-                "          \"value\": [\"OTHERS\"],\n" +
-                "          \"type\": \"ENUM\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "          \"filterId\": \"filter4\",\n" +
-                "          \"operand\": \"NOT_EQUALS\",\n" +
-                "          \"property\": \"voltageRegulatorOn\",\n" +
-                "          \"value\": true,\n" +
-                "          \"type\": \"BOOLEAN\"\n" +
-                "        }\n" +
-                "      ],\n" +
-                "      \"mappedModel\": \"mappedExample\",\n" +
-                "      \"setGroup\": \"setGroup\",\n" +
-                "      \"groupType\": \"FIXED\"\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"automata\": [\n" +
-                "    {\n" +
-                "      \"family\": \"CURRENT_LIMIT\",\n" +
-                "      \"model\": \"CurrentLimitAutomaton\",\n" +
-                "      \"setGroup\": \"automaton_group\",\n" +
-                "      \"properties\": [\n" +
-                "           {\n" +
-                "               \"name\": \"dynamicModelId\",\n" +
-                "               \"value\": \"cla_automaton_name\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"iMeasurement\",\n" +
-                "               \"value\": \"element_id\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"iMeasurementSide\",\n" +
-                "               \"value\": \"Branch.Side.ONE\",\n" +
-                "               \"type\": \"ENUM\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"controlledQuadripole\",\n" +
-                "               \"value\": \"element_id\",\n" +
-                "               \"type\": \"ENUM\"\n" +
-                "           }\n" +
-                "       ]\n" +
-                "     },\n" +
-                "    {\n" +
-                "      \"family\": \"VOLTAGE\",\n" +
-                "      \"model\": \"TapChangerBlockingAutomaton\",\n" +
-                "      \"setGroup\": \"automaton_group_2\",\n" +
-                "      \"properties\": [\n" +
-                "           {\n" +
-                "               \"name\": \"dynamicModelId\",\n" +
-                "               \"value\": \"tcb_automaton_name\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"uMeasurement\",\n" +
-                "               \"value\": \"bus_id_1, bus_id_2\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           },\n" +
-                "           {\n" +
-                "               \"name\": \"transformers\",\n" +
-                "               \"value\": \"load_id_1, load_id_2\",\n" +
-                "               \"type\": \"STRING\"\n" +
-                "           }\n" +
-                "       ]\n" +
-                "    }\n" +
-                "  ],\n" +
-                "  \"controlledParameters\": false" +
-                "}";
+        return """
+                {
+                    "name":"%s",
+                    "rules":[
+                        {
+                            "composition":"filter1 && filter2 && filter3 && filter4",
+                            "equipmentType":"GENERATOR",
+                            "filters":[
+                                {
+                                    "filterId":"filter1",
+                                    "operand":"EQUALS",
+                                    "property":"id",
+                                    "value":[
+                                        "test"
+                                    ],
+                                    "type":"STRING"
+                                },
+                                {
+                                    "filterId":"filter2",
+                                    "operand":"HIGHER",
+                                    "property":"minP",
+                                    "value":[
+                                        3.0
+                                    ],
+                                    "type":"NUMBER"
+                                },
+                                {
+                                    "filterId":"filter3",
+                                    "operand":"IN",
+                                    "property":"energySource",
+                                    "value":[
+                                        "OTHERS"
+                                    ],
+                                    "type":"ENUM"
+                                },
+                                {
+                                    "filterId":"filter4",
+                                    "operand":"NOT_EQUALS",
+                                    "property":"voltageRegulatorOn",
+                                    "value":true,
+                                    "type":"BOOLEAN"
+                                }
+                            ],
+                            "mappedModel":"mappedExample",
+                            "setGroup":"setGroup",
+                            "groupType":"FIXED"
+                        }
+                    ],
+                    "automata":[
+                        {
+                            "family":"CURRENT_LIMIT",
+                            "model":"CurrentLimitAutomaton",
+                            "setGroup":"automaton_group",
+                            "properties":[
+                                {
+                                    "name":"dynamicModelId",
+                                    "value":"cla_automaton_name",
+                                    "type":"STRING"
+                                },
+                                {
+                                    "name":"iMeasurement",
+                                    "value":"element_id",
+                                    "type":"STRING"
+                                },
+                                {
+                                    "name":"iMeasurementSide",
+                                    "value":"Branch.Side.ONE",
+                                    "type":"ENUM"
+                                },
+                                {
+                                    "name":"controlledQuadripole",
+                                    "value":"element_id",
+                                    "type":"ENUM"
+                                }
+                            ]
+                        },
+                        {
+                            "family":"VOLTAGE",
+                            "model":"TapChangerBlockingAutomaton",
+                            "setGroup":"automaton_group_2",
+                            "properties":[
+                                {
+                                    "name":"dynamicModelId",
+                                    "value":"tcb_automaton_name",
+                                    "type":"STRING"
+                                },
+                                {
+                                    "name":"uMeasurement",
+                                    "value":"bus_id_1, bus_id_2",
+                                    "type":"STRING"
+                                },
+                                {
+                                    "name":"transformers",
+                                    "value":"load_id_1, load_id_2",
+                                    "type":"STRING"
+                                }
+                            ]
+                        }
+                    ],
+                    "controlledParameters":false
+                }
+            """
+            .formatted(name);
 
     }
 
