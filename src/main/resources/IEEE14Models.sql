@@ -954,7 +954,7 @@ VALUES ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 
 
 --- model StaticVarCompensator for STATIC_VAR_COMPENSATOR Equipment type
 INSERT INTO models (model_name, equipment_type, created_date)
-VALUES ('StaticVarCompensator', 8, now()::timestamp);
+VALUES ('StaticVarCompensator', 9, now()::timestamp);
 
 INSERT INTO model_sets_group (model_name, name, type)
 VALUES ('StaticVarCompensator', 'SVarCT', 0);
