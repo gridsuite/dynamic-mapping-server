@@ -105,8 +105,7 @@ public class NumberFilter extends AbstractFilter {
             case NOT_IN:
             case NOT_EQUALS:
                 boolean isNot = this.getOperand().equals(Operands.NOT_IN) || this.getOperand().equals(Operands.NOT_EQUALS);
-                isMatched = isNot != value.stream().reduce(false, (acc, filterUniqueValue) -> acc || (Float.compare(floatValue, filterUniqueValue) == 0
-                ), (a, b) -> a || b);
+                isMatched = isNot != value.stream().reduce(false, (acc, filterUniqueValue) -> acc || Float.compare(floatValue, filterUniqueValue) == 0, (a, b) -> a || b);
                 break;
             case LOWER:
                 isMatched = Float.compare(floatValue, value.get(0)) == -1;

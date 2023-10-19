@@ -10,7 +10,7 @@ import lombok.*;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;

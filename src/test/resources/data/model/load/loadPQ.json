@@ -23,7 +23,7 @@
     {
       "name": "load_UPhase0",
       "type": "DOUBLE",
-      "origin": "NETWORK",
+      "origin": "USER",
       "originName": "angle_pu"
     }
   ],

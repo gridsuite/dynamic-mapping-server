@@ -13,7 +13,7 @@ import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelParameter;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 /**
