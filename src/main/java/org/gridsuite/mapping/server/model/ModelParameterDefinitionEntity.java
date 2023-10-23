@@ -8,17 +8,13 @@ package org.gridsuite.mapping.server.model;
 
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
-import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 
@@ -43,25 +39,17 @@ public class ModelParameterDefinitionEntity implements Serializable {
     @Enumerated
     private ParameterType type;
 
-    @Column(name = "origin")
-    @Enumerated
-    private ParameterOrigin origin;
-
     @Column(name = "origin_name")
     private String originName;
 
     @Column(name = "fixed_value")
     private String fixedValue;
 
-    @ManyToMany(
-        mappedBy = "parameterDefinitions",
-        cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
-    )
-    private Set<ModelEntity> models;
+    @OneToMany(mappedBy = "parameterDefinition")
+    List<ModelModelParameterDefinitionEntity> models = new ArrayList<>();
 
-    public ModelParameterDefinitionEntity(ModelEntity model, ModelParameterDefinition parameterDefinition) {
-        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(),
-                model != null ? new LinkedHashSet<>(List.of(model)) : new LinkedHashSet<>(), null, null);
+    public ModelParameterDefinitionEntity(ModelParameterDefinition parameterDefinition) {
+        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getOriginName(), parameterDefinition.getFixedValue(), new ArrayList<>(), null, null);
     }
 
     @CreatedDate

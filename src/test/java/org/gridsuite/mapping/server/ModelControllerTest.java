@@ -87,8 +87,8 @@ public class ModelControllerTest {
         modelParameterDefinitionRepository.deleteAll();
     }
 
-    private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName, ModelEntity model) {
-        return new ModelParameterDefinitionEntity(model, new ModelParameterDefinition(name, type, origin, originName, null));
+    private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName) {
+        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(name, type, origin, originName, null));
     }
 
     @Before
@@ -97,15 +97,23 @@ public class ModelControllerTest {
 
         // prepare token model
         ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD,
-                new LinkedHashSet<>(), new ArrayList<>(), Set.of(), Set.of(), null, null);
-        ArrayList<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
-        definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
-        definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null, modelToSave));
-        definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu", modelToSave));
-        definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu", modelToSave));
-        definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu", modelToSave));
-        definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu", modelToSave));
-        modelToSave.addParameterDefinitions(definitions);
+                new ArrayList<>(), new ArrayList<>(), Set.of(), Set.of(), null, null);
+        List<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
+
+        // add "USER" parameter definitions
+        definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null));
+        definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null));
+        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.USER);
+
+        definitions.clear();
+
+        // add "NETWORK" parameter definitions
+        definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu"));
+        definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu"));
+        definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu"));
+        definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu"));
+        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.NETWORK);
+
         modelRepository.save(modelToSave);
     }
 
@@ -133,27 +141,33 @@ public class ModelControllerTest {
 
         String name = "setName";
         String modelName = "LoadAlphaBeta";
-        String set = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"parameters\": [\n" +
-                "    {\n" +
-                "      \"name\": \"load_alpha\",\n" +
-                "      \"value\": \"1.5\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"name\": \"load_beta\",\n" +
-                "      \"value\": \"2.5\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-        String setGroup = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"type\": \"FIXED\",\n" +
-                "  \"sets\": [\n" +
-                set +
-                "  ]\n" +
-                "}";
+        String set = """
+                {
+                    "name": "%s",
+                    "parameters": [
+                        {
+                            "name": "load_alpha",
+                            "value": "1.5"
+                        },
+                        {
+                            "name": "load_beta",
+                            "value": "2.5"
+                        }
+                    ]
+                }
+            """
+            .formatted(name);
+        String setGroup = """
+                {
+                    "name": "%s",
+                    "modelName": "%s",
+                    "type": "FIXED",
+                    "sets": [
+                        %s
+                    ]
+                }
+            """
+            .formatted(name, modelName, set);
 
         // Put data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -192,14 +206,16 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[\n" +
-                        "{\"name\":\"load_alpha\",\n \"type\":\"DOUBLE\",\"origin\":\"USER\",\"originName\":null,\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_beta\",\"type\":\"DOUBLE\",\"origin\":\"USER\",\"originName\":null,\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_P0Pu\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"p_pu\",\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_Q0Pu\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"q_pu\",\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_U0Pu\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"v_pu\",\"fixedValue\":null},\n" +
-                        "{\"name\":\"load_UPhase0\",\"type\":\"DOUBLE\",\"origin\":\"NETWORK\",\"originName\":\"angle_pu\",\"fixedValue\":null}\n" +
-                        "]", false));
+                .andExpect(content().json("""
+                    [
+                        {"name": "load_alpha", "type": "DOUBLE", "origin": "USER", "originName": null, "fixedValue": null},
+                        {"name": "load_beta", "type": "DOUBLE", "origin": "USER", "originName": null, "fixedValue": null},
+                        {"name": "load_P0Pu", "type": "DOUBLE", "origin": "NETWORK", "originName": "p_pu", "fixedValue": null},
+                        {"name": "load_Q0Pu", "type": "DOUBLE", "origin": "NETWORK", "originName": "q_pu", "fixedValue": null},
+                        {"name": "load_U0Pu", "type": "DOUBLE", "origin": "NETWORK", "originName": "v_pu", "fixedValue": null},
+                        {"name": "load_UPhase0", "type": "DOUBLE", "origin": "NETWORK", "originName": "angle_pu", "fixedValue": null}
+                    ]
+                """, false));
     }
 
     @Test
@@ -207,25 +223,31 @@ public class ModelControllerTest {
 
         String name = "errorSet";
         String modelName = "LoadAlphaBeta";
-        String set = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"parameters\": [\n" +
-                "    {\n" +
-                "      \"name\": \"load_alpha\",\n" +
-                "      \"value\": \"1.5\"\n" +
-                "    },\n" +
-                "  ]\n" +
-                "}";
+        String set = """
+                {
+                    "name": "%s",
+                    "modelName": "%s",
+                    "parameters": [
+                        {
+                            "name": "load_alpha",
+                            "value": "1.5"
+                        }
+                    ]
+                }
+            """
+            .formatted(name, modelName);
         // Put data
-        String setGroup = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"type\": \"FIXED\",\n" +
-                "  \"sets\": [\n" +
-                set +
-                "  ]\n" +
-                "}";
+        String setGroup = """
+                {
+                    "name": "%s",
+                    "modelName": "%s",
+                    "type": "FIXED",
+                    "sets": [
+                        %s
+                    ]
+                }
+            """
+            .formatted(name, modelName, set);
 
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
                         .content(setGroup)
@@ -256,7 +278,7 @@ public class ModelControllerTest {
         loadModel.setSetsGroups(loadGroups);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, Set.of(), null, Set.of(), Set.of(), null, null);
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, List.of(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
         generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
@@ -266,10 +288,24 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[\n" +
-                        "{\"name\":\"LoadAlphaBeta\",\n \"type\":\"LOAD\",\"groups\":[{\"name\": \"LAB\", \"type\": \"FIXED\", \"setsNumber\": 1}]},\n" +
-                        "{\"name\":\"GeneratorThreeWindings\",\n \"type\":\"GENERATOR\",\"groups\":[{\"name\": \"GSTWPR\", \"type\": \"PREFIX\", \"setsNumber\": 0}]}\n" +
-                        "]", true));
+                .andExpect(content().json("""
+                    [
+                        {
+                            "name": "LoadAlphaBeta",
+                            "type": "LOAD",
+                            "groups": [
+                                {"name": "LAB", "type": "FIXED", "setsNumber": 1}
+                            ]
+                        },
+                        {
+                            "name": "GeneratorThreeWindings",
+                            "type": "GENERATOR",
+                            "groups": [
+                                {"name": "GSTWPR", "type": "PREFIX", "setsNumber": 0}
+                            ]
+                        }
+                    ]
+                """, true));
     }
 
     public static String readFileAsString(String file) throws Exception {
@@ -361,7 +397,7 @@ public class ModelControllerTest {
         assertEquals(parameterDefinitionList.size(), savedParameterDefinitionList.size());
 
         // --- Add existing parameter definition to model --- //
-        mvcResult = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add")
+        mvcResult = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add?origin=USER")
                         .content(objectMapper.writeValueAsString(savedParameterDefinitionList.stream().map(ModelParameterDefinition::getName)))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
@@ -680,7 +716,21 @@ public class ModelControllerTest {
 
         // cross-check parameter definitions between two models
         Sets.SetView<ModelParameterDefinition> intersectionParameterDefinitions = Sets.intersection(new HashSet<>(loadAlphaBetaParameterDefinitions), new HashSet<>(loadPQParameterDefinitions));
-        assertEquals(4, intersectionParameterDefinitions.size());
+        assertEquals(3, intersectionParameterDefinitions.size());
+
+        // the last parameter definition of load alpha beta model must be NETWORK
+        ModelParameterDefinition lastParameterDefinitionInLoadAlphaBetaModel = loadAlphaBetaParameterDefinitions.stream().reduce((first, second) -> second).get();
+        assertEquals(ParameterOrigin.NETWORK, lastParameterDefinitionInLoadAlphaBetaModel.getOrigin());
+
+        // the last parameter definition of load PQ model must be USER
+        ModelParameterDefinition lastParameterDefinitionInLoadPQModel = loadPQParameterDefinitions.stream().reduce((first, second) -> second).get();
+        assertEquals(ParameterOrigin.USER, lastParameterDefinitionInLoadPQModel.getOrigin());
+
+        // two last parameter definitions in two models must be the same name, type, originName and fixedValue
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getName(), lastParameterDefinitionInLoadPQModel.getName());
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getType(), lastParameterDefinitionInLoadPQModel.getType());
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getOriginName(), lastParameterDefinitionInLoadPQModel.getOriginName());
+        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getFixedValue(), lastParameterDefinitionInLoadPQModel.getFixedValue());
 
     }
 
@@ -826,27 +876,33 @@ public class ModelControllerTest {
 
         String name = "setName";
         String modelName = "LoadAlphaBeta";
-        String set = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"parameters\": [\n" +
-                "    {\n" +
-                "      \"name\": \"load_alpha\",\n" +
-                "      \"value\": \"1.5\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"name\": \"load_beta\",\n" +
-                "      \"value\": \"2.5\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
-        String setGroup = "{\n" +
-                "  \"name\": \"" + name + "\",\n" +
-                "  \"modelName\": \"" + modelName + "\",\n" +
-                "  \"type\": \"FIXED\",\n" +
-                "  \"sets\": [\n" +
-                set +
-                "  ]\n" +
-                "}";
+        String set = """
+                {
+                  "name": "%s",
+                  "parameters": [
+                    {
+                      "name": "load_alpha",
+                      "value": "1.5"
+                    },
+                    {
+                      "name": "load_beta",
+                      "value": "2.5"
+                    }
+                  ]
+                }
+            """
+            .formatted(name);
+        String setGroup = """
+                {
+                  "name": "%s",
+                  "modelName": "%s",
+                  "type": "FIXED",
+                  "sets": [
+                    %s
+                  ]
+                }
+            """
+            .formatted(name, modelName, set);
 
         // Put data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -884,16 +940,126 @@ public class ModelControllerTest {
         mvc.perform(delete("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED" + "/" + name))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("{\n" +
-                        "  \"name\": \"" + name + "\",\n" +
-                        "  \"modelName\": \"" + modelName + "\",\n" +
-                        "  \"type\": \"FIXED\",\n" +
-                        "  \"sets\": []\n" +
-                        "}"));
+                .andExpect(content().json("""
+                    {
+                      "name": "%s",
+                      "modelName": "%s",
+                      "type": "FIXED",
+                      "sets": []
+                    }
+                """
+                .formatted(name, modelName)));
         mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[]", true));
+    }
+
+    @Test
+    public void testDeleteLoadModelsWhichShareParameterDefinitionsAndVariableDefinitions() throws Exception {
+
+        // These model share 4 parameter definitions and 3 variable definitions
+        String newLoadAlphaBetaModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
+        String newLoadPQModelJson = readFileAsString("src/test/resources/data/model/load/loadPQ.json");
+
+        cleanDB();
+
+        // *** LOAD ALPHA BETA *** //
+        // --- Put data first time with initial parameter/variable definitions --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newLoadAlphaBetaModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        String loadAlphaBetaModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // *** LOAD PQ *** //
+        // --- Put data first time with initial parameter/variable definitions --- //
+        mvcResult = mvc.perform(post("/models/")
+                        .content(newLoadPQModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        String loadPQModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Delete LOAD ALPHA BETA --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(loadAlphaBetaModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model LOAD ALPHA BETA must be not exist in db
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(loadAlphaBetaModelName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // must delete only 2 parameter definitions which are only used by load alpha beta
+        // the rest 4 shared parameter definitions must be always present in db
+        List<ModelParameterDefinitionEntity> foundNoneExistingParameterDefinitions = modelParameterDefinitionRepository.findAllById(List.of("load_alpha", "load_beta"));
+        assertEquals(0, foundNoneExistingParameterDefinitions.size());
+        List<ModelParameterDefinitionEntity> foundExistingParameterDefinitions = modelParameterDefinitionRepository.findAllById(List.of("load_P0Pu", "load_Q0Pu", "load_U0Pu", "load_UPhase0"));
+        assertEquals(4, foundExistingParameterDefinitions.size());
+
+        // must delete only 2 variable definitions which are only used by load alpha beta
+        // the rest 3 shared variable definitions must be always present in db
+        List<ModelVariableDefinitionEntity> foundNoneExistingVariableDefinitions = modelVariableRepository.findAllById(List.of("load_PRefPu", "load_running_value"));
+        assertEquals(0, foundNoneExistingVariableDefinitions.size());
+        List<ModelVariableDefinitionEntity> foundExistingVariableDefinitions = modelVariableRepository.findAllById(List.of("load_PPu", "load_QPu", "load_QRefPu"));
+        assertEquals(3, foundExistingVariableDefinitions.size());
+
+        // --- Delete LOAD PQ --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(loadPQModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model LOAD PQ must be not exist in db
+        foundNoneExistingModelOpt = modelRepository.findById(loadPQModelName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // db must not contain any parameter definition
+        assertEquals(0, modelParameterDefinitionRepository.findAll().size());
+        // db must not contain any variable definition
+        assertEquals(0, modelVariableRepository.findAll().size());
+
+    }
+
+    @Test
+    public void testDeleteGeneratorModelsWithVariableSets() throws Exception {
+        String newGeneratorModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
+
+        cleanDB();
+
+        // --- Put first time with initial variables sets --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Check result --- //
+        // This model has two variable sets => must be present in the db
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("Generator", "VoltageRegulator"));
+        assertEquals(2, variableSets.size());
+        // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
+        assertEquals(5, modelVariableRepository.findAll().size());
+
+        // --- Delete model generator --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(generatorModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model generator model must be not exist in db
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorModelName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // db must not contain any variable set
+        assertEquals(0, modelVariablesSetRepository.findAll().size());
+        // db must not contain any variable definition
+        assertEquals(0, modelVariableRepository.findAll().size());
     }
 }

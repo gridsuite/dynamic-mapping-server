@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.model;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.utils.EquipmentType;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -41,13 +42,8 @@ public class ModelEntity implements Serializable {
     @Column(name = "equipment_type")
     private EquipmentType equipmentType;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinTable(
-            name = "models_model_parameter_definitions",
-            joinColumns = {@JoinColumn(name = "model_name")},
-            inverseJoinColumns = {@JoinColumn(name = "parameter_definition_name", referencedColumnName = "name")}
-    )
-    private Set<ModelParameterDefinitionEntity> parameterDefinitions = new LinkedHashSet<>(0);
+    @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ModelModelParameterDefinitionEntity> parameterDefinitions = new ArrayList<>();
 
     @OneToMany(targetEntity = ModelSetsGroupEntity.class, mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelSetsGroupEntity> setsGroups = new ArrayList<>(0);
@@ -67,7 +63,9 @@ public class ModelEntity implements Serializable {
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
-        parameterDefinitions = modelToConvert.getParameterDefinitions() != null ? modelToConvert.getParameterDefinitions().stream().map(parameterDefinition -> new ModelParameterDefinitionEntity(this, parameterDefinition)).collect(Collectors.toSet()) : null;
+        if (modelToConvert.getParameterDefinitions() != null) {
+            modelToConvert.getParameterDefinitions().forEach(parameterDefinition -> this.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin()));
+        }
         setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
         variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(this, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
         variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(this, variablesSet)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
@@ -85,32 +83,83 @@ public class ModelEntity implements Serializable {
 
     // --- utils methods --- //
 
-    public void addParameterDefinitions(Collection<ModelParameterDefinitionEntity> parameterDefinitions) {
-        parameterDefinitions.forEach(parameterDefinition -> parameterDefinition.getModels().add(this));
-        this.parameterDefinitions.addAll(parameterDefinitions);
+    /**
+     * Add a parameter definition to the relation with the model
+     * @param parameterDefinition given parameter definition to be added
+     * @param origin given origin which is the extra information of the relation
+     */
+    public void addParameterDefinition(ModelParameterDefinitionEntity parameterDefinition, ParameterOrigin origin) {
+        ModelModelParameterDefinitionEntity modelModelParameterDefinitionEntity = new ModelModelParameterDefinitionEntity(this, parameterDefinition, origin);
+        parameterDefinition.getModels().add(modelModelParameterDefinitionEntity);
+        this.parameterDefinitions.add(modelModelParameterDefinitionEntity);
     }
 
-    public void removeParameterDefinitions(Collection<ModelParameterDefinitionEntity> parameterDefinitions) {
-        parameterDefinitions.forEach(parameterDefinition -> parameterDefinition.getModels().remove(this));
-        this.parameterDefinitions.removeAll(parameterDefinitions);
+    /**
+     * Add all the parameter definitions in the given collection to relation with the model
+     * @param parameterDefinitions collection containing parameter definitions to be added
+     * @param origin given origin which is the extra information of relations
+     */
+    public void addAllParameterDefinition(Collection<ModelParameterDefinitionEntity> parameterDefinitions, ParameterOrigin origin) {
+        parameterDefinitions.forEach(parameterDefinition -> addParameterDefinition(parameterDefinition, origin));
     }
 
-    public void addVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+    /**
+     * Remove a parameter definition from the relation with the model
+     * @param parameterDefinition given parameter definition to be removed from the relation, if present
+     */
+    public void removeParameterDefinition(ModelParameterDefinitionEntity parameterDefinition) {
+        for (Iterator<ModelModelParameterDefinitionEntity> iter = this.parameterDefinitions.iterator(); iter.hasNext();) {
+            ModelModelParameterDefinitionEntity modelModelParameterDefinitionEntity = iter.next();
+            if (modelModelParameterDefinitionEntity.getModel().equals(this) && modelModelParameterDefinitionEntity.getParameterDefinition().equals(parameterDefinition)) {
+                iter.remove();
+                modelModelParameterDefinitionEntity.setModel(null);
+                modelModelParameterDefinitionEntity.setParameterDefinition(null);
+                parameterDefinition.getModels().remove(modelModelParameterDefinitionEntity);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Remove all the parameter definitions in the given collection from relations with the model
+     * @param parameterDefinitions collection containing parameter definitions to be removed
+     */
+    public void removeAllParameterDefinition(Collection<ModelParameterDefinitionEntity> parameterDefinitions) {
+        parameterDefinitions.forEach(this::removeParameterDefinition);
+    }
+
+    /**
+     * Add all the variable definitions in the given collection to relation with the model
+     * @param variableDefinitions collection containing variable definitions to be added
+     */
+    public void addAllVariableDefinition(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
         variableDefinitions.forEach(variableDefinition -> variableDefinition.getModels().add(this));
         this.variableDefinitions.addAll(variableDefinitions);
     }
 
-    public void removeVariableDefinitions(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
+    /**
+     * Remove all the variable definitions in the given collection from relation with the model
+     * @param variableDefinitions collection containing variable definitions to be removed
+     */
+    public void removeAllVariableDefinition(Collection<ModelVariableDefinitionEntity> variableDefinitions) {
         variableDefinitions.forEach(variableDefinition -> variableDefinition.getModels().remove(this));
         this.variableDefinitions.removeAll(variableDefinitions);
     }
 
-    public void addVariablesSets(Collection<ModelVariableSetEntity> variablesSets) {
+    /**
+     * Add all the variable set in the given collection to relation with the model
+     * @param variablesSets collection containing variable sets to be added
+     */
+    public void addAllVariablesSet(Collection<ModelVariableSetEntity> variablesSets) {
         variablesSets.forEach(variablesSet -> variablesSet.getModels().add(this));
         this.variableSets.addAll(variablesSets);
     }
 
-    public void removeVariablesSets(Collection<ModelVariableSetEntity> variablesSets) {
+    /**
+     * Remove all the variable set in the given collection from relation with the model
+     * @param variablesSets collection containing variable sets to be removed
+     */
+    public void removeAllVariablesSet(Collection<ModelVariableSetEntity> variablesSets) {
         variablesSets.forEach(variablesSet -> variablesSet.getModels().remove(this));
         this.variableSets.removeAll(variablesSets);
     }

@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.service.implementation.ModelServiceImpl;
+import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
@@ -85,11 +86,20 @@ public class ModelController {
     }
 
     @GetMapping(value = "/")
-    @Operation(summary = "get models names")
+    @Operation(summary = "Get models names")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "names of all models")})
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
+    }
+
+    @DeleteMapping(value = "/")
+    @Operation(summary = "Delete a list of models")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Deleted models")
+    })
+    public ResponseEntity<List<String>> deleteModels(@RequestBody List<String> modelNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteModels(modelNames));
     }
 
     // --- BEGIN parameter definition-related endpoints --- //
@@ -113,8 +123,10 @@ public class ModelController {
     @Operation(summary = "Add existing parameter definitions to model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
-    public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName, @RequestBody List<String> parameterDefinitionNames) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames));
+    public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName,
+                                                                        @RequestParam(value = "origin", required = false) ParameterOrigin origin,
+                                                                        @RequestBody List<String> parameterDefinitionNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames, origin));
     }
 
     @PatchMapping(value = "/{modelName}/parameters/definitions/remove")
