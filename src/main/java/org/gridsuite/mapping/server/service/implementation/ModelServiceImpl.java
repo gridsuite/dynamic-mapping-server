@@ -64,6 +64,7 @@ public class ModelServiceImpl implements ModelService {
     private final ModelRepository modelRepository;
     private final ModelSetsGroupRepository modelSetsGroupRepository;
     private final ModelParameterSetRepository modelParameterSetRepository;
+    private final ModelParameterRepository modelParameterRepository;
     private final ModelParameterDefinitionRepository modelParameterDefinitionRepository;
     private final ModelVariableRepository modelVariableRepository;
     private final ModelVariablesSetRepository modelVariablesSetRepository;
@@ -75,6 +76,7 @@ public class ModelServiceImpl implements ModelService {
             ModelRepository modelRepository,
             ModelSetsGroupRepository modelSetsGroupRepository,
             ModelParameterSetRepository modelParameterSetRepository,
+            ModelParameterRepository modelParameterRepository,
             ModelParameterDefinitionRepository modelParameterDefinitionRepository,
             ModelVariableRepository modelVariableRepository,
             ModelVariablesSetRepository modelVariablesSetRepository
@@ -84,6 +86,7 @@ public class ModelServiceImpl implements ModelService {
         this.modelRepository = modelRepository;
         this.modelSetsGroupRepository = modelSetsGroupRepository;
         this.modelParameterSetRepository = modelParameterSetRepository;
+        this.modelParameterRepository = modelParameterRepository;
         this.modelParameterDefinitionRepository = modelParameterDefinitionRepository;
         this.modelVariableRepository = modelVariableRepository;
         this.modelVariablesSetRepository = modelVariablesSetRepository;
@@ -170,6 +173,11 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public List<SimpleModel> getModels() {
         return modelRepository.findAll().stream().map(modelEntity -> new SimpleModel(new Model(modelEntity))).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ModelParameter> getParameters() {
+        return modelParameterRepository.findAll().stream().map(ModelParameter::new).toList();
     }
 
     @Override

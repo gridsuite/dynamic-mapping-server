@@ -45,6 +45,14 @@ public class ModelController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getAutomatonDefinitions());
     }
 
+    @GetMapping(value = "/parameters")
+    @Operation(summary = "get all parameters in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "all parameters in database")})
+    public ResponseEntity<List<ModelParameter>> getParameters() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameters());
+    }
+
     @GetMapping(value = "/parameters/set-groups")
     @Operation(summary = "get all parameter set groups in database")
     @ApiResponses(value = {

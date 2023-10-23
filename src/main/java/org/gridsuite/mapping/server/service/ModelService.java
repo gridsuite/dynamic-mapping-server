@@ -21,6 +21,8 @@ public interface ModelService {
 
     List<SimpleModel> getModels();
 
+    List<ModelParameter> getParameters();
+
     List<ParametersSetsGroup> getSetGroups();
 
     List<ParametersSet> getParameterSets();

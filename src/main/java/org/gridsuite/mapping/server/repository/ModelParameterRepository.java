@@ -7,8 +7,8 @@
 
 package org.gridsuite.mapping.server.repository;
 
-import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
-import org.gridsuite.mapping.server.model.ModelSetsGroupId;
+import org.gridsuite.mapping.server.model.ModelParameterEntity;
+import org.gridsuite.mapping.server.model.ModelParameterId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +16,5 @@ import org.springframework.stereotype.Repository;
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @Repository
-public interface ModelSetsGroupRepository extends JpaRepository<ModelSetsGroupEntity, ModelSetsGroupId> {
+public interface ModelParameterRepository extends JpaRepository<ModelParameterEntity, ModelParameterId> {
 }
