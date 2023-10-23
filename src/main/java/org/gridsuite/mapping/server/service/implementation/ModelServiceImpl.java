@@ -275,14 +275,14 @@ public class ModelServiceImpl implements ModelService {
             modelRepository.deleteAllById(modelNames);
 
             // delete all parameter definitions which are not referenced by any model
-            List<ModelParameterDefinitionEntity> toDeleteParameterDefinitions = allParameterDefinitions.stream().filter(elem -> elem.getModels().size() == 0).toList();
+            List<ModelParameterDefinitionEntity> toDeleteParameterDefinitions = allParameterDefinitions.stream().filter(elem -> elem.getModels().isEmpty()).toList();
             if (!CollectionUtils.isEmpty(toDeleteParameterDefinitions)) {
                 modelParameterDefinitionRepository.deleteAllById(toDeleteParameterDefinitions.stream()
                         .map(ModelParameterDefinitionEntity::getName).toList());
             }
 
             // delete all variable sets which are not referenced by any model
-            List<ModelVariableSetEntity> toDeleteVariableSets = allVariableSets.stream().filter(elem -> elem.getModels().size() == 0).toList();
+            List<ModelVariableSetEntity> toDeleteVariableSets = allVariableSets.stream().filter(elem -> elem.getModels().isEmpty()).toList();
             if (!CollectionUtils.isEmpty(toDeleteVariableSets)) {
                 modelVariablesSetRepository.deleteAllById(toDeleteVariableSets.stream()
                         .map(ModelVariableSetEntity::getName).toList());
@@ -290,7 +290,7 @@ public class ModelServiceImpl implements ModelService {
 
             // delete all variable definitions which are not referenced neither model nor variable set
             List<ModelVariableDefinitionEntity> toDeleteVariableDefinitions = allVariableDefinitions.stream()
-                    .filter(elem -> elem.getModels().size() == 0 && elem.getVariablesSets().size() == 0).toList();
+                    .filter(elem -> elem.getModels().isEmpty() && elem.getVariablesSets().isEmpty()).toList();
             if (!CollectionUtils.isEmpty(toDeleteVariableDefinitions)) {
                 modelVariableRepository.deleteAllById(toDeleteVariableDefinitions.stream()
                         .map(ModelVariableDefinitionEntity::getName).toList());
