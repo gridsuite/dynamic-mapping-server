@@ -21,6 +21,10 @@ public interface ModelService {
 
     List<SimpleModel> getModels();
 
+    List<ParametersSetsGroup> getSetGroups();
+
+    List<ParametersSet> getParameterSets();
+
     List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType);
 
     ParametersSetsGroup saveParametersSetsGroup(String modelName, ParametersSetsGroup setsGroup, Boolean strict);
@@ -32,6 +36,11 @@ public interface ModelService {
     ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName);
 
     // --- BEGIN parameter definition-related service methods --- //
+
+    List<String> getParameterDefinitionNames();
+
+    List<ModelParameterDefinition> getParameterDefinitions(List<String> parameterDefinitionNames);
+
     List<ModelParameterDefinition> getParameterDefinitionsFromModel(String modelName);
 
     Model addNewParameterDefinitionsToModel(String modelName, List<ModelParameterDefinition> parameterDefinitions);
@@ -49,6 +58,10 @@ public interface ModelService {
     // --- END parameter definition-related service methods --- //
 
     // --- BEGIN variable-related service methods --- //
+    List<String> getVariableDefinitionNames();
+
+    List<ModelVariableDefinition> getVariableDefinitions(List<String> variableNames);
+
     List<ModelVariableDefinition> getVariableDefinitionsFromModel(String modelName);
 
     Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions);
@@ -60,6 +73,10 @@ public interface ModelService {
     List<ModelVariableDefinition> saveNewVariableDefinitions(List<ModelVariableDefinition> variableDefinitions);
 
     Model removeAllVariableDefinitionsOnModel(String modelName);
+
+    List<String> getVariablesSetNames();
+
+    List<VariablesSet> getVariablesSes(List<String> variableSetNames);
 
     List<VariablesSet> getVariablesSetsFromModel(String modelName);
 
