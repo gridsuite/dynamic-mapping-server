@@ -1,0 +1,44 @@
+{
+  "modelName": "GeneratorSynchronousFourWindingsProportionalRegulations",
+  "equipmentType": "GENERATOR",
+  "parameterDefinitions": [],
+  "setsGroups": [],
+  "variableDefinitions": [],
+  "variablesSets": [
+    {
+      "name": "Generator",
+      "variableDefinitions": [
+        {
+          "name": "generator_omegaPu",
+          "type": "DOUBLE",
+          "unit": "pu"
+        },
+        {
+          "name": "generator_PGen",
+          "type": "DOUBLE",
+          "unit": "MW"
+        },
+        {
+          "name": "generator_QGen",
+          "type": "DOUBLE",
+          "unit": "MW"
+        },
+        {
+          "name": "generator_UStatorPu",
+          "type": "DOUBLE",
+          "unit": "pu"
+        }
+      ]
+    },
+    {
+      "name": "VoltageRegulator",
+      "variableDefinitions": [
+        {
+          "name": "voltageRegulator_EfdPu",
+          "type": "DOUBLE",
+          "unit": "pu"
+        }
+      ]
+    }
+  ]
+}

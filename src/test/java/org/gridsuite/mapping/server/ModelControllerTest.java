@@ -10,10 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import org.gridsuite.mapping.server.dto.models.Model;
-import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
-import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
-import org.gridsuite.mapping.server.dto.models.VariablesSet;
+import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelParameterDefinitionRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
@@ -41,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -216,6 +214,31 @@ public class ModelControllerTest {
                         {"name": "load_UPhase0", "type": "DOUBLE", "origin": "NETWORK", "originName": "angle_pu", "fixedValue": null}
                     ]
                 """, false));
+
+        // --- GET all names of parameter definitions in the database --- //
+        MvcResult mvcResult = mvc.perform(get("/models/parameter-definitions/names")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // check result
+        // must contain 6 names of parameter definitions in the database
+        List<String> foundParameterDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<List<String>>() { });
+        assertEquals(6, foundParameterDefinitionNames.size());
+
+        // --- GET all parameter definitions in the database --- //
+        mvcResult = mvc.perform(get("/models/parameter-definitions")
+                        .contentType(APPLICATION_JSON)
+                        .param("parameterDefinitionNames", foundParameterDefinitionNames.stream().collect(Collectors.joining(","))))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // check result
+        // must contain 6 parameter definitions in the database
+        List<ModelParameterDefinition> foundParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<List<ModelParameterDefinition>>() { });
+        assertEquals(6, foundParameterDefinitions.size());
     }
 
     @Test
@@ -306,6 +329,42 @@ public class ModelControllerTest {
                         }
                     ]
                 """, true));
+
+        // --- GET parameter set groups in the database --- //
+        MvcResult mvcResult = mvc.perform(get("/models/parameters-sets-groups")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        // check result
+        // must contain 2 parameter set groups, i.e. "LAB" and "GSTWPR"
+        List<ParametersSetsGroup> foundParametersSetsGroups = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ParametersSetsGroup>>() { });
+        assertEquals(2, foundParametersSetsGroups.size());
+
+        // --- GET parameter sets in the database --- //
+        mvcResult = mvc.perform(get("/models/parameters-sets")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        // check result
+        // must contain only 1 parameter set, i.e. "LAB"
+        List<ParametersSet> foundParametersSets = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ParametersSet>>() { });
+        assertEquals(1, foundParametersSets.size());
+
+        // --- GET parameters in the database --- //
+        mvcResult = mvc.perform(get("/models/parameters")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        // check result
+        // must contain 2 parameter, i.e. "load_alpha", "load_beta"
+        List<ModelParameter> foundParameters = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameter>>() { });
+        assertEquals(2, foundParameters.size());
     }
 
     public static String readFileAsString(String file) throws Exception {
@@ -582,6 +641,21 @@ public class ModelControllerTest {
         // must contains all initial variable definitions
         assertTrue(variableDefinitions2.containsAll(variableDefinitions));
 
+        // check in the database, must be 4 variable definitions, 2 in the initial set and 2 added later
+        mvcResult = mvc.perform(get("/models/variable-definitions/names")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        List<String> foundVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
+        assertEquals(4, foundVariableDefinitionNames.size());
+
+        mvcResult = mvc.perform(get("/models/variable-definitions")
+                        .param("variableDefinitionNames", foundVariableDefinitionNames.stream().collect(Collectors.joining(",")))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        List<ModelVariableDefinition> foundVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+        assertEquals(4, foundVariableDefinitions.size());
+
         // --- Remove an existing variable definition --- //
         mvcResult = mvc.perform(patch("/models/variables-sets/" + variablesSet.getName() + "/variables/remove")
                         .content(objectMapper.writeValueAsString(List.of(variableDefinitions2.get(3).getName())))
@@ -659,6 +733,23 @@ public class ModelControllerTest {
         // cross-check between two variables set
         Sets.SetView<ModelVariableDefinition> intersectionVariableDefinitions = Sets.intersection(new HashSet<>(fourWindingVariableDefinitions), new HashSet<>(threeWindingVariableDefinitions));
         assertEquals(2, intersectionVariableDefinitions.size());
+
+        // check in the database, must be 3 variable definitions, i.e. 2 shared variable definitions
+        // and 1 in FourWindingsSynchronousGenerator
+        mvcResult = mvc.perform(get("/models/variable-definitions/names")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        List<String> foundVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
+        assertEquals(3, foundVariableDefinitionNames.size());
+
+        mvcResult = mvc.perform(get("/models/variable-definitions")
+                        .param("variableDefinitionNames", foundVariableDefinitionNames.stream().collect(Collectors.joining(",")))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        List<ModelVariableDefinition> foundVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+        assertEquals(3, foundVariableDefinitions.size());
+
     }
 
     @Test
@@ -868,6 +959,21 @@ public class ModelControllerTest {
         // Check result
         assertEquals(1, deletedVariablesSetNames.size());
         assertEquals(variablesSet2.get(2).getName(), deletedVariablesSetNames.get(0));
+
+        // -- there is 2 variables set in database, i.e. two initial, one added, one deleted => remain 2 -- //
+        mvcResult = mvc.perform(get("/models/variables-sets/names")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        List<String> foundVariableSetNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
+        assertEquals(2, foundVariableSetNames.size());
+
+        mvcResult = mvc.perform(get("/models/variables-sets")
+                        .param("variablesSetNames", foundVariableSetNames.stream().collect(Collectors.joining(",")))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        List<VariablesSet> foundVariableSets = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<VariablesSet>>() { });
+        assertEquals(2, foundVariableSets.size());
     }
 
     @Test
@@ -1060,6 +1166,174 @@ public class ModelControllerTest {
         // db must not contain any variable set
         assertEquals(0, modelVariablesSetRepository.findAll().size());
         // db must not contain any variable definition
+        assertEquals(0, modelVariableRepository.findAll().size());
+    }
+
+    @Test
+    public void testDeleteGeneratorModelsWhichShareVariableSets() throws Exception {
+        String newGeneratorThreeWindingsModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
+        String newGeneratorFourWindingsModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousFourWindingsProportionalRegulations.json");
+
+        cleanDB();
+
+        // --- Put first time with initial variables sets for Three Windings Generator --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorThreeWindingsModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorModelThreeWindingsName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Put first time with initial variables sets for Three Windings Generator --- //
+        mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorFourWindingsModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorModelFourWindingsName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Check result --- //
+        // These models have two shared variable sets => must be present in the db
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("Generator", "VoltageRegulator"));
+        assertEquals(2, variableSets.size());
+        // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
+        assertEquals(5, modelVariableRepository.findAll().size());
+
+        // --- Delete model Three Windings Generator --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(generatorModelThreeWindingsName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model Three Windings Generator must be not exist in db
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorModelThreeWindingsName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // These models have two shared variable sets => after delete one model, shared shared variable sets must be always in db
+        variableSets = modelVariablesSetRepository.findAllById(List.of("Generator", "VoltageRegulator"));
+        assertEquals(2, variableSets.size());
+        // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
+        assertEquals(5, modelVariableRepository.findAll().size());
+
+        // --- Delete model Four Windings Generator --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(generatorModelFourWindingsName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model Three Windings Generator must be not exist in db
+        foundNoneExistingModelOpt = modelRepository.findById(generatorModelFourWindingsName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // the last model which uses shared variable sets has been deleted
+        // db must not contain any variable set
+        assertEquals(0, modelVariablesSetRepository.findAll().size());
+        // db must not contain any variable definition
+        assertEquals(0, modelVariableRepository.findAll().size());
+
+    }
+
+    @Test
+    public void testDeleteGeneratorModelsWhichShareVariableDefinitionsBetweenDifferentVariableSets() throws Exception {
+        String newGeneratorPQModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPQ.json");
+        String newGeneratorPVModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPV.json");
+
+        cleanDB();
+
+        // --- Put first time with initial variables sets for PQ Generator --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorPQModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorPQModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Put first time with initial variables sets for PV Generator --- //
+        mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorPVModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorPVModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Check result --- //
+        // These models have two shared 3 variables definitions between 2 different variable sets => must be present in the db
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPQ", "GeneratorPV"));
+        assertEquals(2, variableSets.size());
+        // Variable set GeneratorPQ and GeneratorPV share 3 variable definitions
+        assertEquals(3, modelVariableRepository.findAll().size());
+
+        // --- Delete model Generator PQ --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(generatorPQModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model Generator PQ must be not exist in db
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorPQModelName);
+        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+
+        // Variable set Generator PQ must be not exist in db
+        variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPQ"));
+        assertEquals(0, variableSets.size());
+        // 3 variable definitions used by variable set GeneratorPV must be always present in db
+        assertEquals(3, modelVariableRepository.findAll().size());
+
+        // --- Delete model Generator PV --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(generatorPVModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // Variable set Generator PV must be not exist in db
+        variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPV"));
+        assertEquals(0, variableSets.size());
+        // 3 variable definitions used by variable set GeneratorPV must be not exist in db
+        assertEquals(0, modelVariableRepository.findAll().size());
+    }
+
+    @Test
+    public void testDeleteAllGeneratorModelsWhichShareVariableDefinitionsBetweenDifferentVariableSets() throws Exception {
+        String newGeneratorPQModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPQ.json");
+        String newGeneratorPVModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPV.json");
+
+        cleanDB();
+
+        // --- Put first time with initial variables sets for PQ Generator --- //
+        MvcResult mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorPQModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorPQModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Put first time with initial variables sets for PV Generator --- //
+        mvcResult = mvc.perform(post("/models/")
+                        .content(newGeneratorPVModelJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        String generatorPVModelName = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getModelName();
+
+        // --- Check result --- //
+        // These models have two shared 3 variables definitions between 2 different variable sets => must be present in the db
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPQ", "GeneratorPV"));
+        assertEquals(2, variableSets.size());
+        // Variable set GeneratorPQ and GeneratorPV share 3 variable definitions
+        assertEquals(3, modelVariableRepository.findAll().size());
+
+        // --- Delete model Generator PQ --- //
+        mvc.perform(delete("/models/")
+                        .content(objectMapper.writeValueAsString(List.of(generatorPQModelName, generatorPVModelName)))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // --- Check result --- //
+        // model Generator PQ/PV must be not exist in db
+        List<ModelEntity> modelEntities = modelRepository.findAllById(List.of(generatorPQModelName, generatorPVModelName));
+        assertEquals(0, modelEntities.size());
+
+        // Variable set Generator PQ/PV must be not exist in db
+        variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPV", "GeneratorPQ"));
+        assertEquals(0, variableSets.size());
+        // 3 variable definitions used by variable sets GeneratorPQ/PV must be not exist in db
         assertEquals(0, modelVariableRepository.findAll().size());
     }
 }
