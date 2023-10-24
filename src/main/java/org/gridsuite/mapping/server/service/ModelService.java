@@ -23,9 +23,9 @@ public interface ModelService {
 
     List<ModelParameter> getParameters();
 
-    List<ParametersSetsGroup> getSetGroups();
+    List<ParametersSetsGroup> getParametersSetsGroups();
 
-    List<ParametersSet> getParameterSets();
+    List<ParametersSet> getParametersSets();
 
     List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType);
 
@@ -78,7 +78,7 @@ public interface ModelService {
 
     List<String> getVariablesSetNames();
 
-    List<VariablesSet> getVariablesSes(List<String> variableSetNames);
+    List<VariablesSet> getVariablesSets(List<String> variablesSetNames);
 
     List<VariablesSet> getVariablesSetsFromModel(String modelName);
 

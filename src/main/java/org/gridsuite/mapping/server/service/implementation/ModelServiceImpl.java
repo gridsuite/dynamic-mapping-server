@@ -181,12 +181,12 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public List<ParametersSetsGroup> getSetGroups() {
+    public List<ParametersSetsGroup> getParametersSetsGroups() {
         return modelSetsGroupRepository.findAll().stream().map(ParametersSetsGroup::new).toList();
     }
 
     @Override
-    public List<ParametersSet> getParameterSets() {
+    public List<ParametersSet> getParametersSets() {
         return modelParameterSetRepository.findAll().stream().map(ParametersSet::new).toList();
     }
 
@@ -585,8 +585,8 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public List<VariablesSet> getVariablesSes(List<String> variableSetNames) {
-        return modelVariablesSetRepository.findAllById(variableSetNames).stream().map(VariablesSet::new).toList();
+    public List<VariablesSet> getVariablesSets(List<String> variablesSetNames) {
+        return modelVariablesSetRepository.findAllById(variablesSetNames).stream().map(VariablesSet::new).toList();
     }
 
     @Override
