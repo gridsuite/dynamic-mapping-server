@@ -45,6 +45,30 @@ public class ModelController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getAutomatonDefinitions());
     }
 
+    @GetMapping(value = "/parameters")
+    @Operation(summary = "get all parameters in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "all parameters in database")})
+    public ResponseEntity<List<ModelParameter>> getParameters() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameters());
+    }
+
+    @GetMapping(value = "/parameters-sets-groups")
+    @Operation(summary = "get all parameter set groups in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "parameter set groups in database")})
+    public ResponseEntity<List<ParametersSetsGroup>> getParametersSetsGroups() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParametersSetsGroups());
+    }
+
+    @GetMapping(value = "/parameters-sets")
+    @Operation(summary = "get all parameter sets in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "parameter sets in database")})
+    public ResponseEntity<List<ParametersSet>> getParametersSets() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParametersSets());
+    }
+
     @GetMapping(value = "/{modelName}/parameters/sets/{groupName}/{groupType}")
     @Operation(summary = "get all parameters sets for a given group")
     @ApiResponses(value = {
@@ -103,6 +127,23 @@ public class ModelController {
     }
 
     // --- BEGIN parameter definition-related endpoints --- //
+
+    @GetMapping(value = "/parameter-definitions/names")
+    @Operation(summary = "get all parameters definitions' names in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "parameter definitions' names in database")})
+    public ResponseEntity<List<String>> getParameterDefinitionNames() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameterDefinitionNames());
+    }
+
+    @GetMapping(value = "/parameter-definitions")
+    @Operation(summary = "get parameters definitions by names")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "parameter definitions found by names")})
+    public ResponseEntity<List<ModelParameterDefinition>> getParameterDefinitions(@RequestParam("parameterDefinitionNames") List<String> parameterDefinitionNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameterDefinitions(parameterDefinitionNames));
+    }
+
     @GetMapping(value = "/{modelName}/parameters/definitions")
     @Operation(summary = "get parameters definitions for a given model")
     @ApiResponses(value = {
@@ -163,6 +204,23 @@ public class ModelController {
     // --- END parameter definition-related endpoints --- //
 
     // --- BEGIN variable-related endpoints --- //
+
+    @GetMapping(value = "/variable-definitions/names")
+    @Operation(summary = "get all variable definitions' names in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "variable definitions' names in database")})
+    public ResponseEntity<List<String>> getVariableDefinitionNames() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitionNames());
+    }
+
+    @GetMapping(value = "/variable-definitions")
+    @Operation(summary = "get variable definitions by names")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "variable definitions found by names")})
+    public ResponseEntity<List<ModelVariableDefinition>> getVariableDefinitions(@RequestParam(value = "variableDefinitionNames") List<String> variableDefinitionNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitions(variableDefinitionNames));
+    }
+
     @GetMapping(value = "/{modelName}/variables")
     @Operation(summary = "get variable definitions for a given model")
     @ApiResponses(value = {
@@ -233,6 +291,22 @@ public class ModelController {
         @ApiResponse(responseCode = "200", description = "saved variables set")})
     public ResponseEntity<VariablesSet> removeAllVariableDefinitionOnVariablesSet(@PathVariable("variableSetName") String variableSetName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllVariableDefinitionOnVariablesSet(variableSetName));
+    }
+
+    @GetMapping(value = "/variables-sets/names")
+    @Operation(summary = "get variable sets' names in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "variable sets' names in database")})
+    public ResponseEntity<List<String>> getVariablesSetNames() {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariablesSetNames());
+    }
+
+    @GetMapping(value = "/variables-sets")
+    @Operation(summary = "get variable sets in database")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "variable sets found by names")})
+    public ResponseEntity<List<VariablesSet>> getVariablesSets(@RequestParam(value = "variablesSetNames") List<String> variablesSetNames) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariablesSets(variablesSetNames));
     }
 
     @GetMapping(value = "/{modelName}/variables-sets")

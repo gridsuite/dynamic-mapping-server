@@ -1,0 +1,97 @@
+{
+    "modelName": "GeneratorPQ",
+    "equipmentType": "GENERATOR",
+    "parameterDefinitions": [
+        {
+            "name": "generator_AlphaPuPNom",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_P0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "p_pu"
+        },
+        {
+            "name": "generator_PMax",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "pMax"
+        },
+        {
+            "name": "generator_PMin",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "pMin"
+        },
+        {
+            "name": "generator_PNom",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "pMax"
+        },
+        {
+            "name": "generator_Q0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "q_pu"
+        },
+        {
+            "name": "generator_U0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "v_pu"
+        },
+        {
+            "name": "generator_UPhase0",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "angle_pu"
+        }
+    ],
+    "setsGroups": [
+        {
+            "name": "GPQ",
+            "type": "FIXED",
+            "modelName": "GeneratorPQ",
+            "sets": [
+                {
+                    "name": "GPQ",
+                    "parameters": [
+                        {
+                            "name": "generator_AlphaPuPNom",
+                            "value": "25"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variableDefinitions": [],
+    "variablesSets": [
+        {
+            "name": "GeneratorPQ",
+            "variableDefinitions": [
+                {
+                    "name": "generator_running_value",
+                    "type": "BOOL",
+                    "unit": null,
+                    "factor": null
+                },
+                {
+                    "name": "generator_QGenPu",
+                    "type": "DOUBLE",
+                    "unit": "Mvar",
+                    "factor": 100
+                },
+                {
+                    "name": "generator_PGenPu",
+                    "type": "DOUBLE",
+                    "unit": "MW",
+                    "factor": 100
+                }
+            ]
+        }
+    ]
+}

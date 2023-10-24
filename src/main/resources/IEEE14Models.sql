@@ -865,11 +865,12 @@ VALUES ('LoadAlphaBeta', 'load_PPu'),
        ('LoadAlphaBeta', 'load_QRefPu'),
        ('LoadAlphaBeta', 'load_running_value');
 
+-- variable sets for three/four windings generator models
 INSERT INTO model_variable_sets (variable_set_name, created_date)
 VALUES ('Generator', now()::timestamp),
        ('VoltageRegulator', now()::timestamp);
 
--- variables grouped in sets used in generator models
+-- variables grouped in sets used in three/four windings generator models
 INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, created_date)
 VALUES ('generator_omegaPu', 2, 'pu', NULL, now()::timestamp),
        ('generator_PGen', 2, 'MW', NULL, now()::timestamp),
@@ -907,6 +908,30 @@ VALUES ('GeneratorSynchronousThreeWindingsProportionalRegulations', 'Generator')
 INSERT INTO models_model_variable_sets (model_name, variable_set_name)
 VALUES ('GeneratorSynchronousFourWindingsProportionalRegulations', 'Generator'),
        ('GeneratorSynchronousFourWindingsProportionalRegulations', 'VoltageRegulator');
+
+-- variable sets for PQ/PV windings generator models
+INSERT INTO model_variable_sets (variable_set_name, created_date)
+VALUES ('GeneratorPQ', now()::timestamp),
+       ('GeneratorPV', now()::timestamp);
+
+-- variables grouped in sets used in PQ/PV generator models
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, created_date)
+VALUES ('generator_running_value', 1, NULL, NULL, now()::timestamp),
+       ('generator_QGenPu', 2, 'Mvar', 100, now()::timestamp),
+       ('generator_PGenPu', 2, 'MW', 100, now()::timestamp);
+
+INSERT INTO model_variable_sets_model_variable_definitions (variable_definition_name, variable_set_name)
+VALUES ('generator_running_value', 'GeneratorPQ'),
+       ('generator_QGenPu', 'GeneratorPQ'),
+       ('generator_PGenPu', 'GeneratorPQ'),
+       ('generator_running_value', 'GeneratorPV'),
+       ('generator_QGenPu', 'GeneratorPV'),
+       ('generator_PGenPu', 'GeneratorPV');
+
+-- variables sets for GeneratorPQ/GeneratorPV models
+INSERT INTO models_model_variable_sets (model_name, variable_set_name)
+VALUES ('GeneratorPQ', 'GeneratorPQ'),
+       ('GeneratorPV', 'GeneratorPV');
 
 --- model TapChangerBlockingAutomaton for VOLTAGE Equipment type
 INSERT INTO models (model_name, equipment_type, created_date)
