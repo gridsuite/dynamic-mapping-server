@@ -196,7 +196,7 @@ public class ScriptServiceImpl implements ScriptService {
             ParametersSetsGroup correspondingGroup = new ParametersSetsGroup(model.get().getSetsGroups().stream().filter(group -> group.getName().equals(groupName)).findAny().orElseThrow());
             List<ParametersSet> correspondingSets = correspondingGroup.getSets();
             List<ModelParameterDefinition> correspondingDefinitions = model.get().getParameterDefinitions().stream()
-                    .map(parameterDefinition -> new ModelParameterDefinition(parameterDefinition.getParameterDefinition(), parameterDefinition.getOrigin()))
+                    .map(parameterDefinition -> new ModelParameterDefinition(parameterDefinition.getParameterDefinition(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName()))
                     .collect(Collectors.toList());
 
             return correspondingSets.stream().map(set -> new EnrichedParametersSet(set, correspondingDefinitions)).collect(Collectors.toList());

@@ -101,16 +101,15 @@ public class ModelControllerTest {
         // add "USER" parameter definitions
         definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null));
         definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null));
-        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.USER);
+        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.USER, null);
 
         definitions.clear();
 
         // add "NETWORK" parameter definitions
-        definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu"));
-        definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu"));
-        definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu"));
-        definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu"));
-        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.NETWORK);
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu"), ParameterOrigin.NETWORK, "p_pu");
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu"), ParameterOrigin.NETWORK, "q_pu");
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu"), ParameterOrigin.NETWORK, "v_pu");
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu"), ParameterOrigin.NETWORK, "angle_pu");
 
         modelRepository.save(modelToSave);
     }

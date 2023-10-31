@@ -32,10 +32,14 @@ public class ModelModelParameterDefinitionEntity implements Serializable {
     @Column(name = "origin")
     private ParameterOrigin origin;
 
-    public ModelModelParameterDefinitionEntity(ModelEntity model, ModelParameterDefinitionEntity parameterDefinition, ParameterOrigin origin) {
+    @Column(name = "origin_name")
+    private String originName;
+
+    public ModelModelParameterDefinitionEntity(ModelEntity model, ModelParameterDefinitionEntity parameterDefinition, ParameterOrigin origin, String originName) {
         this.model = model;
         this.parameterDefinition = parameterDefinition;
         this.origin = origin;
+        this.originName = originName;
         this.id = new ModelModelParameterDefinitionId(model.getModelName(), parameterDefinition.getName());
     }
 
