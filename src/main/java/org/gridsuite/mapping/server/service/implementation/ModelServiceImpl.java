@@ -15,10 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.mapping.server.dto.models.*;
 import org.gridsuite.mapping.server.model.*;
-import org.gridsuite.mapping.server.repository.ModelParameterDefinitionRepository;
-import org.gridsuite.mapping.server.repository.ModelRepository;
-import org.gridsuite.mapping.server.repository.ModelVariableRepository;
-import org.gridsuite.mapping.server.repository.ModelVariablesSetRepository;
+import org.gridsuite.mapping.server.repository.*;
 import org.gridsuite.mapping.server.service.ModelService;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.SetGroupType;
@@ -65,6 +62,9 @@ public class ModelServiceImpl implements ModelService {
     private final ResourcePatternResolver resourcePatternResolver;
     private final ObjectMapper objectMapper;
     private final ModelRepository modelRepository;
+    private final ModelSetsGroupRepository modelSetsGroupRepository;
+    private final ModelParameterSetRepository modelParameterSetRepository;
+    private final ModelParameterRepository modelParameterRepository;
     private final ModelParameterDefinitionRepository modelParameterDefinitionRepository;
     private final ModelVariableRepository modelVariableRepository;
     private final ModelVariablesSetRepository modelVariablesSetRepository;
@@ -74,6 +74,9 @@ public class ModelServiceImpl implements ModelService {
             ResourcePatternResolver resourcePatternResolver,
             ObjectMapper objectMapper,
             ModelRepository modelRepository,
+            ModelSetsGroupRepository modelSetsGroupRepository,
+            ModelParameterSetRepository modelParameterSetRepository,
+            ModelParameterRepository modelParameterRepository,
             ModelParameterDefinitionRepository modelParameterDefinitionRepository,
             ModelVariableRepository modelVariableRepository,
             ModelVariablesSetRepository modelVariablesSetRepository
@@ -81,6 +84,9 @@ public class ModelServiceImpl implements ModelService {
         this.resourcePatternResolver = resourcePatternResolver;
         this.objectMapper = objectMapper;
         this.modelRepository = modelRepository;
+        this.modelSetsGroupRepository = modelSetsGroupRepository;
+        this.modelParameterSetRepository = modelParameterSetRepository;
+        this.modelParameterRepository = modelParameterRepository;
         this.modelParameterDefinitionRepository = modelParameterDefinitionRepository;
         this.modelVariableRepository = modelVariableRepository;
         this.modelVariablesSetRepository = modelVariablesSetRepository;
@@ -170,6 +176,21 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    public List<ModelParameter> getParameters() {
+        return modelParameterRepository.findAll().stream().map(ModelParameter::new).toList();
+    }
+
+    @Override
+    public List<ParametersSetsGroup> getParametersSetsGroups() {
+        return modelSetsGroupRepository.findAll().stream().map(ParametersSetsGroup::new).toList();
+    }
+
+    @Override
+    public List<ParametersSet> getParametersSets() {
+        return modelParameterSetRepository.findAll().stream().map(ParametersSet::new).toList();
+    }
+
+    @Override
     public List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -254,14 +275,14 @@ public class ModelServiceImpl implements ModelService {
             modelRepository.deleteAllById(modelNames);
 
             // delete all parameter definitions which are not referenced by any model
-            List<ModelParameterDefinitionEntity> toDeleteParameterDefinitions = allParameterDefinitions.stream().filter(elem -> elem.getModels().size() == 0).toList();
+            List<ModelParameterDefinitionEntity> toDeleteParameterDefinitions = allParameterDefinitions.stream().filter(elem -> elem.getModels().isEmpty()).toList();
             if (!CollectionUtils.isEmpty(toDeleteParameterDefinitions)) {
                 modelParameterDefinitionRepository.deleteAllById(toDeleteParameterDefinitions.stream()
                         .map(ModelParameterDefinitionEntity::getName).toList());
             }
 
             // delete all variable sets which are not referenced by any model
-            List<ModelVariableSetEntity> toDeleteVariableSets = allVariableSets.stream().filter(elem -> elem.getModels().size() == 0).toList();
+            List<ModelVariableSetEntity> toDeleteVariableSets = allVariableSets.stream().filter(elem -> elem.getModels().isEmpty()).toList();
             if (!CollectionUtils.isEmpty(toDeleteVariableSets)) {
                 modelVariablesSetRepository.deleteAllById(toDeleteVariableSets.stream()
                         .map(ModelVariableSetEntity::getName).toList());
@@ -269,7 +290,7 @@ public class ModelServiceImpl implements ModelService {
 
             // delete all variable definitions which are not referenced neither model nor variable set
             List<ModelVariableDefinitionEntity> toDeleteVariableDefinitions = allVariableDefinitions.stream()
-                    .filter(elem -> elem.getModels().size() == 0 && elem.getVariablesSets().size() == 0).toList();
+                    .filter(elem -> elem.getModels().isEmpty() && elem.getVariablesSets().isEmpty()).toList();
             if (!CollectionUtils.isEmpty(toDeleteVariableDefinitions)) {
                 modelVariableRepository.deleteAllById(toDeleteVariableDefinitions.stream()
                         .map(ModelVariableDefinitionEntity::getName).toList());
@@ -297,6 +318,18 @@ public class ModelServiceImpl implements ModelService {
     }
 
     // --- BEGIN parameter definition-related service methods --- //
+
+    @Override
+    public List<String> getParameterDefinitionNames() {
+        return modelParameterDefinitionRepository.findAll().stream().map(ModelParameterDefinitionEntity::getName).toList();
+    }
+
+    @Override
+    public List<ModelParameterDefinition> getParameterDefinitions(List<String> parameterDefinitionNames) {
+        return modelParameterDefinitionRepository.findAllById(parameterDefinitionNames).stream()
+                .map(parameterDefinitionEntity -> new ModelParameterDefinition(parameterDefinitionEntity, null)).toList();
+    }
+
     @Override
     public List<ModelParameterDefinition> getParameterDefinitionsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
@@ -434,6 +467,16 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    public List<String> getVariableDefinitionNames() {
+        return modelVariableRepository.findAll().stream().map(ModelVariableDefinitionEntity::getName).toList();
+    }
+
+    @Override
+    public List<ModelVariableDefinition> getVariableDefinitions(List<String> variableNames) {
+        return modelVariableRepository.findAllById(variableNames).stream().map(ModelVariableDefinition::new).toList();
+    }
+
+    @Override
     @Transactional
     public Model addNewVariableDefinitionsToModel(String modelName, List<ModelVariableDefinition> variableDefinitions) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
@@ -534,6 +577,16 @@ public class ModelServiceImpl implements ModelService {
         modelRepository.save(modelToUpdate);
 
         return new Model(modelToUpdate);
+    }
+
+    @Override
+    public List<String> getVariablesSetNames() {
+        return modelVariablesSetRepository.findAll().stream().map(ModelVariableSetEntity::getName).toList();
+    }
+
+    @Override
+    public List<VariablesSet> getVariablesSets(List<String> variablesSetNames) {
+        return modelVariablesSetRepository.findAllById(variablesSetNames).stream().map(VariablesSet::new).toList();
     }
 
     @Override
