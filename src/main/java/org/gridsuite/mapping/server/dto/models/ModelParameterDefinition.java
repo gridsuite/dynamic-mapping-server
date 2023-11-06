@@ -31,11 +31,11 @@ public class ModelParameterDefinition {
 
     private String fixedValue;
 
-    public ModelParameterDefinition(ModelParameterDefinitionEntity modelParameterDefinitionEntity, ParameterOrigin origin) {
-        name = modelParameterDefinitionEntity.getName();
-        type = modelParameterDefinitionEntity.getType();
+    public ModelParameterDefinition(ModelParameterDefinitionEntity modelParameterDefinitionEntity, ParameterOrigin origin, String originName) {
+        this.name = modelParameterDefinitionEntity.getName();
+        this.type = modelParameterDefinitionEntity.getType();
         this.origin = origin;
-        originName = modelParameterDefinitionEntity.getOriginName();
-        fixedValue = modelParameterDefinitionEntity.getFixedValue();
+        this.originName = originName;
+        this.fixedValue = modelParameterDefinitionEntity.getFixedValue();
     }
 }

@@ -327,7 +327,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public List<ModelParameterDefinition> getParameterDefinitions(List<String> parameterDefinitionNames) {
         return modelParameterDefinitionRepository.findAllById(parameterDefinitionNames).stream()
-                .map(parameterDefinitionEntity -> new ModelParameterDefinition(parameterDefinitionEntity, null)).toList();
+                .map(parameterDefinitionEntity -> new ModelParameterDefinition(parameterDefinitionEntity, null, null)).toList();
     }
 
     @Override
@@ -351,7 +351,7 @@ public class ModelServiceImpl implements ModelService {
         if (!CollectionUtils.isEmpty(parameterDefinitions)) {
             // do merge with existing list
             parameterDefinitions.forEach(parameterDefinition ->
-                modelToUpdate.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin()));
+                modelToUpdate.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin(), parameterDefinition.getOriginName()));
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
         }
@@ -361,7 +361,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     @Transactional
-    public Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames, ParameterOrigin origin) {
+    public Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames, ParameterOrigin origin, String originName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
         ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
@@ -380,7 +380,7 @@ public class ModelServiceImpl implements ModelService {
             }
 
             // do merge with existing list
-            modelToUpdate.addAllParameterDefinition(foundParameterDefinitionEntities, origin);
+            modelToUpdate.addAllParameterDefinition(foundParameterDefinitionEntities, origin, originName);
 
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -438,7 +438,7 @@ public class ModelServiceImpl implements ModelService {
                     .map(ModelParameterDefinitionEntity::new)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelParameterDefinitionEntity> savedParameterDefinitionEntities = modelParameterDefinitionRepository.saveAll(parameterDefinitionEntities);
-            return savedParameterDefinitionEntities.stream().map(entity -> new ModelParameterDefinition(entity, null)).collect(Collectors.toList());
+            return savedParameterDefinitionEntities.stream().map(entity -> new ModelParameterDefinition(entity, null, null)).collect(Collectors.toList());
         }
 
         return Collections.emptyList();

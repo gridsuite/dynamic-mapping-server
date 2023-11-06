@@ -64,11 +64,16 @@ public class ModelEntity implements Serializable {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
         if (modelToConvert.getParameterDefinitions() != null) {
-            modelToConvert.getParameterDefinitions().forEach(parameterDefinition -> this.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin()));
+            modelToConvert.getParameterDefinitions().forEach(parameterDefinition ->
+                    this.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin(), parameterDefinition.getOriginName()));
         }
-        setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream().map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
-        variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(this, null, variableDefinition)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
-        variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream().map(variablesSet -> new ModelVariableSetEntity(this, variablesSet)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
+        setsGroups = modelToConvert.getSetsGroups() != null ? modelToConvert.getSetsGroups().stream()
+                .map(group -> new ModelSetsGroupEntity(this, group)).collect(Collectors.toList()) : null;
+        variableDefinitions = modelToConvert.getVariableDefinitions() != null ? modelToConvert.getVariableDefinitions().stream()
+                .map(variableDefinition -> new ModelVariableDefinitionEntity(this, null, variableDefinition))
+                .collect(Collectors.toCollection(LinkedHashSet::new)) : null;
+        variableSets = modelToConvert.getVariablesSets() != null ? modelToConvert.getVariablesSets().stream()
+                .map(variablesSet -> new ModelVariableSetEntity(this, variablesSet)).collect(Collectors.toCollection(LinkedHashSet::new)) : null;
     }
 
     @CreatedDate
@@ -87,9 +92,10 @@ public class ModelEntity implements Serializable {
      * Add a parameter definition to the relation with the model
      * @param parameterDefinition given parameter definition to be added
      * @param origin given origin which is the extra information of the relation
+     * @param originName given originName which is the extra information of the relation
      */
-    public void addParameterDefinition(ModelParameterDefinitionEntity parameterDefinition, ParameterOrigin origin) {
-        ModelModelParameterDefinitionEntity modelModelParameterDefinitionEntity = new ModelModelParameterDefinitionEntity(this, parameterDefinition, origin);
+    public void addParameterDefinition(ModelParameterDefinitionEntity parameterDefinition, ParameterOrigin origin, String originName) {
+        ModelModelParameterDefinitionEntity modelModelParameterDefinitionEntity = new ModelModelParameterDefinitionEntity(this, parameterDefinition, origin, originName);
         parameterDefinition.getModels().add(modelModelParameterDefinitionEntity);
         this.parameterDefinitions.add(modelModelParameterDefinitionEntity);
     }
@@ -98,9 +104,10 @@ public class ModelEntity implements Serializable {
      * Add all the parameter definitions in the given collection to relation with the model
      * @param parameterDefinitions collection containing parameter definitions to be added
      * @param origin given origin which is the extra information of relations
+     * @param originName given origin which is the extra information of relations
      */
-    public void addAllParameterDefinition(Collection<ModelParameterDefinitionEntity> parameterDefinitions, ParameterOrigin origin) {
-        parameterDefinitions.forEach(parameterDefinition -> addParameterDefinition(parameterDefinition, origin));
+    public void addAllParameterDefinition(Collection<ModelParameterDefinitionEntity> parameterDefinitions, ParameterOrigin origin, String originName) {
+        parameterDefinitions.forEach(parameterDefinition -> addParameterDefinition(parameterDefinition, origin, originName));
     }
 
     /**
