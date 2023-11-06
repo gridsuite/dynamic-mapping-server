@@ -308,10 +308,10 @@ VALUES  ('load_alpha', 2, now()::timestamp),
 INSERT INTO models_model_parameter_definitions (model_name, parameter_definition_name, origin, origin_name)
 VALUES ('LoadAlphaBeta', 'load_alpha', 2, NULL),
        ('LoadAlphaBeta', 'load_beta', 2, NULL),
-       ('LoadAlphaBeta', 'load_P0Pu', 'p_pu'),
-       ('LoadAlphaBeta', 'load_Q0Pu', 'q_pu'),
-       ('LoadAlphaBeta', 'load_U0Pu', 'v_pu'),
-       ('LoadAlphaBeta', 'load_UPhase0', 'angle_pu');
+       ('LoadAlphaBeta', 'load_P0Pu', 0, 'p_pu'),
+       ('LoadAlphaBeta', 'load_Q0Pu', 0, 'q_pu'),
+       ('LoadAlphaBeta', 'load_U0Pu', 0, 'v_pu'),
+       ('LoadAlphaBeta', 'load_UPhase0', 0, 'angle_pu');
 
 INSERT INTO models_model_parameter_definitions (model_name, parameter_definition_name, origin, origin_name)
 VALUES ('LoadPQ', 'load_P0Pu', 0, 'p_pu'),
