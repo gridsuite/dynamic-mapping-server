@@ -220,7 +220,7 @@ public class ModelServiceImpl implements ModelService {
         } else {
             // If additional checks are required here, ensure that set erasure cannot happen here with sets merging.
             groupToAdd.getSets().forEach(set ->
-                    previousGroup.getSets().add(set)
+                    previousGroup.addParameterSet(set)
             );
         }
 
@@ -310,10 +310,16 @@ public class ModelServiceImpl implements ModelService {
                 .filter(setGroup -> StringUtils.equals(setGroup.getName(), groupName) && setGroup.getType() == groupType)
                 .findAny();
         ModelSetsGroupEntity setsGroup = getSetsGroupFromOptional("[" + groupName + "," + groupType.name() + "]", modelSetsGroupOpt);
-        List<ModelParameterSetEntity> sets = setsGroup.getSets();
-        setsGroup.setSets(sets.stream().filter(set -> !set.getName().equals(setName)).collect(Collectors.toList()));
 
-        modelRepository.save(modelToUpdate);
+        // do not throw exception even the given set name is not found
+        Optional<ModelParameterSetEntity> modelSetOpt = setsGroup.getSets().stream()
+                .filter(set -> StringUtils.equals(set.getName(), setName))
+                .findAny();
+        modelSetOpt.ifPresent(set -> {
+            setsGroup.removeParameterSet(set);
+            modelRepository.save(modelToUpdate);
+        });
+
         return new ParametersSetsGroup(setsGroup);
     }
 

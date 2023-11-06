@@ -59,4 +59,22 @@ public class ModelSetsGroupEntity implements Serializable {
         this.type = group.getType();
         this.sets = group.getSets().stream().map(set -> new ModelParameterSetEntity(this, set)).collect(Collectors.toList());
     }
+
+    // --- utils methods --- //
+
+    /**
+     * Add a parameter set into the set group
+     * @param parameterSet given parameter set
+     */
+    public void addParameterSet(ModelParameterSetEntity parameterSet) {
+        this.sets.add(parameterSet);
+    }
+
+    /**
+     * Remove a parameter set from a set group
+     * @param parameterSet given parameter set
+     */
+    public void removeParameterSet(ModelParameterSetEntity parameterSet) {
+        this.sets.remove(parameterSet);
+    }
 }
