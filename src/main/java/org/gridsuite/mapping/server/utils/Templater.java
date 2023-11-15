@@ -121,6 +121,9 @@ public final class Templater {
                 break;
             case GENERATOR:
                 equipmentCollection = "generators";
+                break;
+            case STATIC_VAR_COMPENSATOR:
+                equipmentCollection = "staticVarCompensators";
         }
         return equipmentCollection;
     }
@@ -133,6 +136,9 @@ public final class Templater {
                 break;
             case GENERATOR:
                 equipmentClass = "Generator";
+                break;
+            case STATIC_VAR_COMPENSATOR:
+                equipmentClass = "StaticVarCompensator";
         }
         return equipmentClass;
     }

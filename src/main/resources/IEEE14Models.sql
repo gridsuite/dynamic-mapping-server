@@ -990,3 +990,104 @@ VALUES ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_UMin', 
        ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagBeforeBlocked', 'TCB_2_5', 105.),
        ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedD', 'TCB_2_5', 1005.),
        ('TCB_2_5', 0, 'TapChangerBlockingAutomaton', 'tapChangerBlocking_tLagTransBlockedT', 'TCB_2_5', 15.);
+
+--- model StaticVarCompensator for STATIC_VAR_COMPENSATOR Equipment type
+INSERT INTO models (model_name, equipment_type, created_date)
+VALUES ('StaticVarCompensator', 9, now()::timestamp);
+
+INSERT INTO model_sets_group (model_name, name, type)
+VALUES ('StaticVarCompensator', 'SVarCT', 0);
+
+INSERT INTO model_parameter_sets (group_name, group_type, model_name, name)
+VALUES ('SVarCT', 0, 'StaticVarCompensator', 'SVarCT');
+
+INSERT INTO model_parameter_definitions (name, type, fixed_value, created_date)
+VALUES ('SVarC_BMaxPu', 2, NULL, now()::timestamp),
+       ('SVarC_BMinPu', 2, NULL, now()::timestamp),
+       ('SVarC_BShuntPu', 2, NULL, now()::timestamp),
+       ('SVarC_IMaxPu', 2, NULL, now()::timestamp),
+       ('SVarC_IMinPu', 2, NULL, now()::timestamp),
+       ('SVarC_KCurrentLimiter', 2, NULL, now()::timestamp),
+       ('SVarC_Kp', 2, NULL, now()::timestamp),
+       ('SVarC_Lambda', 2, NULL, now()::timestamp),
+       ('SVarC_Mode0', 0, NULL, now()::timestamp),
+       ('SVarC_P0Pu', 2, NULL, now()::timestamp),
+       ('SVarC_Q0Pu', 2, NULL, now()::timestamp),
+       ('SVarC_SNom', 2, NULL, now()::timestamp),
+       ('SVarC_Ti', 2, NULL, now()::timestamp),
+       ('SVarC_U0Pu', 2, NULL, now()::timestamp),
+       ('SVarC_UBlock', 2, NULL, now()::timestamp),
+       ('SVarC_UNom', 2, NULL, now()::timestamp),
+       ('SVarC_UPhase0', 2, NULL, now()::timestamp),
+       ('SVarC_URefDown', 2, NULL, now()::timestamp),
+       ('SVarC_URefUp', 2, NULL, now()::timestamp),
+       ('SVarC_UThresholdDown', 2, NULL, now()::timestamp),
+       ('SVarC_UThresholdUp', 2, NULL, now()::timestamp),
+       ('SVarC_UUnblockDown', 2, NULL, now()::timestamp),
+       ('SVarC_UUnblockUp', 2, NULL, now()::timestamp),
+       ('SVarC_tThresholdDown', 2, NULL, now()::timestamp),
+       ('SVarC_tThresholdUp', 2, NULL, now()::timestamp);
+
+INSERT INTO models_model_parameter_definitions (model_name, parameter_definition_name, origin, origin_name)
+VALUES ('StaticVarCompensator', 'SVarC_BMaxPu', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_BMinPu', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_BShuntPu', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_IMaxPu', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_IMinPu', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_KCurrentLimiter', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_Kp', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_Lambda', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_Mode0', 0, 'regulatingMode'),
+       ('StaticVarCompensator', 'SVarC_P0Pu', 0, 'p_pu'),
+       ('StaticVarCompensator', 'SVarC_Q0Pu', 0, 'q_pu'),
+       ('StaticVarCompensator', 'SVarC_SNom', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_Ti', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_U0Pu', 0, 'v_pu'),
+       ('StaticVarCompensator', 'SVarC_UBlock', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_UNom', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_UPhase0', 0, 'angle_pu'),
+       ('StaticVarCompensator', 'SVarC_URefDown', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_URefUp', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_UThresholdDown', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_UThresholdUp', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_UUnblockDown', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_UUnblockUp', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_tThresholdDown', 2, NULL),
+       ('StaticVarCompensator', 'SVarC_tThresholdUp', 2, NULL);
+
+INSERT INTO model_parameters (group_name, group_type, model_name, name, set_name, value_)
+VALUES ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_BMaxPu', 'SVarCT', 1.0678),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_BMinPu', 'SVarCT', -1.0466),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_BShuntPu', 'SVarCT', 0),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_IMaxPu', 'SVarCT', 1),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_IMinPu', 'SVarCT', -1),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_KCurrentLimiter', 'SVarCT', 8),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_Kp', 'SVarCT', 1.75),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_Lambda', 'SVarCT', 0.01),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_Mode0', 'SVarCT', 2),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_UNom', 'SVarCT', 250),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_Ti', 'SVarCT', 0.003428),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_UBlock', 'SVarCT', 5),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_SNom', 'SVarCT', 225),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_URefDown', 'SVarCT', 220),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_URefUp', 'SVarCT', 230),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_UThresholdDown', 'SVarCT', 218),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_UThresholdUp', 'SVarCT', 240),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_UUnblockDown', 'SVarCT', 180),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_UUnblockUp', 'SVarCT', 270),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_tThresholdDown', 'SVarCT', 0),
+       ('SVarCT', 0, 'StaticVarCompensator', 'SVarC_tThresholdUp', 'SVarCT', 60);
+
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, created_date)
+VALUES ('SVarC_injector_UPu', 2, NULL, NULL, now()::timestamp),
+       ('SVarC_injector_PInjPu', 2, NULL, NULL, now()::timestamp),
+       ('SVarC_injector_QInjPu', 2, NULL, NULL, now()::timestamp),
+       ('SVarC_injector_BPu', 2, NULL, NULL, now()::timestamp),
+       ('SVarC_modeHandling_mode_value', 0, NULL, NULL, now()::timestamp);
+
+INSERT INTO models_model_variable_definitions (model_name, variable_definition_name)
+VALUES ('StaticVarCompensator', 'SVarC_injector_UPu'),
+       ('StaticVarCompensator', 'SVarC_injector_PInjPu'),
+       ('StaticVarCompensator', 'SVarC_injector_QInjPu'),
+       ('StaticVarCompensator', 'SVarC_injector_BPu'),
+       ('StaticVarCompensator', 'SVarC_modeHandling_mode_value');

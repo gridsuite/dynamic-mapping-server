@@ -113,6 +113,12 @@ public class ScriptControllerTest {
         generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", generatorFourModel.getModelName(), null, SetGroupType.PREFIX, generatorFourModel));
         generatorFourModel.setSetsGroups(generatorFourGroups);
         modelRepository.save(generatorFourModel);
+
+        ModelEntity sVarModel = new ModelEntity("StaticVarCompensator", EquipmentType.STATIC_VAR_COMPENSATOR, null, null, null, null, null, null);
+        ArrayList<ModelSetsGroupEntity> sVarModelGroups = new ArrayList<>();
+        sVarModelGroups.add(new ModelSetsGroupEntity("SVarC", sVarModel.getModelName(), null, SetGroupType.PREFIX, sVarModel));
+        sVarModel.setSetsGroups(sVarModelGroups);
+        modelRepository.save(sVarModel);
     }
 
     String mapping(String name, String modelName, String groupName) {
@@ -279,6 +285,92 @@ public class ScriptControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
+    }
+
+    @Test
+    @Transactional
+    public void conversionSVarTest() throws Exception {
+
+        String equipmentId = "SVC2";
+        String equipmentType = "STATIC_VAR_COMPENSATOR";
+        String modelName = "StaticVarCompensator";
+        String groupName = "SVarC";
+        String groupList = "staticVarCompensators";
+
+        // Put data
+        mvc.perform(post("/mappings/" + equipmentId)
+                        .content(baseMapping(equipmentType, equipmentId, modelName, groupName))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // convert to script
+        mvc.perform(get("/scripts/from/" + equipmentId)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(content().json(baseScript(equipmentId, modelName, groupName, groupList), true));
+    }
+
+    private String baseMapping(String equipmentType, String name, String model, String group) {
+        return """
+                {
+                  "name": "%s",
+                  "rules": [
+                    {
+                      "composition": "filter1 || filter2",
+                      "equipmentType": "%s",
+                      "filters": [
+                        {
+                          "filterId": "filter1",
+                          "operand": "EQUALS",
+                          "property": "id",
+                          "value": ["%s"],
+                          "type": "STRING"
+                        },
+                        {
+                          "filterId": "filter2",
+                          "operand": "NOT_EQUALS",
+                          "property": "terminal.voltageLevel.substation.country.name",
+                          "value": ["FRANCE"],
+                          "type": "STRING"
+                        }
+                      ],
+                      "mappedModel": "%s",
+                      "setGroup": "%s",
+                      "groupType": "PREFIX"
+                    }
+                 ],
+                 "automata": [],
+                 "controlledParameters": false
+                }""".formatted(name, equipmentType, name, model, group);
+    }
+
+    private String baseScript(String name, String model, String group, String modelList) {
+        return """
+                {
+                "name": "%s-script",
+                "parentName": "%s",
+                "script":"/**
+                 * Copyright (c) 2021, RTE (http://www.rte-france.com)
+                 * This Source Code Form is subject to the terms of the Mozilla Public
+                 * License, v. 2.0. If a copy of the MPL was not distributed with this
+                 * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+                 */
+
+                import com.powsybl.iidm.network.%s
+
+                for (%s equipment : network.%s) {
+                          if (equipment.id.equals(\\"%s\\") || !equipment.terminal.voltageLevel.substation.country.name.equals(\\"FRANCE\\")) {
+                                 StaticVarCompensator {
+                                     staticId equipment.id
+                                     parameterSetId  \\"%s\\" + equipment.id
+                                 }
+                    }
+                }",
+                "current": true,
+                "parametersFile": null
+                }
+                """.formatted(name, name, model, model, modelList, name, group);
     }
 
     @Test
