@@ -1,0 +1,253 @@
+{
+  "modelName": "StaticVarCompensator",
+  "equipmentType": "STATIC_VAR_COMPENSATOR",
+  "parameterDefinitions": [
+    {
+      "name": "SVarC_BMaxPu",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_BMinPu",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_BShuntPu",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_IMaxPu",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_IMinPu",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_KCurrentLimiter",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_Kp",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_Lambda",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_Mode0",
+      "type": "INT",
+      "origin": "NETWORK",
+      "originName": "regulatingMode"
+    },
+    {
+      "name": "SVarC_P0Pu",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "p_pu"
+    },
+    {
+      "name": "SVarC_Q0Pu",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "q_pu"
+    },
+    {
+      "name": "SVarC_SNom",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_Ti",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_U0Pu",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "v_pu"
+    },
+    {
+      "name": "SVarC_UBlock",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_UNom",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_UPhase0",
+      "type": "DOUBLE",
+      "origin": "NETWORK",
+      "originName": "angle_pu"
+    },
+    {
+      "name": "SVarC_URefDown",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_URefUp",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_UThresholdDown",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_UThresholdUp",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_UUnblockDown",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_UUnblockUp",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_tThresholdDown",
+      "type": "DOUBLE",
+      "origin": "USER"
+    },
+    {
+      "name": "SVarC_tThresholdUp",
+      "type": "DOUBLE",
+      "origin": "USER"
+    }
+  ],
+  "setsGroups": [
+    {
+      "name": "SVarC",
+      "type": "FIXED",
+      "modelName": "StaticVarCompensator",
+      "sets": [
+        {
+          "name": "SVarC",
+          "parameters": [
+            {
+              "name": "SVarC_BMaxPu",
+              "value": "1.0678"
+            },
+            {
+              "name": "SVarC_BMinPu",
+              "value": "-1.0466"
+            },
+            {
+              "name": "SVarC_BShuntPu",
+              "value": "0"
+            },
+            {
+              "name": "SVarC_IMaxPu",
+              "value": "1"
+            },
+            {
+              "name": "SVarC_IMinPu",
+              "value": "-1"
+            },
+            {
+              "name": "SVarC_KCurrentLimiter",
+              "value": "8"
+            },
+            {
+              "name": "SVarC_Kp",
+              "value": "1.75"
+            },
+            {
+              "name": "SVarC_Lambda",
+              "value": "0.01"
+            },
+            {
+              "name": "SVarC_SNom",
+              "value": "250"
+            },
+            {
+              "name": "SVarC_Ti",
+              "value": "0.003428"
+            },
+            {
+              "name": "SVarC_UBlock",
+              "value": "5"
+            },
+            {
+              "name": "SVarC_UNom",
+              "value": "225"
+            },
+            {
+              "name": "SVarC_URefDown",
+              "value": "220"
+            },
+            {
+              "name": "SVarC_URefUp",
+              "value": "230"
+            },
+            {
+              "name": "SVarC_UThresholdDown",
+              "value": "218"
+            },
+            {
+              "name": "SVarC_UThresholdUp",
+              "value": "240"
+            },
+            {
+              "name": "SVarC_UUnblockDown",
+              "value": "180"
+            },
+            {
+              "name": "SVarC_UUnblockUp",
+              "value": "270"
+            },
+            {
+              "name": "SVarC_tThresholdDown",
+              "value": "0"
+            },
+            {
+              "name": "SVarC_tThresholdUp",
+              "value": "60"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variableDefinitions": [
+    {
+      "name": "SVarC_injector_UPu",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "SVarC_injector_PInjPu",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "SVarC_injector_QInjPu",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "SVarC_injector_BPu",
+      "type": "DOUBLE"
+    },
+    {
+      "name": "SVarC_modeHandling_mode_value",
+      "type": "INT"
+    }
+  ],
+  "variablesSets": []
+}

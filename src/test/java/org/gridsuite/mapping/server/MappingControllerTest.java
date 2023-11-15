@@ -321,6 +321,15 @@ public class MappingControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
+        // put StaticVarCompensator model
+        InputStream isStaticVarCompensator =
+                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/svarc/staticVarCompensator.json");
+        String staticVarCompensatorJson = new String(isStaticVarCompensator.readAllBytes());
+        mvc.perform(post("/models/")
+                        .content(staticVarCompensatorJson)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
         // put a mapping which uses the saved models
         String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "mapping/mapping_01.json").readAllBytes());
         // Put data
@@ -341,6 +350,7 @@ public class MappingControllerTest {
         // must contain at least LoadAlphaBeta model
         assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName())));
         assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("GeneratorSynchronousThreeWindingsProportionalRegulations", model.getModelName())));
+        assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("StaticVarCompensator", model.getModelName())));
 
     }
 }
