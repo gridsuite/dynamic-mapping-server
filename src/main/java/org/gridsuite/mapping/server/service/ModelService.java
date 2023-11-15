@@ -47,7 +47,7 @@ public interface ModelService {
 
     Model addNewParameterDefinitionsToModel(String modelName, List<ModelParameterDefinition> parameterDefinitions);
 
-    Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames, ParameterOrigin origin);
+    Model addExistingParameterDefinitionsToModel(String modelName, List<String> parameterDefinitionNames, ParameterOrigin origin, String originName);
 
     Model removeExistingParameterDefinitionsFromModel(String modelName, List<String> parameterDefinitionNames);
 

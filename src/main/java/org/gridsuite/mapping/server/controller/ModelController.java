@@ -166,8 +166,9 @@ public class ModelController {
         @ApiResponse(responseCode = "200", description = "saved model")})
     public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName,
                                                                         @RequestParam(value = "origin", required = false) ParameterOrigin origin,
+                                                                        @RequestParam(value = "originName", required = false) String originName,
                                                                         @RequestBody List<String> parameterDefinitionNames) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames, origin));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingParameterDefinitionsToModel(modelName, parameterDefinitionNames, origin, originName));
     }
 
     @PatchMapping(value = "/{modelName}/parameters/definitions/remove")

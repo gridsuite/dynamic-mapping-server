@@ -85,8 +85,8 @@ public class ModelControllerTest {
         modelParameterDefinitionRepository.deleteAll();
     }
 
-    private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type, ParameterOrigin origin, String originName) {
-        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(name, type, origin, originName, null));
+    private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type) {
+        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(name, type, null, null, null));
     }
 
     @Before
@@ -99,18 +99,17 @@ public class ModelControllerTest {
         List<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
 
         // add "USER" parameter definitions
-        definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE, ParameterOrigin.USER, null));
-        definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE, ParameterOrigin.USER, null));
-        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.USER);
+        definitions.add(createDefinitionEntity("load_alpha", ParameterType.DOUBLE));
+        definitions.add(createDefinitionEntity("load_beta", ParameterType.DOUBLE));
+        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.USER, null);
 
         definitions.clear();
 
         // add "NETWORK" parameter definitions
-        definitions.add(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "p_pu"));
-        definitions.add(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "q_pu"));
-        definitions.add(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "v_pu"));
-        definitions.add(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE, ParameterOrigin.NETWORK, "angle_pu"));
-        modelToSave.addAllParameterDefinition(definitions, ParameterOrigin.NETWORK);
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_P0Pu", ParameterType.DOUBLE), ParameterOrigin.NETWORK, "p_pu");
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_Q0Pu", ParameterType.DOUBLE), ParameterOrigin.NETWORK, "q_pu");
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_U0Pu", ParameterType.DOUBLE), ParameterOrigin.NETWORK, "v_pu");
+        modelToSave.addParameterDefinition(createDefinitionEntity("load_UPhase0", ParameterType.DOUBLE), ParameterOrigin.NETWORK, "angle_pu");
 
         modelRepository.save(modelToSave);
     }
