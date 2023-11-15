@@ -52,6 +52,24 @@
       "groupType": "FIXED",
       "composition": "true",
       "filters": []
+    },
+    {
+      "equipmentType": "STATIC_VAR_COMPENSATOR",
+      "mappedModel": "StaticVarCompensator",
+      "setGroup": "SVarCT",
+      "groupType": "FIXED",
+      "composition": "filter1",
+      "filters": [
+        {
+          "type": "NUMBER",
+          "filterId": "filter1",
+          "property": "terminal.voltageLevel.nominalV",
+          "operand": "EQUALS",
+          "value": [
+            69.0
+          ]
+        }
+      ]
     }
   ],
   "automata": [
