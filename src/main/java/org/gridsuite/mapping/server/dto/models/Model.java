@@ -27,6 +27,8 @@ public class Model {
 
     private EquipmentType equipmentType;
 
+    private boolean defaultModel;
+
     private List<ModelParameterDefinition> parameterDefinitions;
 
     private List<ParametersSetsGroup> setsGroups;
@@ -38,6 +40,7 @@ public class Model {
     public Model(ModelEntity modelEntity) {
         modelName = modelEntity.getModelName();
         equipmentType = modelEntity.getEquipmentType();
+        defaultModel = modelEntity.isDefaultModel();
         parameterDefinitions = modelEntity.getParameterDefinitions().stream()
                 .map(parameterDefinition -> new ModelParameterDefinition(parameterDefinition.getParameterDefinition(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName()))
                 .collect(Collectors.toList());

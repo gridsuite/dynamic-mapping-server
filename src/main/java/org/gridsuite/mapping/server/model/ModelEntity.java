@@ -42,6 +42,9 @@ public class ModelEntity implements Serializable {
     @Column(name = "equipment_type")
     private EquipmentType equipmentType;
 
+    @Column(name = "default_model", columnDefinition = "boolean default false")
+    private boolean defaultModel;
+
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelModelParameterDefinitionEntity> parameterDefinitions = new ArrayList<>();
 
@@ -63,6 +66,7 @@ public class ModelEntity implements Serializable {
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
+        defaultModel = modelToConvert.isDefaultModel();
         if (modelToConvert.getParameterDefinitions() != null) {
             modelToConvert.getParameterDefinitions().forEach(parameterDefinition ->
                     this.addParameterDefinition(new ModelParameterDefinitionEntity(parameterDefinition), parameterDefinition.getOrigin(), parameterDefinition.getOriginName()));
