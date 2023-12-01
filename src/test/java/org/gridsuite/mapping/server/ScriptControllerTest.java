@@ -68,7 +68,7 @@ public class ScriptControllerTest {
         cleanDB();
 
         // Prepare models
-        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, new ArrayList<>(), null, Set.of(), Set.of(), null, null);
+        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, false, new ArrayList<>(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
         ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
@@ -102,19 +102,19 @@ public class ScriptControllerTest {
 
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, false, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
         generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), null, SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
-        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, null, null, null, null, null, null);
+        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, false, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorFourGroups = new ArrayList<>();
         generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", generatorFourModel.getModelName(), null, SetGroupType.PREFIX, generatorFourModel));
         generatorFourModel.setSetsGroups(generatorFourGroups);
         modelRepository.save(generatorFourModel);
 
-        ModelEntity sVarModel = new ModelEntity("StaticVarCompensator", EquipmentType.STATIC_VAR_COMPENSATOR, null, null, null, null, null, null);
+        ModelEntity sVarModel = new ModelEntity("StaticVarCompensator", EquipmentType.STATIC_VAR_COMPENSATOR, false, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> sVarModelGroups = new ArrayList<>();
         sVarModelGroups.add(new ModelSetsGroupEntity("SVarC", sVarModel.getModelName(), null, SetGroupType.PREFIX, sVarModel));
         sVarModel.setSetsGroups(sVarModelGroups);

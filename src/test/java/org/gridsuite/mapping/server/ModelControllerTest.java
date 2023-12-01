@@ -94,7 +94,7 @@ public class ModelControllerTest {
         cleanDB();
 
         // prepare token model
-        ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD,
+        ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, false,
                 new ArrayList<>(), new ArrayList<>(), Set.of(), Set.of(), null, null);
         List<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
 
@@ -300,7 +300,7 @@ public class ModelControllerTest {
         loadModel.setSetsGroups(loadGroups);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, List.of(), null, Set.of(), Set.of(), null, null);
+        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, false, List.of(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
         generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);

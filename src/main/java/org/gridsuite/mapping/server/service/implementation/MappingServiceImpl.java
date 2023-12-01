@@ -147,13 +147,10 @@ public class MappingServiceImpl implements MappingService {
         Set<String> mappedModelNames = Stream.concat(ruleModelNames.stream(), automatonModelNames.stream())
                 .collect(Collectors.toSet());
 
-        // get model by name from db and convert to dtos
-        List<Model> mappedModels = mappedModelNames.stream()
-                .map(mappedModelName -> modelRepository.findById(mappedModelName)
-                        .map(Model::new)
-                        .orElse(null))
-                .filter(Objects::nonNull) // only keep found models
-                .collect(Collectors.toList());
+        // get model by name from db, concat to default models and convert to dtos
+        List<Model> mappedModels = Stream.concat(modelRepository.findAllById(mappedModelNames).stream(),
+                        modelRepository.findAllByDefaultModelTrue().stream())
+                .map(Model::new).toList();
 
         return mappedModels;
     }
