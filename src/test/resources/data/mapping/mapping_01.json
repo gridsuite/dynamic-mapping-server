@@ -90,7 +90,7 @@
         },
         {
           "name": "iMeasurementSide",
-          "value": "Branch.Side.TWO",
+          "value": "TwoSides.TWO",
           "type": "ENUM"
         },
         {
@@ -117,7 +117,7 @@
         },
         {
           "name": "iMeasurementSide",
-          "value": "Branch.Side.TWO",
+          "value": "TwoSides.TWO",
           "type": "ENUM"
         },
         {

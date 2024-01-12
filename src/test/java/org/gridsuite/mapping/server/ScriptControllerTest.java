@@ -189,7 +189,7 @@ public class ScriptControllerTest {
                             },
                             {
                                 "name":"iMeasurementSide",
-                                "value":"Branch.Side.ONE",
+                                "value":"TwoSides.ONE",
                                 "type":"ENUM"
                             },
                             {
@@ -235,7 +235,7 @@ public class ScriptControllerTest {
                 "     parameterSetId \\\"automaton_group\\\"\n" +
                 "     dynamicModelId \\\"cla_automaton_name\\\"\n" +
                 "     iMeasurement \\\"element_id\\\"\n" +
-                "     iMeasurementSide Branch.Side.ONE\n" +
+                "     iMeasurementSide TwoSides.ONE\n" +
                 "     controlledQuadripole \\\"element_id\\\"\n" +
                 "}\n\n" +
                 "TapChangerBlockingAutomaton {\n" +
