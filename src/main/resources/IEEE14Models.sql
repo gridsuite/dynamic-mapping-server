@@ -1091,3 +1091,17 @@ VALUES ('StaticVarCompensator', 'SVarC_injector_UPu'),
        ('StaticVarCompensator', 'SVarC_injector_QInjPu'),
        ('StaticVarCompensator', 'SVarC_injector_BPu'),
        ('StaticVarCompensator', 'SVarC_modeHandling_mode_value');
+
+--- model DefaultBus for BUS and BUSBAR_SECTION Equipment type
+INSERT INTO models (model_name, equipment_type, created_date, default_model)
+VALUES ('DefaultBus', 4, now()::timestamp, true);
+
+INSERT INTO model_variable_definitions (variable_definition_name, type, unit, factor, created_date)
+VALUES ('U_value', 2, 'kV', NULL, now()::timestamp),
+       ('Upu_value', 2, NULL, NULL, now()::timestamp),
+       ('phi_value', 2, '°', NULL, now()::timestamp);
+
+INSERT INTO models_model_variable_definitions (model_name, variable_definition_name)
+VALUES ('DefaultBus', 'U_value'),
+       ('DefaultBus', 'Upu_value'),
+       ('DefaultBus', 'phi_value');
