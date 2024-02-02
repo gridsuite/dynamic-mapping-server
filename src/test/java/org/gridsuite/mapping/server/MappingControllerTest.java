@@ -138,7 +138,7 @@ public class MappingControllerTest {
                                 },
                                 {
                                     "name":"iMeasurementSide",
-                                    "value":"Branch.Side.ONE",
+                                    "value":"TwoSides.ONE",
                                     "type":"ENUM"
                                 },
                                 {

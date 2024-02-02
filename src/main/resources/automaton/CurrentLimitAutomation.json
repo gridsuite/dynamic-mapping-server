@@ -22,11 +22,11 @@
       "label": "Side",
       "values": [
         {
-          "value": "Branch.Side.ONE",
+          "value": "TwoSides.ONE",
           "label": "One"
         },
         {
-          "value": "Branch.Side.TWO",
+          "value": "TwoSides.TWO",
           "label": "Two"
         }
       ],
