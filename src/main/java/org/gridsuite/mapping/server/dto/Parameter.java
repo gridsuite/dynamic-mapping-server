@@ -7,23 +7,21 @@
 package org.gridsuite.mapping.server.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.mapping.server.utils.EquipmentType;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
-@Schema(description = "RuleToMatch")
-public class RuleToMatch {
-    @Schema(description = "Rule Index")
-    private int ruleIndex;
+@Schema(description = "Parameter set in par format")
+@AllArgsConstructor
+public class Parameter {
 
-    @Schema(description = "Equipment type")
-    private EquipmentType equipmentType;
+    @Schema(description = "Name of the parent mapping")
+    private String parentName;
 
-    @Schema(description = "Filter")
-    private ExpertFilter filter;
+    @Schema(description = "Parameter file")
+    private String parametersFile;
+
 }
-

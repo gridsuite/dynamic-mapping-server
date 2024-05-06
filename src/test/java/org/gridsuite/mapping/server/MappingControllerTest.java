@@ -8,9 +8,14 @@ package org.gridsuite.mapping.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
+import org.gridsuite.mapping.server.service.client.filter.FilterClient;
+import org.gridsuite.mapping.server.utils.FilterClientMockUtils;
+import org.gridsuite.mapping.server.utils.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,10 +32,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -44,16 +49,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {MappingApplication.class})
 public class MappingControllerTest {
 
-    public static final String RESOURCE_PATH_DELIMETER = "/";
-    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMETER + "data";
+    public static final String RESOURCE_PATH_DELIMITER = "/";
+    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
+    public static final String MAPPING_FILE = "mapping_01.json";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MappingControllerTest.class);
+
+    private final Map<UUID, ExpertFilter> filtersMockDB = new HashMap<>();
 
     @Autowired
     private MappingRepository mappingRepository;
 
     @Autowired
     ModelRepository modelRepository;
+
+    @MockBean
+    FilterClient filterClient;
 
     @Autowired
     private MockMvc mvc;
@@ -64,137 +75,40 @@ public class MappingControllerTest {
     private void cleanDB() {
         mappingRepository.deleteAll();
         modelRepository.deleteAll();
+
+        filtersMockDB.clear();
     }
 
     @Before
     public void setUp() {
+        FilterClientMockUtils.mockAll(filtersMockDB, filterClient, objectMapper);
         cleanDB();
-    }
-
-    String mapping(String name) {
-        return """
-                {
-                    "name":"%s",
-                    "rules":[
-                        {
-                            "composition":"filter1 && filter2 && filter3 && filter4",
-                            "equipmentType":"GENERATOR",
-                            "filters":[
-                                {
-                                    "filterId":"filter1",
-                                    "operand":"EQUALS",
-                                    "property":"id",
-                                    "value":[
-                                        "test"
-                                    ],
-                                    "type":"STRING"
-                                },
-                                {
-                                    "filterId":"filter2",
-                                    "operand":"HIGHER",
-                                    "property":"minP",
-                                    "value":[
-                                        3.0
-                                    ],
-                                    "type":"NUMBER"
-                                },
-                                {
-                                    "filterId":"filter3",
-                                    "operand":"IN",
-                                    "property":"energySource",
-                                    "value":[
-                                        "OTHERS"
-                                    ],
-                                    "type":"ENUM"
-                                },
-                                {
-                                    "filterId":"filter4",
-                                    "operand":"NOT_EQUALS",
-                                    "property":"voltageRegulatorOn",
-                                    "value":true,
-                                    "type":"BOOLEAN"
-                                }
-                            ],
-                            "mappedModel":"mappedExample",
-                            "setGroup":"setGroup",
-                            "groupType":"FIXED"
-                        }
-                    ],
-                    "automata":[
-                        {
-                            "family":"CURRENT_LIMIT",
-                            "model":"CurrentLimitAutomaton",
-                            "setGroup":"automaton_group",
-                            "properties":[
-                                {
-                                    "name":"dynamicModelId",
-                                    "value":"cla_automaton_name",
-                                    "type":"STRING"
-                                },
-                                {
-                                    "name":"iMeasurement",
-                                    "value":"element_id",
-                                    "type":"STRING"
-                                },
-                                {
-                                    "name":"iMeasurementSide",
-                                    "value":"TwoSides.ONE",
-                                    "type":"ENUM"
-                                },
-                                {
-                                    "name":"controlledQuadripole",
-                                    "value":"element_id",
-                                    "type":"ENUM"
-                                }
-                            ]
-                        },
-                        {
-                            "family":"VOLTAGE",
-                            "model":"TapChangerBlockingAutomaton",
-                            "setGroup":"automaton_group_2",
-                            "properties":[
-                                {
-                                    "name":"dynamicModelId",
-                                    "value":"tcb_automaton_name",
-                                    "type":"STRING"
-                                },
-                                {
-                                    "name":"uMeasurement",
-                                    "value":"bus_id_1, bus_id_2",
-                                    "type":"STRING"
-                                },
-                                {
-                                    "name":"transformers",
-                                    "value":"load_id_1, load_id_2",
-                                    "type":"STRING"
-                                }
-                            ]
-                        }
-                    ],
-                    "controlledParameters":false
-                }
-            """
-            .formatted(name);
-
     }
 
     @Test
     public void test() throws Exception {
 
         String name = "test";
+        String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
+        InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
         // Put data
         mvc.perform(post("/mappings/" + name)
-                        .content(mapping(name))
+                        .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // get all data
-        mvc.perform(get("/mappings/")
+        MvcResult mvcResult = mvc.perform(get("/mappings/")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[" + mapping(name) + "]", true));
+                .andReturn();
+        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<InputMapping>>() {
+        });
+        assertThat(mappings.get(0).getName()).isEqualTo(name);
+        inputMapping.setName(name); // to ignore name in the following test
+        Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
 
         // delete data
         mvc.perform(delete("/mappings/" + name))
@@ -215,9 +129,12 @@ public class MappingControllerTest {
 
         String newName = "new";
 
+        String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
+        InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
+
         // Put data
         mvc.perform(post("/mappings/" + originalName)
-                        .content(mapping(originalName))
+                        .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -228,15 +145,21 @@ public class MappingControllerTest {
                 .andExpect(status().isOk());
 
         // get all data
-        mvc.perform(get("/mappings/")
+        MvcResult mvcResult = mvc.perform(get("/mappings/")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[" + mapping(newName) + "]", true));
+                .andReturn();
+
+        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<InputMapping>>() {
+        });
+        assertThat(mappings.get(0).getName()).isEqualTo(newName);
+        inputMapping.setName(newName); // to ignore name in the following test
+        Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
 
         // Add a new mapping
         mvc.perform(post("/mappings/" + originalName)
-                        .content(mapping(originalName))
+                        .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -261,29 +184,39 @@ public class MappingControllerTest {
 
         String copyName = "copy";
 
+        String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
+        InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
+
         // Put data
         mvc.perform(post("/mappings/" + originalName)
-                        .content(mapping(originalName))
+                        .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // Rename data
+        // copy data
         mvc.perform(post("/mappings/copy/" + originalName + "/to/" + copyName
                 )
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         // get all data
-        mvc.perform(get("/mappings/")
+        MvcResult mvcResult = mvc.perform(get("/mappings/")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                // Content served in alphabetical order since name  is the id
-                .andExpect(content().json("[" + mapping(originalName) + ", " + mapping(copyName) + "]", true));
+                .andReturn();
+        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<InputMapping>>() {
+        });
+        assertThat(mappings.get(0).getName()).isEqualTo(originalName);
+        assertThat(mappings.get(1).getName()).isEqualTo(copyName);
+        inputMapping.setName(originalName); // to ignore name in the following test
+        Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
+        inputMapping.setName(copyName); // to ignore name in the following test
+        Assertions.assertThat(mappings.get(1)).recursivelyEquals(inputMapping);
 
-        // Add a new mapping
+        // Add a new mapping => will replace the whole old mapping by the new one
         mvc.perform(post("/mappings/" + originalName)
-                        .content(mapping(originalName))
+                        .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -305,7 +238,7 @@ public class MappingControllerTest {
     @Transactional
     public void testGetMappedModelsList() throws Exception {
         // put LoadAlphaBetaModel model
-        InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/load/loadAlphaBeta.json");
+        InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "model/load/loadAlphaBeta.json");
         String alphaBetaModelJson = new String(isLoadAlphaBetaModel.readAllBytes());
         mvc.perform(post("/models/")
                         .content(alphaBetaModelJson)
@@ -314,7 +247,7 @@ public class MappingControllerTest {
 
         // put GeneratorSynchronousThreeWindingsProportionalRegulations model
         InputStream isGeneratorSynchronousThreeWindingsProportionalRegulations =
-                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
+                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
         String generatorSynchronousThreeWindingsProportionalRegulationsJson = new String(isGeneratorSynchronousThreeWindingsProportionalRegulations.readAllBytes());
         mvc.perform(post("/models/")
                         .content(generatorSynchronousThreeWindingsProportionalRegulationsJson)
@@ -323,7 +256,7 @@ public class MappingControllerTest {
 
         // put StaticVarCompensator model
         InputStream isStaticVarCompensator =
-                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "model/svarc/staticVarCompensator.json");
+                getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "model/svarc/staticVarCompensator.json");
         String staticVarCompensatorJson = new String(isStaticVarCompensator.readAllBytes());
         mvc.perform(post("/models/")
                         .content(staticVarCompensatorJson)
@@ -331,7 +264,7 @@ public class MappingControllerTest {
                 .andExpect(status().isOk());
 
         // put a mapping which uses the saved models
-        String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "mapping/mapping_01.json").readAllBytes());
+        String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping/mapping_01.json").readAllBytes());
         // Put data
         mvc.perform(post("/mappings/" + "mapping_01")
                         .content(mappingJson)
@@ -348,9 +281,9 @@ public class MappingControllerTest {
         LOGGER.info("resultMappedModelsListJson : " + resultMappedModelsListJson);
         List<Model> resultMappedModelsList = objectMapper.readValue(resultMappedModelsListJson, new TypeReference<List<Model>>() { });
         // must contain at least LoadAlphaBeta model
-        assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName())));
-        assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("GeneratorSynchronousThreeWindingsProportionalRegulations", model.getModelName())));
-        assertTrue(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("StaticVarCompensator", model.getModelName())));
+        assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName()))).isTrue();
+        assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("GeneratorSynchronousThreeWindingsProportionalRegulations", model.getModelName()))).isTrue();
+        assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("StaticVarCompensator", model.getModelName()))).isTrue();
 
     }
 }

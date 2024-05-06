@@ -6,6 +6,11 @@
  */
 package org.gridsuite.mapping.server.service.implementation;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.mapping.server.DynamicMappingException;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.models.Model;
@@ -15,7 +20,9 @@ import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.repository.MappingRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
+import org.gridsuite.mapping.server.repository.RuleRepository;
 import org.gridsuite.mapping.server.service.MappingService;
+import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.gridsuite.mapping.server.DynamicMappingException.Type.MAPPING_NAME_NOT_PROVIDED;
 import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
 
 /**
@@ -35,28 +43,78 @@ import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME
 @Service
 public class MappingServiceImpl implements MappingService {
 
+    public static final String CONFLICT_MAPPING_ERROR_MESSAGE = "A mapping with this name already exists";
+
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
+    private final RuleRepository ruleRepository;
+    private final FilterClient filterClient;
 
     @Autowired
     public MappingServiceImpl(
             MappingRepository mappingRepository,
-            ModelRepository modelRepository
+            ModelRepository modelRepository,
+            RuleRepository ruleRepository,
+            FilterClient filterClient
     ) {
         this.modelRepository = modelRepository;
         this.mappingRepository = mappingRepository;
+        this.ruleRepository = ruleRepository;
+        this.filterClient = filterClient;
     }
 
     @Override
     public List<InputMapping> getMappingList() {
         List<MappingEntity> mappingEntities = mappingRepository.findAll();
 
-        return mappingEntities.stream().map(InputMapping::new).collect(Collectors.toList());
+        List<InputMapping> mappings = mappingEntities.stream().map(InputMapping::new).toList();
+
+        // get all filter uuids to GET from filter-server
+        List<UUID> filterUuids = mappings.stream()
+                .flatMap(mapping -> mapping.getRules().stream())
+                .map(rule -> Optional.ofNullable(rule.getFilterUuid()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        List<ExpertFilter> filters = filterClient.getFilters(filterUuids);
+        Map<UUID, ExpertFilter> filterByUuidMap = filters.stream().collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+
+        // enrich rules with retrieved filter
+        mappings.stream().flatMap(mapping -> mapping.getRules().stream()).forEach(rule -> {
+            ExpertFilter expertFilter = filterByUuidMap.get(rule.getFilterUuid());
+            rule.setFilter(expertFilter);
+        });
+
+        return mappings;
     }
 
     @Override
     public InputMapping createMapping(String mappingName, InputMapping mapping) {
+        if (!StringUtils.isBlank(mappingName)) {
+            mapping.setName(mappingName);
+        }
+
+        if (StringUtils.isBlank(mapping.getName())) {
+            throw new DynamicMappingException(MAPPING_NAME_NOT_PROVIDED, "Mapping name not provided");
+        }
+
+        // get all filterUuids used in the mapping to delete at the end if exists
+        List<UUID> filterUuids = ruleRepository.findFilterUuidsByMappingName(mappingName);
+
+        // IMPORTANT: filter is enriched with new uuid while converting the whole mapping in cascade
+        // So must do converting before persisting filter in filter-server to ensure that new uuid is provided
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
+
+        // --- persist all filters appeared in rules in remote filter-server --- //
+        Map<UUID, ExpertFilter> filtersToCreateMap = mapping.getRules().stream()
+                .map(rule -> Optional.ofNullable(rule.getFilter()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+        filterClient.createFilters(filtersToCreateMap);
+
+        // --- persist in cascade the mapping in local database --- //
         mappingToSave.markNotNew();
         if (mappingToSave.isControlledParameters()) {
             try {
@@ -64,7 +122,7 @@ public class MappingServiceImpl implements MappingService {
                         new String[]{
                                 ruleEntity.getMappedModel(), ruleEntity.getSetGroup()
                         }
-                ).collect(Collectors.toList());
+                ).toList();
                 for (String[] instantiatedModel : instantiatedModels) {
                     ParametersSetsGroup parametersSetsGroup = Methods.getSetsGroupFromModel(instantiatedModel[0], instantiatedModel[1], modelRepository);
                     if (parametersSetsGroup.getSets().isEmpty()) {
@@ -77,16 +135,29 @@ public class MappingServiceImpl implements MappingService {
             }
         }
         mappingRepository.save(mappingToSave);
+
+        // --- clean old filters in filter-server --- //
+        if (CollectionUtils.isNotEmpty(filterUuids)) {
+            filterClient.deleteFilters(filterUuids);
+        }
+
         return mapping;
     }
 
     @Override
     public String deleteMapping(String mappingName) {
+        // get all filterUuids used in the mapping to delete if exists
+        List<UUID> filterUuids = ruleRepository.findFilterUuidsByMappingName(mappingName);
+
+        // --- delete filters in filter-server --- //
+        if (CollectionUtils.isNotEmpty(filterUuids)) {
+            filterClient.deleteFilters(filterUuids);
+        }
+
+        // --- delete the whole mapping in local db --- //
         mappingRepository.deleteById(mappingName);
         return mappingName;
     }
-
-    static String conflictMappingErrorMessage = "A Mapping with this name already exists";
 
     @Override
     public RenameObject renameMapping(String oldName, String newName) {
@@ -98,7 +169,7 @@ public class MappingServiceImpl implements MappingService {
                 mappingRepository.save(mappingToSave);
                 return new RenameObject(oldName, newName);
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE, ex);
             }
         } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
             // In case of naming of new mapping, save it to db.
@@ -107,7 +178,7 @@ public class MappingServiceImpl implements MappingService {
                 return new RenameObject(DEFAULT_MAPPING_NAME, newName);
 
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE, ex);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
@@ -120,10 +191,26 @@ public class MappingServiceImpl implements MappingService {
         if (mappingToCopy.isPresent()) {
             MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy.get());
             try {
+                // --- duplicate filters in filter-server--- //
+                // distribute new filter uuids and replace the old by the new for rule entities
+                Map<UUID, UUID> filterUuidsToDuplicateMap = copiedMapping.getRules().stream()
+                    .filter(rule -> rule.getFilterUuid() != null)
+                    .map(rule -> {
+                        UUID newFilterUuid = UUID.randomUUID();
+                        UUID oldFilterUuid = rule.getFilterUuid();
+                        rule.setFilterUuid(newFilterUuid);
+                        return Pair.of(oldFilterUuid, newFilterUuid);
+                    })
+                    .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+
+                // call filter-server API to duplicate filter
+                filterClient.duplicateFilters(filterUuidsToDuplicateMap);
+
+                // --- persist in cascade the mapping in local database --- //
                 mappingRepository.save(copiedMapping);
                 return new InputMapping(copiedMapping);
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMappingErrorMessage, ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE, ex);
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");

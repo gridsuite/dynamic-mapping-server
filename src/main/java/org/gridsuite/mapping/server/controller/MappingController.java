@@ -15,8 +15,8 @@ import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.service.MappingService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class MappingController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping"),
         @ApiResponse(responseCode = "409", description = "The mapping already exist"),
         @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
-    public ResponseEntity<InputMapping> createMapping(@PathVariable("mappingName") String mappingName, @RequestBody InputMapping mapping) {
+    public ResponseEntity<InputMapping> createMapping(@PathVariable(name = "mappingName", required = false) String mappingName, @RequestBody InputMapping mapping) {
         InputMapping createMapping = mappingService.createMapping(mappingName, mapping);
         return ResponseEntity.ok().body(createMapping);
     }
