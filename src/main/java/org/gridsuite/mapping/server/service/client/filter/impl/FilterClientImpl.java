@@ -75,7 +75,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = buildEndPointUrl(getBaseUri(), API_VERSION, FILTER_CREATE_END_POINT);
+        String endPointUrl = buildEndPointUrl(getBaseUri(), API_VERSION, FILTER_CREATE_IN_BATCH_END_POINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -102,7 +102,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyMap();
         }
 
-        String endPointUrl = buildEndPointUrl(getBaseUri(), API_VERSION, FILTER_DUPLICATE_END_POINT);
+        String endPointUrl = buildEndPointUrl(getBaseUri(), API_VERSION, FILTER_DUPLICATE_IN_BATCH_END_POINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -129,7 +129,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return;
         }
 
-        String endPointUrl = buildEndPointUrl(getBaseUri(), API_VERSION, FILTER_DELETE_END_POINT);
+        String endPointUrl = buildEndPointUrl(getBaseUri(), API_VERSION, FILTER_DELETE_IN_BATCH_END_POINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
