@@ -43,7 +43,7 @@ public final class FilterClientMockUtils {
                 return null;
             }
 
-            data.stream().forEach(filterUuid -> filtersMockDB.remove(filterUuid));
+            data.forEach(filtersMockDB::remove);
             return null;
         }).when(filterClient).deleteFilters(any());
     }
@@ -57,25 +57,28 @@ public final class FilterClientMockUtils {
                 return Collections.emptyList();
             }
 
-            return data.stream().map(filterUuid -> filtersMockDB.get(filterUuid)).toList();
+            return data.stream().map(filtersMockDB::get).toList();
         }).when(filterClient).getFilters(any());
     }
 
     public static void mockDuplicateFilters(Map<UUID, ExpertFilter> filtersMockDB, FilterClient filterClient, ObjectMapper objectMapper) {
         Mockito.doAnswer(invocation -> {
             final Object[] args = invocation.getArguments();
-            Map<UUID, UUID> data = (Map<UUID, UUID>) args[0];
+            List<UUID> data = (List<UUID>) args[0];
 
-            if (data == null || data.isEmpty()) {
+            if (CollectionUtils.isEmpty(data)) {
                 return Collections.emptyList();
             }
 
             Map<UUID, ExpertFilter> newData = new HashMap<>();
-            data.forEach((sourceUuid, newUuid) -> {
+            Map<UUID, UUID> uuidsMap = new HashMap<>();
+            data.forEach(sourceUuid -> {
                 ExpertFilter sourceFilter = filtersMockDB.get(sourceUuid);
                 try {
                     /* deep copy */
                     ExpertFilter newFilter = objectMapper.readValue(objectMapper.writeValueAsString(sourceFilter), ExpertFilter.class);
+                    UUID newUuid = UUID.randomUUID();
+                    uuidsMap.put(sourceUuid, newUuid);
                     newFilter.setId(newUuid);
                     newData.put(newUuid, newFilter);
                 } catch (JsonProcessingException e) {
@@ -84,7 +87,7 @@ public final class FilterClientMockUtils {
             });
             filtersMockDB.putAll(newData);
 
-            return List.copyOf(data.values());
+            return uuidsMap;
         }).when(filterClient).duplicateFilters(any());
     }
 

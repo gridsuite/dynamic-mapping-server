@@ -97,9 +97,9 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
     }
 
     @Override
-    public List<ExpertFilter> duplicateFilters(Map<UUID, UUID> filterUuidsToDuplicateMap) {
-        if (filterUuidsToDuplicateMap == null || filterUuidsToDuplicateMap.isEmpty()) {
-            return Collections.emptyList();
+    public Map<UUID, UUID> duplicateFilters(List<UUID> filterUuids) {
+        if (CollectionUtils.isEmpty(filterUuids)) {
+            return Collections.emptyMap();
         }
 
         String endPointUrl = buildEndPointUrl(getBaseUri(), API_VERSION, FILTER_DUPLICATE_END_POINT);
@@ -109,7 +109,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Map<UUID, UUID>> httpEntity = new HttpEntity<>(filterUuidsToDuplicateMap, headers);
+        HttpEntity<List<UUID>> httpEntity = new HttpEntity<>(filterUuids, headers);
 
         // call filter server Rest API
         try {
@@ -117,7 +117,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
                     uriComponentsBuilder.build().toUriString(),
                     HttpMethod.POST,
                     httpEntity,
-                    new ParameterizedTypeReference<List<ExpertFilter>>() { }).getBody();
+                    new ParameterizedTypeReference<Map<UUID, UUID>>() { }).getBody();
         } catch (HttpStatusCodeException e) {
             throw handleHttpError(e, CREATE_FILTER_ERROR, getObjectMapper());
         }
@@ -133,11 +133,18 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<List<UUID>> httpEntity = new HttpEntity<>(filterUuids, headers);
+
         // call filter server Rest API
         try {
-            getRestTemplate().delete(
+            getRestTemplate().exchange(
                     uriComponentsBuilder.build().toUriString(),
-                    filterUuids);
+                    HttpMethod.DELETE,
+                    httpEntity,
+                    Void.class);
         } catch (HttpStatusCodeException e) {
             throw handleHttpError(e, DELETE_FILTER_ERROR, getObjectMapper());
         }

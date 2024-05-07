@@ -27,7 +27,7 @@ public interface FilterClient {
 
     List<ExpertFilter> createFilters(Map<UUID, ExpertFilter> filtersToCreateMap);
 
-    List<ExpertFilter> duplicateFilters(Map<UUID, UUID> filterUuidsToDuplicateMap);
+    Map<UUID, UUID> duplicateFilters(List<UUID> filterUuids);
 
     void deleteFilters(List<UUID> filterUuids);
 

@@ -8,7 +8,6 @@ package org.gridsuite.mapping.server.service.implementation;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.DynamicMappingException;
 import org.gridsuite.mapping.server.dto.InputMapping;
@@ -192,19 +191,19 @@ public class MappingServiceImpl implements MappingService {
             MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy.get());
             try {
                 // --- duplicate filters in filter-server--- //
-                // distribute new filter uuids and replace the old by the new for rule entities
-                Map<UUID, UUID> filterUuidsToDuplicateMap = copiedMapping.getRules().stream()
-                    .filter(rule -> rule.getFilterUuid() != null)
-                    .map(rule -> {
-                        UUID newFilterUuid = UUID.randomUUID();
-                        UUID oldFilterUuid = rule.getFilterUuid();
-                        rule.setFilterUuid(newFilterUuid);
-                        return Pair.of(oldFilterUuid, newFilterUuid);
-                    })
-                    .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+                // get all filter uuids that needs to duplicate its corresponding filter
+                List<UUID> filterUuids = copiedMapping.getRules().stream()
+                    .map(RuleEntity::getFilterUuid)
+                    .filter(Objects::nonNull)
+                    .toList();
 
                 // call filter-server API to duplicate filter
-                filterClient.duplicateFilters(filterUuidsToDuplicateMap);
+                Map<UUID, UUID> uuidsMap = filterClient.duplicateFilters(filterUuids);
+
+                // replace the old by the new uuid for rule entities
+                copiedMapping.getRules().stream()
+                        .filter(rule -> rule.getFilterUuid() != null)
+                        .forEach(rule -> rule.setFilterUuid(uuidsMap.get(rule.getFilterUuid())));
 
                 // --- persist in cascade the mapping in local database --- //
                 mappingRepository.save(copiedMapping);
