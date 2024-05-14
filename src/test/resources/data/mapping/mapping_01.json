@@ -75,7 +75,7 @@
   "automata": [
     {
       "family": "CURRENT_LIMIT",
-      "model": "CurrentLimitAutomaton",
+      "model": "OverloadManagementSystem",
       "setGroup": "CLA_2_4",
       "properties": [
         {
@@ -94,7 +94,7 @@
           "type": "ENUM"
         },
         {
-          "name": "controlledQuadripole",
+          "name": "controlledBranch",
           "value": "_BUS____2-BUS____4-1_AC",
           "type": "STRING"
         }
@@ -102,7 +102,7 @@
     },
     {
       "family": "CURRENT_LIMIT",
-      "model": "CurrentLimitAutomaton",
+      "model": "OverloadManagementSystem",
       "setGroup": "CLA_2_5",
       "properties": [
         {
@@ -121,7 +121,7 @@
           "type": "ENUM"
         },
         {
-          "name": "controlledQuadripole",
+          "name": "controlledBranch",
           "value": "_BUS____2-BUS____5-1_AC",
           "type": "STRING"
         }

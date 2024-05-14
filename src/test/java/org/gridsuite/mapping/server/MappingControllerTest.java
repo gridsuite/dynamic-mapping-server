@@ -123,7 +123,7 @@ public class MappingControllerTest {
                     "automata":[
                         {
                             "family":"CURRENT_LIMIT",
-                            "model":"CurrentLimitAutomaton",
+                            "model":"OverloadManagementSystem",
                             "setGroup":"automaton_group",
                             "properties":[
                                 {
@@ -142,7 +142,7 @@ public class MappingControllerTest {
                                     "type":"ENUM"
                                 },
                                 {
-                                    "name":"controlledQuadripole",
+                                    "name":"controlledBranch",
                                     "value":"element_id",
                                     "type":"ENUM"
                                 }
@@ -150,7 +150,7 @@ public class MappingControllerTest {
                         },
                         {
                             "family":"VOLTAGE",
-                            "model":"TapChangerBlockingAutomaton",
+                            "model":"TapChangerBlockingAutomationSystem",
                             "setGroup":"automaton_group_2",
                             "properties":[
                                 {

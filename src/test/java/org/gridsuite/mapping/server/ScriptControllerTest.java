@@ -174,7 +174,7 @@ public class ScriptControllerTest {
                 "automata":[
                     {
                         "family":"CURRENT_LIMIT",
-                        "model":"CurrentLimitAutomaton",
+                        "model":"OverloadManagementSystem",
                         "setGroup":"automaton_group",
                         "properties":[
                             {
@@ -193,7 +193,7 @@ public class ScriptControllerTest {
                                 "type":"ENUM"
                             },
                             {
-                                "name":"controlledQuadripole",
+                                "name":"controlledBranch",
                                 "value":"element_id",
                                 "type":"STRING"
                             }
@@ -201,7 +201,7 @@ public class ScriptControllerTest {
                     },
                     {
                         "family":"VOLTAGE",
-                        "model":"TapChangerBlockingAutomaton",
+                        "model":"TapChangerBlockingAutomationSystem",
                         "setGroup":"automaton_group_2",
                         "properties":[
                             {
@@ -231,14 +231,14 @@ public class ScriptControllerTest {
 
     String scriptOutput(String scriptName, String parentName) {
         return "{\"name\":\"" + scriptName + "\",\"parentName\":\"" + parentName + "\",\"script\":\"/**\n * Copyright (c) 2021, RTE (http://www.rte-france.com)\n * This Source Code Form is subject to the terms of the Mozilla Public\n * License, v. 2.0. If a copy of the MPL was not distributed with this\n * file, You can obtain one at http://mozilla.org/MPL/2.0/.\n */\n\nimport com.powsybl.iidm.network.Generator\nimport com.powsybl.iidm.network.TwoSides\n\nfor (Generator equipment : network.generators) {\n          if (equipment.id.equals(\\\"test\\\") && equipment.minP > 3.000000 && [\\\"HYDRO\\\", \\\"OTHERS\\\"].contains(equipment.energySource) && equipment.voltageRegulatorOn != true) {\n                 GeneratorFourWindings {\n                     staticId equipment.id\n                     parameterSetId  \\\"GSFWPR\\\" + equipment.id\n                 }\n    }\n}\n\n" +
-                "CurrentLimitAutomaton {\n" +
+                "OverloadManagementSystem {\n" +
                 "     parameterSetId \\\"automaton_group\\\"\n" +
                 "     dynamicModelId \\\"cla_automaton_name\\\"\n" +
                 "     iMeasurement \\\"element_id\\\"\n" +
                 "     iMeasurementSide TwoSides.ONE\n" +
-                "     controlledQuadripole \\\"element_id\\\"\n" +
+                "     controlledBranch \\\"element_id\\\"\n" +
                 "}\n\n" +
-                "TapChangerBlockingAutomaton {\n" +
+                "TapChangerBlockingAutomationSystem {\n" +
                 "     parameterSetId \\\"automaton_group_2\\\"\n" +
                 "     dynamicModelId \\\"tcb_automaton_name\\\"\n" +
                 "     uMeasurement \\\"bus_id_1\\\", \\\"bus_id_2\\\"\n" +
