@@ -150,7 +150,7 @@ public class MappingControllerTest {
                         },
                         {
                             "family":"VOLTAGE",
-                            "model":"TapChangerBlockingAutomationSystem",
+                            "model":"TapChangerBlockingAutomaton",
                             "setGroup":"automaton_group_2",
                             "properties":[
                                 {
@@ -159,7 +159,7 @@ public class MappingControllerTest {
                                     "type":"STRING"
                                 },
                                 {
-                                    "name":"uMeasurement",
+                                    "name":"uMeasurements",
                                     "value":"bus_id_1, bus_id_2",
                                     "type":"STRING"
                                 },

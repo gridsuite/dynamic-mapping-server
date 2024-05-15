@@ -5,7 +5,7 @@
       "label": "Name",
       "isRequired": true
     },
-    "uMeasurement": {
+    "uMeasurements": {
       "type": "STRING",
       "label": "U Measurement",
       "mapping": {

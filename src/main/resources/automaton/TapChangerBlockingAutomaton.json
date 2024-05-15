@@ -1,5 +1,5 @@
 {
-  "TapChangerBlockingAutomationSystem": {
+  "TapChangerBlockingAutomaton": {
     "dynamicModelId": {
       "type": "STRING",
       "label": "Name",

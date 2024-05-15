@@ -201,7 +201,7 @@ public class ScriptControllerTest {
                     },
                     {
                         "family":"VOLTAGE",
-                        "model":"TapChangerBlockingAutomationSystem",
+                        "model":"TapChangerBlockingAutomaton",
                         "setGroup":"automaton_group_2",
                         "properties":[
                             {
@@ -210,7 +210,7 @@ public class ScriptControllerTest {
                                 "type":"STRING"
                             },
                             {
-                                "name":"uMeasurement",
+                                "name":"uMeasurements",
                                 "value":"bus_id_1, bus_id_2",
                                 "type":"STRING"
                             },
@@ -238,10 +238,10 @@ public class ScriptControllerTest {
                 "     iMeasurementSide TwoSides.ONE\n" +
                 "     controlledBranch \\\"element_id\\\"\n" +
                 "}\n\n" +
-                "TapChangerBlockingAutomationSystem {\n" +
+                "TapChangerBlockingAutomaton {\n" +
                 "     parameterSetId \\\"automaton_group_2\\\"\n" +
                 "     dynamicModelId \\\"tcb_automaton_name\\\"\n" +
-                "     uMeasurement \\\"bus_id_1\\\", \\\"bus_id_2\\\"\n" +
+                "     uMeasurements \\\"bus_id_1\\\", \\\"bus_id_2\\\"\n" +
                 "     transformers \\\"load_id_1\\\", \\\"load_id_2\\\"\n" +
                 "}" +
                 "\",\"current\": true, \"parametersFile\": null}";
