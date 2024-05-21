@@ -122,7 +122,7 @@ public class MappingControllerTest {
                     ],
                     "automata":[
                         {
-                            "family":"CURRENT_LIMIT",
+                            "family":"CURRENT",
                             "model":"OverloadManagementSystem",
                             "setGroup":"automaton_group",
                             "properties":[

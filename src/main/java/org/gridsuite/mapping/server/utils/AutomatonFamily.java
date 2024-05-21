@@ -10,6 +10,6 @@ package org.gridsuite.mapping.server.utils;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 public enum AutomatonFamily {
-    CURRENT_LIMIT,
+    CURRENT,
     VOLTAGE,
 }
