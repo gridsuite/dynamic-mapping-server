@@ -23,7 +23,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,21 +62,17 @@ public class MappingServiceImpl implements MappingService {
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
         mappingToSave.markNotNew();
         if (mappingToSave.isControlledParameters()) {
-            try {
-                List<String[]> instantiatedModels = mappingToSave.getRules().stream().map(ruleEntity ->
-                        new String[]{
-                                ruleEntity.getMappedModel(), ruleEntity.getSetGroup()
-                        }
-                ).collect(Collectors.toList());
-                for (String[] instantiatedModel : instantiatedModels) {
-                    ParametersSetsGroup parametersSetsGroup = Methods.getSetsGroupFromModel(instantiatedModel[0], instantiatedModel[1], modelRepository);
-                    if (parametersSetsGroup.getSets().isEmpty()) {
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No sets associated to the group");
+            List<String[]> instantiatedModels = mappingToSave.getRules().stream().map(ruleEntity ->
+                    new String[]{
+                            ruleEntity.getMappedModel(), ruleEntity.getSetGroup()
                     }
+            ).collect(Collectors.toList());
+            for (String[] instantiatedModel : instantiatedModels) {
+                ParametersSetsGroup parametersSetsGroup = Methods.getSetsGroupFromModel(instantiatedModel[0], instantiatedModel[1], modelRepository);
+                if (parametersSetsGroup.getSets().isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No sets associated to the group of model " +
+                        instantiatedModel[0] + ": " + instantiatedModel[1]);
                 }
-
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parameter sets not found", e);
             }
         }
         mappingRepository.save(mappingToSave);

@@ -74,8 +74,8 @@
   ],
   "automata": [
     {
-      "family": "CURRENT_LIMIT",
-      "model": "CurrentLimitAutomaton",
+      "family": "CURRENT",
+      "model": "OverloadManagementSystem",
       "setGroup": "CLA_2_4",
       "properties": [
         {
@@ -94,15 +94,15 @@
           "type": "ENUM"
         },
         {
-          "name": "controlledQuadripole",
+          "name": "controlledBranch",
           "value": "_BUS____2-BUS____4-1_AC",
           "type": "STRING"
         }
       ]
     },
     {
-      "family": "CURRENT_LIMIT",
-      "model": "CurrentLimitAutomaton",
+      "family": "CURRENT",
+      "model": "OverloadManagementSystem",
       "setGroup": "CLA_2_5",
       "properties": [
         {
@@ -121,8 +121,52 @@
           "type": "ENUM"
         },
         {
-          "name": "controlledQuadripole",
+          "name": "controlledBranch",
           "value": "_BUS____2-BUS____5-1_AC",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "family": "VOLTAGE",
+      "model": "TapChangerBlockingAutomaton",
+      "setGroup": "TCB_2_4",
+      "properties": [
+        {
+          "name": "dynamicModelId",
+          "value": "TCB_1",
+          "type": "STRING"
+        },
+        {
+          "name": "uMeasurements",
+          "value": "_BUS___11_TN, _BUS___11_TN",
+          "type": "STRING"
+        },
+        {
+          "name": "transformers",
+          "value": "_LOAD__11_EC, _LOAD__12_EC",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "family": "VOLTAGE",
+      "model": "TapChangerBlockingAutomaton",
+      "setGroup": "TCB_2_5",
+      "properties": [
+        {
+          "name": "dynamicModelId",
+          "value": "TCB_2",
+          "type": "STRING"
+        },
+        {
+          "name": "uMeasurements",
+          "value": "_BUS____4_TN",
+          "type": "STRING"
+        },
+        {
+          "name": "transformers",
+          "value": "_BUS____4-BUS____9-1_PT",
           "type": "STRING"
         }
       ]

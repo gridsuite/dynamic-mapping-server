@@ -122,8 +122,8 @@ public class MappingControllerTest {
                     ],
                     "automata":[
                         {
-                            "family":"CURRENT_LIMIT",
-                            "model":"CurrentLimitAutomaton",
+                            "family":"CURRENT",
+                            "model":"OverloadManagementSystem",
                             "setGroup":"automaton_group",
                             "properties":[
                                 {
@@ -142,7 +142,7 @@ public class MappingControllerTest {
                                     "type":"ENUM"
                                 },
                                 {
-                                    "name":"controlledQuadripole",
+                                    "name":"controlledBranch",
                                     "value":"element_id",
                                     "type":"ENUM"
                                 }
@@ -159,7 +159,7 @@ public class MappingControllerTest {
                                     "type":"STRING"
                                 },
                                 {
-                                    "name":"uMeasurement",
+                                    "name":"uMeasurements",
                                     "value":"bus_id_1, bus_id_2",
                                     "type":"STRING"
                                 },
