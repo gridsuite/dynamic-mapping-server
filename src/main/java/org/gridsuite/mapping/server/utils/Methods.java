@@ -57,9 +57,11 @@ public final class Methods {
     public static ParametersSetsGroup getSetsGroupFromModel(String modelName, String setGroupName, ModelRepository modelRepository) {
         Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
         if (foundModel.isPresent()) {
-            return new ParametersSetsGroup(foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(setGroupName)).findAny().orElseThrow());
+            return new ParametersSetsGroup(foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(setGroupName))
+                .findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No sets group associated to the model " +
+                   modelName + ": " + setGroupName)));
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No model found with this name: " + modelName);
         }
     }
 }
