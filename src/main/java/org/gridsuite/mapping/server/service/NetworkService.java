@@ -30,4 +30,6 @@ public interface NetworkService {
     Network getNetwork(UUID networkUuid);
 
     MatchedRule getNetworkMatches(UUID networkUuid, RuleToMatch ruleToMatch);
+
+    UUID deleteNetwork(UUID networkUuid);
 }

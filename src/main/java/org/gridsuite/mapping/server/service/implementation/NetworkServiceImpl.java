@@ -119,6 +119,13 @@ public class NetworkServiceImpl implements NetworkService {
         return new NetworkValues(networkUuid, equipmentValuesList);
     }
 
+    @Override
+    public UUID deleteNetwork(UUID networkUuid) {
+        networkRepository.deleteById(networkUuid);
+        networkStoreService.deleteNetwork(networkUuid);
+        return networkUuid;
+    }
+
     private void setPropertyMap(HashMap<String, Set<String>> propertyMap, String value, String propertyName) {
         if (propertyMap.containsKey(propertyName)) {
             Set<String> propertyValues = propertyMap.get(propertyName);

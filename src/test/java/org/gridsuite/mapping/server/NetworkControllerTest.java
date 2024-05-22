@@ -146,6 +146,10 @@ public class NetworkControllerTest {
         NetworkEntity actualEntity = savedNetworks.get(0);
         assertTrue(expectedEntity.getNetworkId().equals(actualEntity.getNetworkId()) && expectedEntity.getNetworkName().equals(actualEntity.getNetworkName()));
 
+        mvc.perform(MockMvcRequestBuilders.delete("/network/" + networkUUID)).andExpect(status().isOk());
+        savedNetworks = networkRepository.findAll();
+        assertEquals(0, savedNetworks.size());
+
     }
 
     private String network(UUID id, String name) {
