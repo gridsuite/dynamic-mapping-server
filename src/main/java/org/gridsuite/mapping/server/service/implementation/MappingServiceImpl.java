@@ -151,21 +151,17 @@ public class MappingServiceImpl implements MappingService {
         // --- persist in cascade the mapping in local database --- //
         mappingToSave.markNotNew();
         if (mappingToSave.isControlledParameters()) {
-            try {
-                List<String[]> instantiatedModels = mappingToSave.getRules().stream().map(ruleEntity ->
-                        new String[]{
-                                ruleEntity.getMappedModel(), ruleEntity.getSetGroup()
-                        }
-                ).toList();
-                for (String[] instantiatedModel : instantiatedModels) {
-                    ParametersSetsGroup parametersSetsGroup = Methods.getSetsGroupFromModel(instantiatedModel[0], instantiatedModel[1], modelRepository);
-                    if (parametersSetsGroup.getSets().isEmpty()) {
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No sets associated to the group");
+            List<String[]> instantiatedModels = mappingToSave.getRules().stream().map(ruleEntity ->
+                    new String[]{
+                            ruleEntity.getMappedModel(), ruleEntity.getSetGroup()
                     }
+            ).toList();
+            for (String[] instantiatedModel : instantiatedModels) {
+                ParametersSetsGroup parametersSetsGroup = Methods.getSetsGroupFromModel(instantiatedModel[0], instantiatedModel[1], modelRepository);
+                if (parametersSetsGroup.getSets().isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No sets associated to the group of model " +
+                        instantiatedModel[0] + ": " + instantiatedModel[1]);
                 }
-
-            } catch (Exception e) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parameter sets not found", e);
             }
         }
         mappingRepository.save(mappingToSave);
