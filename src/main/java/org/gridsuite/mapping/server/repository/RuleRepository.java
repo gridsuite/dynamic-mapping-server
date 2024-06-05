@@ -21,6 +21,6 @@ import java.util.UUID;
  */
 @Repository
 public interface RuleRepository extends JpaRepository<RuleEntity, UUID> {
-    @Query("SELECT rule.filterUuid FROM RuleEntity rule WHERE rule.mapping.name = :mappingName ")
+    @Query("SELECT rule.filterUuid FROM RuleEntity rule WHERE rule.mapping.name = :mappingName AND rule.filterUuid IS NOT NULL")
     List<UUID> findFilterUuidsByMappingName(@Param("mappingName") String mappingName);
 }

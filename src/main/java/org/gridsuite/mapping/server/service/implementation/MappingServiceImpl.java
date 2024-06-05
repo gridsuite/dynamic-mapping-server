@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -42,7 +43,8 @@ import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME
 @Service
 public class MappingServiceImpl implements MappingService {
 
-    public static final String CONFLICT_MAPPING_ERROR_MESSAGE = "A mapping with this name already exists";
+    public static final String CONFLICT_MAPPING_ERROR_MESSAGE = "A mapping already exists with name: ";
+    public static final String MAPPING_NOT_FOUND_ERROR_MESSAGE = "Mapping not found with name: ";
 
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
@@ -62,30 +64,63 @@ public class MappingServiceImpl implements MappingService {
         this.filterClient = filterClient;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<InputMapping> getMappingList() {
         List<MappingEntity> mappingEntities = mappingRepository.findAll();
 
         List<InputMapping> mappings = mappingEntities.stream().map(InputMapping::new).toList();
 
+        if (CollectionUtils.isNotEmpty(mappings)) {
+            // get all filter uuids to GET from filter-server
+            List<UUID> filterUuids = mappings.stream()
+                    .flatMap(mapping -> mapping.getRules().stream())
+                    .map(rule -> Optional.ofNullable(rule.getFilterUuid()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .toList();
+
+            if (CollectionUtils.isNotEmpty(filterUuids)) {
+                List<ExpertFilter> filters = filterClient.getFilters(filterUuids);
+                Map<UUID, ExpertFilter> filterByUuidMap = filters.stream().collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+
+                // enrich rules with retrieved filter
+                mappings.stream().flatMap(mapping -> mapping.getRules().stream()).forEach(rule -> {
+                    ExpertFilter expertFilter = filterByUuidMap.get(rule.getFilterUuid());
+                    rule.setFilter(expertFilter);
+                });
+            }
+        }
+
+        return mappings;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public InputMapping getMapping(String mappingName) {
+        Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingName);
+        MappingEntity mappingEntity = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingName));
+        InputMapping mapping = new InputMapping(mappingEntity);
+
         // get all filter uuids to GET from filter-server
-        List<UUID> filterUuids = mappings.stream()
-                .flatMap(mapping -> mapping.getRules().stream())
+        List<UUID> filterUuids = mapping.getRules().stream()
                 .map(rule -> Optional.ofNullable(rule.getFilterUuid()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
 
-        List<ExpertFilter> filters = filterClient.getFilters(filterUuids);
-        Map<UUID, ExpertFilter> filterByUuidMap = filters.stream().collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+        if (CollectionUtils.isNotEmpty(filterUuids)) {
+            List<ExpertFilter> filters = filterClient.getFilters(filterUuids);
+            Map<UUID, ExpertFilter> filterByUuidMap = filters.stream().collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
 
-        // enrich rules with retrieved filter
-        mappings.stream().flatMap(mapping -> mapping.getRules().stream()).forEach(rule -> {
-            ExpertFilter expertFilter = filterByUuidMap.get(rule.getFilterUuid());
-            rule.setFilter(expertFilter);
-        });
+            // enrich rules with retrieved filter
+            mapping.getRules().forEach(rule -> {
+                ExpertFilter expertFilter = filterByUuidMap.get(rule.getFilterUuid());
+                rule.setFilter(expertFilter);
+            });
+        }
 
-        return mappings;
+        return mapping;
     }
 
     @Override
@@ -168,7 +203,7 @@ public class MappingServiceImpl implements MappingService {
                 mappingRepository.save(mappingToSave);
                 return new RenameObject(oldName, newName);
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE, ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + newName, ex);
             }
         } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
             // In case of naming of new mapping, save it to db.
@@ -177,26 +212,28 @@ public class MappingServiceImpl implements MappingService {
                 return new RenameObject(DEFAULT_MAPPING_NAME, newName);
 
             } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE, ex);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + newName, ex);
             }
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + oldName);
         }
     }
 
     @Override
     public InputMapping copyMapping(String originalName, String copyName) {
-        Optional<MappingEntity> mappingToCopy = mappingRepository.findById(originalName);
-        if (mappingToCopy.isPresent()) {
-            MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy.get());
-            try {
-                // --- duplicate filters in filter-server--- //
-                // get all filter uuids that needs to duplicate its corresponding filter
-                List<UUID> filterUuids = copiedMapping.getRules().stream()
-                    .map(RuleEntity::getFilterUuid)
-                    .filter(Objects::nonNull)
-                    .toList();
+        Optional<MappingEntity> mappingToCopyOpt = mappingRepository.findById(originalName);
+        MappingEntity mappingToCopy = mappingToCopyOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + originalName));
 
+        MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy);
+        try {
+            // --- duplicate filters in filter-server--- //
+            // get all filter uuids that needs to duplicate its corresponding filter
+            List<UUID> filterUuids = copiedMapping.getRules().stream()
+                .map(RuleEntity::getFilterUuid)
+                .filter(Objects::nonNull)
+                .toList();
+
+            if (CollectionUtils.isNotEmpty(filterUuids)) {
                 // call filter-server API to duplicate filter
                 Map<UUID, UUID> uuidsMap = filterClient.duplicateFilters(filterUuids);
 
@@ -204,22 +241,21 @@ public class MappingServiceImpl implements MappingService {
                 copiedMapping.getRules().stream()
                         .filter(rule -> rule.getFilterUuid() != null)
                         .forEach(rule -> rule.setFilterUuid(uuidsMap.get(rule.getFilterUuid())));
-
-                // --- persist in cascade the mapping in local database --- //
-                mappingRepository.save(copiedMapping);
-                return new InputMapping(copiedMapping);
-            } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE, ex);
             }
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
+
+            // --- persist in cascade the mapping in local database --- //
+            mappingRepository.save(copiedMapping);
+            return new InputMapping(copiedMapping);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + copyName, ex);
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Model> getMappedModelsList(String mappingName) {
         Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingName);
-        MappingEntity mapping = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name : " + mappingName));
+        MappingEntity mapping = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingName));
 
         // models used by rule
         List<RuleEntity> ruleEntities = mapping.getRules();

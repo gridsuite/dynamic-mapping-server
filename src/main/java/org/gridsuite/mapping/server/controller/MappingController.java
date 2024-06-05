@@ -39,6 +39,13 @@ public class MappingController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappingList());
     }
 
+    @GetMapping(value = "/{mappingName}")
+    @Operation(summary = "Get a mapping by name")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Get a mapping by name")})
+    public ResponseEntity<InputMapping> getMapping(@PathVariable("mappingName") String mappingName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMapping(mappingName));
+    }
+
     @GetMapping(value = "/{mappingName}/models")
     @Operation(summary = "Get models used in the given mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mapped models")})
