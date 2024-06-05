@@ -11,7 +11,7 @@ package org.gridsuite.mapping.server.utils;
  */
 public enum PropertyType {
     BOOLEAN,
-    TWO_SIDES,
+    ENUM,
     NUMBER,
     STRING
 }
