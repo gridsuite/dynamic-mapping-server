@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server.utils.assertions;
 
 import org.assertj.core.util.CheckReturnValue;
+import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
 
 /**
@@ -16,6 +17,11 @@ import org.gridsuite.mapping.server.dto.InputMapping;
 public class Assertions extends org.assertj.core.api.Assertions {
     @CheckReturnValue
     public static <T extends InputMapping> DTOAssert<InputMapping> assertThat(T actual) {
+        return new DTOAssert<>(actual);
+    }
+
+    @CheckReturnValue
+    public static <T extends ExpertFilter> DTOAssert<ExpertFilter> assertThat(T actual) {
         return new DTOAssert<>(actual);
     }
 

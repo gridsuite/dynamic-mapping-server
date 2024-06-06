@@ -43,6 +43,7 @@ public class RestResponseEntityExceptionHandler {
             case URI_SYNTAX,
                 GET_FILTER_ERROR,
                 CREATE_FILTER_ERROR,
+                DUPLICATE_FILTER_ERROR,
                 DELETE_FILTER_ERROR
                 -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exception.getMessage());
         };
