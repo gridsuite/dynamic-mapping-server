@@ -22,7 +22,7 @@ public interface FilterClient {
     String FILTER_BASE_END_POINT = "filters";
     String FILTER_GET_END_POINT = FILTER_BASE_END_POINT + DELIMITER + "metadata";
     String FILTER_CREATE_IN_BATCH_END_POINT = FILTER_BASE_END_POINT + DELIMITER + "batch";
-    String FILTER_DUPLICATE_IN_BATCH_END_POINT = FILTER_BASE_END_POINT + DELIMITER + "batch";
+    String FILTER_DUPLICATE_IN_BATCH_END_POINT = FILTER_BASE_END_POINT + DELIMITER + "batch" + DELIMITER + "duplicate";
     String FILTER_DELETE_IN_BATCH_END_POINT = FILTER_BASE_END_POINT;
 
     List<ExpertFilter> createFilters(Map<UUID, ExpertFilter> filtersToCreateMap);
