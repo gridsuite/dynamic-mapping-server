@@ -101,6 +101,33 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
     }
 
     @Override
+    public List<ExpertFilter> updateFilters(Map<UUID, ExpertFilter> filtersToUpdateMap) {
+        if (filtersToUpdateMap == null || filtersToUpdateMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String endPointUrl = getEndPointUrl(FILTER_UPDATE_IN_BATCH_END_POINT);
+
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<Map<UUID, ExpertFilter>> httpEntity = new HttpEntity<>(filtersToUpdateMap, headers);
+
+        // call filter server Rest API
+        try {
+            return getRestTemplate().exchange(
+                    uriComponentsBuilder.build().toUriString(),
+                    HttpMethod.PUT,
+                    httpEntity,
+                    new ParameterizedTypeReference<List<ExpertFilter>>() { }).getBody();
+        } catch (HttpStatusCodeException e) {
+            throw handleHttpError(e, UPDATE_FILTER_ERROR, getObjectMapper());
+        }
+    }
+
+    @Override
     public Map<UUID, UUID> duplicateFilters(List<UUID> filterUuids) {
         if (CollectionUtils.isEmpty(filterUuids)) {
             return Collections.emptyMap();

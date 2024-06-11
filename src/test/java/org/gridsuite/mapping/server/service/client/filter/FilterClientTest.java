@@ -146,6 +146,57 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 .isEqualTo(ERROR_MESSAGE);
     }
 
+    public void testUpdateFilters() throws JsonProcessingException {
+
+        // prepare filters to update
+        List<ExpertFilter> filterList = createFilterList();
+        Map<UUID, ExpertFilter> filtersToUpdate = filterList.stream()
+                .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+
+        // mock response for test case PUT with url - /filters/batch
+        String endpointUrl = getEndpointUrl(FILTER_UPDATE_IN_BATCH_END_POINT);
+        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching(endpointUrl))
+                .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(filtersToUpdate)))
+                .willReturn(WireMock.ok()
+                        .withBody(objectMapper.writeValueAsString(filterList))
+                        .withHeader("Content-Type", "application/json; charset=utf-8")
+                ));
+
+        List<ExpertFilter> updatedFilters = filterClient.updateFilters(filtersToUpdate);
+
+        // check result
+        for (ExpertFilter filter : updatedFilters) {
+            assertThat(filter).recursivelyEquals(filtersToUpdate.get(filter.getId()));
+        }
+
+    }
+
+    @Test
+    public void testUpdateFiltersGivenException() throws JsonProcessingException {
+        // prepare filters to update
+        List<ExpertFilter> filterList = createFilterList();
+        Map<UUID, ExpertFilter> filtersToUpdate = filterList.stream()
+                .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+
+        // mock response for test case PUT with url - /filters/batch
+        String endpointUrl = getEndpointUrl(FILTER_UPDATE_IN_BATCH_END_POINT);
+        wireMockServer.stubFor(WireMock.put(WireMock.urlMatching(endpointUrl))
+                .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(filtersToUpdate)))
+                .willReturn(WireMock.serverError()
+                        .withBody(ERROR_MESSAGE_JSON)
+                ));
+
+        DynamicMappingException exception = catchThrowableOfType(
+                () -> filterClient.updateFilters(filtersToUpdate),
+                DynamicMappingException.class);
+
+        // check result
+        assertThat(exception.getType())
+                .isEqualTo(UPDATE_FILTER_ERROR);
+        assertThat(exception.getMessage())
+                .isEqualTo(ERROR_MESSAGE);
+    }
+
     @Test
     public void testDuplicateFilters() throws JsonProcessingException {
 

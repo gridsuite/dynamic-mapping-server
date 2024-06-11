@@ -16,6 +16,7 @@ public class DynamicMappingException extends RuntimeException {
         MAPPING_NAME_NOT_PROVIDED,
         GET_FILTER_ERROR,
         CREATE_FILTER_ERROR,
+        UPDATE_FILTER_ERROR,
         DUPLICATE_FILTER_ERROR,
         DELETE_FILTER_ERROR,
         FILTER_NOT_FOUND

@@ -59,9 +59,13 @@ public class Rule {
         convertedRule.setEquipmentType(equipmentType);
         convertedRule.setMapping(parentMapping);
         if (filter != null) {
-            UUID createdFilterId = UUID.randomUUID();
-            this.filter.setId(createdFilterId);
-            convertedRule.setFilterUuid(createdFilterId);
+            if (filter.getId() != null) {
+                convertedRule.setFilterUuid(filter.getId());
+            } else {
+                UUID createdFilterId = UUID.randomUUID();
+                this.filter.setId(createdFilterId);
+                convertedRule.setFilterUuid(createdFilterId);
+            }
         }
         return convertedRule;
     }

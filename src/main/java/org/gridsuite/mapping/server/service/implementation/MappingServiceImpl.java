@@ -133,19 +133,33 @@ public class MappingServiceImpl implements MappingService {
             throw new DynamicMappingException(MAPPING_NAME_NOT_PROVIDED, "Mapping name not provided");
         }
 
-        // get all filterUuids used in the mapping to delete at the end if exists
+        // get all filterUuids used previously in the mapping to infer to update/create/delete filters
         List<UUID> filterUuids = ruleRepository.findFilterUuidsByMappingName(mappingName);
 
-        // IMPORTANT: filter is enriched with new uuid while converting the whole mapping in cascade
+        // IMPORTANT: new filter is enriched with new uuid while converting the whole mapping in cascade
         // So must do converting before persisting filter in filter-server to ensure that new uuid is provided
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
 
-        // --- persist all filters appeared in rules in remote filter-server --- //
-        Map<UUID, ExpertFilter> filtersToCreateMap = mapping.getRules().stream()
+        // --- update or create filters appeared in rules in remote filter-server --- //
+        Map<Boolean, Map<UUID, ExpertFilter>> filtersToUpdateOrCreate = mapping.getRules().stream()
                 .map(rule -> Optional.ofNullable(rule.getFilter()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+                .collect(Collectors.partitioningBy(
+                    filter -> filterUuids.contains(filter.getId()),
+                    Collectors.toMap(ExpertFilter::getId, filter -> filter)
+                ));
+
+        // filters to update
+        Map<UUID, ExpertFilter> filtersToUpdateMap = filtersToUpdateOrCreate.get(Boolean.TRUE);
+
+        // filter to create
+        Map<UUID, ExpertFilter> filtersToCreateMap = filtersToUpdateOrCreate.get(Boolean.FALSE);
+
+        // filter to delete
+        List<UUID> filterUuidsToDelete = filterUuids.stream().filter(uuid -> !filtersToUpdateMap.containsKey(uuid)).toList();
+
+        filterClient.updateFilters(filtersToUpdateMap);
         filterClient.createFilters(filtersToCreateMap);
 
         // --- persist in cascade the mapping in local database --- //
@@ -166,9 +180,9 @@ public class MappingServiceImpl implements MappingService {
         }
         mappingRepository.save(mappingToSave);
 
-        // --- clean old filters in filter-server --- //
-        if (CollectionUtils.isNotEmpty(filterUuids)) {
-            filterClient.deleteFilters(filterUuids);
+        // --- clean filters in filter-server --- //
+        if (CollectionUtils.isNotEmpty(filterUuidsToDelete)) {
+            filterClient.deleteFilters(filterUuidsToDelete);
         }
 
         return mapping;
