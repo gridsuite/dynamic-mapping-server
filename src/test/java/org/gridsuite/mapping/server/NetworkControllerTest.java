@@ -18,8 +18,8 @@ import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -72,7 +72,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
-class NetworkControllerTest {
+public class NetworkControllerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkControllerTest.class);
 
@@ -98,7 +98,7 @@ class NetworkControllerTest {
     @MockBean
     private NetworkStoreService networkStoreService;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         networkRepository.deleteAll();
         mockServer = MockRestServiceServer.createServer(restTemplate);
