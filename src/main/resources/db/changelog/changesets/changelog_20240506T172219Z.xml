@@ -5,24 +5,6 @@
             <column name="filter_uuid" type="uuid"/>
         </addColumn>
     </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-8">
-        <createIndex indexName="IX_model_variable_sets_model_variable_definitionsPK" tableName="model_variable_sets_model_variable_definitions" unique="true">
-            <column name="variable_set_name"/>
-            <column name="variable_definition_name"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-9">
-        <createIndex indexName="IX_models_model_parameter_definitionsPK" tableName="models_model_parameter_definitions" unique="true">
-            <column name="model_name"/>
-            <column name="parameter_definition_name"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-10">
-        <createIndex indexName="IX_models_model_variable_definitionsPK" tableName="models_model_variable_definitions" unique="true">
-            <column name="model_name"/>
-            <column name="variable_definition_name"/>
-        </createIndex>
-    </changeSet>
     <changeSet author="phamquy (generated)" id="1715016149192-11">
         <dropForeignKeyConstraint baseTableName="FILTERS" constraintName="RULES_FILTER_FK"/>
     </changeSet>
@@ -34,23 +16,5 @@
     </changeSet>
     <changeSet author="phamquy (generated)" id="1715016149192-14">
         <dropColumn columnName="COMPOSITION" tableName="RULES"/>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-1">
-        <dropPrimaryKey tableName="model_variable_sets_model_variable_definitions"/>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-2">
-        <addPrimaryKey columnNames="variable_set_name, variable_definition_name" constraintName="model_variable_sets_model_variable_definitionsPK" tableName="model_variable_sets_model_variable_definitions"/>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-3">
-        <dropPrimaryKey tableName="models_model_parameter_definitions"/>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-4">
-        <addPrimaryKey columnNames="model_name, parameter_definition_name" constraintName="models_model_parameter_definitionsPK" tableName="models_model_parameter_definitions"/>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-5">
-        <dropPrimaryKey tableName="models_model_variable_definitions"/>
-    </changeSet>
-    <changeSet author="phamquy (generated)" id="1715016149192-6">
-        <addPrimaryKey columnNames="model_name, variable_definition_name" constraintName="models_model_variable_definitionsPK" tableName="models_model_variable_definitions"/>
     </changeSet>
 </databaseChangeLog>
