@@ -98,16 +98,26 @@ public class MappingControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // get all data
-        MvcResult mvcResult = mvc.perform(get("/mappings/")
+        // Get one mapping
+        MvcResult mvcResult = mvc.perform(get("/mappings/" + name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
-        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<InputMapping>>() {
+        InputMapping mapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        assertThat(mapping.getName()).isEqualTo(name);
+        inputMapping.setName(name); // to ignore name in the following test
+        Assertions.assertThat(mapping).recursivelyEquals(inputMapping);
+
+        // get all data
+        mvcResult = mvc.perform(get("/mappings/")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
         });
         assertThat(mappings.get(0).getName()).isEqualTo(name);
-        inputMapping.setName(name); // to ignore name in the following test
         Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
 
         // delete data
@@ -151,7 +161,7 @@ public class MappingControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
 
-        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<InputMapping>>() {
+        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
         });
         assertThat(mappings.get(0).getName()).isEqualTo(newName);
         inputMapping.setName(newName); // to ignore name in the following test
@@ -205,7 +215,7 @@ public class MappingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
-        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<InputMapping>>() {
+        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
         });
         assertThat(mappings.get(0).getName()).isEqualTo(originalName);
         assertThat(mappings.get(1).getName()).isEqualTo(copyName);
@@ -279,7 +289,7 @@ public class MappingControllerTest {
         // check result
         String resultMappedModelsListJson = result.getResponse().getContentAsString();
         LOGGER.info("resultMappedModelsListJson : " + resultMappedModelsListJson);
-        List<Model> resultMappedModelsList = objectMapper.readValue(resultMappedModelsListJson, new TypeReference<List<Model>>() { });
+        List<Model> resultMappedModelsList = objectMapper.readValue(resultMappedModelsListJson, new TypeReference<>() { });
         // must contain at least LoadAlphaBeta model
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName()))).isTrue();
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("GeneratorSynchronousThreeWindingsProportionalRegulations", model.getModelName()))).isTrue();
