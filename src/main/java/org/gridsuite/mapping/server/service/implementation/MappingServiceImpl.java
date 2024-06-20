@@ -12,6 +12,7 @@ import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.DynamicMappingException;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
+import org.gridsuite.mapping.server.dto.Rule;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
@@ -249,13 +250,28 @@ public class MappingServiceImpl implements MappingService {
 
                 // replace the old by the new uuid for rule entities
                 copiedMapping.getRules().stream()
-                        .filter(rule -> rule.getFilterUuid() != null)
-                        .forEach(rule -> rule.setFilterUuid(uuidsMap.get(rule.getFilterUuid())));
+                    .filter(rule -> rule.getFilterUuid() != null)
+                    .forEach(rule -> rule.setFilterUuid(uuidsMap.get(rule.getFilterUuid())));
             }
 
             // --- persist in cascade the mapping in local database --- //
             mappingRepository.save(copiedMapping);
-            return new InputMapping(copiedMapping);
+
+            // --- build mapping dto to return --- //
+            InputMapping mapping = new InputMapping(copiedMapping);
+            // enrich filter for rules in the returned mapping
+            Map<UUID, Rule> filterUuidRuleMap = mapping.getRules().stream()
+                    .filter(rule -> rule.getFilterUuid() != null)
+                    .collect(Collectors.toMap(Rule::getFilterUuid, rule -> rule));
+            List<UUID> newFilterUuids = filterUuidRuleMap.keySet().stream().toList();
+            if (CollectionUtils.isNotEmpty(newFilterUuids)) {
+                List<ExpertFilter> newFilters = filterClient.getFilters(newFilterUuids);
+                Map<UUID, ExpertFilter> filterUuidFilterMap = newFilters.stream()
+                    .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+                filterUuidRuleMap.forEach((filterUuid, rule) -> rule.setFilter(filterUuidFilterMap.get(filterUuid)));
+            }
+
+            return mapping;
         } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + copyName, ex);
         }
