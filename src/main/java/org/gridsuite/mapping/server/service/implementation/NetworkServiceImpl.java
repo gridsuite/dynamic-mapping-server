@@ -260,6 +260,7 @@ public class NetworkServiceImpl implements NetworkService {
         parts.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
+        // upload case
         ResponseEntity<String> response = restTemplate.exchange(
                 caseServerBaseUri + "/" + CASE_API_VERSION + "/cases",
                 HttpMethod.POST,
@@ -272,7 +273,15 @@ public class NetworkServiceImpl implements NetworkService {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
         UUID caseUuid = UUID.fromString(responseBody.substring(1, 37));
-        String url = networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid + "&isAsyncRun=false";
+
+        // get case format after uploaded
+        String caseFormat = restTemplate.getForEntity(
+                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/" + caseUuid + "/format",
+                String.class
+        ).getBody();
+
+        // do conversion
+        String url = networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid + "&caseFormat=" + caseFormat + "&isAsyncRun=false";
         NetworkIdentification networkIdentification = restTemplate.postForEntity(url, Collections.emptyMap(), NetworkIdentification.class).getBody();
         if (networkIdentification == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
