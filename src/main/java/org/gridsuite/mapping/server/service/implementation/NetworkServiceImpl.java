@@ -261,18 +261,18 @@ public class NetworkServiceImpl implements NetworkService {
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
         // upload case
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<UUID> response = restTemplate.exchange(
                 caseServerBaseUri + "/" + CASE_API_VERSION + "/cases",
                 HttpMethod.POST,
                 requestEntity,
-                // Cannot convert to UUID in test mocks
-                String.class
+                UUID.class
         );
-        String responseBody = response.getBody();
-        if (responseBody == null) {
+
+        if (response.getBody() == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }
-        UUID caseUuid = UUID.fromString(responseBody.substring(1, 37));
+
+        UUID caseUuid = response.getBody();
 
         // get case format after uploaded
         String caseFormat = restTemplate.getForEntity(

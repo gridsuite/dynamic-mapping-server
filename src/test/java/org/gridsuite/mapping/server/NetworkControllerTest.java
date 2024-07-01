@@ -57,7 +57,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.TEXT_PLAIN;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -112,21 +111,30 @@ public class NetworkControllerTest {
 
         UUID caseUUID = UUID.randomUUID();
         UUID networkUUID = UUID.randomUUID();
+        String caseFormat = "iidm";
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test.iidm",
                 MediaType.TEXT_PLAIN_VALUE,
                 "This is a network".getBytes());
 
-        // Mock call to case-server for import
+        // Mock call to case-server for import case
         mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(TEXT_PLAIN)
+                        .contentType(APPLICATION_JSON)
                         .body("\"" + caseUUID + "\""));
 
+        // Mock call to case-server for get case format
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases/" + caseUUID + "/format")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(APPLICATION_JSON)
+                        .body(caseFormat));
+
         // Mock call to case-server for conversion
-        mockServer.expect(ExpectedCount.once(), requestTo(new URI(networkConversionApiUri + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUUID + "&isAsyncRun=false")))
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(networkConversionApiUri +
+            NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUUID + "&caseFormat=" + caseFormat + "&isAsyncRun=false")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(APPLICATION_JSON)
