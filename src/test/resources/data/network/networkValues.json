@@ -4,95 +4,78 @@
     {
       "type": "GENERATOR",
       "values": {
-        "terminal.voltageLevel.nominalV": [
-          "400.0"
-        ],
-        "terminal.voltageLevel.substation.country.name": [
-          "FRANCE"
-        ],
-        "id": [
+        "ID": [
           "generator1"
         ],
-        "energySource": [
+        "ENERGY_SOURCE": [
           "NUCLEAR"
         ],
-        "voltageRegulatorOn": [
+        "VOLTAGE_REGULATOR_ON": [
           "true"
+        ],
+        "COUNTRY": [
+          "FR"
+        ],
+        "NOMINAL_VOLTAGE": [
+          "400.0"
         ]
       }
     },
     {
       "type": "LOAD",
       "values": {
-        "loadType": [
+        "ID": [
+          "load1"
+        ],
+        "LOAD_TYPE": [
           "UNDEFINED"
         ],
-        "terminal.voltageLevel.nominalV": [
+        "COUNTRY": [
+          "FR"
+        ],
+        "NOMINAL_VOLTAGE": [
           "400.0"
-        ],
-        "terminal.voltageLevel.substation.country.name": [
-          "FRANCE"
-        ],
-        "id": [
-          "load1"
         ]
       }
     },
     {
       "type": "BUS",
       "values": {
-        "terminal.voltageLevel.nominalV": [
-          "400.0"
-        ],
-        "terminal.voltageLevel.substation.country.name": [
-          "FRANCE"
-        ],
-        "id": [
+        "ID": [
           "voltageLevel1_0",
           "voltageLevel1_1"
+        ],
+        "COUNTRY": [
+          "FR"
+        ],
+        "NOMINAL_VOLTAGE": [
+          "400.0"
         ]
       }
     },
     {
       "type": "LINE",
       "values": {
-
       }
     },
     {
       "type": "TWO_WINDINGS_TRANSFORMER",
       "values": {
-        "terminal.voltageLevel.substation.country.name": [
-          "FRANCE"
-        ]
       }
     },
     {
       "type": "SHUNT_COMPENSATOR",
       "values": {
-        "terminal.voltageLevel.nominalV": [
-          "400.0"
-        ],
-        "terminal.voltageLevel.substation.country.name": [
-          "FRANCE"
-        ]
       }
     },
     {
       "type": "STATIC_VAR_COMPENSATOR",
       "values": {
-        "terminal.voltageLevel.nominalV": [
-          "400.0"
-        ],
-        "terminal.voltageLevel.substation.country.name":[
-          "FRANCE"
-        ]
       }
     },
     {
       "type": "HVDC_LINE",
       "values": {
-
       }
     }
   ]

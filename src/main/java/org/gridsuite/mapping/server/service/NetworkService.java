@@ -7,9 +7,9 @@
 package org.gridsuite.mapping.server.service;
 
 import com.powsybl.iidm.network.Network;
-import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.gridsuite.mapping.server.dto.MatchedRule;
 import org.gridsuite.mapping.server.dto.NetworkValues;
+import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.springframework.web.multipart.MultipartFile;
 

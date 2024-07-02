@@ -1,0 +1,52 @@
+{
+  "ruleIndex": 1,
+  "equipmentType":"LOAD",
+  "filter": {
+    "equipmentType": "LOAD",
+    "type": "EXPERT",
+    "rules" : {
+      "combinator": "OR",
+      "dataType": "COMBINATOR",
+      "rules": [
+        {
+          "dataType": "STRING",
+          "field": "ID",
+          "operator": "NOT_IN",
+          "values": [
+            "load1"
+          ]
+        },
+        {
+          "dataType": "ENUM",
+          "field": "COUNTRY",
+          "operator": "NOT_EQUALS",
+          "value": "FR"
+        },
+        {
+          "dataType": "ENUM",
+          "field": "COUNTRY",
+          "operator": "IN",
+          "values": [
+            "GE"
+          ]
+        },
+        {
+          "dataType": "NUMBER",
+          "field": "NOMINAL_VOLTAGE",
+          "operator": "NOT_IN",
+          "values": [
+            20,
+            60,
+            400
+          ]
+        },
+        {
+          "dataType": "ENUM",
+          "field": "LOAD_TYPE",
+          "operator": "EQUALS",
+          "value": "UNDEFINED"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "ruleIndex": 1,
+  "equipmentType":"GENERATOR",
+  "filter": {
+    "equipmentType": "GENERATOR",
+    "type": "EXPERT",
+    "rules" : {
+      "combinator": "OR",
+      "dataType": "COMBINATOR",
+      "rules": [
+        {
+          "combinator": "AND",
+          "dataType": "COMBINATOR",
+          "rules": [
+            {
+              "combinator": "OR",
+              "dataType": "COMBINATOR",
+              "rules": [
+                {
+                  "dataType": "STRING",
+                  "field": "ID",
+                  "operator": "IS",
+                  "value": "generator1"
+                },
+                {
+                  "dataType": "NUMBER",
+                  "field": "NOMINAL_VOLTAGE",
+                  "operator": "GREATER",
+                  "value": 3.0
+                },
+                {
+                  "dataType": "STRING",
+                  "field": "ID",
+                  "operator": "CONTAINS",
+                  "value": "generator"
+                },
+                {
+                  "dataType": "STRING",
+                  "field": "ID",
+                  "operator": "ENDS_WITH",
+                  "value": "1"
+                }
+              ]
+            },
+            {
+              "combinator": "OR",
+              "dataType": "COMBINATOR",
+              "rules": [
+                {
+                  "dataType": "BOOLEAN",
+                  "field": "VOLTAGE_REGULATOR_ON",
+                  "operator": "EQUALS",
+                  "value": true
+                },
+                {
+                  "dataType": "NUMBER",
+                  "field": "NOMINAL_VOLTAGE",
+                  "operator": "GREATER_OR_EQUALS",
+                  "value": 400
+                },
+                {
+                  "dataType": "NUMBER",
+                  "field": "NOMINAL_VOLTAGE",
+                  "operator": "IN",
+                  "values": [
+                    20,
+                    60,
+                    400
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dataType": "BOOLEAN",
+          "field": "VOLTAGE_REGULATOR_ON",
+          "operator": "NOT_EQUALS",
+          "value": true
+        },
+        {
+          "dataType": "ENUM",
+          "field": "ENERGY_SOURCE",
+          "operator": "EQUALS",
+          "value": "OTHERS"
+        }
+      ]
+    }
+  }
+}
