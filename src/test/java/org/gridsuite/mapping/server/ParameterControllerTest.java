@@ -43,8 +43,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 public class ParameterControllerTest {
-    public static final String RESOURCE_PATH_DELIMETER = "/";
-    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMETER + "data";
+    public static final String RESOURCE_PATH_DELIMITER = "/";
+    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
     public static final String MAPPING_FILE = "mapping_01.json";
     private final Map<UUID, ExpertFilter> filtersMockDB = new HashMap<>();
 
@@ -146,7 +146,7 @@ public class ParameterControllerTest {
 
         String name = "test";
 
-        String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMETER + "mapping" + RESOURCE_PATH_DELIMETER + MAPPING_FILE;
+        String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
         // Put data
