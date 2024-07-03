@@ -8,7 +8,10 @@ package org.gridsuite.mapping.server.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
@@ -26,6 +29,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @Schema(description = "Rule")
 public class Rule {
+    @Schema(description = "Rule id")
+    private UUID id;
+
     @Schema(description = "Equipment type")
     private EquipmentType equipmentType;
 
@@ -39,20 +45,19 @@ public class Rule {
     private SetGroupType groupType;
 
     @Schema(description = "Filter")
-    @Setter
     private ExpertFilter filter;
 
     @JsonIgnore
     private UUID filterUuid;
 
-    public ExpertFilter getFilter() {
-        return filter;
-    }
-
     public RuleEntity convertRuleToEntity(MappingEntity parentMapping) {
-        UUID createdId = UUID.randomUUID();
         RuleEntity convertedRule = new RuleEntity();
-        convertedRule.setRuleId(createdId);
+        if (this.id != null) {
+            convertedRule.setRuleId(this.id);
+        } else {
+            UUID createdId = UUID.randomUUID();
+            convertedRule.setRuleId(createdId);
+        }
         convertedRule.setMappedModel(mappedModel);
         convertedRule.setSetGroup(setGroup);
         convertedRule.setGroupType(groupType);
@@ -71,6 +76,7 @@ public class Rule {
     }
 
     public Rule(RuleEntity ruleEntity) {
+        id = ruleEntity.getRuleId();
         equipmentType = ruleEntity.getEquipmentType();
         mappedModel = ruleEntity.getMappedModel();
         setGroup = ruleEntity.getSetGroup();

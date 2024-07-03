@@ -65,6 +65,28 @@ public class MappingServiceImpl implements MappingService {
         this.filterClient = filterClient;
     }
 
+    private void enrichFiltersForMappings(List<InputMapping> mappings) {
+        // collect filterIds to a set (avoid duplication)
+        Set<UUID> filterIds = mappings.stream()
+            .flatMap(mapping -> mapping.getRules().stream())
+            .map(Rule::getFilterUuid)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        if (CollectionUtils.isNotEmpty(filterIds)) {
+            // retrieve from filter server then indexing
+            List<ExpertFilter> filters = filterClient.getFilters(filterIds.stream().toList());
+            Map<UUID, ExpertFilter> filterIdFilterMap = filters.stream()
+                .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
+
+            // enrich filter for each rule
+            mappings.stream()
+                .flatMap(mapping -> mapping.getRules().stream()
+                    .filter(rule -> rule.getFilterUuid() != null))
+                .forEach(rule -> rule.setFilter(filterIdFilterMap.get(rule.getFilterUuid())));
+        }
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<InputMapping> getMappingList() {
@@ -72,26 +94,7 @@ public class MappingServiceImpl implements MappingService {
 
         List<InputMapping> mappings = mappingEntities.stream().map(InputMapping::new).toList();
 
-        if (CollectionUtils.isNotEmpty(mappings)) {
-            // get all filter uuids to GET from filter-server
-            List<UUID> filterUuids = mappings.stream()
-                    .flatMap(mapping -> mapping.getRules().stream())
-                    .map(rule -> Optional.ofNullable(rule.getFilterUuid()))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .toList();
-
-            if (CollectionUtils.isNotEmpty(filterUuids)) {
-                List<ExpertFilter> filters = filterClient.getFilters(filterUuids);
-                Map<UUID, ExpertFilter> filterByUuidMap = filters.stream().collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
-
-                // enrich rules with retrieved filter
-                mappings.stream().flatMap(mapping -> mapping.getRules().stream()).forEach(rule -> {
-                    ExpertFilter expertFilter = filterByUuidMap.get(rule.getFilterUuid());
-                    rule.setFilter(expertFilter);
-                });
-            }
-        }
+        enrichFiltersForMappings(mappings);
 
         return mappings;
     }
@@ -101,25 +104,10 @@ public class MappingServiceImpl implements MappingService {
     public InputMapping getMapping(String mappingName) {
         Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingName);
         MappingEntity mappingEntity = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingName));
+
+        // --- build mapping dto to return --- //
         InputMapping mapping = new InputMapping(mappingEntity);
-
-        // get all filter uuids to GET from filter-server
-        List<UUID> filterUuids = mapping.getRules().stream()
-                .map(rule -> Optional.ofNullable(rule.getFilterUuid()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
-
-        if (CollectionUtils.isNotEmpty(filterUuids)) {
-            List<ExpertFilter> filters = filterClient.getFilters(filterUuids);
-            Map<UUID, ExpertFilter> filterByUuidMap = filters.stream().collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
-
-            // enrich rules with retrieved filter
-            mapping.getRules().forEach(rule -> {
-                ExpertFilter expertFilter = filterByUuidMap.get(rule.getFilterUuid());
-                rule.setFilter(expertFilter);
-            });
-        }
+        enrichFiltersForMappings(List.of(mapping));
 
         return mapping;
     }
@@ -179,14 +167,18 @@ public class MappingServiceImpl implements MappingService {
                 }
             }
         }
-        mappingRepository.save(mappingToSave);
+        MappingEntity savedMappingEntity = mappingRepository.save(mappingToSave);
 
         // --- clean filters in filter-server --- //
         if (CollectionUtils.isNotEmpty(filterUuidsToDelete)) {
             filterClient.deleteFilters(filterUuidsToDelete);
         }
 
-        return mapping;
+        // --- build mapping dto to return --- //
+        InputMapping returnMapping = new InputMapping(savedMappingEntity);
+        enrichFiltersForMappings(List.of(returnMapping));
+
+        return returnMapping;
     }
 
     @Override
@@ -255,21 +247,11 @@ public class MappingServiceImpl implements MappingService {
             }
 
             // --- persist in cascade the mapping in local database --- //
-            mappingRepository.save(copiedMapping);
+            MappingEntity savedMappingEntity = mappingRepository.save(copiedMapping);
 
             // --- build mapping dto to return --- //
-            InputMapping mapping = new InputMapping(copiedMapping);
-            // enrich filter for rules in the returned mapping
-            Map<UUID, Rule> filterUuidRuleMap = mapping.getRules().stream()
-                    .filter(rule -> rule.getFilterUuid() != null)
-                    .collect(Collectors.toMap(Rule::getFilterUuid, rule -> rule));
-            List<UUID> newFilterUuids = filterUuidRuleMap.keySet().stream().toList();
-            if (CollectionUtils.isNotEmpty(newFilterUuids)) {
-                List<ExpertFilter> newFilters = filterClient.getFilters(newFilterUuids);
-                Map<UUID, ExpertFilter> filterUuidFilterMap = newFilters.stream()
-                    .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
-                filterUuidRuleMap.forEach((filterUuid, rule) -> rule.setFilter(filterUuidFilterMap.get(filterUuid)));
-            }
+            InputMapping mapping = new InputMapping(savedMappingEntity);
+            enrichFiltersForMappings(List.of(mapping));
 
             return mapping;
         } catch (DataIntegrityViolationException ex) {
