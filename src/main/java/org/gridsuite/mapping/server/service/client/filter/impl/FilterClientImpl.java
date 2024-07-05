@@ -51,7 +51,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_GET_END_POINT);
+        String endPointUrl = getEndPointUrl(FILTER_GET_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
         uriComponentsBuilder.queryParam("ids", filterUuids);
@@ -66,7 +66,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
 
         } catch (HttpStatusCodeException e) {
             if (HttpStatus.NOT_FOUND.equals(e.getStatusCode())) {
-                throw new DynamicMappingException(FILTER_NOT_FOUND, "Some filter not found");
+                throw new DynamicMappingException(FILTER_NOT_FOUND, "Some filters have not been found");
             } else {
                 throw handleHttpError(e, GET_FILTER_ERROR, getObjectMapper());
             }
@@ -79,7 +79,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_CREATE_IN_BATCH_END_POINT);
+        String endPointUrl = getEndPointUrl(FILTER_CREATE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -106,7 +106,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_UPDATE_IN_BATCH_END_POINT);
+        String endPointUrl = getEndPointUrl(FILTER_UPDATE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -133,7 +133,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyMap();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_DUPLICATE_IN_BATCH_END_POINT);
+        String endPointUrl = getEndPointUrl(FILTER_DUPLICATE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -160,7 +160,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return;
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_DELETE_IN_BATCH_END_POINT);
+        String endPointUrl = getEndPointUrl(FILTER_DELETE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 

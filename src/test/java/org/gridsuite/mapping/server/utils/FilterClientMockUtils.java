@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 public final class FilterClientMockUtils {
 
     private FilterClientMockUtils() {
-
+        throw new AssertionError("Utility class should not be instantiated");
     }
 
     public static void mockAll(Map<UUID, ExpertFilter> filtersMockDB, FilterClient filterClient, ObjectMapper objectMapper) {

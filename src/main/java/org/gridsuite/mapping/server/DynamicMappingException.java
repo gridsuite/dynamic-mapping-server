@@ -6,9 +6,12 @@
  */
 package org.gridsuite.mapping.server;
 
+import lombok.Getter;
+
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
+@Getter
 public class DynamicMappingException extends RuntimeException {
 
     public enum Type {
@@ -27,9 +30,5 @@ public class DynamicMappingException extends RuntimeException {
     public DynamicMappingException(Type type, String message) {
         super(message);
         this.type = type;
-    }
-
-    public Type getType() {
-        return type;
     }
 }

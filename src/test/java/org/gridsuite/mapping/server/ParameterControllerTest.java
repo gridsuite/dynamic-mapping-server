@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021, RTE (http://www.rte-france.com)
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
+ * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -131,7 +131,7 @@ public class ParameterControllerTest {
         modelRepository.save(sVarModel);
     }
 
-    private String baseScript(String parentName, String parametersFile) {
+    private String baseParameterJson(String parentName, String parametersFile) {
         return """
                 {
                 "parentName": "%s",
@@ -142,7 +142,7 @@ public class ParameterControllerTest {
 
     @Test
     @Transactional
-    public void conversionTest() throws Exception {
+    public void getParametersTest() throws Exception {
 
         String name = "test";
 
@@ -155,21 +155,22 @@ public class ParameterControllerTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // convert to script
-        mvc.perform(get("/parameters/from/" + name)
+        // get parameter
+        mvc.perform(get("/parameters")
+                .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseScript(name, null), true));
+                .andExpect(content().json(baseParameterJson(name, null), true));
 
-        // try to convert unknown script
-        mvc.perform(get("/parameters/from/" + "unknown")
+        // try to get parameter with unknown mapping
+        mvc.perform(get("/parameters")
+                        .queryParam("mappingName", "unknown")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
     // Parameters tests
-
     @Test
     public void parTest() throws Exception {
         String name = "test";
@@ -212,10 +213,11 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk());
 
         // convert to script
-        mvc.perform(get("/parameters/from/" + name)
+        mvc.perform(get("/parameters")
+                        .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseScript(name, objectMapper.writeValueAsString(parFile)), true));
+                .andExpect(content().json(baseParameterJson(name, objectMapper.writeValueAsString(parFile)), true));
     }
 }

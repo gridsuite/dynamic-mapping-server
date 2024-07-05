@@ -44,16 +44,16 @@ public final class Templater {
             setText.add("id", set.getName());
             String[] parameterTexts = set.getParameters().stream().map(parameter -> {
                 ST parameterText;
-                if (parameter.getOrigin() == ParameterOrigin.NETWORK) {
+                if (parameter.origin() == ParameterOrigin.NETWORK) {
                     parameterText = new ST(refParameterTemplate, '{', '}');
                     parameterText.add("origData", "IIDM");
-                    parameterText.add("origName", parameter.getOriginName());
+                    parameterText.add("origName", parameter.originName());
                 } else {
                     parameterText = new ST(parameterTemplate, '{', '}');
-                    parameterText.add("value", parameter.getValue());
+                    parameterText.add("value", parameter.value());
                 }
-                parameterText.add("name", parameter.getName());
-                parameterText.add("type", parameter.getType());
+                parameterText.add("name", parameter.name());
+                parameterText.add("type", parameter.type());
                 return parameterText.render();
             }).toArray(String[]::new);
             setText.add("name", set.getName());

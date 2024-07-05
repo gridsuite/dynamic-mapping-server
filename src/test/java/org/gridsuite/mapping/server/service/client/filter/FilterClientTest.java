@@ -96,14 +96,13 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
 
     @Test
     public void testCreateFilters() throws JsonProcessingException {
-
         // prepare filters to create
         List<ExpertFilter> filterList = createFilterList();
         Map<UUID, ExpertFilter> filtersToCreate = filterList.stream()
                 .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
 
         // mock response for test case POST with url - /filters/batch
-        String endpointUrl = getEndpointUrl(FILTER_CREATE_IN_BATCH_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_CREATE_IN_BATCH_ENDPOINT);
         wireMockServer.stubFor(WireMock.post(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(filtersToCreate)))
                 .willReturn(WireMock.ok()
@@ -117,7 +116,6 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
         for (ExpertFilter filter : createdFilters) {
             assertThat(filter).recursivelyEquals(filtersToCreate.get(filter.getId()));
         }
-
     }
 
     @Test
@@ -128,7 +126,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
 
         // mock response for test case POST with url - /filters/batch
-        String endpointUrl = getEndpointUrl(FILTER_CREATE_IN_BATCH_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_CREATE_IN_BATCH_ENDPOINT);
         wireMockServer.stubFor(WireMock.post(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(filtersToCreate)))
                 .willReturn(WireMock.serverError()
@@ -147,14 +145,13 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     public void testUpdateFilters() throws JsonProcessingException {
-
         // prepare filters to update
         List<ExpertFilter> filterList = createFilterList();
         Map<UUID, ExpertFilter> filtersToUpdate = filterList.stream()
                 .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
 
         // mock response for test case PUT with url - /filters/batch
-        String endpointUrl = getEndpointUrl(FILTER_UPDATE_IN_BATCH_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_UPDATE_IN_BATCH_ENDPOINT);
         wireMockServer.stubFor(WireMock.put(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(filtersToUpdate)))
                 .willReturn(WireMock.ok()
@@ -168,7 +165,6 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
         for (ExpertFilter filter : updatedFilters) {
             assertThat(filter).recursivelyEquals(filtersToUpdate.get(filter.getId()));
         }
-
     }
 
     @Test
@@ -179,7 +175,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
 
         // mock response for test case PUT with url - /filters/batch
-        String endpointUrl = getEndpointUrl(FILTER_UPDATE_IN_BATCH_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_UPDATE_IN_BATCH_ENDPOINT);
         wireMockServer.stubFor(WireMock.put(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(filtersToUpdate)))
                 .willReturn(WireMock.serverError()
@@ -199,7 +195,6 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
 
     @Test
     public void testDuplicateFilters() throws JsonProcessingException {
-
         // prepare filters to duplicate
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
@@ -207,7 +202,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 .collect(Collectors.toMap(uuid -> uuid, uuid -> UUID.randomUUID()));
 
         // mock response for test case POST with url - /filters/batch/duplicate
-        String endpointUrl = getEndpointUrl(FILTER_DUPLICATE_IN_BATCH_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_DUPLICATE_IN_BATCH_ENDPOINT);
         wireMockServer.stubFor(WireMock.post(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(sourceUuids)))
                 .willReturn(WireMock.ok()
@@ -223,13 +218,12 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
 
     @Test
     public void testDuplicateFiltersGivenException() throws JsonProcessingException {
-
         // prepare filters to duplicate
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
 
         // mock response for test case POST with url - /filters/batch/duplicate
-        String endpointUrl = getEndpointUrl(FILTER_DUPLICATE_IN_BATCH_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_DUPLICATE_IN_BATCH_ENDPOINT);
         wireMockServer.stubFor(WireMock.post(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(sourceUuids)))
                 .willReturn(WireMock.serverError()
@@ -249,30 +243,27 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
 
     @Test
     public void testDeleteFilters() throws JsonProcessingException {
-
         // prepare filters to delete
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
 
         // mock response for test case DELETE with url - /filters
-        String endpointUrl = getEndpointUrl(FILTER_BASE_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_BASE_ENDPOINT);
         wireMockServer.stubFor(WireMock.delete(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(sourceUuids)))
                 .willReturn(WireMock.ok()));
 
         assertDoesNotThrow(() -> filterClient.deleteFilters(sourceUuids));
-
     }
 
     @Test
     public void testDeleteFiltersGivenException() throws JsonProcessingException {
-
         // prepare filters to delete
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
 
         // mock response for test case DELETE with url - /filters
-        String endpointUrl = getEndpointUrl(FILTER_BASE_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_BASE_ENDPOINT);
         wireMockServer.stubFor(WireMock.delete(WireMock.urlMatching(endpointUrl))
                 .withRequestBody(WireMock.equalToJson(objectMapper.writeValueAsString(sourceUuids)))
                 .willReturn(WireMock.serverError()
@@ -291,13 +282,12 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
 
     @Test
     public void testGetFilters() throws JsonProcessingException {
-
         // prepare filters to get
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> uuids = filterList.stream().map(ExpertFilter::getId).toList();
 
         // mock response for test case GET with url - /filters
-        String endpointUrl = getEndpointUrl(FILTER_GET_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_GET_ENDPOINT);
         wireMockServer.stubFor(WireMock.get(WireMock.urlMatching(endpointUrl + ".*"))
                 .withQueryParam("ids", WireMock.matching(".*"))
                 .willReturn(WireMock.ok()
@@ -316,13 +306,12 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
 
     @Test
     public void testGetFiltersGivenException() {
-
         // prepare filters to get
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> uuids = filterList.stream().map(ExpertFilter::getId).toList();
 
         // mock response for test case GET with url - /filters
-        String endpointUrl = getEndpointUrl(FILTER_GET_END_POINT);
+        String endpointUrl = getEndpointUrl(FILTER_GET_ENDPOINT);
         wireMockServer.stubFor(WireMock.get(WireMock.urlMatching(endpointUrl + ".*"))
                 .withQueryParam("ids", WireMock.matching(".*"))
                 .willReturn(WireMock.serverError()

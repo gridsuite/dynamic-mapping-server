@@ -1,12 +1,15 @@
 /**
- * Copyright (c) 2021, RTE (http://www.rte-france.com)
+ * Copyright (c) 2024, RTE (http://www.rte-france.com)
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package org.gridsuite.mapping.server.service.implementation;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.Parameter;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
@@ -29,10 +32,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
+ * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @Service
 public class ParameterServiceImpl implements ParameterService {
+
+    public static final String MODEL_NOT_FOUND_MSG = "No model has been found with this name: ";
+    public static final String MAPPING_NOT_FOUND_MSG = "No mapping has been found with this name: ";
 
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
@@ -44,60 +50,61 @@ public class ParameterServiceImpl implements ParameterService {
         this.mappingRepository = mappingRepository;
     }
 
-    String noModelFoundErrorMessage = "No model found with this name";
-
     @Override
-    public Parameter createFromMapping(String mappingName) {
+    public Parameter getParameters(String mappingName) {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             String createdPar = null;
             if (foundMapping.get().isControlledParameters()) {
-                try {
-                    // build enriched parameters sets from the mapping
-                    Set<InstantiatedModel> instantiatedModels = foundMapping.get().getRules().stream()
-                            .map(InstantiatedModel::new)
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
-                    instantiatedModels.addAll(foundMapping.get().getAutomata().stream()
-                            .map(InstantiatedModel::new)
-                            .collect(Collectors.toCollection(LinkedHashSet::new)));
+                // build enriched parameters sets from the mapping
+                Set<InstantiatedModel> instantiatedModels = foundMapping.get().getRules().stream()
+                    .map(InstantiatedModel::new)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                instantiatedModels.addAll(foundMapping.get().getAutomata().stream()
+                    .map(InstantiatedModel::new)
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
 
-                    List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream()
-                            .map(instantiatedModel -> getEnrichedSetsFromInstanceModel(instantiatedModel.getModel(), instantiatedModel.getSetGroup()))
-                            .collect(Collectors.toList());
-                    List<EnrichedParametersSet> sets = new ArrayList<>();
-                    setsLists.forEach(sets::addAll);
+                List<List<EnrichedParametersSet>> setsLists = instantiatedModels.stream()
+                    .map(instantiatedModel -> getEnrichedSetsFromInstanceModel(
+                        instantiatedModel.getModel(),
+                        instantiatedModel.getSetGroup()))
+                    .toList();
+                List<EnrichedParametersSet> sets = new ArrayList<>();
+                setsLists.forEach(sets::addAll);
 
-                    // generate .par content
-                    createdPar = Templater.setsToPar(sets);
-                } catch (Exception e) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid parameter sets");
-                }
+                // generate .par content
+                createdPar = Templater.setsToPar(sets);
             }
             return new Parameter(mappingName, createdPar);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No mapping found with this name");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_MSG + mappingName);
         }
     }
 
     private List<EnrichedParametersSet> getEnrichedSetsFromInstanceModel(String modelName, String groupName) {
         Optional<ModelEntity> model = modelRepository.findById(modelName);
         if (model.isPresent()) {
-            ParametersSetsGroup correspondingGroup = new ParametersSetsGroup(model.get().getSetsGroups().stream().filter(group -> group.getName().equals(groupName)).findAny().orElseThrow());
+            ParametersSetsGroup correspondingGroup = new ParametersSetsGroup(model.get().getSetsGroups().stream()
+                .filter(group -> group.getName().equals(groupName))
+                .findAny().orElseThrow());
             List<ParametersSet> correspondingSets = correspondingGroup.getSets();
             List<ModelParameterDefinition> correspondingDefinitions = model.get().getParameterDefinitions().stream()
-                    .map(parameterDefinition -> new ModelParameterDefinition(parameterDefinition.getParameterDefinition(), parameterDefinition.getOrigin(), parameterDefinition.getOriginName()))
-                    .toList();
+                .map(parameterDefinition -> new ModelParameterDefinition(
+                    parameterDefinition.getParameterDefinition(),
+                    parameterDefinition.getOrigin(),
+                    parameterDefinition.getOriginName()))
+                .toList();
 
             return correspondingSets.stream().map(set -> new EnrichedParametersSet(set, correspondingDefinitions)).toList();
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, noModelFoundErrorMessage);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MODEL_NOT_FOUND_MSG + modelName);
         }
     }
 
     @Getter
     @Setter
     @NoArgsConstructor
-    public class EnrichedParametersSet {
+    public static class EnrichedParametersSet {
         private String name;
         private List<EnrichedParameter> parameters;
 
@@ -106,7 +113,10 @@ public class ParameterServiceImpl implements ParameterService {
             parameters = definitions.stream().map(definition ->
                     new EnrichedParameter(
                             definition.getName(),
-                            definition.getOrigin() == ParameterOrigin.NETWORK ? null : set.getParameters().stream().filter(parameter -> parameter.getName().equals(definition.getName())).findAny().orElseThrow().getValue(),
+                            definition.getOrigin() == ParameterOrigin.NETWORK ? null :
+                                    set.getParameters().stream()
+                                            .filter(parameter -> parameter.getName().equals(definition.getName()))
+                                            .findAny().orElseThrow().getValue(),
                             definition.getType(),
                             definition.getOrigin(),
                             definition.getOriginName()
@@ -114,23 +124,11 @@ public class ParameterServiceImpl implements ParameterService {
         }
     }
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class EnrichedParameter {
-        private String name;
-        private String value;
-        private ParameterType type;
-        private ParameterOrigin origin;
-        private String originName;
-
-
-    }
+    public record EnrichedParameter(String name, String value, ParameterType type, ParameterOrigin origin, String originName) { }
 
     @Getter
     @EqualsAndHashCode
-    public class InstantiatedModel {
+    public static class InstantiatedModel {
         private final String model;
         private final String setGroup;
 

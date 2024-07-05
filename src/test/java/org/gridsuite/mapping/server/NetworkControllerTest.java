@@ -72,7 +72,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 public class NetworkControllerTest {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkControllerTest.class);
 
     public static final String RESOURCE_PATH_DELIMITER = "/";
@@ -108,7 +107,6 @@ public class NetworkControllerTest {
 
     @Test
     public void fileTest() throws Exception {
-
         UUID caseUUID = UUID.randomUUID();
         UUID networkUUID = UUID.randomUUID();
         String caseFormat = "iidm";
@@ -159,7 +157,6 @@ public class NetworkControllerTest {
         NetworkEntity expectedEntity = new NetworkEntity(networkUUID, "test.iidm");
         NetworkEntity actualEntity = savedNetworks.get(0);
         assertTrue(expectedEntity.getNetworkId().equals(actualEntity.getNetworkId()) && expectedEntity.getNetworkName().equals(actualEntity.getNetworkName()));
-
     }
 
     private String network(UUID id, String name) {
@@ -186,7 +183,6 @@ public class NetworkControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + network(id1, name1) + ", " + network(id2, name2) + "]", true));
-
     }
 
     @Test
@@ -216,7 +212,6 @@ public class NetworkControllerTest {
         assertEquals(objectMapper.readTree(expectNetworkValuesJson), objectMapper.readTree(resultNetworkValuesJson));
 
         Mockito.verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
-
     }
 
     @Test

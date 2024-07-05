@@ -41,7 +41,7 @@ public class MappingController {
 
     @GetMapping(value = "/{mappingName}")
     @Operation(summary = "Get a mapping by name")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Get a mapping by name")})
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The requested mapping")})
     public ResponseEntity<InputMapping> getMapping(@PathVariable("mappingName") String mappingName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMapping(mappingName));
     }

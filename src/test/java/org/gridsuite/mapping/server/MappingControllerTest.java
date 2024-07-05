@@ -48,7 +48,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 public class MappingControllerTest {
-
     public static final String RESOURCE_PATH_DELIMITER = "/";
     public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
     public static final String MAPPING_FILE = "mapping_01.json";
@@ -87,7 +86,6 @@ public class MappingControllerTest {
 
     @Test
     public void test() throws Exception {
-
         String name = "test";
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
@@ -134,7 +132,6 @@ public class MappingControllerTest {
 
     @Test
     public void testRename() throws Exception {
-
         String originalName = "origin";
 
         String newName = "new";
@@ -184,12 +181,10 @@ public class MappingControllerTest {
                 )
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-
     }
 
     @Test
     public void testCopy() throws Exception {
-
         String originalName = "origin";
 
         String copyName = "copy";
@@ -241,7 +236,6 @@ public class MappingControllerTest {
                 )
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-
     }
 
     @Test
@@ -294,6 +288,5 @@ public class MappingControllerTest {
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName()))).isTrue();
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("GeneratorSynchronousThreeWindingsProportionalRegulations", model.getModelName()))).isTrue();
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("StaticVarCompensator", model.getModelName()))).isTrue();
-
     }
 }

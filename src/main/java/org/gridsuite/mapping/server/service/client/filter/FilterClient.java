@@ -12,20 +12,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.gridsuite.mapping.server.service.client.RestClient.DELIMITER;
+import static org.gridsuite.mapping.server.service.client.RestClient.URL_DELIMITER;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 public interface FilterClient {
     String API_VERSION = "v1";
-    String FILTER_BASE_END_POINT = "filters";
-    String FILTER_BATCH_END_POINT = FILTER_BASE_END_POINT + DELIMITER + "batch";
-    String FILTER_GET_END_POINT = FILTER_BASE_END_POINT + DELIMITER + "metadata";
-    String FILTER_CREATE_IN_BATCH_END_POINT = FILTER_BATCH_END_POINT;
-    String FILTER_UPDATE_IN_BATCH_END_POINT = FILTER_BATCH_END_POINT;
-    String FILTER_DUPLICATE_IN_BATCH_END_POINT = FILTER_BATCH_END_POINT + DELIMITER + "duplicate";
-    String FILTER_DELETE_IN_BATCH_END_POINT = FILTER_BASE_END_POINT;
+    String FILTER_BASE_ENDPOINT = "filters";
+    String FILTER_BATCH_ENDPOINT = FILTER_BASE_ENDPOINT + URL_DELIMITER + "batch";
+    String FILTER_GET_ENDPOINT = FILTER_BASE_ENDPOINT + URL_DELIMITER + "metadata";
+    String FILTER_CREATE_IN_BATCH_ENDPOINT = FILTER_BATCH_ENDPOINT;
+    String FILTER_UPDATE_IN_BATCH_ENDPOINT = FILTER_BATCH_ENDPOINT;
+    String FILTER_DUPLICATE_IN_BATCH_ENDPOINT = FILTER_BATCH_ENDPOINT + URL_DELIMITER + "duplicate";
+    String FILTER_DELETE_IN_BATCH_ENDPOINT = FILTER_BASE_ENDPOINT;
 
     List<ExpertFilter> createFilters(Map<UUID, ExpertFilter> filtersToCreateMap);
 

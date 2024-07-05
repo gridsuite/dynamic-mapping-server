@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.model.MappingEntity;
@@ -24,7 +23,6 @@ import java.util.UUID;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Rule")
