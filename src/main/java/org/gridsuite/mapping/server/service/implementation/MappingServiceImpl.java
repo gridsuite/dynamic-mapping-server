@@ -130,23 +130,22 @@ public class MappingServiceImpl implements MappingService {
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
 
         // --- update or create filters appeared in rules in remote filter-server --- //
-        Map<Boolean, Map<UUID, ExpertFilter>> filtersToUpdateOrCreate = mapping.getRules().stream()
+        // filters to update
+        Map<UUID, ExpertFilter> filtersToUpdateMap = mapping.getRules().stream()
+                .filter(Rule::isFilterDirty) // get only rule marked as filter dirty from client
                 .map(rule -> Optional.ofNullable(rule.getFilter()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.partitioningBy(
-                    filter -> filterUuids.contains(filter.getId()),
-                    Collectors.toMap(ExpertFilter::getId, filter -> filter)
-                ));
-
-        // filters to update
-        Map<UUID, ExpertFilter> filtersToUpdateMap = filtersToUpdateOrCreate.get(Boolean.TRUE);
+                .filter(filter -> filterUuids.contains(filter.getId())) // must be an existing uuid
+                .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
 
         // filter to create
-        Map<UUID, ExpertFilter> filtersToCreateMap = filtersToUpdateOrCreate.get(Boolean.FALSE);
-
-        // filter to delete
-        List<UUID> filterUuidsToDelete = filterUuids.stream().filter(uuid -> !filtersToUpdateMap.containsKey(uuid)).toList();
+        Map<UUID, ExpertFilter> filtersToCreateMap = mapping.getRules().stream()
+                .map(rule -> Optional.ofNullable(rule.getFilter()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(filter -> !filterUuids.contains(filter.getId())) // new uuid appeared
+                .collect(Collectors.toMap(ExpertFilter::getId, filter -> filter));
 
         filterClient.updateFilters(filtersToUpdateMap);
         filterClient.createFilters(filtersToCreateMap);
@@ -170,6 +169,15 @@ public class MappingServiceImpl implements MappingService {
         MappingEntity savedMappingEntity = mappingRepository.save(mappingToSave);
 
         // --- clean filters in filter-server --- //
+        List<UUID> filterUuidsRemaining = mapping.getRules().stream()
+                .map(rule -> Optional.ofNullable(rule.getFilter()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(filter -> filterUuids.contains(filter.getId())) // must be an existing uuid
+                .map(ExpertFilter::getId)
+                .toList();
+        // filter to delete
+        List<UUID> filterUuidsToDelete = filterUuids.stream().filter(uuid -> !filterUuidsRemaining.contains(uuid)).toList();
         if (CollectionUtils.isNotEmpty(filterUuidsToDelete)) {
             filterClient.deleteFilters(filterUuidsToDelete);
         }

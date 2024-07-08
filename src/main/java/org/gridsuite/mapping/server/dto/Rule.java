@@ -48,6 +48,9 @@ public class Rule {
     @JsonIgnore
     private UUID filterUuid;
 
+    @Schema(description = "Filter is dirty or not")
+    private boolean filterDirty;
+
     public RuleEntity convertRuleToEntity(MappingEntity parentMapping) {
         RuleEntity convertedRule = new RuleEntity();
         if (this.id != null) {
