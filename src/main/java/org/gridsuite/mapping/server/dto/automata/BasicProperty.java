@@ -7,6 +7,7 @@ import org.gridsuite.mapping.server.utils.PropertyType;
 
 @Data
 @AllArgsConstructor
+@Schema(description = "Basic property")
 public class BasicProperty {
     @Schema(description = "Property name")
     private String name;

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @NoArgsConstructor
+@Schema(description = "Automaton")
 public class Automaton {
     @Schema(description = "Automaton family")
     @JsonProperty

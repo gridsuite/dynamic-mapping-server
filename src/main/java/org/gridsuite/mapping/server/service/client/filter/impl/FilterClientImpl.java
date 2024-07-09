@@ -51,7 +51,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_GET_ENDPOINT);
+        String endPointUrl = getEndPointUrl(FILTERS_GET_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
         uriComponentsBuilder.queryParam("ids", filterUuids);
@@ -79,7 +79,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_CREATE_IN_BATCH_ENDPOINT);
+        String endPointUrl = getEndPointUrl(FILTERS_CREATE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -106,7 +106,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_UPDATE_IN_BATCH_ENDPOINT);
+        String endPointUrl = getEndPointUrl(FILTERS_UPDATE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -133,7 +133,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyMap();
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_DUPLICATE_IN_BATCH_ENDPOINT);
+        String endPointUrl = getEndPointUrl(FILTERS_DUPLICATE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
@@ -160,7 +160,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return;
         }
 
-        String endPointUrl = getEndPointUrl(FILTER_DELETE_IN_BATCH_ENDPOINT);
+        String endPointUrl = getEndPointUrl(FILTERS_DELETE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 
