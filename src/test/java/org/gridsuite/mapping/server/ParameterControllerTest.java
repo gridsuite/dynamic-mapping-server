@@ -131,18 +131,18 @@ public class ParameterControllerTest {
         modelRepository.save(sVarModel);
     }
 
-    private String baseParameterJson(String parentName, String parametersFile) {
+    private String baseParameterFileJson(String mappingName, String fileContent) {
         return """
                 {
-                "parentName": "%s",
-                "parametersFile": %s
+                "mappingName": "%s",
+                "fileContent": %s
                 }
-                """.formatted(parentName, parametersFile);
+                """.formatted(mappingName, fileContent);
     }
 
     @Test
     @Transactional
-    public void getParametersTest() throws Exception {
+    public void exportParametersTest() throws Exception {
 
         String name = "test";
 
@@ -155,16 +155,16 @@ public class ParameterControllerTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // get parameter
-        mvc.perform(get("/parameters")
+        // export parameter file
+        mvc.perform(get("/parameters/export")
                 .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseParameterJson(name, null), true));
+                .andExpect(content().json(baseParameterFileJson(name, null), true));
 
-        // try to get parameter with unknown mapping
-        mvc.perform(get("/parameters")
+        // try to export parameter file with unknown mapping
+        mvc.perform(get("/parameters/export")
                         .queryParam("mappingName", "unknown")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -212,12 +212,12 @@ public class ParameterControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        // convert to script
-        mvc.perform(get("/parameters")
+        // export parameter file
+        mvc.perform(get("/parameters/export")
                         .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseParameterJson(name, objectMapper.writeValueAsString(parFile)), true));
+                .andExpect(content().json(baseParameterFileJson(name, objectMapper.writeValueAsString(parFile)), true));
     }
 }

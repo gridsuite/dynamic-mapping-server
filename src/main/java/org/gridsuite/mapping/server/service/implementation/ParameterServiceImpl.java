@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.gridsuite.mapping.server.dto.Parameter;
+import org.gridsuite.mapping.server.dto.ParameterFile;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
@@ -51,7 +51,7 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
-    public Parameter getParameters(String mappingName) {
+    public ParameterFile exportParameters(String mappingName) {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
             String createdPar = null;
@@ -75,7 +75,7 @@ public class ParameterServiceImpl implements ParameterService {
                 // generate .par content
                 createdPar = Templater.setsToPar(sets);
             }
-            return new Parameter(mappingName, createdPar);
+            return new ParameterFile(mappingName, createdPar);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_MSG + mappingName);
         }

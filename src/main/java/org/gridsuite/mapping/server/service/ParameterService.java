@@ -6,11 +6,11 @@
  */
 package org.gridsuite.mapping.server.service;
 
-import org.gridsuite.mapping.server.dto.Parameter;
+import org.gridsuite.mapping.server.dto.ParameterFile;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 public interface ParameterService {
-    Parameter getParameters(String mappingName);
+    ParameterFile exportParameters(String mappingName);
 }

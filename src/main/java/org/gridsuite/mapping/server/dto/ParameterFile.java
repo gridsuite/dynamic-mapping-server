@@ -16,12 +16,12 @@ import lombok.Data;
 @Data
 @Schema(description = "Parameter sets in *.par format")
 @AllArgsConstructor
-public class Parameter {
+public class ParameterFile {
 
     @Schema(description = "Name of the parent mapping")
-    private String parentName;
+    private String mappingName;
 
     @Schema(description = "Parameter file content in *.par format")
-    private String parametersFile;
+    private String fileContent;
 
 }

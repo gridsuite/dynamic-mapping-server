@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.gridsuite.mapping.server.dto.Parameter;
+import org.gridsuite.mapping.server.dto.ParameterFile;
 import org.gridsuite.mapping.server.service.ParameterService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +31,12 @@ public class ParameterController {
 
     private final ParameterService parameterService;
 
-    @GetMapping(value = "")
-    @Operation(summary = "Get parameter sets in used models of a given mapping into *.par format")
+    @GetMapping(value = "/export")
+    @Operation(summary = "Export parameter sets in used models of a given mapping into *.par format")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Used parameter sets serialized in *.par format")})
-    public ResponseEntity<Parameter> getParameters(@RequestParam("mappingName") String mappingName) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(parameterService.getParameters(mappingName));
+    public ResponseEntity<ParameterFile> exportParameters(@RequestParam("mappingName") String mappingName) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(parameterService.exportParameters(mappingName));
     }
 
 }
