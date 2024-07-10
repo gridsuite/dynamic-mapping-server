@@ -106,7 +106,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
             return Collections.emptyList();
         }
 
-        String endPointUrl = getEndPointUrl(FILTERS_UPDATE_IN_BATCH_ENDPOINT);
+        String endPointUrl = getEndPointUrl(FilterClient.FILTERS_UPDATE_IN_BATCH_ENDPOINT);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
 

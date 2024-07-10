@@ -113,7 +113,7 @@ public class MappingServiceImpl implements MappingService {
     }
 
     @Override
-    public InputMapping createMapping(String mappingName, InputMapping mapping) {
+    public InputMapping saveMapping(String mappingName, InputMapping mapping) {
         if (!StringUtils.isBlank(mappingName)) {
             mapping.setName(mappingName);
         }

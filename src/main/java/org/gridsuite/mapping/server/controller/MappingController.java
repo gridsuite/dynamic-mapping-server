@@ -58,9 +58,9 @@ public class MappingController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping"),
         @ApiResponse(responseCode = "409", description = "The mapping already exist"),
         @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
-    public ResponseEntity<InputMapping> createMapping(@PathVariable(name = "mappingName", required = false) String mappingName, @RequestBody InputMapping mapping) {
-        InputMapping createMapping = mappingService.createMapping(mappingName, mapping);
-        return ResponseEntity.ok().body(createMapping);
+    public ResponseEntity<InputMapping> saveMapping(@PathVariable(name = "mappingName", required = false) String mappingName, @RequestBody InputMapping mapping) {
+        InputMapping savedMapping = mappingService.saveMapping(mappingName, mapping);
+        return ResponseEntity.ok().body(savedMapping);
     }
 
     @DeleteMapping(path = "/{mappingName}")
