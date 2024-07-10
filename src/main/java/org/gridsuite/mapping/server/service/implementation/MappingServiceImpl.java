@@ -69,8 +69,9 @@ public class MappingServiceImpl implements MappingService {
         // collect filterIds to a set (avoid duplication)
         Set<UUID> filterIds = mappings.stream()
             .flatMap(mapping -> mapping.getRules().stream())
-            .map(Rule::getFilterUuid)
+            .map(Rule::getFilter)
             .filter(Objects::nonNull)
+            .map(ExpertFilter::getId)
             .collect(Collectors.toSet());
 
         if (CollectionUtils.isNotEmpty(filterIds)) {
@@ -82,8 +83,8 @@ public class MappingServiceImpl implements MappingService {
             // enrich filter for each rule
             mappings.stream()
                 .flatMap(mapping -> mapping.getRules().stream()
-                    .filter(rule -> rule.getFilterUuid() != null))
-                .forEach(rule -> rule.setFilter(filterIdFilterMap.get(rule.getFilterUuid())));
+                .filter(rule -> rule.getFilter() != null))
+                .forEach(rule -> rule.setFilter(filterIdFilterMap.get(rule.getFilter().getId())));
         }
     }
 

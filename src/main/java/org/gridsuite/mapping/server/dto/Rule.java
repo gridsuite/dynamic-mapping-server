@@ -6,7 +6,6 @@
  */
 package org.gridsuite.mapping.server.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,9 +44,6 @@ public class Rule {
     @Schema(description = "Filter")
     private ExpertFilter filter;
 
-    @JsonIgnore
-    private UUID filterUuid;
-
     @Schema(description = "Filter is dirty or not")
     private boolean filterDirty;
 
@@ -82,7 +78,7 @@ public class Rule {
         mappedModel = ruleEntity.getMappedModel();
         setGroup = ruleEntity.getSetGroup();
         groupType = ruleEntity.getGroupType();
-        filterUuid = ruleEntity.getFilterUuid();
+        filter = ruleEntity.getFilterUuid() != null ? ExpertFilter.builder().id(ruleEntity.getFilterUuid()).build() : null;
     }
 }
 
