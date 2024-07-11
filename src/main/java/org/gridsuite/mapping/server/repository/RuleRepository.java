@@ -9,8 +9,6 @@ package org.gridsuite.mapping.server.repository;
 
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,6 +19,5 @@ import java.util.UUID;
  */
 @Repository
 public interface RuleRepository extends JpaRepository<RuleEntity, UUID> {
-    @Query("SELECT rule.filterUuid FROM RuleEntity rule WHERE rule.mapping.name = :mappingName AND rule.filterUuid IS NOT NULL")
-    List<UUID> findFilterUuidsByMappingName(@Param("mappingName") String mappingName);
+    List<RuleEntity.ProjectionFilterUuid> findByMappingNameAndFilterUuidNotNull(String mappingName);
 }

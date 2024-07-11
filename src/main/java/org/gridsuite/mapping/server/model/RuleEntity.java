@@ -25,6 +25,10 @@ import java.util.UUID;
 @Setter
 public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
 
+    public interface ProjectionFilterUuid {
+        UUID getFilterUuid();
+    }
+
     @Id
     @Column(name = "rule_id")
     private UUID ruleId;

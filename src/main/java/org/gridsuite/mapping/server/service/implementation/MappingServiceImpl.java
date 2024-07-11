@@ -124,7 +124,9 @@ public class MappingServiceImpl implements MappingService {
         }
 
         // get all filterUuids used previously in the mapping to infer to update/create/delete filters
-        List<UUID> filterUuids = ruleRepository.findFilterUuidsByMappingName(mappingName);
+        List<UUID> filterUuids = ruleRepository.findByMappingNameAndFilterUuidNotNull(mappingName).stream()
+                .map(RuleEntity.ProjectionFilterUuid::getFilterUuid)
+                .toList();
 
         // IMPORTANT: new filter is enriched with new uuid while converting the whole mapping in cascade
         // So must do converting before persisting filter in filter-server to ensure that new uuid is provided
@@ -193,7 +195,9 @@ public class MappingServiceImpl implements MappingService {
     @Override
     public String deleteMapping(String mappingName) {
         // get all filterUuids used in the mapping to delete if exists
-        List<UUID> filterUuids = ruleRepository.findFilterUuidsByMappingName(mappingName);
+        List<UUID> filterUuids = ruleRepository.findByMappingNameAndFilterUuidNotNull(mappingName).stream()
+                .map(RuleEntity.ProjectionFilterUuid::getFilterUuid)
+                .toList();
 
         // --- delete filters in filter-server --- //
         if (CollectionUtils.isNotEmpty(filterUuids)) {
