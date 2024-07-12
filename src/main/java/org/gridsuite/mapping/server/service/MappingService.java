@@ -19,7 +19,9 @@ public interface MappingService {
 
     List<InputMapping> getMappingList();
 
-    InputMapping createMapping(String mappingName, InputMapping mapping);
+    InputMapping getMapping(String mappingName);
+
+    InputMapping saveMapping(String mappingName, InputMapping mapping);
 
     String deleteMapping(String mappingName);
 

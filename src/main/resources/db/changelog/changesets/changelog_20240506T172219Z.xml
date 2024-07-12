@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="phamquy (generated)" id="1715016149192-7">
+        <addColumn tableName="rules">
+            <column name="filter_uuid" type="uuid"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1715016149192-11">
+        <dropForeignKeyConstraint baseTableName="FILTERS" constraintName="RULES_FILTER_FK"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1715016149192-12">
+        <dropTable tableName="FILTERS"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1715016149192-13">
+        <dropTable tableName="SCRIPTS"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1715016149192-14">
+        <dropColumn columnName="COMPOSITION" tableName="RULES"/>
+    </changeSet>
+</databaseChangeLog>

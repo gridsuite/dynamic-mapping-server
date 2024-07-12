@@ -1,0 +1,52 @@
+{
+  "ruleIndex": 1,
+  "equipmentType":"LOAD",
+  "filter": {
+    "equipmentType": "STATIC_VAR_COMPENSATOR",
+    "type": "EXPERT",
+    "rules" : {
+      "combinator": "OR",
+      "dataType": "COMBINATOR",
+      "rules": [
+        {
+          "dataType": "STRING",
+          "field": "ID",
+          "operator": "IS",
+          "values": [
+            "SVC2"
+          ]
+        },
+        {
+          "dataType": "ENUM",
+          "field": "COUNTRY",
+          "operator": "NOT_EQUALS",
+          "value": "FR"
+        },
+        {
+          "dataType": "ENUM",
+          "field": "COUNTRY",
+          "operator": "IN",
+          "values": [
+            "GE"
+          ]
+        },
+        {
+          "dataType": "NUMBER",
+          "field": "NOMINAL_VOLTAGE",
+          "operator": "NOT_IN",
+          "values": [
+            60,
+            255,
+            400
+          ]
+        },
+        {
+          "dataType": "NUMBER",
+          "field": "NOMINAL_VOLTAGE",
+          "operator": "LOWER_OR_EQUALS",
+          "value": 380
+        }
+      ]
+    }
+  }
+}

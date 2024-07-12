@@ -6,14 +6,12 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
-import jakarta.persistence.*;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -26,6 +24,10 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
+
+    public interface ProjectionFilterUuid {
+        UUID getFilterUuid();
+    }
 
     @Id
     @Column(name = "rule_id")
@@ -44,11 +46,9 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
     @Column(name = "group_type", nullable = false)
     private SetGroupType groupType;
 
-    @Column(name = "composition", nullable = false)
-    private String composition;
-
-    @OneToMany(targetEntity = FilterEntity.class, mappedBy = "rule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FilterEntity> filters;
+    // filter is an expert filter which is persisted in the filter-server
+    @Column(name = "filter_uuid")
+    private UUID filterUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mappingName", foreignKey = @ForeignKey(name = "mapping_rules_fk"), referencedColumnName = "name")
@@ -67,8 +67,6 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
         this.mappedModel = ruleToCopy.getMappedModel();
         this.setGroup = ruleToCopy.getSetGroup();
         this.groupType = ruleToCopy.getGroupType();
-        this.composition = ruleToCopy.getComposition();
-        this.filters = ruleToCopy.getFilters().stream().map(filterEntity -> new FilterEntity(newID, filterEntity)).collect(Collectors.toList());
-
+        this.filterUuid = ruleToCopy.getFilterUuid();
     }
 }

@@ -14,6 +14,11 @@ powsybl-ws:
   database:
     host: localhost
 
+gridsuite:
+  services:
+    filter-server:
+      base-uri: http://localhost:5027
+
 # when perform a local test, fill by the path that contains external automaton resource files in json format
 # e.g. /home/<user>/dynamic-mapping-resources/automaton
 ex-resources:

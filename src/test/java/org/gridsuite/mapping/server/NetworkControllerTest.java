@@ -14,11 +14,15 @@ import com.powsybl.iidm.network.test.SvcTestCaseFactory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.NetworkValues;
+import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -44,6 +48,8 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.gridsuite.mapping.server.MappingConstants.CASE_API_VERSION;
 import static org.gridsuite.mapping.server.MappingConstants.NETWORK_CONVERSION_API_VERSION;
@@ -51,7 +57,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.TEXT_PLAIN;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -67,7 +72,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 public class NetworkControllerTest {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkControllerTest.class);
 
     public static final String RESOURCE_PATH_DELIMITER = "/";
@@ -103,24 +107,32 @@ public class NetworkControllerTest {
 
     @Test
     public void fileTest() throws Exception {
-
         UUID caseUUID = UUID.randomUUID();
         UUID networkUUID = UUID.randomUUID();
+        String caseFormat = "iidm";
         MockMultipartFile file = new MockMultipartFile(
                 "file",
                 "test.iidm",
                 MediaType.TEXT_PLAIN_VALUE,
                 "This is a network".getBytes());
 
-        // Mock call to case-server for import
+        // Mock call to case-server for import case
         mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(TEXT_PLAIN)
+                        .contentType(APPLICATION_JSON)
                         .body("\"" + caseUUID + "\""));
 
+        // Mock call to case-server for get case format
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases/" + caseUUID + "/format")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(APPLICATION_JSON)
+                        .body(caseFormat));
+
         // Mock call to case-server for conversion
-        mockServer.expect(ExpectedCount.once(), requestTo(new URI(networkConversionApiUri + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUUID + "&isAsyncRun=false")))
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(networkConversionApiUri +
+            NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUUID + "&caseFormat=" + caseFormat + "&isAsyncRun=false")))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(APPLICATION_JSON)
@@ -145,7 +157,6 @@ public class NetworkControllerTest {
         NetworkEntity expectedEntity = new NetworkEntity(networkUUID, "test.iidm");
         NetworkEntity actualEntity = savedNetworks.get(0);
         assertTrue(expectedEntity.getNetworkId().equals(actualEntity.getNetworkId()) && expectedEntity.getNetworkName().equals(actualEntity.getNetworkName()));
-
     }
 
     private String network(UUID id, String name) {
@@ -172,7 +183,6 @@ public class NetworkControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json("[" + network(id1, name1) + ", " + network(id2, name2) + "]", true));
-
     }
 
     @Test
@@ -188,19 +198,20 @@ public class NetworkControllerTest {
                 .andReturn();
 
         String resultNetworkValuesJson = mvcResult.getResponse().getContentAsString();
+        NetworkValues resultNetworkValues = objectMapper.readValue(resultNetworkValuesJson, NetworkValues.class);
+        resultNetworkValuesJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resultNetworkValues);
 
         String networkValuesJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "network/networkValues.json").readAllBytes());
         NetworkValues networkValues = objectMapper.readValue(networkValuesJson, NetworkValues.class);
         networkValues.setNetworkId(networkUUID);
 
-        String expectNetworkValuesJson = objectMapper.writeValueAsString(networkValues);
+        String expectNetworkValuesJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(networkValues);
         LOGGER.info("expect network values = " + expectNetworkValuesJson);
         LOGGER.info("result network values = " + resultNetworkValuesJson);
 
         assertEquals(objectMapper.readTree(expectNetworkValuesJson), objectMapper.readTree(resultNetworkValuesJson));
 
         Mockito.verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
-
     }
 
     @Test
@@ -217,256 +228,52 @@ public class NetworkControllerTest {
 
     }
 
-    @Test
-    public void ruleMatchingTest() throws Exception {
+    @ParameterizedTest
+    @MethodSource({
+        "provideArgumentsForGeneratorTest",
+        "provideArgumentsForLoadTest",
+        "provideArgumentsForStaticVarCompensatorTest"
+    })
+    void ruleMatchingTest(Network testNetwork, String ruleToMatchFile, int ruleIndex, List<String> expectedMatchedIds) throws Exception {
         UUID networkUUID = UUID.randomUUID();
 
+        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
+
+        String ruleToMatchPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "network" + RESOURCE_PATH_DELIMITER + ruleToMatchFile;
+        RuleToMatch ruleToMatch = objectMapper.readValue(getClass().getResourceAsStream(ruleToMatchPath), RuleToMatch.class);
+        ruleToMatch.setRuleIndex(ruleIndex);
+        mvc.perform(MockMvcRequestBuilders.post("/network/" + networkUUID + "/matches/rule")
+                        .content(objectMapper.writeValueAsString(ruleToMatch))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json("""
+                            {
+                                "ruleIndex": %d,
+                                "matchedIds":[%s]
+                            }
+                        """
+                        .formatted(ruleIndex, expectedMatchedIds.stream().collect(Collectors.joining(", "))), true));
+    }
+
+    private static Stream<Arguments> provideArgumentsForGeneratorTest() {
         Network testNetwork = NetworkTest1Factory.create();
-        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
-
-        int generatorIndex = 2;
-        String generatorRuleToMatch = """
-            {
-                "ruleIndex":"%d",
-                "equipmentType":"GENERATOR",
-                "composition":"(filter1 || filter2 || filter4 || filter5) && (filter3 || filter6 || filter7) || filter8 || filter9",
-                "filters":[
-                    {
-                        "filterId":"filter1",
-                        "operand":"EQUALS",
-                        "property":"id",
-                        "value":[
-                            "generator1"
-                        ],
-                        "type":"STRING"
-                    },
-                    {
-                        "filterId":"filter2",
-                        "operand":"HIGHER",
-                        "property":"terminal.voltageLevel.nominalV",
-                        "value":[
-                            3.0
-                        ],
-                        "type":"NUMBER"
-                    },
-                    {
-                        "filterId":"filter3",
-                        "operand":"EQUALS",
-                        "property":"voltageRegulatorOn",
-                        "value":true,
-                        "type":"BOOLEAN"
-                    },
-                    {
-                        "filterId":"filter4",
-                        "operand":"INCLUDES",
-                        "property":"id",
-                        "value":[
-                            "generator"
-                        ],
-                        "type":"STRING"
-                    },
-                    {
-                        "filterId":"filter5",
-                        "operand":"ENDS_WITH",
-                        "property":"id",
-                        "value":[
-                            "1"
-                        ],
-                        "type":"STRING"
-                    },
-                    {
-                        "filterId":"filter6",
-                        "operand":"HIGHER_OR_EQUALS",
-                        "property":"terminal.voltageLevel.nominalV",
-                        "value":[
-                            400
-                        ],
-                        "type":"NUMBER"
-                    },
-                    {
-                        "filterId":"filter7",
-                        "operand":"IN",
-                        "property":"terminal.voltageLevel.nominalV",
-                        "value":[
-                            20,
-                            60,
-                            400
-                        ],
-                        "type":"NUMBER"
-                    },
-                    {
-                        "filterId":"filter8",
-                        "operand":"NOT_EQUALS",
-                        "property":"voltageRegulatorOn",
-                        "value":true,
-                        "type":"BOOLEAN"
-                    },
-                    {
-                        "filterId":"filter9",
-                        "operand":"EQUALS",
-                        "property":"energySource",
-                        "value":[
-                            "OTHERS"
-                        ],
-                        "type":"ENUM"
-                    }
-                ]
-            }
-            """
-            .formatted(generatorIndex);
-
-        mvc.perform(MockMvcRequestBuilders.post("/network/" + networkUUID + "/matches/rule")
-                        .content(generatorRuleToMatch)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json("""
-                            {
-                                "ruleIndex": %d,
-                                "matchedIds":["generator1"]
-                            }
-                        """
-                        .formatted(generatorIndex), true));
-
-        int loadIndex = 0;
-        String loadRuleToMatch = """
-            {
-                "ruleIndex":"%d",
-                "equipmentType":"LOAD",
-                "composition":"filter1 || filter2 || filter3 || filter4 || filter5 || filter6",
-                "filters":[
-                    {
-                        "filterId":"filter1",
-                        "operand":"NOT_IN",
-                        "property":"id",
-                        "value":[
-                            "load1"
-                        ],
-                        "type":"STRING"
-                    },
-                    {
-                        "filterId":"filter2",
-                        "operand":"NOT_EQUALS",
-                        "property":"terminal.voltageLevel.substation.country.name",
-                        "value":[
-                            "FRANCE"
-                        ],
-                        "type":"STRING"
-                    },
-                    {
-                        "filterId":"filter3",
-                        "operand":"STARTS_WITH",
-                        "property":"terminal.voltageLevel.substation.country.name",
-                        "value":[
-                            "GER"
-                        ],
-                        "type":"STRING"
-                    },
-                    {
-                        "filterId":"filter4",
-                        "operand":"NOT_IN",
-                        "property":"terminal.voltageLevel.nominalV",
-                        "value":[
-                            60,
-                            225,
-                            400
-                        ],
-                        "type":"NUMBER"
-                    },
-                    {
-                        "filterId":"filter5",
-                        "operand":"LOWER_OR_EQUALS",
-                        "property":"terminal.voltageLevel.nominalV",
-                        "value":[
-                            380
-                        ],
-                        "type":"NUMBER"
-                    },
-                    {
-                        "filterId":"filter6",
-                        "operand":"EQUALS",
-                        "property":"loadType",
-                        "value":[
-                            "UNDEFINED"
-                        ],
-                        "type":"ENUM"
-                    }
-                ]
-            }
-            """
-            .formatted(loadIndex);
-
-        mvc.perform(MockMvcRequestBuilders.post("/network/" + networkUUID + "/matches/rule")
-                        .content(loadRuleToMatch)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json("""
-                            {
-                                "ruleIndex": %d,
-                                "matchedIds": ["load1"]
-                            }
-                        """
-                        .formatted(loadIndex), true));
+        return Stream.of(
+            Arguments.of(testNetwork, "generatorRuleToMatch.json", 1, List.of("generator1"))
+        );
     }
 
-    @Test
-    public void sVarRuleMatchingTest() throws Exception {
-        UUID networkUUID = UUID.randomUUID();
+    private static Stream<Arguments> provideArgumentsForLoadTest() {
+        Network testNetwork = NetworkTest1Factory.create();
+        return Stream.of(
+            Arguments.of(testNetwork, "loadRuleToMatch.json", 10, List.of("load1"))
+        );
+    }
 
+    private static Stream<Arguments> provideArgumentsForStaticVarCompensatorTest() {
         Network testNetwork = SvcTestCaseFactory.create();
-        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
-
-        int ruleIndex = 2;
-        String equipmentId = "SVC2";
-        String ruleToMatch = """
-                {
-                  "ruleIndex": %s,
-                  "equipmentType": "STATIC_VAR_COMPENSATOR",
-                  "composition": "filter1 || filter2 || filter3 || filter4 || filter5 || filter6",
-                  "filters": [
-                    {
-                      "filterId": "filter1",
-                      "operand": "EQUALS",
-                      "property": "id",
-                      "value": ["%s"],
-                      "type": "STRING"
-                    },
-                    {
-                      "filterId": "filter2",
-                      "operand": "NOT_EQUALS",
-                      "property": "terminal.voltageLevel.substation.country.name",
-                      "value": ["FRANCE"],
-                      "type": "STRING"
-                    },
-                    {
-                      "filterId": "filter3",
-                      "operand": "STARTS_WITH",
-                      "property": "terminal.voltageLevel.substation.country.name",
-                      "value": ["GER"],
-                      "type": "STRING"
-                    },
-                    {
-                      "filterId": "filter4",
-                      "operand": "NOT_IN",
-                      "property": "terminal.voltageLevel.nominalV",
-                      "value": [60, 225, 400],
-                      "type": "NUMBER"
-                    },
-                    {
-                      "filterId": "filter5",
-                      "operand": "LOWER_OR_EQUALS",
-                      "property": "terminal.voltageLevel.nominalV",
-                      "value": [380],
-                      "type": "NUMBER"
-                    }
-                  ]
-                }""".formatted(ruleIndex, equipmentId);
-
-        mvc.perform(MockMvcRequestBuilders.post("/network/" + networkUUID + "/matches/rule")
-                        .content(ruleToMatch)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"ruleIndex\":" + ruleIndex + ",\"matchedIds\":[\"" + equipmentId + "\"]}",
-                        true));
-
+        return Stream.of(
+            Arguments.of(testNetwork, "svarRuleToMatch.json", 20, List.of("SVC2"))
+        );
     }
+
 }
