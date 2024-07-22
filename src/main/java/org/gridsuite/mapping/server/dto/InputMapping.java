@@ -28,10 +28,10 @@ public class InputMapping implements Mapping {
     @Schema(description = "Name")
     private String name;
 
-    @Schema(description = "Mapping rules")
+    @Schema(description = "Rules")
     private List<Rule> rules;
 
-    @Schema(description = "Mapping automata")
+    @Schema(description = "Automata")
     private List<Automaton> automata;
 
     @Schema(description = "Mapping should control its parameters")

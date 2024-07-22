@@ -8,27 +8,27 @@ package org.gridsuite.mapping.server.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
+import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Schema(description = "Rule")
 public class Rule {
+    @Schema(description = "Rule id")
+    private UUID id;
+
     @Schema(description = "Equipment type")
     private EquipmentType equipmentType;
 
@@ -41,40 +41,44 @@ public class Rule {
     @Schema(description = "Mapped Parameter Set Group Type")
     private SetGroupType groupType;
 
-    @Schema(description = "Composition")
-    private String composition;
+    @Schema(description = "Filter")
+    private ExpertFilter filter;
 
-    @Schema(description = "Filters")
-    private List<AbstractFilter> filters;
-
-    public List<AbstractFilter> getFilters() {
-        return filters;
-    }
+    @Schema(description = "Filter is dirty or not")
+    private boolean filterDirty;
 
     public RuleEntity convertRuleToEntity(MappingEntity parentMapping) {
-        UUID createdId = UUID.randomUUID();
         RuleEntity convertedRule = new RuleEntity();
-        convertedRule.setComposition(composition);
-        convertedRule.setRuleId(createdId);
+        if (this.id != null) {
+            convertedRule.setRuleId(this.id);
+        } else {
+            UUID createdId = UUID.randomUUID();
+            convertedRule.setRuleId(createdId);
+        }
         convertedRule.setMappedModel(mappedModel);
         convertedRule.setSetGroup(setGroup);
         convertedRule.setGroupType(groupType);
         convertedRule.setEquipmentType(equipmentType);
         convertedRule.setMapping(parentMapping);
-        convertedRule.setFilters(filters.stream().map(filter -> filter.convertFilterToEntity(convertedRule)).collect(Collectors.toList()));
+        if (filter != null) {
+            if (filter.getId() != null) {
+                convertedRule.setFilterUuid(filter.getId());
+            } else {
+                UUID createdFilterId = UUID.randomUUID();
+                this.filter.setId(createdFilterId);
+                convertedRule.setFilterUuid(createdFilterId);
+            }
+        }
         return convertedRule;
     }
 
     public Rule(RuleEntity ruleEntity) {
+        id = ruleEntity.getRuleId();
         equipmentType = ruleEntity.getEquipmentType();
         mappedModel = ruleEntity.getMappedModel();
         setGroup = ruleEntity.getSetGroup();
         groupType = ruleEntity.getGroupType();
-        composition = ruleEntity.getComposition();
-        filters = ruleEntity.getFilters().stream().map(AbstractFilter::createFilterFromEntity).collect(Collectors.toList());
+        filter = ruleEntity.getFilterUuid() != null ? ExpertFilter.builder().id(ruleEntity.getFilterUuid()).build() : null;
     }
-
-    // Needs to put the default rule last, hence going for the most specific rule to the most generic
-    public static final Comparator<Rule> RULE_COMPARATOR = Comparator.comparing(rule -> -rule.getFilters().size());
 }
 

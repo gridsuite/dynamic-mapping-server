@@ -8,10 +8,8 @@ package org.gridsuite.mapping.server.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.gridsuite.mapping.server.dto.filters.AbstractFilter;
+import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.utils.EquipmentType;
-
-import java.util.List;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -25,10 +23,7 @@ public class RuleToMatch {
     @Schema(description = "Equipment type")
     private EquipmentType equipmentType;
 
-    @Schema(description = "Composition")
-    private String composition;
-
-    @Schema(description = "Filters")
-    private List<AbstractFilter> filters;
+    @Schema(description = "Filter")
+    private ExpertFilter filter;
 }
 

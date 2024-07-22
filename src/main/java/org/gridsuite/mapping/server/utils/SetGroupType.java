@@ -10,7 +10,16 @@ package org.gridsuite.mapping.server.utils;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 public enum SetGroupType {
+    /**
+     * group is used as a parameter set id
+     */
     FIXED,
+    /**
+     * the parameter set id comprise the model dynamic id (or the equipment static id if not found) prefixed by group
+     */
     PREFIX,
+    /**
+     * the parameter set id comprise the model dynamic id (or the equipment static id if not found) suffixed by group
+     */
     SUFFIX
 }
