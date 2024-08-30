@@ -50,18 +50,20 @@ public class AutomatonPropertyEntity implements Serializable {
     @MapsId("automatonId")
     private AutomatonEntity automaton;
 
-    public AutomatonPropertyEntity(UUID automatonId, AutomatonPropertyEntity automatonPropertyEntity) {
+    public AutomatonPropertyEntity(UUID automatonId, AutomatonPropertyEntity automatonPropertyEntity, AutomatonEntity automaton) {
         this.automatonId = automatonId;
         this.name = automatonPropertyEntity.getName();
         this.type = automatonPropertyEntity.getType();
         this.value = automatonPropertyEntity.getValue();
+        this.automaton = automaton;
     }
 
-    public AutomatonPropertyEntity(UUID automatonId, BasicProperty basicProperty) {
+    public AutomatonPropertyEntity(UUID automatonId, BasicProperty basicProperty, AutomatonEntity automaton) {
         this.automatonId = automatonId;
         this.name = basicProperty.getName();
         this.type = basicProperty.getType();
         this.value = basicProperty.getValue();
+        this.automaton = automaton;
     }
 
 }
