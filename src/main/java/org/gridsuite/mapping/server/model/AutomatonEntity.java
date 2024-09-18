@@ -61,7 +61,7 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.model = automaton.getModel();
         this.setGroup = automaton.getSetGroup();
         this.properties = automaton.getProperties() != null ? automaton.getProperties().stream()
-                .map(basicProperty -> new AutomatonPropertyEntity(newID, basicProperty))
+                .map(basicProperty -> new AutomatonPropertyEntity(newID, basicProperty, this))
                 .collect(Collectors.toList()) : null;
     }
 
@@ -73,7 +73,7 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
         this.model = automatonToCopy.getModel();
         this.setGroup = automatonToCopy.getSetGroup();
         this.properties = automatonToCopy.getProperties().stream()
-                .map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity))
+                .map(automatonPropertyEntity -> new AutomatonPropertyEntity(newID, automatonPropertyEntity, this))
                 .collect(Collectors.toList());
     }
 }
