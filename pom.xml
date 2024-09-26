@@ -32,7 +32,7 @@
     </scm>
 
     <properties>
-        <gridsuite-dependencies.version>33</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>34</gridsuite-dependencies.version>
         <string-template.version>4.3.1</string-template.version>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
     </properties>
@@ -96,11 +96,9 @@
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-ws-commons</artifactId>
         </dependency>
-        <!-- FIXME: gridsuite-filter modules' version is overloaded in the dependencies section. The overloads and this property below have to be removed at next gridsuite-dependencies.version upgrade -->
         <dependency>
             <groupId>org.gridsuite</groupId>
             <artifactId>gridsuite-filter</artifactId>
-            <version>1.0.13</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
