@@ -32,7 +32,7 @@
     </scm>
 
     <properties>
-        <gridsuite-dependencies.version>35</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>36</gridsuite-dependencies.version>
         <string-template.version>4.3.1</string-template.version>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
     </properties>
