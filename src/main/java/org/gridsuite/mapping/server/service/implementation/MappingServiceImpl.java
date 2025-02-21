@@ -25,7 +25,6 @@ import org.gridsuite.mapping.server.service.MappingService;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.gridsuite.mapping.server.utils.Methods;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +43,7 @@ import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME
 @Service
 public class MappingServiceImpl implements MappingService {
 
-    public static final String CONFLICT_MAPPING_ERROR_MESSAGE = "A mapping already exists with name: ";
-    public static final String MAPPING_NOT_FOUND_ERROR_MESSAGE = "Mapping not found with name: ";
+    private static final String MAPPING_NOT_FOUND_ERROR_MESSAGE = "Mapping not found with name: ";
 
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
@@ -114,6 +112,7 @@ public class MappingServiceImpl implements MappingService {
     }
 
     @Override
+    @Transactional
     public InputMapping saveMapping(String mappingName, InputMapping mapping) {
         if (!StringUtils.isBlank(mappingName)) {
             mapping.setName(mappingName);
@@ -210,66 +209,55 @@ public class MappingServiceImpl implements MappingService {
     }
 
     @Override
+    @Transactional
     public RenameObject renameMapping(String oldName, String newName) {
         Optional<MappingEntity> mappingToRename = mappingRepository.findById(oldName);
         if (mappingToRename.isPresent()) {
             MappingEntity mappingToSave = new MappingEntity(newName, mappingToRename.get());
-            try {
-                mappingRepository.deleteById(oldName);
-                mappingRepository.save(mappingToSave);
-                return new RenameObject(oldName, newName);
-            } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + newName, ex);
-            }
+            mappingRepository.deleteById(oldName);
+            mappingRepository.save(mappingToSave);
+            return new RenameObject(oldName, newName);
         } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
             // In case of naming of new mapping, save it to db.
-            try {
-                mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>(), false));
-                return new RenameObject(DEFAULT_MAPPING_NAME, newName);
-
-            } catch (DataIntegrityViolationException ex) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + newName, ex);
-            }
+            mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>(), false));
+            return new RenameObject(DEFAULT_MAPPING_NAME, newName);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + oldName);
         }
     }
 
     @Override
+    @Transactional
     public InputMapping copyMapping(String originalName, String copyName) {
         Optional<MappingEntity> mappingToCopyOpt = mappingRepository.findById(originalName);
         MappingEntity mappingToCopy = mappingToCopyOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + originalName));
 
         MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy);
-        try {
-            // --- duplicate filters in filter-server--- //
-            // get all filter uuids that needs to duplicate its corresponding filter
-            List<UUID> filterUuids = copiedMapping.getRules().stream()
-                .map(RuleEntity::getFilterUuid)
-                .filter(Objects::nonNull)
-                .toList();
+        // --- duplicate filters in filter-server--- //
+        // get all filter uuids that needs to duplicate its corresponding filter
+        List<UUID> filterUuids = copiedMapping.getRules().stream()
+            .map(RuleEntity::getFilterUuid)
+            .filter(Objects::nonNull)
+            .toList();
 
-            if (CollectionUtils.isNotEmpty(filterUuids)) {
-                // call filter-server API to duplicate filter
-                Map<UUID, UUID> uuidsMap = filterClient.duplicateFilters(filterUuids);
+        if (CollectionUtils.isNotEmpty(filterUuids)) {
+            // call filter-server API to duplicate filter
+            Map<UUID, UUID> uuidsMap = filterClient.duplicateFilters(filterUuids);
 
-                // replace the old by the new uuid for rule entities
-                copiedMapping.getRules().stream()
-                    .filter(rule -> rule.getFilterUuid() != null)
-                    .forEach(rule -> rule.setFilterUuid(uuidsMap.get(rule.getFilterUuid())));
-            }
-
-            // --- persist in cascade the mapping in local database --- //
-            MappingEntity savedMappingEntity = mappingRepository.save(copiedMapping);
-
-            // --- build mapping dto to return --- //
-            InputMapping mapping = new InputMapping(savedMappingEntity);
-            enrichFiltersForMappings(List.of(mapping));
-
-            return mapping;
-        } catch (DataIntegrityViolationException ex) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + copyName, ex);
+            // replace the old by the new uuid for rule entities
+            copiedMapping.getRules().stream()
+                .filter(rule -> rule.getFilterUuid() != null)
+                .forEach(rule -> rule.setFilterUuid(uuidsMap.get(rule.getFilterUuid())));
         }
+
+        // --- persist in cascade the mapping in local database --- //
+        MappingEntity savedMappingEntity = mappingRepository.save(copiedMapping);
+
+        // --- build mapping dto to return --- //
+        InputMapping mapping = new InputMapping(savedMappingEntity);
+        enrichFiltersForMappings(List.of(mapping));
+
+        return mapping;
     }
 
     @Transactional(readOnly = true)
@@ -291,11 +279,9 @@ public class MappingServiceImpl implements MappingService {
                 .collect(Collectors.toSet());
 
         // get model by name from db, concat to default models and convert to dtos
-        List<Model> mappedModels = Stream.concat(modelRepository.findAllById(mappedModelNames).stream(),
+        return Stream.concat(modelRepository.findAllById(mappedModelNames).stream(),
                         modelRepository.findAllByDefaultModelTrue().stream())
                 .map(Model::new).toList();
-
-        return mappedModels;
     }
 
 }

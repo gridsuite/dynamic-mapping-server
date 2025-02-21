@@ -205,6 +205,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public ParametersSetsGroup saveParametersSetsGroup(String modelName, ParametersSetsGroup setsGroup, Boolean strict) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -337,6 +338,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModelParameterDefinition> getParameterDefinitionsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -463,6 +465,7 @@ public class ModelServiceImpl implements ModelService {
 
     // --- BEGIN variable-related service methods --- //
     @Override
+    @Transactional(readOnly = true)
     public List<ModelVariableDefinition> getVariableDefinitionsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -591,11 +594,13 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<VariablesSet> getVariablesSets(List<String> variablesSetNames) {
         return modelVariablesSetRepository.findAllById(variablesSetNames).stream().map(VariablesSet::new).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<VariablesSet> getVariablesSetsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -614,6 +619,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModelVariableDefinition> getVariableDefinitionsFromVariablesSet(String variableSetName) {
         Optional<ModelVariableSetEntity> foundVariableSetOpt = modelVariablesSetRepository.findById(variableSetName);
 
@@ -748,6 +754,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public Model removeAllExistingVariablesSetsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 

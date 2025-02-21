@@ -26,6 +26,7 @@ import org.gridsuite.mapping.server.utils.ParameterType;
 import org.gridsuite.mapping.server.utils.Templater;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -51,6 +52,7 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ParameterFile exportParameters(String mappingName) {
         Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
         if (foundMapping.isPresent()) {
