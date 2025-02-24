@@ -15,9 +15,12 @@ import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.service.MappingService;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -29,6 +32,8 @@ import java.util.List;
 @Tag(name = "Mapping server")
 @AllArgsConstructor
 public class MappingController {
+
+    private static final String CONFLICT_MAPPING_ERROR_MESSAGE = "A mapping already exists with name: ";
 
     private final MappingService mappingService;
 
@@ -77,8 +82,15 @@ public class MappingController {
         @ApiResponse(responseCode = "404", description = "Mapping not found"),
         @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
     public ResponseEntity<RenameObject> renameMapping(@PathVariable("oldName") String oldName, @PathVariable("newName") String newName) {
-        RenameObject renamedMapping = mappingService.renameMapping(oldName, newName);
-        return ResponseEntity.ok().body(renamedMapping);
+        return ResponseEntity.ok().body(renameMappingWithUniquenessCheck(oldName, newName));
+    }
+
+    private RenameObject renameMappingWithUniquenessCheck(String oldName, String newName) {
+        try {
+            return mappingService.renameMapping(oldName, newName);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + newName, ex);
+        }
     }
 
     @PostMapping(value = "/copy/{originalName}/to/{copyName}")
@@ -87,8 +99,15 @@ public class MappingController {
         @ApiResponse(responseCode = "404", description = "Mapping not found"),
         @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
     public ResponseEntity<InputMapping> copyMapping(@PathVariable("originalName") String originalName, @PathVariable("copyName") String copyName) {
-        InputMapping copiedMapping = mappingService.copyMapping(originalName, copyName);
-        return ResponseEntity.ok().body(copiedMapping);
+        return ResponseEntity.ok().body(copyMappingWithUniquenessCheck(originalName, copyName));
+    }
+
+    private InputMapping copyMappingWithUniquenessCheck(String originalName, String copyName) {
+        try {
+            return mappingService.copyMapping(originalName, copyName);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, CONFLICT_MAPPING_ERROR_MESSAGE + copyName, ex);
+        }
     }
 
 }

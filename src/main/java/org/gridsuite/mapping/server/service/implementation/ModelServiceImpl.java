@@ -31,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -171,26 +172,31 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SimpleModel> getModels() {
-        return modelRepository.findAll().stream().map(modelEntity -> new SimpleModel(new Model(modelEntity))).collect(Collectors.toList());
+        return modelRepository.findAll().stream().map(modelEntity -> new SimpleModel(new Model(modelEntity))).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModelParameter> getParameters() {
         return modelParameterRepository.findAll().stream().map(ModelParameter::new).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ParametersSetsGroup> getParametersSetsGroups() {
         return modelSetsGroupRepository.findAll().stream().map(ParametersSetsGroup::new).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ParametersSet> getParametersSets() {
         return modelParameterSetRepository.findAll().stream().map(ParametersSet::new).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ParametersSet> getSetsFromGroup(String modelName, String groupName, SetGroupType groupType) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -201,10 +207,11 @@ public class ModelServiceImpl implements ModelService {
                 .findAny();
         ModelSetsGroupEntity setsGroup = getSetsGroupFromOptional("[" + groupName + "," + groupType.name() + "]", modelSetsGroupOpt);
 
-        return setsGroup.getSets().stream().map(ParametersSet::new).collect(Collectors.toList());
+        return setsGroup.getSets().stream().map(ParametersSet::new).toList();
     }
 
     @Override
+    @Transactional
     public ParametersSetsGroup saveParametersSetsGroup(String modelName, ParametersSetsGroup setsGroup, Boolean strict) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -219,9 +226,7 @@ public class ModelServiceImpl implements ModelService {
             savedGroups.add(groupToAdd);
         } else {
             // If additional checks are required here, ensure that set erasure cannot happen here with sets merging.
-            groupToAdd.getSets().forEach(set ->
-                    previousGroup.addParameterSet(set)
-            );
+            groupToAdd.getSets().forEach(previousGroup::addParameterSet);
         }
 
         if (new Model(modelToUpdate).isParameterSetGroupValid(setsGroup.getName(), strict)) {
@@ -301,6 +306,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public ParametersSetsGroup deleteSet(String modelName, String groupName, SetGroupType groupType, String setName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -326,17 +332,20 @@ public class ModelServiceImpl implements ModelService {
     // --- BEGIN parameter definition-related service methods --- //
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> getParameterDefinitionNames() {
         return modelParameterDefinitionRepository.findAll().stream().map(ModelParameterDefinitionEntity::getName).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModelParameterDefinition> getParameterDefinitions(List<String> parameterDefinitionNames) {
         return modelParameterDefinitionRepository.findAllById(parameterDefinitionNames).stream()
                 .map(parameterDefinitionEntity -> new ModelParameterDefinition(parameterDefinitionEntity, null, null)).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModelParameterDefinition> getParameterDefinitionsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -380,8 +389,8 @@ public class ModelServiceImpl implements ModelService {
             // check whether found all, fail fast
             if (foundParameterDefinitionEntities.size() != parameterDefinitionNames.size()) {
                 List<String> foundNames = foundParameterDefinitionEntities.stream()
-                        .map(ModelParameterDefinitionEntity::getName).collect(Collectors.toList());
-                List<String> notFoundNames = parameterDefinitionNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
+                        .map(ModelParameterDefinitionEntity::getName).toList();
+                List<String> notFoundNames = parameterDefinitionNames.stream().filter(name -> !foundNames.contains(name)).toList();
                 throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some parameter definition not found: " + notFoundNames);
             }
 
@@ -428,7 +437,7 @@ public class ModelServiceImpl implements ModelService {
 
         // clear the existing list
         modelToUpdate.removeAllParameterDefinition(modelToUpdate.getParameterDefinitions().stream()
-                .map(ModelModelParameterDefinitionEntity::getParameterDefinition).collect(Collectors.toList()));
+                .map(ModelModelParameterDefinitionEntity::getParameterDefinition).toList());
 
         // save modified existing model entity
         modelRepository.save(modelToUpdate);
@@ -444,7 +453,7 @@ public class ModelServiceImpl implements ModelService {
                     .map(ModelParameterDefinitionEntity::new)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelParameterDefinitionEntity> savedParameterDefinitionEntities = modelParameterDefinitionRepository.saveAll(parameterDefinitionEntities);
-            return savedParameterDefinitionEntities.stream().map(entity -> new ModelParameterDefinition(entity, null, null)).collect(Collectors.toList());
+            return savedParameterDefinitionEntities.stream().map(entity -> new ModelParameterDefinition(entity, null, null)).toList();
         }
 
         return Collections.emptyList();
@@ -463,6 +472,7 @@ public class ModelServiceImpl implements ModelService {
 
     // --- BEGIN variable-related service methods --- //
     @Override
+    @Transactional(readOnly = true)
     public List<ModelVariableDefinition> getVariableDefinitionsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -473,10 +483,12 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> getVariableDefinitionNames() {
         return modelVariableRepository.findAll().stream().map(ModelVariableDefinitionEntity::getName).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ModelVariableDefinition> getVariableDefinitions(List<String> variableNames) {
         return modelVariableRepository.findAllById(variableNames).stream().map(ModelVariableDefinition::new).toList();
@@ -494,7 +506,7 @@ public class ModelServiceImpl implements ModelService {
             // do merge with existing list
             List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream()
                     .map(variableDefinition -> new ModelVariableDefinitionEntity(modelToUpdate, null, variableDefinition))
-                    .collect(Collectors.toList());
+                    .toList();
             modelToUpdate.addAllVariableDefinition(variableDefinitionEntities);
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -519,8 +531,8 @@ public class ModelServiceImpl implements ModelService {
             // check whether found all, fail fast
             if (foundVariableDefinitionEntities.size() != variableDefinitionNames.size()) {
                 List<String> foundNames = foundVariableDefinitionEntities.stream()
-                        .map(ModelVariableDefinitionEntity::getName).collect(Collectors.toList());
-                List<String> notFoundNames = variableDefinitionNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
+                        .map(ModelVariableDefinitionEntity::getName).toList();
+                List<String> notFoundNames = variableDefinitionNames.stream().filter(name -> !foundNames.contains(name)).toList();
                 throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some variable definition not found: " + notFoundNames);
             }
 
@@ -564,7 +576,7 @@ public class ModelServiceImpl implements ModelService {
                     .map(variableDefinition -> new ModelVariableDefinitionEntity(null, null, variableDefinition))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             List<ModelVariableDefinitionEntity> savedVariableDefinitionEntities = modelVariableRepository.saveAll(variableDefinitionEntities);
-            return savedVariableDefinitionEntities.stream().map(ModelVariableDefinition::new).collect(Collectors.toList());
+            return savedVariableDefinitionEntities.stream().map(ModelVariableDefinition::new).toList();
         }
         return Collections.emptyList();
     }
@@ -586,16 +598,19 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<String> getVariablesSetNames() {
         return modelVariablesSetRepository.findAll().stream().map(ModelVariableSetEntity::getName).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<VariablesSet> getVariablesSets(List<String> variablesSetNames) {
         return modelVariablesSetRepository.findAllById(variablesSetNames).stream().map(VariablesSet::new).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<VariablesSet> getVariablesSetsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
@@ -614,6 +629,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ModelVariableDefinition> getVariableDefinitionsFromVariablesSet(String variableSetName) {
         Optional<ModelVariableSetEntity> foundVariableSetOpt = modelVariablesSetRepository.findById(variableSetName);
 
@@ -634,7 +650,7 @@ public class ModelServiceImpl implements ModelService {
             // do merge with existing list
             List<ModelVariableDefinitionEntity> variableDefinitionEntities = variableDefinitions.stream()
                     .map(variableDefinition -> new ModelVariableDefinitionEntity(null, variableSetToUpdate, variableDefinition))
-                    .collect(Collectors.toList());
+                    .toList();
             variableSetToUpdate.addAllVariableDefinition(variableDefinitionEntities);
             // save modified existing variables set entity
             modelVariablesSetRepository.save(variableSetToUpdate);
@@ -691,7 +707,7 @@ public class ModelServiceImpl implements ModelService {
             // do merge with existing list
             List<ModelVariableSetEntity> variablesSetEntities = variableSets.stream()
                     .map(variablesSet -> new ModelVariableSetEntity(modelToUpdate, variablesSet))
-                    .collect(Collectors.toList());
+                    .toList();
             modelToUpdate.addAllVariablesSet(variablesSetEntities);
             // save modified existing model entity
             modelRepository.save(modelToUpdate);
@@ -714,8 +730,8 @@ public class ModelServiceImpl implements ModelService {
 
             // check whether found all
             if (foundVariablesSetEntities.size() != variablesSetNames.size()) {
-                List<String> foundNames = foundVariablesSetEntities.stream().map(ModelVariableSetEntity::getName).collect(Collectors.toList());
-                List<String> notFoundNames = variablesSetNames.stream().filter(name -> !foundNames.contains(name)).collect(Collectors.toList());
+                List<String> foundNames = foundVariablesSetEntities.stream().map(ModelVariableSetEntity::getName).toList();
+                List<String> notFoundNames = variablesSetNames.stream().filter(name -> !foundNames.contains(name)).toList();
                 throw new HttpClientErrorException(HttpStatus.NOT_FOUND, "Some variables set not found: " + notFoundNames);
             }
 
@@ -748,6 +764,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    @Transactional
     public Model removeAllExistingVariablesSetsFromModel(String modelName) {
         Optional<ModelEntity> foundModelOpt = modelRepository.findById(modelName);
 
