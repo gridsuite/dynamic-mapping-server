@@ -35,6 +35,8 @@
         <gridsuite-dependencies.version>38.0.0</gridsuite-dependencies.version>
         <string-template.version>4.3.1</string-template.version>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
+        <sonar.organization>gridsuite</sonar.organization>
+        <sonar.projectKey>org.gridsuite:dynamic-mapping-server</sonar.projectKey>
     </properties>
 
     <build>
