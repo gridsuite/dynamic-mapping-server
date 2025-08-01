@@ -33,6 +33,9 @@
 
     <properties>
         <gridsuite-dependencies.version>42.0.0</gridsuite-dependencies.version>
+        <!-- FIXME to remove at next upgrade of powsybl-ws-dependencies -->
+        <gridsuite-filter.version>1.7.0</gridsuite-filter.version>
+
         <string-template.version>4.3.1</string-template.version>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
         <sonar.organization>gridsuite</sonar.organization>
@@ -101,6 +104,7 @@
         <dependency>
             <groupId>org.gridsuite</groupId>
             <artifactId>gridsuite-filter</artifactId>
+            <version>${gridsuite-filter.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
