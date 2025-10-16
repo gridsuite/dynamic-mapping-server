@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.dto.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelVariableSetEntity;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class VariablesSet {
     private String name;
     private List<ModelVariableDefinition> variableDefinitions;

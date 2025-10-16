@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.dto.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Model {
 
     private String modelName;

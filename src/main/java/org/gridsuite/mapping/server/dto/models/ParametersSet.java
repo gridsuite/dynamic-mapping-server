@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.dto.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelParameterSetEntity;
 
 import java.util.Date;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Data
+@NoArgsConstructor
 public class ParametersSet {
     private String name;
     private List<ModelParameter> parameters;

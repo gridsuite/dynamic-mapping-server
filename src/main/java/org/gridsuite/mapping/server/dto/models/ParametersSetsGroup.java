@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.dto.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ParametersSetsGroup {
 
     private String name;
