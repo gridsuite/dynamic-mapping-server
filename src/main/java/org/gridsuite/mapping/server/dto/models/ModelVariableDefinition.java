@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server.dto.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelVariableDefinitionEntity;
 import org.gridsuite.mapping.server.utils.VariableType;
 
@@ -17,6 +18,7 @@ import org.gridsuite.mapping.server.utils.VariableType;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ModelVariableDefinition {
 
     private String name;

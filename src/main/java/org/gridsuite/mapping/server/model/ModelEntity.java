@@ -58,10 +58,10 @@ public class ModelEntity implements Serializable {
             joinColumns = {@JoinColumn(name = "model_name")},
             inverseJoinColumns = {@JoinColumn(name = "variable_definition_name")}
     )
-    private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
+    private Set<ModelVariableDefinitionEntity> variableDefinitions = LinkedHashSet.newLinkedHashSet(0);
 
     @ManyToMany(targetEntity = ModelVariableSetEntity.class, mappedBy = "models", cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private Set<ModelVariableSetEntity> variableSets = new LinkedHashSet<>(0);
+    private Set<ModelVariableSetEntity> variableSets = LinkedHashSet.newLinkedHashSet(0);
 
     public ModelEntity(Model modelToConvert) {
         modelName = modelToConvert.getModelName();
