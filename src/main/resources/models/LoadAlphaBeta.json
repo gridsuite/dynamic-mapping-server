@@ -1,0 +1,93 @@
+{
+    "modelName": "LoadAlphaBeta",
+    "equipmentType": "LOAD",
+    "parameterDefinitions": [
+        {
+            "name": "load_P0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "p_pu"
+        },
+        {
+            "name": "load_Q0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "q_pu"
+        },
+        {
+            "name": "load_U0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "v_pu"
+        },
+        {
+            "name": "load_UPhase0",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "angle_pu"
+        },
+        {
+            "name": "load_alpha",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "load_beta",
+            "type": "DOUBLE",
+            "origin": "USER"
+        }
+    ],
+    "setsGroups": [
+        {
+            "name": "LAB",
+            "type": "FIXED",
+            "modelName": "LoadAlphaBeta",
+            "sets": [
+                {
+                    "name": "LAB",
+                    "parameters": [
+                        {
+                            "name": "load_alpha",
+                            "value": "1."
+                        },
+                        {
+                            "name": "load_beta",
+                            "value": "2."
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variableDefinitions": [
+        {
+            "name": "load_running_value",
+            "type": "BOOL"
+        },
+        {
+            "name": "load_PPu",
+            "type": "DOUBLE",
+            "unit": "MW",
+            "factor": "100"
+        },
+        {
+            "name": "load_PRefPu",
+            "type": "DOUBLE",
+            "unit": "MW",
+            "factor": "100"
+        },
+        {
+            "name": "load_QPu",
+            "type": "DOUBLE",
+            "unit": "Mvar",
+            "factor": "100"
+        },
+        {
+            "name": "load_QRefPu",
+            "type": "DOUBLE",
+            "unit": "Mvar",
+            "factor": "100"
+        }
+    ],
+    "variablesSets": []
+}
