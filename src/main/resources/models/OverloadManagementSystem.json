@@ -1,0 +1,130 @@
+{
+    "modelName": "OverloadManagementSystem",
+    "equipmentType": "OVERLOAD_MANAGEMENT",
+    "parameterDefinitions": [
+        {
+            "name": "currentLimitAutomaton_IMax",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "currentLimitAutomaton_OrderToEmit",
+            "type": "INT",
+            "origin": "USER"
+        },
+        {
+            "name": "currentLimitAutomaton_Running",
+            "type": "BOOL",
+            "origin": "USER"
+        },
+        {
+            "name": "currentLimitAutomaton_tLagBeforeActing",
+            "type": "DOUBLE",
+            "origin": "USER"
+        }
+    ],
+    "setsGroups": [
+        {
+            "name": "CLA",
+            "type": "FIXED",
+            "modelName": "OverloadManagementSystem",
+            "sets": [
+                {
+                    "name": "CLA",
+                    "parameters": [
+                        {
+                            "name": "currentLimitAutomaton_IMax",
+                            "value": "1000"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_OrderToEmit",
+                            "value": "3"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_Running",
+                            "value": "true"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_tLagBeforeActing",
+                            "value": "10"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CLA_2_4",
+            "type": "FIXED",
+            "modelName": "OverloadManagementSystem",
+            "sets": [
+                {
+                    "name": "CLA_2_4",
+                    "parameters": [
+                        {
+                            "name": "currentLimitAutomaton_IMax",
+                            "value": "1000"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_OrderToEmit",
+                            "value": "3"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_Running",
+                            "value": "true"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_tLagBeforeActing",
+                            "value": "10"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CLA_2_5",
+            "type": "FIXED",
+            "modelName": "OverloadManagementSystem",
+            "sets": [
+                {
+                    "name": "CLA_2_5",
+                    "parameters": [
+                        {
+                            "name": "currentLimitAutomaton_IMax",
+                            "value": "600"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_OrderToEmit",
+                            "value": "1"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_Running",
+                            "value": "true"
+                        },
+                        {
+                            "name": "currentLimitAutomaton_tLagBeforeActing",
+                            "value": "5"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variableDefinitions": [
+        {
+            "name": "currentLimitAutomaton_IMonitored_value",
+            "type": "DOUBLE",
+            "unit": "kA"
+        },
+        {
+            "name": "currentLimitAutomaton_tThresholdReached",
+            "type": "DOUBLE",
+            "unit": "s"
+        },
+        {
+            "name": "currentLimitAutomaton_tOrder",
+            "type": "DOUBLE",
+            "unit": "s"
+        }
+    ],
+    "variablesSets": []
+}

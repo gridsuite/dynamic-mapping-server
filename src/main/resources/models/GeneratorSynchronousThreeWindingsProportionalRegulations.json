@@ -1,0 +1,760 @@
+{
+    "modelName": "GeneratorSynchronousThreeWindingsProportionalRegulations",
+    "equipmentType": "GENERATOR",
+    "parameterDefinitions": [
+        {
+            "name": "generator_DPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_ExcitationPu",
+            "type": "INT",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_H",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_MdPuEfd",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_P0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "p_pu"
+        },
+        {
+            "name": "generator_PNomAlt",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_PNomTurb",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_Q0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "q_pu"
+        },
+        {
+            "name": "generator_RTfPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_RaPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_SNom",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_SnTfo",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_Tpd0",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_Tppd0",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_Tppq0",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_U0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "v_pu"
+        },
+        {
+            "name": "generator_UBaseHV",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_UBaseLV",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_UNom",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_UNomHV",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_UNomLV",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_UPhase0",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "angle_pu"
+        },
+        {
+            "name": "generator_UseApproximation",
+            "type": "BOOL",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_XTfPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_XdPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_XlPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_XpdPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_XppdPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_XppqPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_XqPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_md",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_mq",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_nd",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_nq",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "governor_KGover",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "governor_PMax",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "governor_PMin",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "governor_PNom",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "voltageRegulator_EfdMaxPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "voltageRegulator_EfdMinPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "voltageRegulator_Gain",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "voltageRegulator_LagEfdMax",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "voltageRegulator_LagEfdMin",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "voltageRegulator_UsRefMaxPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "voltageRegulator_UsRefMinPu",
+            "type": "DOUBLE",
+            "origin": "USER"
+        }
+    ],
+    "setsGroups": [
+        {
+            "name": "GSTWPR",
+            "type": "FIXED",
+            "modelName": "GeneratorSynchronousThreeWindingsProportionalRegulations",
+            "sets": [
+                {
+                    "name": "GSTWPR",
+                    "parameters": [
+                        {
+                            "name": "generator_DPu",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_ExcitationPu",
+                            "value": "1"
+                        },
+                        {
+                            "name": "generator_H",
+                            "value": "4.975"
+                        },
+                        {
+                            "name": "generator_MdPuEfd",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_PNomAlt",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "generator_PNomTurb",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "generator_RTfPu",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_RaPu",
+                            "value": "0.004"
+                        },
+                        {
+                            "name": "generator_SNom",
+                            "value": "80"
+                        },
+                        {
+                            "name": "generator_SnTfo",
+                            "value": "80"
+                        },
+                        {
+                            "name": "generator_Tpd0",
+                            "value": "3"
+                        },
+                        {
+                            "name": "generator_Tppd0",
+                            "value": "0.04"
+                        },
+                        {
+                            "name": "generator_Tppq0",
+                            "value": "0.04"
+                        },
+                        {
+                            "name": "generator_UBaseHV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UBaseLV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UNom",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UNomHV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UNomLV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UseApproximation",
+                            "value": "true"
+                        },
+                        {
+                            "name": "generator_XTfPu",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_XdPu",
+                            "value": "0.75"
+                        },
+                        {
+                            "name": "generator_XlPu",
+                            "value": "0.102"
+                        },
+                        {
+                            "name": "generator_XpdPu",
+                            "value": "0.225"
+                        },
+                        {
+                            "name": "generator_XppdPu",
+                            "value": "0.154"
+                        },
+                        {
+                            "name": "generator_XppqPu",
+                            "value": "0.2"
+                        },
+                        {
+                            "name": "generator_XqPu",
+                            "value": "0.45"
+                        },
+                        {
+                            "name": "generator_md",
+                            "value": "0.16"
+                        },
+                        {
+                            "name": "generator_mq",
+                            "value": "0.16"
+                        },
+                        {
+                            "name": "generator_nd",
+                            "value": "5.7"
+                        },
+                        {
+                            "name": "generator_nq",
+                            "value": "5.7"
+                        },
+                        {
+                            "name": "governor_KGover",
+                            "value": "5"
+                        },
+                        {
+                            "name": "governor_PMax",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "governor_PMin",
+                            "value": "0"
+                        },
+                        {
+                            "name": "governor_PNom",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "voltageRegulator_EfdMaxPu",
+                            "value": "5"
+                        },
+                        {
+                            "name": "voltageRegulator_EfdMinPu",
+                            "value": "-5"
+                        },
+                        {
+                            "name": "voltageRegulator_Gain",
+                            "value": "20"
+                        },
+                        {
+                            "name": "voltageRegulator_LagEfdMax",
+                            "value": "0"
+                        },
+                        {
+                            "name": "voltageRegulator_LagEfdMin",
+                            "value": "0"
+                        },
+                        {
+                            "name": "voltageRegulator_UsRefMaxPu",
+                            "value": "1.2"
+                        },
+                        {
+                            "name": "voltageRegulator_UsRefMinPu",
+                            "value": "0.8"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "IEEE14",
+            "type": "PREFIX",
+            "modelName": "GeneratorSynchronousThreeWindingsProportionalRegulations",
+            "sets": [
+                {
+                    "name": "IEEE14_GEN____6_SM",
+                    "parameters": [
+                        {
+                            "name": "generator_DPu",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_ExcitationPu",
+                            "value": "1"
+                        },
+                        {
+                            "name": "generator_H",
+                            "value": "4.975"
+                        },
+                        {
+                            "name": "generator_MdPuEfd",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_PNomAlt",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "generator_PNomTurb",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "generator_RTfPu",
+                            "value": "0.0"
+                        },
+                        {
+                            "name": "generator_RaPu",
+                            "value": "0.004"
+                        },
+                        {
+                            "name": "generator_SNom",
+                            "value": "80"
+                        },
+                        {
+                            "name": "generator_SnTfo",
+                            "value": "80"
+                        },
+                        {
+                            "name": "generator_Tpd0",
+                            "value": "3"
+                        },
+                        {
+                            "name": "generator_Tppd0",
+                            "value": "0.04"
+                        },
+                        {
+                            "name": "generator_Tppq0",
+                            "value": "0.04"
+                        },
+                        {
+                            "name": "generator_UBaseHV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UBaseLV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UNom",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UNomHV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UNomLV",
+                            "value": "15"
+                        },
+                        {
+                            "name": "generator_UseApproximation",
+                            "value": "true"
+                        },
+                        {
+                            "name": "generator_XTfPu",
+                            "value": "0.0"
+                        },
+                        {
+                            "name": "generator_XdPu",
+                            "value": "0.75"
+                        },
+                        {
+                            "name": "generator_XlPu",
+                            "value": "0.102"
+                        },
+                        {
+                            "name": "generator_XpdPu",
+                            "value": "0.225"
+                        },
+                        {
+                            "name": "generator_XppdPu",
+                            "value": "0.154"
+                        },
+                        {
+                            "name": "generator_XppqPu",
+                            "value": "0.2"
+                        },
+                        {
+                            "name": "generator_XqPu",
+                            "value": "0.45"
+                        },
+                        {
+                            "name": "generator_md",
+                            "value": "0.16"
+                        },
+                        {
+                            "name": "generator_mq",
+                            "value": "0.16"
+                        },
+                        {
+                            "name": "generator_nd",
+                            "value": "5.7"
+                        },
+                        {
+                            "name": "generator_nq",
+                            "value": "5.7"
+                        },
+                        {
+                            "name": "governor_KGover",
+                            "value": "5"
+                        },
+                        {
+                            "name": "governor_PMax",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "governor_PMin",
+                            "value": "0"
+                        },
+                        {
+                            "name": "governor_PNom",
+                            "value": "74.4"
+                        },
+                        {
+                            "name": "voltageRegulator_EfdMaxPu",
+                            "value": "5"
+                        },
+                        {
+                            "name": "voltageRegulator_EfdMinPu",
+                            "value": "-5"
+                        },
+                        {
+                            "name": "voltageRegulator_Gain",
+                            "value": "20"
+                        },
+                        {
+                            "name": "voltageRegulator_LagEfdMax",
+                            "value": "0"
+                        },
+                        {
+                            "name": "voltageRegulator_LagEfdMin",
+                            "value": "0"
+                        },
+                        {
+                            "name": "voltageRegulator_UsRefMaxPu",
+                            "value": "1.2"
+                        },
+                        {
+                            "name": "voltageRegulator_UsRefMinPu",
+                            "value": "0.8"
+                        }
+                    ]
+                },
+                {
+                    "name": "IEEE14_GEN____8_SM",
+                    "parameters": [
+                        {
+                            "name": "generator_DPu",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_ExcitationPu",
+                            "value": "1"
+                        },
+                        {
+                            "name": "generator_H",
+                            "value": "2.748"
+                        },
+                        {
+                            "name": "generator_MdPuEfd",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_PNomAlt",
+                            "value": "228"
+                        },
+                        {
+                            "name": "generator_PNomTurb",
+                            "value": "228"
+                        },
+                        {
+                            "name": "generator_RTfPu",
+                            "value": "0.0"
+                        },
+                        {
+                            "name": "generator_RaPu",
+                            "value": "0.004"
+                        },
+                        {
+                            "name": "generator_SNom",
+                            "value": "250"
+                        },
+                        {
+                            "name": "generator_SnTfo",
+                            "value": "250"
+                        },
+                        {
+                            "name": "generator_Tpd0",
+                            "value": "8.4"
+                        },
+                        {
+                            "name": "generator_Tppd0",
+                            "value": "0.096"
+                        },
+                        {
+                            "name": "generator_Tppq0",
+                            "value": "0.56"
+                        },
+                        {
+                            "name": "generator_UBaseHV",
+                            "value": "13.8"
+                        },
+                        {
+                            "name": "generator_UBaseLV",
+                            "value": "18"
+                        },
+                        {
+                            "name": "generator_UNom",
+                            "value": "18"
+                        },
+                        {
+                            "name": "generator_UNomHV",
+                            "value": "13.8"
+                        },
+                        {
+                            "name": "generator_UNomLV",
+                            "value": "18"
+                        },
+                        {
+                            "name": "generator_UseApproximation",
+                            "value": "true"
+                        },
+                        {
+                            "name": "generator_XTfPu",
+                            "value": "0.1"
+                        },
+                        {
+                            "name": "generator_XdPu",
+                            "value": "1.53"
+                        },
+                        {
+                            "name": "generator_XlPu",
+                            "value": "0.11"
+                        },
+                        {
+                            "name": "generator_XpdPu",
+                            "value": "0.31"
+                        },
+                        {
+                            "name": "generator_XppdPu",
+                            "value": "0.275"
+                        },
+                        {
+                            "name": "generator_XppqPu",
+                            "value": "0.58"
+                        },
+                        {
+                            "name": "generator_XqPu",
+                            "value": "0.99"
+                        },
+                        {
+                            "name": "generator_md",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_mq",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_nd",
+                            "value": "0"
+                        },
+                        {
+                            "name": "generator_nq",
+                            "value": "0"
+                        },
+                        {
+                            "name": "governor_KGover",
+                            "value": "5"
+                        },
+                        {
+                            "name": "governor_PMax",
+                            "value": "228"
+                        },
+                        {
+                            "name": "governor_PMin",
+                            "value": "0"
+                        },
+                        {
+                            "name": "governor_PNom",
+                            "value": "228"
+                        },
+                        {
+                            "name": "voltageRegulator_EfdMaxPu",
+                            "value": "5"
+                        },
+                        {
+                            "name": "voltageRegulator_EfdMinPu",
+                            "value": "-5"
+                        },
+                        {
+                            "name": "voltageRegulator_Gain",
+                            "value": "20"
+                        },
+                        {
+                            "name": "voltageRegulator_LagEfdMax",
+                            "value": "0"
+                        },
+                        {
+                            "name": "voltageRegulator_LagEfdMin",
+                            "value": "0"
+                        },
+                        {
+                            "name": "voltageRegulator_UsRefMaxPu",
+                            "value": "1.2"
+                        },
+                        {
+                            "name": "voltageRegulator_UsRefMinPu",
+                            "value": "0.8"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variableDefinitions": [],
+    "variablesSets": []
+}

@@ -1,0 +1,21 @@
+{
+    "name": "GeneratorPQ",
+    "variableDefinitions": [
+        {
+            "name": "generator_running_value",
+            "type": "BOOL"
+        },
+        {
+            "name": "generator_QGenPu",
+            "type": "DOUBLE",
+            "unit": "Mvar",
+            "factor": "100"
+        },
+        {
+            "name": "generator_PGenPu",
+            "type": "DOUBLE",
+            "unit": "MW",
+            "factor": "100"
+        }
+    ]
+}

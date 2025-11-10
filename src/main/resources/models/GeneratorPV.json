@@ -1,0 +1,106 @@
+{
+    "modelName": "GeneratorPV",
+    "equipmentType": "GENERATOR",
+    "parameterDefinitions": [
+        {
+            "name": "generator_AlphaPuPNom",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_LambdaPuSNom",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_P0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "p_pu"
+        },
+        {
+            "name": "generator_PMax",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "pMax"
+        },
+        {
+            "name": "generator_PMin",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "pMin"
+        },
+        {
+            "name": "generator_PNom",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "pMax"
+        },
+        {
+            "name": "generator_Q0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "q_pu"
+        },
+        {
+            "name": "generator_QMax",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_QMin",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "generator_SNom",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "sNom"
+        },
+        {
+            "name": "generator_U0Pu",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "v_pu"
+        },
+        {
+            "name": "generator_UPhase0",
+            "type": "DOUBLE",
+            "origin": "NETWORK",
+            "originName": "angle_pu"
+        }
+    ],
+    "setsGroups": [
+        {
+            "name": "GPV",
+            "type": "FIXED",
+            "modelName": "GeneratorPV",
+            "sets": [
+                {
+                    "name": "GPV",
+                    "parameters": [
+                        {
+                            "name": "generator_AlphaPuPNom",
+                            "value": "20"
+                        },
+                        {
+                            "name": "generator_LambdaPuSNom",
+                            "value": "0.01"
+                        },
+                        {
+                            "name": "generator_QMax",
+                            "value": "35.1"
+                        },
+                        {
+                            "name": "generator_QMin",
+                            "value": "-41"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "variableDefinitions": [],
+    "variablesSets": []
+}
