@@ -36,7 +36,7 @@ public class ModelEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
-    @Column(name = "id", columnDefinition = "UUID")
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "model_name")
