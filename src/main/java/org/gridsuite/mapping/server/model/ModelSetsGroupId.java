@@ -6,19 +6,16 @@
  */
 package org.gridsuite.mapping.server.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.Embeddable;
+import lombok.*;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
-import jakarta.persistence.Embeddable;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
+@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
@@ -28,27 +25,8 @@ public class ModelSetsGroupId implements Serializable {
 
     private String name;
 
-    private String modelName;
+    private String modelId;
 
     private SetGroupType type;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ModelSetsGroupId modelSetsGroupIdClass = (ModelSetsGroupId) o;
-        return name.equals(modelSetsGroupIdClass.name) &&
-                modelName.equals(modelSetsGroupIdClass.modelName) &&
-                type.equals(modelSetsGroupIdClass.type);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, modelName, type);
-    }
 
 }

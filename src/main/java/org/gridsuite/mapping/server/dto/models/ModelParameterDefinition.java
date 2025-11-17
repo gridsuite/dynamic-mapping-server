@@ -13,6 +13,8 @@ import org.gridsuite.mapping.server.model.ModelParameterDefinitionEntity;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
 
+import java.util.UUID;
+
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
@@ -20,6 +22,8 @@ import org.gridsuite.mapping.server.utils.ParameterType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModelParameterDefinition {
+
+    private UUID id;
 
     private String name;
 
@@ -32,6 +36,7 @@ public class ModelParameterDefinition {
     private String fixedValue;
 
     public ModelParameterDefinition(ModelParameterDefinitionEntity modelParameterDefinitionEntity, ParameterOrigin origin, String originName) {
+        this.id = modelParameterDefinitionEntity.getId();
         this.name = modelParameterDefinitionEntity.getName();
         this.type = modelParameterDefinitionEntity.getType();
         this.origin = origin;

@@ -10,8 +10,18 @@ package org.gridsuite.mapping.server.repository;
 import org.gridsuite.mapping.server.model.ModelVariableSetEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-public interface ModelVariablesSetRepository extends JpaRepository<ModelVariableSetEntity, String> {
+public interface ModelVariablesSetRepository extends JpaRepository<ModelVariableSetEntity, UUID> {
+    List<ModelVariableSetEntity> findAllByName(Collection<String> names);
+
+    Optional<ModelVariableSetEntity> findByName(String name);
+
+    void deleteAllByName(Collection<String> names);
 }

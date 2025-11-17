@@ -1,9 +1,9 @@
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -19,14 +19,14 @@ public class ModelModelParameterDefinitionEntity implements Serializable {
 
     @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "model_name")
-    @MapsId("modelName")
+    @JoinColumn(name = "model_id")
+    @MapsId("modelId")
     private ModelEntity model;
 
     @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "parameter_definition_name")
-    @MapsId("parameterDefinitionName")
+    @JoinColumn(name = "parameter_definition_id")
+    @MapsId("parameterDefinitionId")
     private ModelParameterDefinitionEntity parameterDefinition;
 
     @Column(name = "origin")
@@ -40,7 +40,7 @@ public class ModelModelParameterDefinitionEntity implements Serializable {
         this.parameterDefinition = parameterDefinition;
         this.origin = origin;
         this.originName = originName;
-        this.id = new ModelModelParameterDefinitionId(model.getModelName(), parameterDefinition.getName());
+        this.id = new ModelModelParameterDefinitionId(model.getId(), parameterDefinition.getId());
     }
 
 }

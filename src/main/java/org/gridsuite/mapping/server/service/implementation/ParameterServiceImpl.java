@@ -84,7 +84,7 @@ public class ParameterServiceImpl implements ParameterService {
     }
 
     private List<EnrichedParametersSet> getEnrichedSetsFromInstanceModel(String modelName, String groupName) {
-        Optional<ModelEntity> model = modelRepository.findById(modelName);
+        Optional<ModelEntity> model = modelRepository.findByModelName(modelName);
         if (model.isPresent()) {
             ParametersSetsGroup correspondingGroup = new ParametersSetsGroup(model.get().getSetsGroups().stream()
                 .filter(group -> group.getName().equals(groupName))

@@ -7,13 +7,13 @@
 
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
 import org.gridsuite.mapping.server.utils.VariableType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
@@ -30,9 +30,14 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @Entity
 @Table(name = "model_variable_definitions")
 public class ModelVariableDefinitionEntity implements Serializable {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
-    @Column(name = "variable_definition_name")
+    @Column(name = "id")
+    private UUID id;
+
+    @Column(name = "name")
     private String name;
 
     @Column(name = "type")
@@ -57,9 +62,9 @@ public class ModelVariableDefinitionEntity implements Serializable {
     private Set<ModelVariableSetEntity> variablesSets;
 
     public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
-        this(variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(),
-                model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(),
-                new LinkedHashSet<>(Arrays.asList(variablesSet)), null, null);
+        this(variableDefinition.getId() == null ? UUID.randomUUID() : variableDefinition.getId(), variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(),
+                model != null ? new LinkedHashSet<>(List.of(model)) : new LinkedHashSet<>(),
+                new LinkedHashSet<>(List.of(variablesSet)), null, null);
     }
 
     @CreatedDate

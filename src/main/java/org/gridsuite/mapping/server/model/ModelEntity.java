@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -13,7 +14,6 @@ import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,9 +33,12 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @Table(name = "models")
 public class ModelEntity implements Serializable {
 
-    // Could be replaced with UUID, but we lose the ease of use of names
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
+    @Column(name = "id", columnDefinition = "UUID")
+    private UUID id;
+
     @Column(name = "model_name")
     private String modelName;
 
@@ -55,8 +58,8 @@ public class ModelEntity implements Serializable {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "models_model_variable_definitions",
-            joinColumns = {@JoinColumn(name = "model_name")},
-            inverseJoinColumns = {@JoinColumn(name = "variable_definition_name")}
+            joinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id")}
     )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = LinkedHashSet.newLinkedHashSet(0);
 
@@ -64,6 +67,7 @@ public class ModelEntity implements Serializable {
     private Set<ModelVariableSetEntity> variableSets = LinkedHashSet.newLinkedHashSet(0);
 
     public ModelEntity(Model modelToConvert) {
+        id = modelToConvert.getId() == null ? UUID.randomUUID() : modelToConvert.getId();
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
         defaultModel = modelToConvert.isDefaultModel();

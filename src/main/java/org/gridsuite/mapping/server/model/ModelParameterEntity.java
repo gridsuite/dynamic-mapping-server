@@ -6,15 +6,15 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelParameter;
-import org.gridsuite.mapping.server.utils.SetGroupType;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -26,48 +26,33 @@ import java.io.Serializable;
 @Setter
 @Entity
 @Table(name = "model_parameters", indexes = {@Index(name = "model_parameter_set_index", columnList = "set_name")})
-@IdClass(ModelParameterId.class)
 public class ModelParameterEntity implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private UUID id;
+
     @Column(name = "name")
     private String name;
 
-    @Id
-    @Column(name = "model_name")
-    private String modelName;
-
-    @Id
-    @Column(name = "group_name")
-    private String groupName;
-
-    @Id
-    @Column(name = "group_type")
-    private SetGroupType groupType;
-
-    @Id
-    @Column(name = "set_name")
-    private String setName;
+    @Column(name = "set_id")
+    private UUID setId;
 
     @Column(name = "value_")
     private String value;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(foreignKey = @ForeignKey(name = "parameter_set_fk"), value = {
-        @JoinColumn(name = "set_name", referencedColumnName = "name", insertable = false, updatable = false),
-        @JoinColumn(name = "group_name", referencedColumnName = "group_name", insertable = false, updatable = false),
-        @JoinColumn(name = "model_name", referencedColumnName = "model_name", insertable = false, updatable = false),
-        @JoinColumn(name = "group_type", referencedColumnName = "group_type", insertable = false, updatable = false)
+        @JoinColumn(name = "set_id", referencedColumnName = "id", insertable = false, updatable = false)
     })
     private ModelParameterSetEntity set;
 
     public ModelParameterEntity(ModelParameterSetEntity set, ModelParameter parameter) {
+        this.id = parameter.getId() == null ? UUID.randomUUID() : parameter.getId();
         this.set = set;
-        name = parameter.getName();
-        groupName = set.getGroup().getName();
-        groupType = set.getGroup().getType();
-        modelName = set.getGroup().getModelName();
-        setName = set.getName();
-        value = parameter.getValue();
+        this.name = parameter.getName();
+        this.setId = set.getId();
+        this.value = parameter.getValue();
     }
 }

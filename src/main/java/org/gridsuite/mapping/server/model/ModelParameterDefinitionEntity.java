@@ -6,15 +6,18 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.utils.ParameterType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 
@@ -31,8 +34,12 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 public class ModelParameterDefinitionEntity implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
-    @Column(name = "name")
+    @Column(name = "id", columnDefinition = "UUID")
+    private UUID id;
+
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
 
     @Column(name = "type")
@@ -46,7 +53,8 @@ public class ModelParameterDefinitionEntity implements Serializable {
     private List<ModelModelParameterDefinitionEntity> models = new ArrayList<>();
 
     public ModelParameterDefinitionEntity(ModelParameterDefinition parameterDefinition) {
-        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getFixedValue(), new ArrayList<>(), null, null);
+        this(parameterDefinition.getId() == null ? UUID.randomUUID() : parameterDefinition.getId(),
+            parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getFixedValue(), new ArrayList<>(), null, null);
     }
 
     @CreatedDate

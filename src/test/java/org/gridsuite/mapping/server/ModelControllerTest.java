@@ -86,7 +86,7 @@ public class ModelControllerTest {
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type) {
-        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(name, type, null, null, null));
+        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(UUID.randomUUID(), name, type, null, null, null));
     }
 
     @Before
@@ -94,7 +94,7 @@ public class ModelControllerTest {
         cleanDB();
 
         // prepare token model
-        ModelEntity modelToSave = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, false,
+        ModelEntity modelToSave = new ModelEntity(UUID.randomUUID(), "LoadAlphaBeta", EquipmentType.LOAD, false,
                 new ArrayList<>(), new ArrayList<>(), Set.of(), Set.of(), null, null);
         List<ModelParameterDefinitionEntity> definitions = new ArrayList<>();
 
@@ -182,7 +182,7 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Date setCreationDate = modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
+        Date setCreationDate = modelRepository.findByModelName(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
 
         // Update data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -190,7 +190,7 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Date setUpdateDate = modelRepository.findById(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
+        Date setUpdateDate = modelRepository.findByModelName(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
 
         assertThat(setCreationDate.compareTo(setUpdateDate) < 0);
     }
@@ -282,17 +282,14 @@ public class ModelControllerTest {
     public void getTest() throws Exception {
 
         // Prepare models
-        ModelEntity loadModel = modelRepository.findById("LoadAlphaBeta").get();
+        ModelEntity loadModel = modelRepository.findByModelName("LoadAlphaBeta").get();
         List<ModelSetsGroupEntity> loadGroups = loadModel.getSetsGroups();
-        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity(UUID.randomUUID(), "LAB", null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(), loadGroup.getType(),
-                null,
-                new Date(),
-                loadGroup);
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity(UUID.randomUUID(), "LAB", null, new Date(), loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_alpha", setToSave.getId(), "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_beta", setToSave.getId(), "2.5", setToSave));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);
@@ -300,9 +297,9 @@ public class ModelControllerTest {
         loadModel.setSetsGroups(loadGroups);
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, false, List.of(), null, Set.of(), Set.of(), null, null);
+        ModelEntity generatorThreeModel = new ModelEntity(UUID.randomUUID(), "GeneratorThreeWindings", EquipmentType.GENERATOR, false, List.of(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
-        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
+        generatorThreeGroups.add(new ModelSetsGroupEntity(UUID.randomUUID(), "GSTWPR", new ArrayList<>(), SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
@@ -837,7 +834,7 @@ public class ModelControllerTest {
                 .andExpect(status().isOk());
 
         // Get Data
-        ModelEntity savedModel = modelRepository.findById(modelName).orElseThrow();
+        ModelEntity savedModel = modelRepository.findByModelName(modelName).orElseThrow();
 
         // sanity check
         assertEquals(modelName, savedModel.getModelName());
@@ -1096,21 +1093,21 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model LOAD ALPHA BETA must be not exist in db
-        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(loadAlphaBetaModelName);
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(loadAlphaBetaModelName);
         assertEquals(false, foundNoneExistingModelOpt.isPresent());
 
         // must delete only 2 parameter definitions which are only used by load alpha beta
         // the rest 4 shared parameter definitions must be always present in db
-        List<ModelParameterDefinitionEntity> foundNoneExistingParameterDefinitions = modelParameterDefinitionRepository.findAllById(List.of("load_alpha", "load_beta"));
+        List<ModelParameterDefinitionEntity> foundNoneExistingParameterDefinitions = modelParameterDefinitionRepository.findAllByName(List.of("load_alpha", "load_beta"));
         assertEquals(0, foundNoneExistingParameterDefinitions.size());
-        List<ModelParameterDefinitionEntity> foundExistingParameterDefinitions = modelParameterDefinitionRepository.findAllById(List.of("load_P0Pu", "load_Q0Pu", "load_U0Pu", "load_UPhase0"));
+        List<ModelParameterDefinitionEntity> foundExistingParameterDefinitions = modelParameterDefinitionRepository.findAllByName(List.of("load_P0Pu", "load_Q0Pu", "load_U0Pu", "load_UPhase0"));
         assertEquals(4, foundExistingParameterDefinitions.size());
 
         // must delete only 2 variable definitions which are only used by load alpha beta
         // the rest 3 shared variable definitions must be always present in db
-        List<ModelVariableDefinitionEntity> foundNoneExistingVariableDefinitions = modelVariableRepository.findAllById(List.of("load_PRefPu", "load_running_value"));
+        List<ModelVariableDefinitionEntity> foundNoneExistingVariableDefinitions = modelVariableRepository.findAllByName(List.of("load_PRefPu", "load_running_value"));
         assertEquals(0, foundNoneExistingVariableDefinitions.size());
-        List<ModelVariableDefinitionEntity> foundExistingVariableDefinitions = modelVariableRepository.findAllById(List.of("load_PPu", "load_QPu", "load_QRefPu"));
+        List<ModelVariableDefinitionEntity> foundExistingVariableDefinitions = modelVariableRepository.findAllByName(List.of("load_PPu", "load_QPu", "load_QRefPu"));
         assertEquals(3, foundExistingVariableDefinitions.size());
 
         // --- Delete LOAD PQ --- //
@@ -1121,7 +1118,7 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model LOAD PQ must be not exist in db
-        foundNoneExistingModelOpt = modelRepository.findById(loadPQModelName);
+        foundNoneExistingModelOpt = modelRepository.findByModelName(loadPQModelName);
         assertEquals(false, foundNoneExistingModelOpt.isPresent());
 
         // db must not contain any parameter definition
@@ -1146,7 +1143,7 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // This model has two variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("Generator", "VoltageRegulator"));
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("Generator", "VoltageRegulator"));
         assertEquals(2, variableSets.size());
         // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
         assertEquals(5, modelVariableRepository.findAll().size());
@@ -1159,7 +1156,7 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model generator model must be not exist in db
-        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorModelName);
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(generatorModelName);
         assertEquals(false, foundNoneExistingModelOpt.isPresent());
 
         // db must not contain any variable set
@@ -1191,7 +1188,7 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // These models have two shared variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("Generator", "VoltageRegulator"));
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("Generator", "VoltageRegulator"));
         assertEquals(2, variableSets.size());
         // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
         assertEquals(5, modelVariableRepository.findAll().size());
@@ -1204,11 +1201,11 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model Three Windings Generator must be not exist in db
-        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorModelThreeWindingsName);
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(generatorModelThreeWindingsName);
         assertEquals(false, foundNoneExistingModelOpt.isPresent());
 
         // These models have two shared variable sets => after delete one model, shared shared variable sets must be always in db
-        variableSets = modelVariablesSetRepository.findAllById(List.of("Generator", "VoltageRegulator"));
+        variableSets = modelVariablesSetRepository.findAllByName(List.of("Generator", "VoltageRegulator"));
         assertEquals(2, variableSets.size());
         // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
         assertEquals(5, modelVariableRepository.findAll().size());
@@ -1221,7 +1218,7 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model Three Windings Generator must be not exist in db
-        foundNoneExistingModelOpt = modelRepository.findById(generatorModelFourWindingsName);
+        foundNoneExistingModelOpt = modelRepository.findByModelName(generatorModelFourWindingsName);
         assertEquals(false, foundNoneExistingModelOpt.isPresent());
 
         // the last model which uses shared variable sets has been deleted
@@ -1255,7 +1252,7 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // These models have two shared 3 variables definitions between 2 different variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPQ", "GeneratorPV"));
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPQ", "GeneratorPV"));
         assertEquals(2, variableSets.size());
         // Variable set GeneratorPQ and GeneratorPV share 3 variable definitions
         assertEquals(3, modelVariableRepository.findAll().size());
@@ -1268,11 +1265,11 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model Generator PQ must be not exist in db
-        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findById(generatorPQModelName);
+        Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(generatorPQModelName);
         assertEquals(false, foundNoneExistingModelOpt.isPresent());
 
         // Variable set Generator PQ must be not exist in db
-        variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPQ"));
+        variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPQ"));
         assertEquals(0, variableSets.size());
         // 3 variable definitions used by variable set GeneratorPV must be always present in db
         assertEquals(3, modelVariableRepository.findAll().size());
@@ -1284,7 +1281,7 @@ public class ModelControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         // Variable set Generator PV must be not exist in db
-        variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPV"));
+        variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPV"));
         assertEquals(0, variableSets.size());
         // 3 variable definitions used by variable set GeneratorPV must be not exist in db
         assertEquals(0, modelVariableRepository.findAll().size());
@@ -1313,7 +1310,7 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // These models have two shared 3 variables definitions between 2 different variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPQ", "GeneratorPV"));
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPQ", "GeneratorPV"));
         assertEquals(2, variableSets.size());
         // Variable set GeneratorPQ and GeneratorPV share 3 variable definitions
         assertEquals(3, modelVariableRepository.findAll().size());
@@ -1326,11 +1323,11 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model Generator PQ/PV must be not exist in db
-        List<ModelEntity> modelEntities = modelRepository.findAllById(List.of(generatorPQModelName, generatorPVModelName));
+        List<ModelEntity> modelEntities = modelRepository.findAllByModelName(List.of(generatorPQModelName, generatorPVModelName));
         assertEquals(0, modelEntities.size());
 
         // Variable set Generator PQ/PV must be not exist in db
-        variableSets = modelVariablesSetRepository.findAllById(List.of("GeneratorPV", "GeneratorPQ"));
+        variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPV", "GeneratorPQ"));
         assertEquals(0, variableSets.size());
         // 3 variable definitions used by variable sets GeneratorPQ/PV must be not exist in db
         assertEquals(0, modelVariableRepository.findAll().size());

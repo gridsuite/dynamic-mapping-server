@@ -16,7 +16,7 @@ import java.beans.PropertyDescriptor;
 import java.util.Arrays;
 
 /**
- * This class is must be identical to one on study-server
+ * This class must be identical to one on study-server
  * @author Jacques Borsenberger <jacques.borsenberger at rte-france.com
  */
 public final class PropertyUtils {

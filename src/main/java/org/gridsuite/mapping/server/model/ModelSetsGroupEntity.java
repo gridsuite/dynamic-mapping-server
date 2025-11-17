@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,10 +14,10 @@ import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -29,33 +30,30 @@ import java.util.stream.Collectors;
 @Setter
 @Entity
 @Table(name = "model_sets_group", indexes = {@Index(name = "model_sets_group_model_name_index", columnList = "model_name")})
-@IdClass(ModelSetsGroupId.class)
 public class ModelSetsGroupEntity implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private UUID id;
+
     @Column(name = "name")
     private String name;
-
-    @Id
-    @Column(name = "model_name")
-    private String modelName;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterSetEntity> sets = new ArrayList<>(0);
 
-    @Id
     @Column(name = "type")
     private SetGroupType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "model_name", foreignKey = @ForeignKey(name = "model_sets_groups_fk"))
-    @MapsId("modelName")
+    @JoinColumn(name = "model_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_sets_groups_fk"))
     private ModelEntity model;
 
     public ModelSetsGroupEntity(ModelEntity model, ParametersSetsGroup group) {
+        this.id = group.getId() == null ? UUID.randomUUID() : group.getId();
         this.model = model;
         this.name = group.getName();
-        this.modelName = model.getModelName();
         this.type = group.getType();
         this.sets = group.getSets().stream().map(set -> new ModelParameterSetEntity(this, set)).collect(Collectors.toList());
     }

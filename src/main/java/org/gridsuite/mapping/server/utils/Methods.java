@@ -55,7 +55,7 @@ public final class Methods {
     }
 
     public static ParametersSetsGroup getSetsGroupFromModel(String modelName, String setGroupName, ModelRepository modelRepository) {
-        Optional<ModelEntity> foundModel = modelRepository.findById(modelName);
+        Optional<ModelEntity> foundModel = modelRepository.findByModelName(modelName);
         if (foundModel.isPresent()) {
             return new ParametersSetsGroup(foundModel.get().getSetsGroups().stream().filter(setGroup -> setGroup.getName().equals(setGroupName))
                 .findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No sets group associated to the model " +
