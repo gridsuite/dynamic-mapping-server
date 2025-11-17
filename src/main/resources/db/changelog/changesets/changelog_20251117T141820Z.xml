@@ -1,0 +1,37 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!-- drop definitions -->
+    <changeSet author="phamquy (generated)" id="1763389111220-1">
+        <dropTable tableName="models_model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-2">
+        <dropTable tableName="model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-3">
+        <dropTable tableName="models_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-4">
+        <dropTable tableName="model_variable_sets_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-5">
+        <dropTable tableName="models_model_variable_sets"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-6">
+        <dropTable tableName="model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-7">
+        <dropTable tableName="model_variable_sets"/>
+    </changeSet>
+    <!-- drop instants-->
+    <changeSet author="phamquy (generated)" id="1763389111220-8">
+        <dropTable tableName="model_parameters"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-9">
+        <dropTable tableName="model_parameter_sets"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-10">
+        <dropTable tableName="model_sets_group"/>
+    </changeSet>
+</databaseChangeLog>
