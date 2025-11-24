@@ -186,7 +186,9 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Date setCreationDate = modelRepository.findByModelName(modelName).get().getSetsGroups().getFirst().getSets().getFirst().getLastModifiedDate();
+        Date setCreationDate = modelRepository.findByModelName(modelName).get()
+                .getSetsGroups().getFirst()
+                .getSets().getFirst().getLastModifiedDate();
 
         // Update data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -194,7 +196,9 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Date setUpdateDate = modelRepository.findByModelName(modelName).get().getSetsGroups().getFirst().getSets().getFirst().getLastModifiedDate();
+        Date setUpdateDate = modelRepository.findByModelName(modelName).get()
+                .getSetsGroups().getFirst()
+                .getSets().getFirst().getLastModifiedDate();
 
         Assertions.assertThat(setCreationDate.compareTo(setUpdateDate) < 0).isTrue();
     }

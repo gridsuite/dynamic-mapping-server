@@ -63,6 +63,7 @@ public class ModelSetsGroupEntity implements Serializable {
      * @param parameterSet given parameter set
      */
     public void addParameterSet(ModelParameterSetEntity parameterSet) {
+        this.sets.remove(parameterSet); // remove if already present, using id as a key
         this.sets.add(parameterSet);
     }
 
