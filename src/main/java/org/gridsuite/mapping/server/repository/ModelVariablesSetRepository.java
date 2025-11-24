@@ -19,9 +19,9 @@ import java.util.UUID;
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 public interface ModelVariablesSetRepository extends JpaRepository<ModelVariableSetEntity, UUID> {
-    List<ModelVariableSetEntity> findAllByName(Collection<String> names);
+    List<ModelVariableSetEntity> findAllByNameIn(Collection<String> names);
 
     Optional<ModelVariableSetEntity> findByName(String name);
 
-    void deleteAllByName(Collection<String> names);
+    void deleteAllByNameIn(Collection<String> names);
 }

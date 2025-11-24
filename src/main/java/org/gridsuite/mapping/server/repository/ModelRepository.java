@@ -24,7 +24,7 @@ public interface ModelRepository extends JpaRepository<ModelEntity, UUID> {
 
     Optional<ModelEntity> findByModelName(String modelName);
 
-    List<ModelEntity> findAllByModelName(Collection<String> modelNames);
+    List<ModelEntity> findAllByModelNameIn(Collection<String> modelNames);
 
-    void deleteAllByModelName(Collection<String> modelNames);
+    void deleteAllByModelNameIn(Collection<String> modelNames);
 }

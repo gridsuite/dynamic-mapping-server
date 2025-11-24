@@ -10,6 +10,7 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,6 +19,19 @@ import java.util.UUID;
  *  @author Slimane Amar <slimane.amar at rte-france.com>
  */
 public class DTOAssert<T> extends AbstractAssert<DTOAssert<T>, T> {
+
+    // A comparator that uses the recursive configuration
+    Comparator<Object> recursiveComparator = (o1, o2) -> {
+        try {
+            Assertions.assertThat(o1)
+                    .usingRecursiveComparison(getRecursiveConfiguration())
+                    .isEqualTo(o2);
+            return 0; // Equal according to recursive comparison
+        } catch (AssertionError e) {
+            return 1; // Not equal
+        }
+    };
+
     public DTOAssert(T actual) {
         super(actual, DTOAssert.class);
     }
@@ -25,6 +39,18 @@ public class DTOAssert<T> extends AbstractAssert<DTOAssert<T>, T> {
     public DTOAssert<T> recursivelyEquals(T other) {
         isNotNull();
         usingRecursiveComparison(this.getRecursiveConfiguration()).isEqualTo(other);
+        return myself;
+    }
+
+    public DTOAssert<T> recursivelyContainAll(T other) {
+        isNotNull();
+        if (actual instanceof Iterable && other instanceof Iterable) {
+            Assertions.assertThat((Iterable) actual)
+                    .usingElementComparator(recursiveComparator)
+                    .containsAll((Iterable) other);
+        } else {
+            throw new AssertionError("Both actual and expected must be Iterables/Collections to use recursiveContainAll");
+        }
         return myself;
     }
 

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface ModelParameterDefinitionRepository extends JpaRepository<ModelParameterDefinitionEntity, UUID> {
-    List<ModelParameterDefinitionEntity> findAllByName(Collection<String> names);
+    List<ModelParameterDefinitionEntity> findAllByNameIn(Collection<String> names);
 
-    void deleteAllByName(Collection<String> names);
+    void deleteAllByNameIn(Collection<String> names);
 }

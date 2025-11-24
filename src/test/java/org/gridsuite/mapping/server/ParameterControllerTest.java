@@ -9,12 +9,14 @@ package org.gridsuite.mapping.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
+import org.gridsuite.mapping.server.dto.ParameterFile;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelParameterDefinitionRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.gridsuite.mapping.server.utils.*;
+import org.gridsuite.mapping.server.utils.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -84,8 +87,8 @@ public class ParameterControllerTest {
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
         ModelParameterSetEntity setToSave = new ModelParameterSetEntity(UUID.randomUUID(), "LAB", null, new Date(), loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_alpha", setToSave.getId(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_beta", setToSave.getId(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_alpha", "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_beta", "2.5", setToSave));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);
@@ -153,12 +156,19 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk());
 
         // export parameter file
-        mvc.perform(get("/parameters/export")
+        MvcResult mvcResult = mvc.perform(get("/parameters/export")
                 .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseParameterFileJson(name, null), true));
+                .andReturn();
+        String resultParameterFileJson = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(objectMapper.readTree(mvcResult.getResponse().getContentAsString()));
+        String expectedParameterFileJson = baseParameterFileJson(name, null);
+
+        ParameterFile resultParameterFile = objectMapper.readValue(resultParameterFileJson, ParameterFile.class);
+        ParameterFile expectedParameterFile = objectMapper.readValue(expectedParameterFileJson, ParameterFile.class);
+        Assertions.assertThat(resultParameterFile).recursivelyEquals(expectedParameterFile);
 
         // try to export parameter file with unknown mapping
         mvc.perform(get("/parameters/export")
@@ -210,11 +220,19 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk());
 
         // export parameter file
-        mvc.perform(get("/parameters/export")
+        MvcResult mvcResult = mvc.perform(get("/parameters/export")
                         .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseParameterFileJson(name, objectMapper.writeValueAsString(parFile)), true));
+                .andReturn();
+
+        String resultParameterFileJson = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(objectMapper.readTree(mvcResult.getResponse().getContentAsString()));
+        String expectedParameterFileJson = baseParameterFileJson(name, objectMapper.writeValueAsString(parFile));
+
+        ParameterFile resultParameterFile = objectMapper.readValue(resultParameterFileJson, ParameterFile.class);
+        ParameterFile expectedParameterFile = objectMapper.readValue(expectedParameterFileJson, ParameterFile.class);
+        Assertions.assertThat(resultParameterFile).recursivelyEquals(expectedParameterFile);
     }
 }

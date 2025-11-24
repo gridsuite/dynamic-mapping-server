@@ -13,6 +13,7 @@ import org.gridsuite.mapping.server.model.ModelParameterSetEntity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -21,20 +22,17 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class ParametersSet {
+    private UUID id;
     private String name;
     private List<ModelParameter> parameters;
     @JsonIgnore
     private Date lastModifiedDate;
 
     public ParametersSet(ModelParameterSetEntity modelParameterSetEntity) {
+        id = modelParameterSetEntity.getId();
         name = modelParameterSetEntity.getName();
         parameters = modelParameterSetEntity.getParameters().stream().map(ModelParameter::new).collect(Collectors.toList());
         lastModifiedDate = modelParameterSetEntity.getLastModifiedDate();
     }
 
-    public ParametersSet(String name, List<ModelParameter> parameters) {
-        this.name = name;
-        this.parameters = parameters;
-        lastModifiedDate = new Date();
-    }
 }

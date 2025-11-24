@@ -7,10 +7,7 @@
 package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
@@ -23,31 +20,32 @@ import java.util.stream.Collectors;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@Inheritance
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "model_sets_group", indexes = {@Index(name = "model_sets_group_model_name_index", columnList = "model_name")})
+@Table(name = "model_sets_group", indexes = {@Index(name = "model_sets_group_name_index", columnList = "name")})
 public class ModelSetsGroupEntity implements Serializable {
 
+    @EqualsAndHashCode.Include
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterSetEntity> sets = new ArrayList<>(0);
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private SetGroupType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "model_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_sets_groups_fk"))
+    @JoinColumn(name = "model_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_sets_group_model_id_fk"))
     private ModelEntity model;
 
     public ModelSetsGroupEntity(ModelEntity model, ParametersSetsGroup group) {

@@ -7,10 +7,7 @@
 package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ModelParameter;
 
 import java.io.Serializable;
@@ -19,40 +16,34 @@ import java.util.UUID;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@Inheritance
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "model_parameters", indexes = {@Index(name = "model_parameter_set_index", columnList = "set_name")})
+@Table(name = "model_parameter", indexes = {@Index(name = "model_parameter_name_index", columnList = "name")})
 public class ModelParameterEntity implements Serializable {
 
+    @EqualsAndHashCode.Include
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
-
-    @Column(name = "set_id")
-    private UUID setId;
 
     @Column(name = "value_")
     private String value;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns(foreignKey = @ForeignKey(name = "parameter_set_fk"), value = {
-        @JoinColumn(name = "set_id", referencedColumnName = "id", insertable = false, updatable = false)
-    })
+    @JoinColumn(name = "set_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_parameter_set_id_fk"))
     private ModelParameterSetEntity set;
 
     public ModelParameterEntity(ModelParameterSetEntity set, ModelParameter parameter) {
         this.id = parameter.getId() == null ? UUID.randomUUID() : parameter.getId();
         this.set = set;
         this.name = parameter.getName();
-        this.setId = set.getId();
         this.value = parameter.getValue();
     }
 }

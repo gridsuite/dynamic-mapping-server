@@ -30,20 +30,19 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @Getter
 @Setter
 @Entity
-@Table(name = "model_parameter_definitions")
+@Table(name = "model_parameter_definition")
 public class ModelParameterDefinitionEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    @Enumerated
     private ParameterType type;
 
     @Column(name = "fixed_value")

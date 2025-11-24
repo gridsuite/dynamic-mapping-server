@@ -20,7 +20,7 @@ import java.util.UUID;
  */
 @Repository
 public interface ModelVariableRepository extends JpaRepository<ModelVariableDefinitionEntity, UUID> {
-    List<ModelVariableDefinitionEntity> findAllByName(Collection<String> names);
+    List<ModelVariableDefinitionEntity> findAllByNameIn(Collection<String> names);
 
-    void deleteAllByName(Collection<String> names);
+    void deleteAllByNameIn(Collection<String> names);
 }

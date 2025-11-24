@@ -110,11 +110,23 @@ public class ModelController {
     }
 
     @GetMapping(value = "/")
-    @Operation(summary = "Get models names")
+    @Operation(summary = "Get simple infos of all models")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "names of all models")})
+        @ApiResponse(responseCode = "200", description = "simple infos of all models")})
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
+    }
+
+    @GetMapping(value = "/names")
+    @Operation(summary = "Get all model names")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "list of all model names")})
+    public ResponseEntity<List<String>> getModelNames() {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(modelService.getModels().stream()
+                    .map(SimpleModel::getName)
+                    .toList());
     }
 
     @DeleteMapping(value = "/")

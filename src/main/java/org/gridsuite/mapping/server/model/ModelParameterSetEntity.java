@@ -7,10 +7,7 @@
 package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 
 import java.io.Serializable;
@@ -22,21 +19,21 @@ import java.util.stream.Collectors;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@Inheritance
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "model_parameter_sets", indexes = {@Index(name = "model_parameter_sets_group_name_index", columnList = "group_name")})
+@Table(name = "model_parameter_set", indexes = {@Index(name = "model_parameter_set_name_index", columnList = "name")})
 public class ModelParameterSetEntity implements Serializable {
 
+    @EqualsAndHashCode.Include
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "set", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -46,12 +43,11 @@ public class ModelParameterSetEntity implements Serializable {
     private Date lastModifiedDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns(foreignKey = @ForeignKey(name = "model_parameter_sets_fk"), value = {
-        @JoinColumn(name = "group_id", referencedColumnName = "id", insertable = false, updatable = false)
-    })
+    @JoinColumn(name = "group_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_parameter_set_group_id_fk"))
     private ModelSetsGroupEntity group;
 
     public ModelParameterSetEntity(ModelSetsGroupEntity group, ParametersSet set) {
+        this.id = set.getId() == null ? UUID.randomUUID() : set.getId();
         this.group = group;
         this.name = set.getName();
         this.parameters = set.getParameters().stream().map(parameter -> new ModelParameterEntity(this, parameter)).collect(Collectors.toList());

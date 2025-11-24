@@ -28,30 +28,29 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @Getter
 @Setter
 @Entity
-@Table(name = "model_variable_sets")
+@Table(name = "model_variable_set")
 public class ModelVariableSetEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinTable(name = "model_variable_sets_model_variable_definitions",
-            joinColumns = {@JoinColumn(name = "variable_set_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id")}
+    @JoinTable(name = "model_variable_set_model_variable_definition",
+            joinColumns = {@JoinColumn(name = "variable_set_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_variable_set_model_variable_definition_variable_set_id_fk"))},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_variable_set_model_variable_definition_variable_definition_id_fk"))}
     )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
-        name = "models_model_variable_sets",
-        joinColumns = {@JoinColumn(name = "variable_set_id", referencedColumnName = "id")},
-        inverseJoinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id")}
+        name = "model_model_variable_set",
+        joinColumns = {@JoinColumn(name = "variable_set_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_model_variable_set_variable_set_id_fk"))},
+        inverseJoinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_model_variable_set_model_id_fk"))}
     )
     private Set<ModelEntity> models;
 

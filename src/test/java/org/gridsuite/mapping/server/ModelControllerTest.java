@@ -20,6 +20,7 @@ import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
 import org.gridsuite.mapping.server.utils.SetGroupType;
+import org.gridsuite.mapping.server.utils.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,11 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -58,7 +56,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {"ex-resources.automaton = src/test/resources/data/ex-automaton"})
 public class ModelControllerTest {
 
-    public static Logger LOGGER = LoggerFactory.getLogger(ModelControllerTest.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ModelControllerTest.class);
 
     @Autowired
     private ModelRepository modelRepository;
@@ -124,12 +122,12 @@ public class ModelControllerTest {
 
         String automatonsJsonResult = mvcResult.getResponse().getContentAsString();
 
-        LOGGER.info("Automatons result in Json array = \n" + automatonsJsonResult);
+        LOGGER.info("Automatons result in Json array = \n {}", automatonsJsonResult);
 
         // Check result
         JsonNode jsonNode = objectMapper.readTree(automatonsJsonResult);
-        assertEquals(true, jsonNode.isArray());
-        assertEquals(3, jsonNode.size());
+        Assertions.assertThat(jsonNode.isArray()).isTrue();
+        Assertions.assertThat(jsonNode.size()).isEqualTo(3);
     }
 
     @Test
@@ -172,17 +170,23 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
+        MvcResult mvcResult = mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[" + set + "]", true));
+                .andReturn();
+
+        String setJson = mvcResult.getResponse().getContentAsString();
+        List<ParametersSet> resultSetList = objectMapper.readValue(setJson, new TypeReference<>() { });
+        ParametersSet expectedSet = objectMapper.readValue(set, ParametersSet.class);
+
+        Assertions.assertThat(resultSetList.getFirst()).recursivelyEquals(expectedSet);
 
         mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "PREFIX")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Date setCreationDate = modelRepository.findByModelName(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
+        Date setCreationDate = modelRepository.findByModelName(modelName).get().getSetsGroups().getFirst().getSets().getFirst().getLastModifiedDate();
 
         // Update data
         mvc.perform(post("/models/" + modelName + "/parameters/sets/strict")
@@ -190,20 +194,16 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Date setUpdateDate = modelRepository.findByModelName(modelName).get().getSetsGroups().get(0).getSets().get(0).getLastModifiedDate();
+        Date setUpdateDate = modelRepository.findByModelName(modelName).get().getSetsGroups().getFirst().getSets().getFirst().getLastModifiedDate();
 
-        assertThat(setCreationDate.compareTo(setUpdateDate) < 0);
+        Assertions.assertThat(setCreationDate.compareTo(setUpdateDate) < 0).isTrue();
     }
 
     @Test
     public void definitionTest() throws Exception {
         String modelName = "LoadAlphaBeta";
 
-        mvc.perform(get("/models/" + modelName + "/parameters/definitions")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("""
+        String expectedParamaterDefinitionsJson = """
                     [
                         {"name": "load_alpha", "type": "DOUBLE", "origin": "USER", "originName": null, "fixedValue": null},
                         {"name": "load_beta", "type": "DOUBLE", "origin": "USER", "originName": null, "fixedValue": null},
@@ -212,10 +212,24 @@ public class ModelControllerTest {
                         {"name": "load_U0Pu", "type": "DOUBLE", "origin": "NETWORK", "originName": "v_pu", "fixedValue": null},
                         {"name": "load_UPhase0", "type": "DOUBLE", "origin": "NETWORK", "originName": "angle_pu", "fixedValue": null}
                     ]
-                """, false));
+                """;
+        MvcResult mvcResult = mvc.perform(get("/models/" + modelName + "/parameters/definitions")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        String resultParameterDefinitionsJson = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(objectMapper.readTree(mvcResult.getResponse().getContentAsString()));
+        LOGGER.info("Result parameter definitions in json array \n {}", resultParameterDefinitionsJson);
+        LOGGER.info("Expected parameter definitions in json array \n {}", expectedParamaterDefinitionsJson);
+
+        List<ModelParameterDefinition> actual = objectMapper.readValue(resultParameterDefinitionsJson, new TypeReference<>() { });
+        List<ModelParameterDefinition> expected = objectMapper.readValue(expectedParamaterDefinitionsJson, new TypeReference<>() { });
+        Assertions.assertThatDtoList(actual).recursivelyContainAll(expected);
 
         // --- GET all names of parameter definitions in the database --- //
-        MvcResult mvcResult = mvc.perform(get("/models/parameter-definitions/names")
+        mvcResult = mvc.perform(get("/models/parameter-definitions/names")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -223,21 +237,21 @@ public class ModelControllerTest {
         // check result
         // must contain 6 names of parameter definitions in the database
         List<String> foundParameterDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<List<String>>() { });
-        assertEquals(6, foundParameterDefinitionNames.size());
+                new TypeReference<>() { });
+        assertThat(foundParameterDefinitionNames).hasSize(6);
 
         // --- GET all parameter definitions in the database --- //
         mvcResult = mvc.perform(get("/models/parameter-definitions")
                         .contentType(APPLICATION_JSON)
-                        .param("parameterDefinitionNames", foundParameterDefinitionNames.stream().collect(Collectors.joining(","))))
+                        .param("parameterDefinitionNames", String.join(",", foundParameterDefinitionNames)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         // check result
         // must contain 6 parameter definitions in the database
         List<ModelParameterDefinition> foundParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<List<ModelParameterDefinition>>() { });
-        assertEquals(6, foundParameterDefinitions.size());
+                new TypeReference<>() { });
+        assertThat(foundParameterDefinitions).hasSize(6);
     }
 
     @Test
@@ -288,8 +302,8 @@ public class ModelControllerTest {
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
         ModelParameterSetEntity setToSave = new ModelParameterSetEntity(UUID.randomUUID(), "LAB", null, new Date(), loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_alpha", setToSave.getId(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_beta", setToSave.getId(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_alpha", "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_beta", "2.5", setToSave));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);
@@ -303,11 +317,7 @@ public class ModelControllerTest {
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
-        mvc.perform(get("/models/")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("""
+        String expectedModelsJson = """
                     [
                         {
                             "name": "LoadAlphaBeta",
@@ -324,10 +334,33 @@ public class ModelControllerTest {
                             ]
                         }
                     ]
-                """, true));
+                """;
+        MvcResult mvcResult = mvc.perform(get("/models/")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        String resultModelsJson = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(objectMapper.readTree(mvcResult.getResponse().getContentAsString()));
+        LOGGER.info("Result models in json array = \n {}", resultModelsJson);
+        LOGGER.info("Expected models in json array = \n {}", expectedModelsJson);
+        List<SimpleModel> resultModels = objectMapper.readValue(resultModelsJson, new TypeReference<>() { });
+        List<SimpleModel> expectedModels = objectMapper.readValue(expectedModelsJson, new TypeReference<>() { });
+        Assertions.assertThatDtoList(resultModels).recursivelyContainAll(expectedModels);
+
+        // --- GET all names of models in the database --- //
+        mvcResult = mvc.perform(get("/models/names")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+
+        List<String> resultModelNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        Assertions.assertThat(resultModelNames).containsExactlyInAnyOrder("LoadAlphaBeta", "GeneratorThreeWindings");
 
         // --- GET parameter set groups in the database --- //
-        MvcResult mvcResult = mvc.perform(get("/models/parameters-sets-groups")
+        mvcResult = mvc.perform(get("/models/parameters-sets-groups")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -335,8 +368,8 @@ public class ModelControllerTest {
 
         // check result
         // must contain 2 parameter set groups, i.e. "LAB" and "GSTWPR"
-        List<ParametersSetsGroup> foundParametersSetsGroups = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ParametersSetsGroup>>() { });
-        assertEquals(2, foundParametersSetsGroups.size());
+        List<ParametersSetsGroup> foundParametersSetsGroups = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundParametersSetsGroups).hasSize(2);
 
         // --- GET parameter sets in the database --- //
         mvcResult = mvc.perform(get("/models/parameters-sets")
@@ -347,8 +380,8 @@ public class ModelControllerTest {
 
         // check result
         // must contain only 1 parameter set, i.e. "LAB"
-        List<ParametersSet> foundParametersSets = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ParametersSet>>() { });
-        assertEquals(1, foundParametersSets.size());
+        List<ParametersSet> foundParametersSets = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundParametersSets).hasSize(1);
 
         // --- GET parameters in the database --- //
         mvcResult = mvc.perform(get("/models/parameters")
@@ -359,8 +392,8 @@ public class ModelControllerTest {
 
         // check result
         // must contain 2 parameter, i.e. "load_alpha", "load_beta"
-        List<ModelParameter> foundParameters = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameter>>() { });
-        assertEquals(2, foundParameters.size());
+        List<ModelParameter> foundParameters = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundParameters).hasSize(2);
     }
 
     public static String readFileAsString(String file) throws Exception {
@@ -382,13 +415,13 @@ public class ModelControllerTest {
 
         // Get initial parameter definitions
         List<ModelParameterDefinition> parameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getParameterDefinitions();
-        assertEquals(6, parameterDefinitions.size());
+        assertThat(parameterDefinitions).hasSize(6);
 
         // --- Get initial parameter definitions from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/" + modelName + "/parameters/definitions"))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelParameterDefinition> parameterDefinitions1 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
-        assertEquals(6, parameterDefinitions1.size());
+        List<ModelParameterDefinition> parameterDefinitions1 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(parameterDefinitions1).hasSize(6);
 
         // --- Try to get parameter definitions from unknown model --- //
         mvc.perform(get("/models/" + modelName + "_unknown" + "/parameters/definitions"))
@@ -402,13 +435,13 @@ public class ModelControllerTest {
 
         // Get current parameter definitions
         List<ModelParameterDefinition> parameterDefinitions2 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getParameterDefinitions();
-        LOGGER.info("Initial parameter definitions = " + parameterDefinitions);
-        LOGGER.info("Updated parameter definitions = " + parameterDefinitions2);
+        LOGGER.info("Initial parameter definitions = {}", parameterDefinitions);
+        LOGGER.info("Updated parameter definitions = {}", parameterDefinitions2);
 
         // check result
         // final model's parameter definitions must contain all ones of initial model
-        assertEquals(1, parameterDefinitions2.size() - parameterDefinitions.size());
-        assertTrue(parameterDefinitions2.containsAll(parameterDefinitions));
+        assertThat(parameterDefinitions2.size() - parameterDefinitions.size()).isOne();
+        Assertions.assertThatDtoList(parameterDefinitions2).recursivelyContainAll(parameterDefinitions);
 
         // --- Remove an existing variable definition --- //
         mvcResult = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/remove")
@@ -418,13 +451,13 @@ public class ModelControllerTest {
 
         // Get current parameter definitions
         List<ModelParameterDefinition> parameterDefinitions3 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getParameterDefinitions();
-        LOGGER.info("Updated parameter definitions = " + parameterDefinitions2);
-        LOGGER.info("Removed parameter definitions = " + parameterDefinitions3);
+        LOGGER.info("Updated parameter definitions = {}", parameterDefinitions2);
+        LOGGER.info("Removed parameter definitions = {}", parameterDefinitions3);
 
         // check result
         // final model's parameter definitions must contain all ones of model
-        assertEquals(1, parameterDefinitions2.size() - parameterDefinitions3.size());
-        assertTrue(parameterDefinitions2.containsAll(parameterDefinitions3));
+        assertThat(parameterDefinitions2.size() - parameterDefinitions3.size()).isOne();
+        Assertions.assertThatDtoList(parameterDefinitions2).recursivelyContainAll(parameterDefinitions3);
 
         // --- Remove all parameter definitions --- //
         mvcResult = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/remove-all")
@@ -432,24 +465,24 @@ public class ModelControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         List<ModelParameterDefinition> parameterDefinitions4 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getParameterDefinitions();
-        LOGGER.info("Unset parameter definitions = " + parameterDefinitions4);
+        LOGGER.info("Unset parameter definitions = {}", parameterDefinitions4);
 
         // check result
         // must have no parameter definition
-        assertEquals(0, parameterDefinitions4.size());
+        assertThat(parameterDefinitions4).isEmpty();
 
         // --- Save new parameter definition --- //
-        List<ModelParameterDefinition> parameterDefinitionList = objectMapper.readValue(newParameterDefinitionsJson, new TypeReference<List<ModelParameterDefinition>>() { });
-        parameterDefinitionList.get(0).setName("load_UPhase0_3");
+        List<ModelParameterDefinition> parameterDefinitionList = objectMapper.readValue(newParameterDefinitionsJson, new TypeReference<>() { });
+        parameterDefinitionList.getFirst().setName("load_UPhase0_3");
         mvcResult = mvc.perform(post("/models/parameters/definitions")
                         .content(objectMapper.writeValueAsString(parameterDefinitionList))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelParameterDefinition> savedParameterDefinitionList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
+        List<ModelParameterDefinition> savedParameterDefinitionList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
 
         // check result
         // must have the same number of input variable definitions
-        assertEquals(parameterDefinitionList.size(), savedParameterDefinitionList.size());
+        assertThat(savedParameterDefinitionList).hasSameSizeAs(parameterDefinitionList);
 
         // --- Add existing parameter definition to model --- //
         mvcResult = mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add?origin=USER")
@@ -459,9 +492,9 @@ public class ModelControllerTest {
 
         // Get current parameter definitions in the model
         List<ModelParameterDefinition> parameterDefinitions6 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getParameterDefinitions();
-        LOGGER.info("Updated parameter definitions = " + parameterDefinitions6);
+        LOGGER.info("Updated parameter definitions = {}", parameterDefinitions6);
         // must have the same number of above input parameter definitions
-        assertEquals(savedParameterDefinitionList.size(), parameterDefinitions6.size());
+        assertThat(parameterDefinitions6).hasSameSizeAs(savedParameterDefinitionList);
 
         // --- Add unknown existing parameter definition to model => must fail fast --- //
         mvc.perform(patch("/models/" + modelName + "/parameters/definitions/add")
@@ -474,12 +507,12 @@ public class ModelControllerTest {
                         .content(objectMapper.writeValueAsString(List.of(parameterDefinitions.get(4).getName())))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<String> deletedParameterDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
-        LOGGER.info("Deleted parameter definitions = " + deletedParameterDefinitionNames);
+        List<String> deletedParameterDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        LOGGER.info("Deleted parameter definitions = {}", deletedParameterDefinitionNames);
 
         // Check result
-        assertEquals(1, deletedParameterDefinitionNames.size());
-        assertEquals(parameterDefinitions.get(4).getName(), deletedParameterDefinitionNames.get(0));
+        assertThat(deletedParameterDefinitionNames).hasSize(1);
+        assertThat(deletedParameterDefinitionNames.getFirst()).isEqualTo(parameterDefinitions.get(4).getName());
     }
 
     @Test
@@ -499,13 +532,13 @@ public class ModelControllerTest {
 
         // Get initial variable definitions
         List<ModelVariableDefinition> variableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
-        assertEquals(5, variableDefinitions.size());
+        assertThat(variableDefinitions).hasSize(5);
 
         // --- Get initial variable definitions from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/" + modelName + "/variables"))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelVariableDefinition> variableDefinitions1 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(5, variableDefinitions1.size());
+        List<ModelVariableDefinition> variableDefinitions1 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(variableDefinitions1).hasSize(5);
 
         // --- Try to get variable definitions from unknown model --- //
         mvc.perform(get("/models/" + modelName + "_unknown" + "/variables"))
@@ -519,13 +552,14 @@ public class ModelControllerTest {
 
         // Get current variable definitions
         List<ModelVariableDefinition> variableDefinitions2 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
-        LOGGER.info("Initial variable definitions = " + variableDefinitions);
-        LOGGER.info("Updated variable definitions = " + variableDefinitions2);
+        LOGGER.info("Initial variable definitions = {}", variableDefinitions);
+        LOGGER.info("Updated variable definitions = {}", variableDefinitions2);
 
         // check result
-        // final model's variable definition must contains all ones of initial model
-        assertEquals(1, variableDefinitions2.size() - variableDefinitions.size());
-        assertTrue(variableDefinitions2.containsAll(variableDefinitions));
+        // final model's variable definition must contain all ones of the initial model
+        assertThat(variableDefinitions2.size() - variableDefinitions.size()).isOne();
+        Assertions.assertThatDtoList(variableDefinitions2)
+                .recursivelyContainAll(variableDefinitions);
 
         // --- Remove an existing variable definition --- //
         mvcResult = mvc.perform(patch("/models/" + modelName + "/variables/remove")
@@ -535,13 +569,13 @@ public class ModelControllerTest {
 
         // Get current variable definitions
         List<ModelVariableDefinition> variableDefinitions3 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
-        LOGGER.info("Updated variable definitions = " + variableDefinitions2);
-        LOGGER.info("Removed variable definitions = " + variableDefinitions3);
+        LOGGER.info("Updated variable definitions = {}", variableDefinitions2);
+        LOGGER.info("Removed variable definitions = {}", variableDefinitions3);
 
         // check result
         // final model's variable definition must contain all ones of model
-        assertEquals(1, variableDefinitions2.size() - variableDefinitions3.size());
-        assertTrue(variableDefinitions2.containsAll(variableDefinitions3));
+        assertThat(variableDefinitions2.size() - variableDefinitions3.size()).isOne();
+        Assertions.assertThatDtoList(variableDefinitions2).recursivelyContainAll(variableDefinitions3);
 
         // --- Remove all variable definitions --- //
         mvcResult = mvc.perform(patch("/models/" + modelName + "/variables/remove-all")
@@ -549,24 +583,24 @@ public class ModelControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         List<ModelVariableDefinition> variableDefinitions4 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
-        LOGGER.info("Unset variable definitions = " + variableDefinitions4);
+        LOGGER.info("Unset variable definitions = {}", variableDefinitions4);
 
         // check result
         // must have no variable definition
-        assertEquals(0, variableDefinitions4.size());
+        assertThat(variableDefinitions4).isEmpty();
 
         // --- Save new variable definition --- //
-        List<ModelVariableDefinition> variableDefinitionList = objectMapper.readValue(newVariableDefinitionsJson, new TypeReference<List<ModelVariableDefinition>>() { });
-        variableDefinitionList.get(0).setName("load_running_value_3");
+        List<ModelVariableDefinition> variableDefinitionList = objectMapper.readValue(newVariableDefinitionsJson, new TypeReference<>() { });
+        variableDefinitionList.getFirst().setName("load_running_value_3");
         mvcResult = mvc.perform(post("/models/variables")
                         .content(objectMapper.writeValueAsString(variableDefinitionList))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelVariableDefinition> savedVariableDefinitionList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
+        List<ModelVariableDefinition> savedVariableDefinitionList = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
 
         // check result
         // must have the same number of input variable definitions
-        assertEquals(variableDefinitionList.size(), savedVariableDefinitionList.size());
+        assertThat(savedVariableDefinitionList).hasSameSizeAs(variableDefinitionList);
 
         // --- Add existing variable definition to model --- //
         mvcResult = mvc.perform(patch("/models/" + modelName + "/variables/add")
@@ -576,9 +610,9 @@ public class ModelControllerTest {
 
         // Get current variable definitions in the model
         List<ModelVariableDefinition> variableDefinitions6 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Model.class).getVariableDefinitions();
-        LOGGER.info("Updated variable definitions = " + variableDefinitions6);
-        // must have the same number of above input variable definitions
-        assertEquals(variableDefinitionList.size(), variableDefinitions6.size());
+        LOGGER.info("Updated variable definitions = {}", variableDefinitions6);
+        // must have the same number of the above input variable definitions
+        assertThat(variableDefinitions6).hasSameSizeAs(variableDefinitionList);
 
         // --- add unknown existing variable definition to model => must fail fast --- //
         mvc.perform(patch("/models/" + modelName + "/variables/add")
@@ -591,12 +625,12 @@ public class ModelControllerTest {
                         .content(objectMapper.writeValueAsString(List.of(variableDefinitions.get(4).getName())))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<String> deletedVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
-        LOGGER.info("Deleted variable definitions = " + deletedVariableDefinitionNames);
+        List<String> deletedVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        LOGGER.info("Deleted variable definitions = {}", deletedVariableDefinitionNames);
 
         // Check result
-        assertEquals(1, deletedVariableDefinitionNames.size());
-        assertEquals(variableDefinitions.get(4).getName(), deletedVariableDefinitionNames.get(0));
+        assertThat(deletedVariableDefinitionNames).hasSize(1);
+        assertThat(deletedVariableDefinitionNames.getFirst()).isEqualTo(variableDefinitions.get(4).getName());
 
     }
 
@@ -618,7 +652,7 @@ public class ModelControllerTest {
         List<ModelVariableDefinition> variableDefinitions = variablesSet.getVariableDefinitions();
 
         // Check result
-        assertEquals(2, variableDefinitions.size());
+        assertThat(variableDefinitions).hasSize(2);
 
         // --- Put second time which add only a variable definition --- //
         mvcResult = mvc.perform(post("/models/variables-sets/" + variablesSet.getName() + "/variables")
@@ -629,28 +663,28 @@ public class ModelControllerTest {
         // Get variable definitions after adding
         VariablesSet variablesSet2 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
         List<ModelVariableDefinition> variableDefinitions2 = variablesSet2.getVariableDefinitions();
-        LOGGER.info("Initial variable definitions = " + variableDefinitions);
-        LOGGER.info("Updated variable definitions = " + variableDefinitions2);
+        LOGGER.info("Initial variable definitions = {}", variableDefinitions);
+        LOGGER.info("Updated variable definitions = {}", variableDefinitions2);
 
         // Check result
-        assertEquals(4, variableDefinitions2.size());
+        assertThat(variableDefinitions2).hasSize(4);
         // must contains all initial variable definitions
-        assertTrue(variableDefinitions2.containsAll(variableDefinitions));
+        Assertions.assertThatDtoList(variableDefinitions2).recursivelyContainAll(variableDefinitions);
 
         // check in the database, must be 4 variable definitions, 2 in the initial set and 2 added later
         mvcResult = mvc.perform(get("/models/variable-definitions/names")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<String> foundVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
-        assertEquals(4, foundVariableDefinitionNames.size());
+        List<String> foundVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundVariableDefinitionNames).hasSize(4);
 
         mvcResult = mvc.perform(get("/models/variable-definitions")
-                        .param("variableDefinitionNames", foundVariableDefinitionNames.stream().collect(Collectors.joining(",")))
+                        .param("variableDefinitionNames", String.join(",", foundVariableDefinitionNames))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
         List<ModelVariableDefinition> foundVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(4, foundVariableDefinitions.size());
+        assertThat(foundVariableDefinitions).hasSize(4);
 
         // --- Remove an existing variable definition --- //
         mvcResult = mvc.perform(patch("/models/variables-sets/" + variablesSet.getName() + "/variables/remove")
@@ -661,13 +695,13 @@ public class ModelControllerTest {
         // Get current variable definitions
         VariablesSet variablesSet3 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
         List<ModelVariableDefinition> variableDefinitions3 = variablesSet3.getVariableDefinitions();
-        LOGGER.info("Updated variable definitions = " + variableDefinitions2);
-        LOGGER.info("Removed variable definitions = " + variableDefinitions3);
+        LOGGER.info("Updated variable definitions = {}", variableDefinitions2);
+        LOGGER.info("Removed variable definitions = {}", variableDefinitions3);
 
         // Check result
-        assertEquals(3, variableDefinitions3.size());
+        assertThat(variableDefinitions3).hasSize(3);
         // must contains all variable definitions after removing
-        assertTrue(variableDefinitions2.containsAll(variableDefinitions3));
+        Assertions.assertThatDtoList(variableDefinitions2).recursivelyContainAll(variableDefinitions3);
 
         // --- Remove all existing variable definition --- //
         mvcResult = mvc.perform(patch("/models/variables-sets/" + variablesSet.getName() + "/variables/remove-all")
@@ -677,10 +711,10 @@ public class ModelControllerTest {
         // Get current variable definitions after remove all
         VariablesSet variablesSet4 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), VariablesSet.class);
         List<ModelVariableDefinition> variableDefinitions4 = variablesSet4.getVariableDefinitions();
-        LOGGER.info("All removed variable definitions = " + variableDefinitions4);
+        LOGGER.info("All removed variable definitions = {}", variableDefinitions4);
 
         // Check result
-        assertEquals(0, variableDefinitions4.size());
+        assertThat(variableDefinitions4).isEmpty();
 
     }
 
@@ -712,8 +746,8 @@ public class ModelControllerTest {
         // --- Get initial variable definition from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/variables-sets/" + threeWindingVariablesSet.getName() + "/variables"))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelVariableDefinition> threeWindingVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(2, threeWindingVariableDefinitions.size());
+        List<ModelVariableDefinition> threeWindingVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(threeWindingVariableDefinitions).hasSize(2);
 
         // --- Try to get variable definition from unknown variables set --- //
         mvc.perform(get("/models/variables-sets/" + "variable_set_unknown" + "/variables"))
@@ -723,28 +757,28 @@ public class ModelControllerTest {
         mvcResult = mvc.perform(get("/models/variables-sets/" + fourWindingVariablesSet.getName() + "/variables"))
                 .andExpect(status().isOk()).andReturn();
 
-        List<ModelVariableDefinition> fourWindingVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(3, fourWindingVariableDefinitions.size());
+        List<ModelVariableDefinition> fourWindingVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(fourWindingVariableDefinitions).hasSize(3);
 
         // cross-check between two variables set
         Sets.SetView<ModelVariableDefinition> intersectionVariableDefinitions = Sets.intersection(new HashSet<>(fourWindingVariableDefinitions), new HashSet<>(threeWindingVariableDefinitions));
-        assertEquals(2, intersectionVariableDefinitions.size());
+        assertThat(intersectionVariableDefinitions).hasSize(2);
 
         // check in the database, must be 3 variable definitions, i.e. 2 shared variable definitions
         // and 1 in FourWindingsSynchronousGenerator
         mvcResult = mvc.perform(get("/models/variable-definitions/names")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<String> foundVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
-        assertEquals(3, foundVariableDefinitionNames.size());
+        List<String> foundVariableDefinitionNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundVariableDefinitionNames).hasSize(3);
 
         mvcResult = mvc.perform(get("/models/variable-definitions")
-                        .param("variableDefinitionNames", foundVariableDefinitionNames.stream().collect(Collectors.joining(",")))
+                        .param("variableDefinitionNames", String.join(",", foundVariableDefinitionNames))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        List<ModelVariableDefinition> foundVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(3, foundVariableDefinitions.size());
+        List<ModelVariableDefinition> foundVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundVariableDefinitions).hasSize(3);
 
     }
 
@@ -776,48 +810,48 @@ public class ModelControllerTest {
         // --- Get variable definitions from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/" + loadAlphaBetaModelName + "/variables"))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelVariableDefinition> loadAlphaBetaVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(5, loadAlphaBetaVariableDefinitions.size());
+        List<ModelVariableDefinition> loadAlphaBetaVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(loadAlphaBetaVariableDefinitions).hasSize(5);
 
         // --- Get initial parameter definitions from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/" + loadAlphaBetaModelName + "/parameters/definitions"))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelParameterDefinition> loadAlphaBetaParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
-        assertEquals(6, loadAlphaBetaParameterDefinitions.size());
+        List<ModelParameterDefinition> loadAlphaBetaParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(loadAlphaBetaParameterDefinitions).hasSize(6);
 
         // --- Get variable definitions from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/" + loadPQModelName + "/variables"))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelVariableDefinition> loadPQVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelVariableDefinition>>() { });
-        assertEquals(3, loadPQVariableDefinitions.size());
+        List<ModelVariableDefinition> loadPQVariableDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(loadPQVariableDefinitions).hasSize(3);
 
         // --- Get initial parameter definitions from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/" + loadPQModelName + "/parameters/definitions"))
                 .andExpect(status().isOk()).andReturn();
-        List<ModelParameterDefinition> loadPQParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<ModelParameterDefinition>>() { });
-        assertEquals(4, loadPQParameterDefinitions.size());
+        List<ModelParameterDefinition> loadPQParameterDefinitions = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(loadPQParameterDefinitions).hasSize(4);
 
         // cross-check variable definitions between two models
         Sets.SetView<ModelVariableDefinition> intersectionVariableDefinitions = Sets.intersection(new HashSet<>(loadAlphaBetaVariableDefinitions), new HashSet<>(loadPQVariableDefinitions));
-        assertEquals(3, intersectionVariableDefinitions.size());
+        assertThat(intersectionVariableDefinitions).hasSize(3);
 
         // cross-check parameter definitions between two models
         Sets.SetView<ModelParameterDefinition> intersectionParameterDefinitions = Sets.intersection(new HashSet<>(loadAlphaBetaParameterDefinitions), new HashSet<>(loadPQParameterDefinitions));
-        assertEquals(3, intersectionParameterDefinitions.size());
+        assertThat(intersectionParameterDefinitions).hasSize(3);
 
         // the last parameter definition of load alpha beta model must be NETWORK
         ModelParameterDefinition lastParameterDefinitionInLoadAlphaBetaModel = loadAlphaBetaParameterDefinitions.stream().reduce((first, second) -> second).get();
-        assertEquals(ParameterOrigin.NETWORK, lastParameterDefinitionInLoadAlphaBetaModel.getOrigin());
+        assertThat(lastParameterDefinitionInLoadAlphaBetaModel.getOrigin()).isEqualTo(ParameterOrigin.NETWORK);
 
         // the last parameter definition of load PQ model must be USER
         ModelParameterDefinition lastParameterDefinitionInLoadPQModel = loadPQParameterDefinitions.stream().reduce((first, second) -> second).get();
-        assertEquals(ParameterOrigin.USER, lastParameterDefinitionInLoadPQModel.getOrigin());
+        assertThat(lastParameterDefinitionInLoadPQModel.getOrigin()).isEqualTo(ParameterOrigin.USER);
 
         // two last parameter definitions in two models must be the same name, type, originName and fixedValue
-        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getName(), lastParameterDefinitionInLoadPQModel.getName());
-        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getType(), lastParameterDefinitionInLoadPQModel.getType());
-        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getOriginName(), lastParameterDefinitionInLoadPQModel.getOriginName());
-        assertEquals(lastParameterDefinitionInLoadAlphaBetaModel.getFixedValue(), lastParameterDefinitionInLoadPQModel.getFixedValue());
+        assertThat(lastParameterDefinitionInLoadPQModel.getName()).isEqualTo(lastParameterDefinitionInLoadAlphaBetaModel.getName());
+        assertThat(lastParameterDefinitionInLoadPQModel.getType()).isEqualTo(lastParameterDefinitionInLoadAlphaBetaModel.getType());
+        assertThat(lastParameterDefinitionInLoadPQModel.getOriginName()).isEqualTo(lastParameterDefinitionInLoadAlphaBetaModel.getOriginName());
+        assertThat(lastParameterDefinitionInLoadPQModel.getFixedValue()).isEqualTo(lastParameterDefinitionInLoadAlphaBetaModel.getFixedValue());
 
     }
 
@@ -837,11 +871,11 @@ public class ModelControllerTest {
         ModelEntity savedModel = modelRepository.findByModelName(modelName).orElseThrow();
 
         // sanity check
-        assertEquals(modelName, savedModel.getModelName());
-        assertEquals(EquipmentType.GENERATOR, savedModel.getEquipmentType());
+        assertThat(savedModel.getModelName()).isEqualTo(modelName);
+        assertThat(savedModel.getEquipmentType()).isEqualTo(EquipmentType.GENERATOR);
 
         // check variables sets
-        assertEquals(2, savedModel.getVariableSets().size());
+        assertThat(savedModel.getVariableSets()).hasSize(2);
     }
 
     @Test
@@ -865,15 +899,15 @@ public class ModelControllerTest {
         List<ModelVariableDefinition> variableDefinitionsOfVoltageRegulatorSet = variablesSet.stream().filter(set -> "VoltageRegulator".equals(set.getName())).findFirst().orElseThrow().getVariableDefinitions();
 
         // Check result
-        assertEquals(2, variablesSet.size());
-        assertEquals(4, variableDefinitionsOfGeneratorSet.size());
-        assertEquals(1, variableDefinitionsOfVoltageRegulatorSet.size());
+        assertThat(variablesSet).hasSize(2);
+        assertThat(variableDefinitionsOfGeneratorSet).hasSize(4);
+        assertThat(variableDefinitionsOfVoltageRegulatorSet.size()).isOne();
 
         // --- Get initial variable sets from GET endpoint --- //
         mvcResult = mvc.perform(get("/models/" + model.getModelName() + "/variables-sets"))
                 .andExpect(status().isOk()).andReturn();
-        List<VariablesSet> variablesSet1 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<VariablesSet>>() { });
-        assertEquals(2, variablesSet1.size());
+        List<VariablesSet> variablesSet1 = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(variablesSet1).hasSize(2);
 
         // --- Try to get variable sets from unknown model --- //
         mvc.perform(get("/models/" + model.getModelName() + "_unknown" + "/variables"))
@@ -894,10 +928,10 @@ public class ModelControllerTest {
         List<ModelVariableDefinition> variableDefinitionsOfRegulator2Set = variablesSet2.stream().filter(set -> "Generator2".equals(set.getName())).findFirst().orElseThrow().getVariableDefinitions();
 
         // Check result
-        assertEquals(3, variablesSet2.size());
-        assertEquals(4, variableDefinitionsOfGeneratorSet.size());
-        assertEquals(1, variableDefinitionsOfVoltageRegulatorSet.size());
-        assertEquals(2, variableDefinitionsOfRegulator2Set.size());
+        assertThat(variablesSet2).hasSize(3);
+        assertThat(variableDefinitionsOfGeneratorSet).hasSize(4);
+        assertThat(variableDefinitionsOfVoltageRegulatorSet.size()).isOne();
+        assertThat(variableDefinitionsOfRegulator2Set).hasSize(2);
 
         // --- Remove an existing variables set --- //
         mvcResult = mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/remove")
@@ -910,9 +944,9 @@ public class ModelControllerTest {
         List<VariablesSet> variablesSet3 = model3.getVariablesSets();
 
         // Check result
-        assertEquals(2, variablesSet3.size());
+        assertThat(variablesSet3).hasSize(2);
         // must contains all variables sets after removing
-        assertTrue(variablesSet2.containsAll(variablesSet3));
+        Assertions.assertThatDtoList(variablesSet2).recursivelyContainAll(variablesSet3);
 
         // --- Remove all variables set --- //
         mvcResult = mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/remove-all")
@@ -924,7 +958,7 @@ public class ModelControllerTest {
         List<VariablesSet> variablesSet4 = model4.getVariablesSets();
 
         // Check result
-        assertEquals(0, variablesSet4.size());
+        assertThat(variablesSet4).isEmpty();
 
         // --- Add an existing variables set --- //
         mvcResult = mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/add")
@@ -937,7 +971,7 @@ public class ModelControllerTest {
         List<VariablesSet> variablesSet5 = model5.getVariablesSets();
 
         // Check result
-        assertEquals(1, variablesSet5.size());
+        assertThat(variablesSet5.size()).isOne();
 
         // --- Add an unknown existing variables set => must fail fast --- //
         mvc.perform(patch("/models/" + model.getModelName() + "/variables-sets/add")
@@ -950,26 +984,26 @@ public class ModelControllerTest {
                         .content(objectMapper.writeValueAsString(List.of(variablesSet2.get(2).getName())))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<String> deletedVariablesSetNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
+        List<String> deletedVariablesSetNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
 
         // Check result
-        assertEquals(1, deletedVariablesSetNames.size());
-        assertEquals(variablesSet2.get(2).getName(), deletedVariablesSetNames.get(0));
+        assertThat(deletedVariablesSetNames.size()).isOne();
+        assertThat(deletedVariablesSetNames.getFirst()).isEqualTo(variablesSet2.get(2).getName());
 
         // -- there is 2 variables set in database, i.e. two initial, one added, one deleted => remain 2 -- //
         mvcResult = mvc.perform(get("/models/variables-sets/names")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
-        List<String> foundVariableSetNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<String>>() { });
-        assertEquals(2, foundVariableSetNames.size());
+        List<String> foundVariableSetNames = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundVariableSetNames).hasSize(2);
 
         mvcResult = mvc.perform(get("/models/variables-sets")
-                        .param("variablesSetNames", foundVariableSetNames.stream().collect(Collectors.joining(",")))
+                        .param("variablesSetNames", String.join(",", foundVariableSetNames))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
 
-        List<VariablesSet> foundVariableSets = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<List<VariablesSet>>() { });
-        assertEquals(2, foundVariableSets.size());
+        List<VariablesSet> foundVariableSets = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        assertThat(foundVariableSets).hasSize(2);
     }
 
     @Test
@@ -1012,11 +1046,17 @@ public class ModelControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
+        MvcResult mvcResult = mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[" + set + "]", true));
+                .andReturn();
+
+        String setJson = mvcResult.getResponse().getContentAsString();
+        List<ParametersSet> resultSetList = objectMapper.readValue(setJson, new TypeReference<>() { });
+        ParametersSet expectedSet = objectMapper.readValue(set, ParametersSet.class);
+
+        Assertions.assertThat(resultSetList.getFirst()).recursivelyEquals(expectedSet);
 
         // Trying to delete from a non-existing model will throw
         mvc.perform(delete("/models/" + "unknownModel" + "/parameters/sets/" + name + "/" + "FIXED" + "/" + name))
@@ -1032,11 +1072,15 @@ public class ModelControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andExpect(content().json(setGroup));
 
-        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
+        mvcResult = mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[" + set + "]", true));
+                .andReturn();
+
+        setJson = mvcResult.getResponse().getContentAsString();
+        resultSetList = objectMapper.readValue(setJson, new TypeReference<>() { });
+        Assertions.assertThat(resultSetList.getFirst()).recursivelyEquals(expectedSet);
 
         // Delete the set
         mvc.perform(delete("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED" + "/" + name))
@@ -1051,11 +1095,13 @@ public class ModelControllerTest {
                     }
                 """
                 .formatted(name, modelName)));
-        mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
+        mvcResult = mvc.perform(get("/models/" + modelName + "/parameters/sets/" + name + "/" + "FIXED")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[]", true));
+                .andReturn();
+        List<ParametersSet> resultSets = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() { });
+        Assertions.assertThat(resultSets).isEmpty();
     }
 
     @Test
@@ -1094,21 +1140,21 @@ public class ModelControllerTest {
         // --- Check result --- //
         // model LOAD ALPHA BETA must be not exist in db
         Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(loadAlphaBetaModelName);
-        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+        assertThat(foundNoneExistingModelOpt).isNotPresent();
 
         // must delete only 2 parameter definitions which are only used by load alpha beta
         // the rest 4 shared parameter definitions must be always present in db
-        List<ModelParameterDefinitionEntity> foundNoneExistingParameterDefinitions = modelParameterDefinitionRepository.findAllByName(List.of("load_alpha", "load_beta"));
-        assertEquals(0, foundNoneExistingParameterDefinitions.size());
-        List<ModelParameterDefinitionEntity> foundExistingParameterDefinitions = modelParameterDefinitionRepository.findAllByName(List.of("load_P0Pu", "load_Q0Pu", "load_U0Pu", "load_UPhase0"));
-        assertEquals(4, foundExistingParameterDefinitions.size());
+        List<ModelParameterDefinitionEntity> foundNoneExistingParameterDefinitions = modelParameterDefinitionRepository.findAllByNameIn(List.of("load_alpha", "load_beta"));
+        assertThat(foundNoneExistingParameterDefinitions).isEmpty();
+        List<ModelParameterDefinitionEntity> foundExistingParameterDefinitions = modelParameterDefinitionRepository.findAllByNameIn(List.of("load_P0Pu", "load_Q0Pu", "load_U0Pu", "load_UPhase0"));
+        assertThat(foundExistingParameterDefinitions).hasSize(4);
 
         // must delete only 2 variable definitions which are only used by load alpha beta
         // the rest 3 shared variable definitions must be always present in db
-        List<ModelVariableDefinitionEntity> foundNoneExistingVariableDefinitions = modelVariableRepository.findAllByName(List.of("load_PRefPu", "load_running_value"));
-        assertEquals(0, foundNoneExistingVariableDefinitions.size());
-        List<ModelVariableDefinitionEntity> foundExistingVariableDefinitions = modelVariableRepository.findAllByName(List.of("load_PPu", "load_QPu", "load_QRefPu"));
-        assertEquals(3, foundExistingVariableDefinitions.size());
+        List<ModelVariableDefinitionEntity> foundNoneExistingVariableDefinitions = modelVariableRepository.findAllByNameIn(List.of("load_PRefPu", "load_running_value"));
+        assertThat(foundNoneExistingVariableDefinitions).isEmpty();
+        List<ModelVariableDefinitionEntity> foundExistingVariableDefinitions = modelVariableRepository.findAllByNameIn(List.of("load_PPu", "load_QPu", "load_QRefPu"));
+        assertThat(foundExistingVariableDefinitions).hasSize(3);
 
         // --- Delete LOAD PQ --- //
         mvc.perform(delete("/models/")
@@ -1119,12 +1165,12 @@ public class ModelControllerTest {
         // --- Check result --- //
         // model LOAD PQ must be not exist in db
         foundNoneExistingModelOpt = modelRepository.findByModelName(loadPQModelName);
-        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+        assertThat(foundNoneExistingModelOpt).isNotPresent();
 
         // db must not contain any parameter definition
-        assertEquals(0, modelParameterDefinitionRepository.findAll().size());
+        assertThat(modelParameterDefinitionRepository.findAll()).isEmpty();
         // db must not contain any variable definition
-        assertEquals(0, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).isEmpty();
 
     }
 
@@ -1143,10 +1189,10 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // This model has two variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("Generator", "VoltageRegulator"));
-        assertEquals(2, variableSets.size());
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("Generator", "VoltageRegulator"));
+        assertThat(variableSets).hasSize(2);
         // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
-        assertEquals(5, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).hasSize(5);
 
         // --- Delete model generator --- //
         mvc.perform(delete("/models/")
@@ -1157,12 +1203,12 @@ public class ModelControllerTest {
         // --- Check result --- //
         // model generator model must be not exist in db
         Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(generatorModelName);
-        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+        assertThat(foundNoneExistingModelOpt).isNotPresent();
 
         // db must not contain any variable set
-        assertEquals(0, modelVariablesSetRepository.findAll().size());
+        assertThat(modelVariablesSetRepository.findAll()).isEmpty();
         // db must not contain any variable definition
-        assertEquals(0, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).isEmpty();
     }
 
     @Test
@@ -1188,10 +1234,10 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // These models have two shared variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("Generator", "VoltageRegulator"));
-        assertEquals(2, variableSets.size());
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("Generator", "VoltageRegulator"));
+        assertThat(variableSets).hasSize(2);
         // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
-        assertEquals(5, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).hasSize(5);
 
         // --- Delete model Three Windings Generator --- //
         mvc.perform(delete("/models/")
@@ -1202,13 +1248,13 @@ public class ModelControllerTest {
         // --- Check result --- //
         // model Three Windings Generator must be not exist in db
         Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(generatorModelThreeWindingsName);
-        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+        assertThat(foundNoneExistingModelOpt).isNotPresent();
 
-        // These models have two shared variable sets => after delete one model, shared shared variable sets must be always in db
-        variableSets = modelVariablesSetRepository.findAllByName(List.of("Generator", "VoltageRegulator"));
-        assertEquals(2, variableSets.size());
+        // These models have two shared variable sets => after delete one model, shared variable sets must be always in db
+        variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("Generator", "VoltageRegulator"));
+        assertThat(variableSets).hasSize(2);
         // Variable set Generator contains 4 variable definitions and VoltageRegulator contains 1 variable definition => total = 5
-        assertEquals(5, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).hasSize(5);
 
         // --- Delete model Four Windings Generator --- //
         mvc.perform(delete("/models/")
@@ -1219,13 +1265,13 @@ public class ModelControllerTest {
         // --- Check result --- //
         // model Three Windings Generator must be not exist in db
         foundNoneExistingModelOpt = modelRepository.findByModelName(generatorModelFourWindingsName);
-        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+        assertThat(foundNoneExistingModelOpt).isNotPresent();
 
         // the last model which uses shared variable sets has been deleted
         // db must not contain any variable set
-        assertEquals(0, modelVariablesSetRepository.findAll().size());
+        assertThat(modelVariablesSetRepository.findAll()).isEmpty();
         // db must not contain any variable definition
-        assertEquals(0, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).isEmpty();
 
     }
 
@@ -1252,10 +1298,10 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // These models have two shared 3 variables definitions between 2 different variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPQ", "GeneratorPV"));
-        assertEquals(2, variableSets.size());
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("GeneratorPQ", "GeneratorPV"));
+        assertThat(variableSets).hasSize(2);
         // Variable set GeneratorPQ and GeneratorPV share 3 variable definitions
-        assertEquals(3, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).hasSize(3);
 
         // --- Delete model Generator PQ --- //
         mvc.perform(delete("/models/")
@@ -1266,13 +1312,13 @@ public class ModelControllerTest {
         // --- Check result --- //
         // model Generator PQ must be not exist in db
         Optional<ModelEntity> foundNoneExistingModelOpt = modelRepository.findByModelName(generatorPQModelName);
-        assertEquals(false, foundNoneExistingModelOpt.isPresent());
+        assertThat(foundNoneExistingModelOpt).isNotPresent();
 
         // Variable set Generator PQ must be not exist in db
-        variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPQ"));
-        assertEquals(0, variableSets.size());
+        variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("GeneratorPQ"));
+        assertThat(variableSets).isEmpty();
         // 3 variable definitions used by variable set GeneratorPV must be always present in db
-        assertEquals(3, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).hasSize(3);
 
         // --- Delete model Generator PV --- //
         mvc.perform(delete("/models/")
@@ -1281,10 +1327,10 @@ public class ModelControllerTest {
                 .andExpect(status().isOk()).andReturn();
 
         // Variable set Generator PV must be not exist in db
-        variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPV"));
-        assertEquals(0, variableSets.size());
+        variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("GeneratorPV"));
+        assertThat(variableSets).isEmpty();
         // 3 variable definitions used by variable set GeneratorPV must be not exist in db
-        assertEquals(0, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).isEmpty();
     }
 
     @Test
@@ -1310,10 +1356,11 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // These models have two shared 3 variables definitions between 2 different variable sets => must be present in the db
-        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPQ", "GeneratorPV"));
-        assertEquals(2, variableSets.size());
+        List<ModelVariableSetEntity> variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("GeneratorPQ", "GeneratorPV"));
+        assertThat(variableSets).hasSize(2);
         // Variable set GeneratorPQ and GeneratorPV share 3 variable definitions
-        assertEquals(3, modelVariableRepository.findAll().size());
+        List<ModelVariableDefinitionEntity> variables = modelVariableRepository.findAll();
+        assertThat(variables).hasSize(3);
 
         // --- Delete model Generator PQ --- //
         mvc.perform(delete("/models/")
@@ -1323,13 +1370,13 @@ public class ModelControllerTest {
 
         // --- Check result --- //
         // model Generator PQ/PV must be not exist in db
-        List<ModelEntity> modelEntities = modelRepository.findAllByModelName(List.of(generatorPQModelName, generatorPVModelName));
-        assertEquals(0, modelEntities.size());
+        List<ModelEntity> modelEntities = modelRepository.findAllByModelNameIn(List.of(generatorPQModelName, generatorPVModelName));
+        assertThat(modelEntities).isEmpty();
 
         // Variable set Generator PQ/PV must be not exist in db
-        variableSets = modelVariablesSetRepository.findAllByName(List.of("GeneratorPV", "GeneratorPQ"));
-        assertEquals(0, variableSets.size());
+        variableSets = modelVariablesSetRepository.findAllByNameIn(List.of("GeneratorPV", "GeneratorPQ"));
+        assertThat(variableSets).isEmpty();
         // 3 variable definitions used by variable sets GeneratorPQ/PV must be not exist in db
-        assertEquals(0, modelVariableRepository.findAll().size());
+        assertThat(modelVariableRepository.findAll()).isEmpty();
     }
 }

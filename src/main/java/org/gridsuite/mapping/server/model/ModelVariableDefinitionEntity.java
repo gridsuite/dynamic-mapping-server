@@ -28,20 +28,19 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @Getter
 @Setter
 @Entity
-@Table(name = "model_variable_definitions")
+@Table(name = "model_variable_definition")
 public class ModelVariableDefinitionEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    @Enumerated
     private VariableType type;
 
     @Column(name = "unit")
@@ -64,7 +63,7 @@ public class ModelVariableDefinitionEntity implements Serializable {
     public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
         this(variableDefinition.getId() == null ? UUID.randomUUID() : variableDefinition.getId(), variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(),
                 model != null ? new LinkedHashSet<>(List.of(model)) : new LinkedHashSet<>(),
-                new LinkedHashSet<>(List.of(variablesSet)), null, null);
+                variablesSet != null ? new LinkedHashSet<>(List.of(variablesSet)) : new LinkedHashSet<>(), null, null);
     }
 
     @CreatedDate

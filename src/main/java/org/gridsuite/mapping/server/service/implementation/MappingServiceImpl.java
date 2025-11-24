@@ -279,7 +279,7 @@ public class MappingServiceImpl implements MappingService {
                 .collect(Collectors.toSet());
 
         // get model by name from db, concat to default models and convert to dtos
-        return Stream.concat(modelRepository.findAllByModelName(mappedModelNames).stream(),
+        return Stream.concat(modelRepository.findAllByModelNameIn(mappedModelNames).stream(),
                         modelRepository.findAllByDefaultModelTrue().stream())
                 .map(Model::new).toList();
     }

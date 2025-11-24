@@ -35,6 +35,7 @@ public class ParametersSetsGroup {
     private String modelName;
 
     public ParametersSetsGroup(ModelSetsGroupEntity setsGroupEntity) {
+        id = setsGroupEntity.getId();
         name = setsGroupEntity.getName();
         type = setsGroupEntity.getType();
         sets = setsGroupEntity.getSets().stream().map(ParametersSet::new).collect(Collectors.toList());

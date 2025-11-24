@@ -34,4 +34,7 @@
     <changeSet author="phamquy (generated)" id="1763389111220-10">
         <dropTable tableName="model_sets_group"/>
     </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-11">
+        <dropTable tableName="models"/>
+    </changeSet>
 </databaseChangeLog>

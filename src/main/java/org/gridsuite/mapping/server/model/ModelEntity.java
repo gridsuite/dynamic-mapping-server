@@ -30,18 +30,18 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @Getter
 @Setter
 @Entity
-@Table(name = "models")
+@Table(name = "model", indexes = {@Index(name = "model_name_index", columnList = "name")})
 public class ModelEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "model_name")
+    @Column(name = "name", nullable = false)
     private String modelName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "equipment_type")
     private EquipmentType equipmentType;
 
@@ -57,9 +57,11 @@ public class ModelEntity implements Serializable {
     // must exclude CascadeType.REMOVE to avoid unexpected cascade on delete a ModelVariableDefinitionEntity
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
-            name = "models_model_variable_definitions",
-            joinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id")}
+            name = "model_model_variable_definition",
+            joinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "model_model_variable_definition_model_id_fk"))},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "model_model_variable_definition_variable_definition_id_fk"))}
     )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = LinkedHashSet.newLinkedHashSet(0);
 
