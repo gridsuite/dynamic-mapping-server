@@ -13,6 +13,7 @@ import org.gridsuite.mapping.server.model.ModelSetsGroupEntity;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class ParametersSetsGroup {
 
+    private UUID id;
+
     private String name;
 
     private SetGroupType type;
@@ -32,9 +35,10 @@ public class ParametersSetsGroup {
     private String modelName;
 
     public ParametersSetsGroup(ModelSetsGroupEntity setsGroupEntity) {
+        id = setsGroupEntity.getId();
         name = setsGroupEntity.getName();
         type = setsGroupEntity.getType();
         sets = setsGroupEntity.getSets().stream().map(ParametersSet::new).collect(Collectors.toList());
-        modelName = setsGroupEntity.getModelName();
+        modelName = setsGroupEntity.getModel().getModelName();
     }
 }
