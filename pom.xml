@@ -32,7 +32,7 @@
     </scm>
 
     <properties>
-        <gridsuite-dependencies.version>45.0.0-SNAPSHOT</gridsuite-dependencies.version>
+        <gridsuite-dependencies.version>45.0.0</gridsuite-dependencies.version>
         <string-template.version>4.3.1</string-template.version>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
         <sonar.organization>gridsuite</sonar.organization>
