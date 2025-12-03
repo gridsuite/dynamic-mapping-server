@@ -10,7 +10,8 @@ package org.gridsuite.mapping.server.service.client.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.gridsuite.mapping.server.DynamicMappingException;
+import org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -27,7 +28,7 @@ public final class ExceptionUtils {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 
-    public static DynamicMappingException handleHttpError(HttpStatusCodeException httpException, DynamicMappingException.Type type, ObjectMapper objectMapper) {
+    public static DynamicMappingException handleHttpError(HttpStatusCodeException httpException, DynamicMappingErrorBusinessCode type, ObjectMapper objectMapper) {
         String responseBody = httpException.getResponseBodyAsString();
 
         String errorMessage = responseBody.isEmpty() ? httpException.getStatusCode().toString() : parseHttpError(responseBody, objectMapper);

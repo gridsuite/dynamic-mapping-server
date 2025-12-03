@@ -19,7 +19,7 @@ import org.gridsuite.filter.utils.EquipmentType;
 import org.gridsuite.filter.utils.expertfilter.CombinatorType;
 import org.gridsuite.filter.utils.expertfilter.FieldType;
 import org.gridsuite.filter.utils.expertfilter.OperatorType;
-import org.gridsuite.mapping.server.DynamicMappingException;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.service.client.AbstractWireMockRestClientTest;
 import org.gridsuite.mapping.server.service.client.filter.impl.FilterClientImpl;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
-import static org.gridsuite.mapping.server.DynamicMappingException.Type.*;
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.*;
 import static org.gridsuite.mapping.server.service.client.filter.FilterClient.*;
 import static org.gridsuite.mapping.server.service.client.utils.UrlUtils.buildEndPointUrl;
 import static org.gridsuite.mapping.server.utils.assertions.Assertions.assertThat;
@@ -138,7 +138,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 DynamicMappingException.class);
 
         // check result
-        assertThat(exception.getType())
+        assertThat(exception.getBusinessErrorCode())
                 .isEqualTo(CREATE_FILTER_ERROR);
         assertThat(exception.getMessage())
                 .isEqualTo(ERROR_MESSAGE);
@@ -187,7 +187,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 DynamicMappingException.class);
 
         // check result
-        assertThat(exception.getType())
+        assertThat(exception.getBusinessErrorCode())
                 .isEqualTo(UPDATE_FILTER_ERROR);
         assertThat(exception.getMessage())
                 .isEqualTo(ERROR_MESSAGE);
@@ -235,7 +235,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 DynamicMappingException.class);
 
         // check result
-        assertThat(exception.getType())
+        assertThat(exception.getBusinessErrorCode())
                 .isEqualTo(DUPLICATE_FILTER_ERROR);
         assertThat(exception.getMessage())
                 .isEqualTo(ERROR_MESSAGE);
@@ -274,7 +274,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 DynamicMappingException.class);
 
         // check result
-        assertThat(exception.getType())
+        assertThat(exception.getBusinessErrorCode())
                 .isEqualTo(DELETE_FILTER_ERROR);
         assertThat(exception.getMessage())
                 .isEqualTo(ERROR_MESSAGE);
@@ -323,7 +323,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 DynamicMappingException.class);
 
         // check result
-        assertThat(exception.getType())
+        assertThat(exception.getBusinessErrorCode())
                 .isEqualTo(GET_FILTER_ERROR);
         assertThat(exception.getMessage())
                 .isEqualTo(ERROR_MESSAGE);

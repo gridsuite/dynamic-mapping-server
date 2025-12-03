@@ -8,12 +8,12 @@
 package org.gridsuite.mapping.server.service.client.utils;
 
 import org.apache.logging.log4j.util.Strings;
-import org.gridsuite.mapping.server.DynamicMappingException;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static org.gridsuite.mapping.server.DynamicMappingException.Type.URI_SYNTAX;
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.URI_SYNTAX;
 import static org.gridsuite.mapping.server.service.client.RestClient.URL_DELIMITER;
 
 /**

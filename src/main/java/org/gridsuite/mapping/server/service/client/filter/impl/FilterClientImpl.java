@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server.service.client.filter.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.mapping.server.DynamicMappingException;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.service.client.AbstractRestClient;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.gridsuite.mapping.server.DynamicMappingException.Type.*;
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.*;
 import static org.gridsuite.mapping.server.service.client.utils.ExceptionUtils.handleHttpError;
 import static org.gridsuite.mapping.server.service.client.utils.UrlUtils.buildEndPointUrl;
 
