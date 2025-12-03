@@ -35,8 +35,7 @@ public class DynamicMappingExceptionHandler extends AbstractBusinessExceptionHan
         return switch (businessErrorCode) {
             case MAPPING_NAME_NOT_PROVIDED -> HttpStatus.BAD_REQUEST;
             case FILTER_NOT_FOUND -> HttpStatus.NOT_FOUND;
-            case URI_SYNTAX,
-                 GET_FILTER_ERROR,
+            case GET_FILTER_ERROR,
                  CREATE_FILTER_ERROR,
                  UPDATE_FILTER_ERROR,
                  DUPLICATE_FILTER_ERROR,
