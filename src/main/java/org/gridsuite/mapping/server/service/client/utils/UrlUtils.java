@@ -9,7 +9,6 @@ package org.gridsuite.mapping.server.service.client.utils;
 
 import com.powsybl.commons.exceptions.UncheckedUriSyntaxException;
 import org.apache.logging.log4j.util.Strings;
-import org.gridsuite.mapping.server.error.DynamicMappingException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
