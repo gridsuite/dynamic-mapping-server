@@ -35,6 +35,6 @@ class DynamicMappingExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(response.getBody()).isNotNull();
-        assertEquals("", response.getBody().getBusinessErrorCode());
+        assertEquals("dynamicMapping.deleteFilterError", response.getBody().getBusinessErrorCode());
     }
 }
