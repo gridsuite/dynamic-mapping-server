@@ -12,8 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.DELETE_FILTER_ERROR;
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.MAPPING_NAME_NOT_PROVIDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -30,11 +31,11 @@ class DynamicMappingExceptionHandlerTest {
     @Test
     void mapsInteralErrorBusinessErrorToStatus() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/results-endpoint/uuid");
-        DynamicMappingException exception = new DynamicMappingException(DELETE_FILTER_ERROR, "filter deleted");
+        DynamicMappingException exception = new DynamicMappingException(MAPPING_NAME_NOT_PROVIDED, "filter deleted");
         ResponseEntity<PowsyblWsProblemDetail> response = handler.handleShortcircuitException(exception, request);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertEquals("dynamicMapping.deleteFilterError", response.getBody().getBusinessErrorCode());
+        assertEquals("dynamicMapping.mappingNameNotProvided", response.getBody().getBusinessErrorCode());
     }
 }
