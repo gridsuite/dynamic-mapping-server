@@ -11,6 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelParameterEntity;
 
+import java.util.UUID;
+
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
@@ -18,11 +20,13 @@ import org.gridsuite.mapping.server.model.ModelParameterEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelParameter {
+    private UUID id;
     private String name;
     private String value;
 
     public ModelParameter(ModelParameterEntity modelParameterEntity) {
-        name = modelParameterEntity.getName();
-        value = modelParameterEntity.getValue();
+        this.id = modelParameterEntity.getId();
+        this.name = modelParameterEntity.getName();
+        this.value = modelParameterEntity.getValue();
     }
 }

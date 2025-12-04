@@ -16,7 +16,7 @@ import java.beans.PropertyDescriptor;
 import java.util.Arrays;
 
 /**
- * This class is must be identical to one on study-server
+ * This class must be identical to one on study-server
  * @author Jacques Borsenberger <jacques.borsenberger at rte-france.com
  */
 public final class PropertyUtils {
@@ -34,7 +34,7 @@ public final class PropertyUtils {
 
         /* we take each property names, and collect the ones pointing to null value */
         return Arrays.stream(propertyDescriptors).map(FeatureDescriptor::getName).filter(name -> beanSource.getPropertyValue(name) == null)
-                .filter(name -> Arrays.stream(authorizedNullProperties).noneMatch(n -> name.equals(n)))
+                .filter(name -> Arrays.stream(authorizedNullProperties).noneMatch(name::equals))
                 .toArray(String[]::new);
     }
 }

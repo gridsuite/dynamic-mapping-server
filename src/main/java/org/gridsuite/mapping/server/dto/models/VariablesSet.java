@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelVariableSetEntity;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -22,10 +23,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VariablesSet {
+    private UUID id;
     private String name;
     private List<ModelVariableDefinition> variableDefinitions;
 
     public VariablesSet(ModelVariableSetEntity variableSetEntity) {
+        this.id = variableSetEntity.getId();
         this.name = variableSetEntity.getName();
         this.variableDefinitions = variableSetEntity.getVariableDefinitions().stream().map(ModelVariableDefinition::new).collect(Collectors.toList());
     }

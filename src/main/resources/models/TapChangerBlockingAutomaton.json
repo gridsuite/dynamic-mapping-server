@@ -1,0 +1,103 @@
+{
+    "modelName": "TapChangerBlockingAutomaton",
+    "equipmentType": "VOLTAGE",
+    "parameterDefinitions": [
+        {
+            "name": "tapChangerBlocking_UMin",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "tapChangerBlocking_tLagBeforeBlocked",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "tapChangerBlocking_tLagTransBlockedD",
+            "type": "DOUBLE",
+            "origin": "USER"
+        },
+        {
+            "name": "tapChangerBlocking_tLagTransBlockedT",
+            "type": "DOUBLE",
+            "origin": "USER"
+        }
+    ],
+    "setsGroups": [
+        {
+            "name": "IEEE14_TCB_1",
+            "type": "FIXED",
+            "modelName": "TapChangerBlockingAutomaton",
+            "sets": [
+                {
+                    "name": "IEEE14_TCB_1",
+                    "parameters": [
+                        {
+                            "name": "tapChangerBlocking_UMin",
+                            "value": "5"
+                        },
+                        {
+                            "name": "tapChangerBlocking_tLagBeforeBlocked",
+                            "value": "0"
+                        },
+                        {
+                            "name": "tapChangerBlocking_tLagTransBlockedD",
+                          "value": "0"
+                        },
+                        {
+                            "name": "tapChangerBlocking_tLagTransBlockedT",
+                            "value": "0"
+                        }
+                    ]
+                }
+            ]
+      },
+      {
+        "name": "IEEE14_TCB_2",
+        "type": "FIXED",
+        "modelName": "TapChangerBlockingAutomaton",
+        "sets": [
+          {
+            "name": "IEEE14_TCB_2",
+            "parameters": [
+              {
+                "name": "tapChangerBlocking_UMin",
+                "value": "50"
+              },
+              {
+                "name": "tapChangerBlocking_tLagBeforeBlocked",
+                "value": "0"
+              },
+              {
+                "name": "tapChangerBlocking_tLagTransBlockedD",
+                "value": "0"
+              },
+              {
+                "name": "tapChangerBlocking_tLagTransBlockedT",
+                "value": "0"
+              }
+            ]
+          }
+        ]
+      }    ],
+    "variableDefinitions": [
+        {
+            "name": "tapChangerBlocking_UMonitored_value",
+            "type": "DOUBLE",
+            "unit": "kV"
+        },
+        {
+            "name": "tapChangerBlocking_state",
+            "type": "INT"
+        },
+        {
+            "name": "tapChangerBlocking_blockedD",
+            "type": "BOOL"
+        },
+        {
+            "name": "tapChangerBlocking_blockedT",
+            "type": "BOOL"
+        }
+    ],
+    "variablesSets": []
+}

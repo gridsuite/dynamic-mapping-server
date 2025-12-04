@@ -1,9 +1,10 @@
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.Embeddable;
 import lombok.*;
 
-import jakarta.persistence.Embeddable;
 import java.io.Serializable;
+import java.util.UUID;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
@@ -13,9 +14,9 @@ import java.io.Serializable;
 @Embeddable
 public class ModelModelParameterDefinitionId implements Serializable {
     @EqualsAndHashCode.Include
-    private String modelName;
+    private UUID modelId;
 
     @EqualsAndHashCode.Include
-    private String parameterDefinitionName;
+    private UUID parameterDefinitionId;
 
 }

@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.Date;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -24,9 +25,9 @@ import static org.junit.Assert.assertNull;
 public class PropertyUtilsTest {
     @Test
     public void testCopyNonNullProperties() {
-        // test with an ModelVariableDefinitionEntity
-        ModelVariableDefinitionEntity variableDefinitionEntity = new ModelVariableDefinitionEntity("load_running_value", VariableType.DOUBLE, "KW", 100.0, null, null, new Date(), new Date());
-        ModelVariableDefinitionEntity variableDefinitionEntity2 = new ModelVariableDefinitionEntity("load_running_value2", VariableType.BOOL, null, 90.0, null, null, null, new Date());
+        // test with a ModelVariableDefinitionEntity
+        ModelVariableDefinitionEntity variableDefinitionEntity = new ModelVariableDefinitionEntity(UUID.randomUUID(), "load_running_value", VariableType.DOUBLE, "KW", 100.0, null, null, new Date(), new Date());
+        ModelVariableDefinitionEntity variableDefinitionEntity2 = new ModelVariableDefinitionEntity(UUID.randomUUID(), "load_running_value2", VariableType.BOOL, null, 90.0, null, null, null, new Date());
 
         // call method to be tested
         PropertyUtils.copyNonNullProperties(variableDefinitionEntity2, variableDefinitionEntity);
