@@ -32,7 +32,7 @@ class DynamicMappingExceptionHandlerTest {
     void mapsInteralErrorBusinessErrorToStatus() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/results-endpoint/uuid");
         DynamicMappingException exception = new DynamicMappingException(MAPPING_NAME_NOT_PROVIDED, "filter deleted");
-        ResponseEntity<PowsyblWsProblemDetail> response = handler.handleShortcircuitException(exception, request);
+        ResponseEntity<PowsyblWsProblemDetail> response = handler.handleDynamicMappingException(exception, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();

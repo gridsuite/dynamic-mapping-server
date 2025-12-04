@@ -38,7 +38,7 @@ public class DynamicMappingExceptionHandler extends AbstractBusinessExceptionHan
     }
 
     @ExceptionHandler(DynamicMappingException.class)
-    protected ResponseEntity<PowsyblWsProblemDetail> handleShortcircuitException(
+    protected ResponseEntity<PowsyblWsProblemDetail> handleDynamicMappingException(
             DynamicMappingException exception, HttpServletRequest request) {
         return super.handleDomainException(exception, request);
     }
