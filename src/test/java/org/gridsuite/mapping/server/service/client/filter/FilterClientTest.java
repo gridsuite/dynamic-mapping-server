@@ -19,11 +19,11 @@ import org.gridsuite.filter.utils.EquipmentType;
 import org.gridsuite.filter.utils.expertfilter.CombinatorType;
 import org.gridsuite.filter.utils.expertfilter.FieldType;
 import org.gridsuite.filter.utils.expertfilter.OperatorType;
-import org.gridsuite.mapping.server.DynamicMappingException;
 import org.gridsuite.mapping.server.service.client.AbstractWireMockRestClientTest;
 import org.gridsuite.mapping.server.service.client.filter.impl.FilterClientImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
-import static org.gridsuite.mapping.server.DynamicMappingException.Type.*;
 import static org.gridsuite.mapping.server.service.client.filter.FilterClient.*;
 import static org.gridsuite.mapping.server.service.client.utils.UrlUtils.buildEndPointUrl;
 import static org.gridsuite.mapping.server.utils.assertions.Assertions.assertThat;
@@ -61,7 +60,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
         loadRules.add(loadRule);
 
         CombinatorExpertRule loadRootCombinator = CombinatorExpertRule.builder()
-            .combinator(CombinatorType.AND).rules(loadRules).build();
+                .combinator(CombinatorType.AND).rules(loadRules).build();
 
         ExpertFilter loadExpertFilter = new ExpertFilter(UUID.randomUUID(), null, EquipmentType.LOAD, loadRootCombinator);
 
@@ -72,7 +71,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
         generatorRules.add(generatorRule);
 
         CombinatorExpertRule generatorRootCombinator = CombinatorExpertRule.builder()
-            .combinator(CombinatorType.AND).rules(generatorRules).build();
+                .combinator(CombinatorType.AND).rules(generatorRules).build();
 
         ExpertFilter generatorExpertFilter = new ExpertFilter(UUID.randomUUID(), null, EquipmentType.GENERATOR, generatorRootCombinator);
 
@@ -133,15 +132,9 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                         .withBody(ERROR_MESSAGE_JSON)
                 ));
 
-        DynamicMappingException exception = catchThrowableOfType(
-                () -> filterClient.createFilters(filtersToCreate),
-                DynamicMappingException.class);
-
+        HttpServerErrorException exception = catchThrowableOfType(HttpServerErrorException.class, () -> filterClient.createFilters(filtersToCreate));
         // check result
-        assertThat(exception.getType())
-                .isEqualTo(CREATE_FILTER_ERROR);
-        assertThat(exception.getMessage())
-                .isEqualTo(ERROR_MESSAGE);
+        assertThat(exception.getMessage()).contains(ERROR_MESSAGE);
     }
 
     public void testUpdateFilters() throws JsonProcessingException {
@@ -182,15 +175,10 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                         .withBody(ERROR_MESSAGE_JSON)
                 ));
 
-        DynamicMappingException exception = catchThrowableOfType(
-                () -> filterClient.updateFilters(filtersToUpdate),
-                DynamicMappingException.class);
-
+        HttpServerErrorException exception = catchThrowableOfType(HttpServerErrorException.class, () -> filterClient.updateFilters(filtersToUpdate));
         // check result
-        assertThat(exception.getType())
-                .isEqualTo(UPDATE_FILTER_ERROR);
         assertThat(exception.getMessage())
-                .isEqualTo(ERROR_MESSAGE);
+                .contains(ERROR_MESSAGE);
     }
 
     @Test
@@ -230,15 +218,9 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                         .withBody(ERROR_MESSAGE_JSON)
                 ));
 
-        DynamicMappingException exception = catchThrowableOfType(
-                () -> filterClient.duplicateFilters(sourceUuids),
-                DynamicMappingException.class);
-
+        HttpServerErrorException exception = catchThrowableOfType(HttpServerErrorException.class, () -> filterClient.duplicateFilters(sourceUuids));
         // check result
-        assertThat(exception.getType())
-                .isEqualTo(DUPLICATE_FILTER_ERROR);
-        assertThat(exception.getMessage())
-                .isEqualTo(ERROR_MESSAGE);
+        assertThat(exception.getMessage()).contains(ERROR_MESSAGE);
     }
 
     @Test
@@ -269,15 +251,9 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                 .willReturn(WireMock.serverError()
                         .withBody(ERROR_MESSAGE_JSON)));
 
-        DynamicMappingException exception = catchThrowableOfType(
-                () -> filterClient.deleteFilters(sourceUuids),
-                DynamicMappingException.class);
-
+        HttpServerErrorException exception = catchThrowableOfType(HttpServerErrorException.class, () -> filterClient.deleteFilters(sourceUuids));
         // check result
-        assertThat(exception.getType())
-                .isEqualTo(DELETE_FILTER_ERROR);
-        assertThat(exception.getMessage())
-                .isEqualTo(ERROR_MESSAGE);
+        assertThat(exception.getMessage()).contains(ERROR_MESSAGE);
     }
 
     @Test
@@ -318,14 +294,8 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
                         .withBody(ERROR_MESSAGE_JSON)
                 ));
 
-        DynamicMappingException exception = catchThrowableOfType(
-                () -> filterClient.getFilters(uuids),
-                DynamicMappingException.class);
-
+        HttpServerErrorException exception = catchThrowableOfType(HttpServerErrorException.class, () -> filterClient.getFilters(uuids));
         // check result
-        assertThat(exception.getType())
-                .isEqualTo(GET_FILTER_ERROR);
-        assertThat(exception.getMessage())
-                .isEqualTo(ERROR_MESSAGE);
+        assertThat(exception.getMessage()).contains(ERROR_MESSAGE);
     }
 }
