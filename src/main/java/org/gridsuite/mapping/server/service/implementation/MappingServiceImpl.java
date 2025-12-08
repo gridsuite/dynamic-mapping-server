@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server.service.implementation;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.mapping.server.DynamicMappingException;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.Rule;
@@ -34,8 +34,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.gridsuite.mapping.server.DynamicMappingException.Type.MAPPING_NAME_NOT_PROVIDED;
 import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.MAPPING_NAME_NOT_PROVIDED;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
