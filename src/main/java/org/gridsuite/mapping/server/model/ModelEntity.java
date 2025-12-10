@@ -23,7 +23,6 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,7 +33,6 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 public class ModelEntity implements Serializable {
 
     @Id
-    @EqualsAndHashCode.Include
     @Column(name = "id")
     private UUID id;
 

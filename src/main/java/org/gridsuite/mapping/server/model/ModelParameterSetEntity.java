@@ -7,7 +7,10 @@
 package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
 
 import java.io.Serializable;
@@ -19,7 +22,6 @@ import java.util.stream.Collectors;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -28,7 +30,6 @@ import java.util.stream.Collectors;
 @Table(name = "model_parameter_set", indexes = {@Index(name = "model_parameter_set_name_index", columnList = "name")})
 public class ModelParameterSetEntity implements Serializable {
 
-    @EqualsAndHashCode.Include
     @Id
     @Column(name = "id")
     private UUID id;
@@ -36,7 +37,7 @@ public class ModelParameterSetEntity implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "set", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "set", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterEntity> parameters;
 
     @Column(name = "last_modified_date")

@@ -7,7 +7,10 @@
 package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelParameter;
 
 import java.io.Serializable;
@@ -16,7 +19,6 @@ import java.util.UUID;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -25,7 +27,6 @@ import java.util.UUID;
 @Table(name = "model_parameter", indexes = {@Index(name = "model_parameter_name_index", columnList = "name")})
 public class ModelParameterEntity implements Serializable {
 
-    @EqualsAndHashCode.Include
     @Id
     @Column(name = "id")
     private UUID id;

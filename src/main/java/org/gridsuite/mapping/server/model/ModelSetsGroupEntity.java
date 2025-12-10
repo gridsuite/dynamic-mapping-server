@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -37,7 +36,7 @@ public class ModelSetsGroupEntity implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ModelParameterSetEntity> sets = new ArrayList<>(0);
 
     @Enumerated(EnumType.STRING)
@@ -63,7 +62,6 @@ public class ModelSetsGroupEntity implements Serializable {
      * @param parameterSet given parameter set
      */
     public void addParameterSet(ModelParameterSetEntity parameterSet) {
-        this.sets.remove(parameterSet); // remove if already present, using id as a key
         this.sets.add(parameterSet);
     }
 

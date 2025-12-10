@@ -7,7 +7,10 @@
 package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.utils.ParameterType;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,7 +27,6 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -34,7 +36,6 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 public class ModelParameterDefinitionEntity implements Serializable {
 
     @Id
-    @EqualsAndHashCode.Include
     @Column(name = "id")
     private UUID id;
 

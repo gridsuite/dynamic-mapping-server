@@ -227,14 +227,18 @@ public class ModelServiceImpl implements ModelService {
             savedGroups.add(groupToAdd);
         } else {
             // merge sets by name
-            groupToAdd.getSets().forEach(setToAdd -> {
+            groupToAdd.getSets().forEach(setToAdd ->
                 // if set's name is existing in the group, consider the setToAdd as an update version by setting the same id
                 previousGroup.getSets().stream()
-                        .filter(set -> set.getName().equals(setToAdd.getName()))
-                        .findAny()
-                        .ifPresent(existingSet -> setToAdd.setId(existingSet.getId()));
-                previousGroup.addParameterSet(setToAdd);
-            });
+                    .filter(set -> set.getName().equals(setToAdd.getName()))
+                    .findAny()
+                    .ifPresent(existingSet -> {
+                        setToAdd.setId(existingSet.getId());
+                        // replace the whole old set by the new set
+                        previousGroup.removeParameterSet(existingSet);
+                        previousGroup.addParameterSet(setToAdd);
+                    })
+            );
         }
 
         if (new Model(modelToUpdate).isParameterSetGroupValid(setsGroup.getName(), strict)) {

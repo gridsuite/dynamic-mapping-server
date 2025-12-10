@@ -1,12 +1,14 @@
 package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
 import java.io.Serializable;
 
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -17,13 +19,11 @@ public class ModelModelParameterDefinitionEntity implements Serializable {
     @EmbeddedId
     private ModelModelParameterDefinitionId id;
 
-    @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_model_parameter_definition_model_id_fk"))
     @MapsId("modelId")
     private ModelEntity model;
 
-    @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "parameter_definition_id", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "model_model_parameter_definition_parameter_definition_id_fk"))
