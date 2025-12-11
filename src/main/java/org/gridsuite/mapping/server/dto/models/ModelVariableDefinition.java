@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import org.gridsuite.mapping.server.model.ModelVariableDefinitionEntity;
 import org.gridsuite.mapping.server.utils.VariableType;
 
+import java.util.UUID;
+
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
@@ -20,6 +22,8 @@ import org.gridsuite.mapping.server.utils.VariableType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelVariableDefinition {
+
+    private UUID id;
 
     private String name;
 
@@ -30,6 +34,7 @@ public class ModelVariableDefinition {
     private Double factor;
 
     public ModelVariableDefinition(ModelVariableDefinitionEntity modelVariableDefinitionEntity) {
+        this.id = modelVariableDefinitionEntity.getId();
         this.name = modelVariableDefinitionEntity.getName();
         this.type = modelVariableDefinitionEntity.getType();
         this.unit = modelVariableDefinitionEntity.getUnit();

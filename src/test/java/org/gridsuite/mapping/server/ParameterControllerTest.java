@@ -9,12 +9,14 @@ package org.gridsuite.mapping.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
+import org.gridsuite.mapping.server.dto.ParameterFile;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.model.*;
 import org.gridsuite.mapping.server.repository.ModelParameterDefinitionRepository;
 import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.gridsuite.mapping.server.utils.*;
+import org.gridsuite.mapping.server.utils.assertions.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -69,7 +72,7 @@ public class ParameterControllerTest {
     }
 
     private ModelParameterDefinitionEntity createDefinitionEntity(String name, ParameterType type) {
-        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(name, type, null, null, null));
+        return new ModelParameterDefinitionEntity(new ModelParameterDefinition(UUID.randomUUID(), name, type, null, null, null));
     }
 
     @Before
@@ -78,17 +81,14 @@ public class ParameterControllerTest {
         cleanDB();
 
         // Prepare models
-        ModelEntity loadModel = new ModelEntity("LoadAlphaBeta", EquipmentType.LOAD, false, new ArrayList<>(), null, Set.of(), Set.of(), null, null);
+        ModelEntity loadModel = new ModelEntity(UUID.randomUUID(), "LoadAlphaBeta", EquipmentType.LOAD, false, new ArrayList<>(), null, Set.of(), Set.of(), null, null);
         ArrayList<ModelSetsGroupEntity> loadGroups = new ArrayList<>();
-        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity("LAB", loadModel.getModelName(), null, SetGroupType.FIXED, loadModel);
+        ModelSetsGroupEntity loadGroup = new ModelSetsGroupEntity(UUID.randomUUID(), "LAB", null, SetGroupType.FIXED, loadModel);
         ArrayList<ModelParameterSetEntity> groupSets = new ArrayList<>();
-        ModelParameterSetEntity setToSave = new ModelParameterSetEntity("LAB", loadGroup.getName(), loadModel.getModelName(), loadGroup.getType(),
-                null,
-                new Date(),
-                loadGroup);
+        ModelParameterSetEntity setToSave = new ModelParameterSetEntity(UUID.randomUUID(), "LAB", null, new Date(), loadGroup);
         ArrayList<ModelParameterEntity> setParameters = new ArrayList<>();
-        setParameters.add(new ModelParameterEntity("load_alpha", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "1.5", setToSave));
-        setParameters.add(new ModelParameterEntity("load_beta", loadGroup.getModelName(), loadGroup.getName(), loadGroup.getType(), setToSave.getName(), "2.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_alpha", "1.5", setToSave));
+        setParameters.add(new ModelParameterEntity(UUID.randomUUID(), "load_beta", "2.5", setToSave));
         setToSave.setParameters(setParameters);
         groupSets.add(setToSave);
         loadGroup.setSets(groupSets);
@@ -112,21 +112,21 @@ public class ParameterControllerTest {
 
         modelRepository.save(loadModel);
 
-        ModelEntity generatorThreeModel = new ModelEntity("GeneratorThreeWindings", EquipmentType.GENERATOR, false, null, null, null, null, null, null);
+        ModelEntity generatorThreeModel = new ModelEntity(UUID.randomUUID(), "GeneratorThreeWindings", EquipmentType.GENERATOR, false, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorThreeGroups = new ArrayList<>();
-        generatorThreeGroups.add(new ModelSetsGroupEntity("GSTWPR", generatorThreeModel.getModelName(), null, SetGroupType.PREFIX, generatorThreeModel));
+        generatorThreeGroups.add(new ModelSetsGroupEntity(UUID.randomUUID(), "GSTWPR", null, SetGroupType.PREFIX, generatorThreeModel));
         generatorThreeModel.setSetsGroups(generatorThreeGroups);
         modelRepository.save(generatorThreeModel);
 
-        ModelEntity generatorFourModel = new ModelEntity("GeneratorFourWindings", EquipmentType.GENERATOR, false, null, null, null, null, null, null);
+        ModelEntity generatorFourModel = new ModelEntity(UUID.randomUUID(), "GeneratorFourWindings", EquipmentType.GENERATOR, false, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> generatorFourGroups = new ArrayList<>();
-        generatorFourGroups.add(new ModelSetsGroupEntity("GSFWPR", generatorFourModel.getModelName(), null, SetGroupType.PREFIX, generatorFourModel));
+        generatorFourGroups.add(new ModelSetsGroupEntity(UUID.randomUUID(), "GSFWPR", null, SetGroupType.PREFIX, generatorFourModel));
         generatorFourModel.setSetsGroups(generatorFourGroups);
         modelRepository.save(generatorFourModel);
 
-        ModelEntity sVarModel = new ModelEntity("StaticVarCompensator", EquipmentType.STATIC_VAR_COMPENSATOR, false, null, null, null, null, null, null);
+        ModelEntity sVarModel = new ModelEntity(UUID.randomUUID(), "StaticVarCompensator", EquipmentType.STATIC_VAR_COMPENSATOR, false, null, null, null, null, null, null);
         ArrayList<ModelSetsGroupEntity> sVarModelGroups = new ArrayList<>();
-        sVarModelGroups.add(new ModelSetsGroupEntity("SVarC", sVarModel.getModelName(), null, SetGroupType.PREFIX, sVarModel));
+        sVarModelGroups.add(new ModelSetsGroupEntity(UUID.randomUUID(), "SVarC", null, SetGroupType.PREFIX, sVarModel));
         sVarModel.setSetsGroups(sVarModelGroups);
         modelRepository.save(sVarModel);
     }
@@ -156,12 +156,19 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk());
 
         // export parameter file
-        mvc.perform(get("/parameters/export")
+        MvcResult mvcResult = mvc.perform(get("/parameters/export")
                 .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseParameterFileJson(name, null), true));
+                .andReturn();
+        String resultParameterFileJson = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(objectMapper.readTree(mvcResult.getResponse().getContentAsString()));
+        String expectedParameterFileJson = baseParameterFileJson(name, null);
+
+        ParameterFile resultParameterFile = objectMapper.readValue(resultParameterFileJson, ParameterFile.class);
+        ParameterFile expectedParameterFile = objectMapper.readValue(expectedParameterFileJson, ParameterFile.class);
+        Assertions.assertThat(resultParameterFile).recursivelyEquals(expectedParameterFile);
 
         // try to export parameter file with unknown mapping
         mvc.perform(get("/parameters/export")
@@ -213,11 +220,19 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk());
 
         // export parameter file
-        mvc.perform(get("/parameters/export")
+        MvcResult mvcResult = mvc.perform(get("/parameters/export")
                         .queryParam("mappingName", name)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json(baseParameterFileJson(name, objectMapper.writeValueAsString(parFile)), true));
+                .andReturn();
+
+        String resultParameterFileJson = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(objectMapper.readTree(mvcResult.getResponse().getContentAsString()));
+        String expectedParameterFileJson = baseParameterFileJson(name, objectMapper.writeValueAsString(parFile));
+
+        ParameterFile resultParameterFile = objectMapper.readValue(resultParameterFileJson, ParameterFile.class);
+        ParameterFile expectedParameterFile = objectMapper.readValue(expectedParameterFileJson, ParameterFile.class);
+        Assertions.assertThat(resultParameterFile).recursivelyEquals(expectedParameterFile);
     }
 }

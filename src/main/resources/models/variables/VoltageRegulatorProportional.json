@@ -1,0 +1,117 @@
+{
+    "name": "VoltageRegulatorProportional",
+    "variableDefinitions": [
+        {
+            "name": "voltageRegulator_EfdPu",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "voltageRegulator_UsPu",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "voltageRegulator_UsRefPu",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "voltageRegulator_UsRefTotal_u1",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_UsRefTotal_u2",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_UsRefTotal_y",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_deltaUsRefPu",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "voltageRegulator_feedback_u1",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_feedback_u2",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_feedback_y",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_gain_u",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_gain_y",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_limUsRef_simplifiedExpr",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_limUsRef_u",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_limUsRef_y",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_limitationDown_value",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limitationEfdMax",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limitationEfdMin",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limitationUp_value",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limitationUsRefMax",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limitationUsRefMin",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limiterWithLag_initSaturatedMax",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limiterWithLag_initSaturatedMin",
+            "type": "BOOL"
+        },
+        {
+            "name": "voltageRegulator_limiterWithLag_tUMaxReached",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_limiterWithLag_tUMinReached",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_limiterWithLag_u",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "voltageRegulator_limiterWithLag_y",
+            "type": "DOUBLE"
+        }
+    ]
+}

@@ -1,0 +1,227 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!-- 1. drop definitions -->
+    <changeSet author="phamquy (generated)" id="1763389111220-1">
+        <dropTable tableName="models_model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-2">
+        <dropTable tableName="model_parameter_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-3">
+        <dropTable tableName="models_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-4">
+        <dropTable tableName="model_variable_sets_model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-5">
+        <dropTable tableName="models_model_variable_sets"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-6">
+        <dropTable tableName="model_variable_definitions"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-7">
+        <dropTable tableName="model_variable_sets"/>
+    </changeSet>
+    <!-- 2. drop instants-->
+    <changeSet author="phamquy (generated)" id="1763389111220-8">
+        <dropTable tableName="model_parameters"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-9">
+        <dropTable tableName="model_parameter_sets"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-10">
+        <dropTable tableName="model_sets_group"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763389111220-11">
+        <dropTable tableName="models"/>
+    </changeSet>
+    <!-- 3. re-create schema -->
+    <changeSet author="phamquy (generated)" id="1763679849050-1">
+        <createTable tableName="model">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="modelPK"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP(6)"/>
+            <column defaultValueBoolean="false" name="default_model" type="BOOLEAN"/>
+            <column name="equipment_type" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_date" type="TIMESTAMP(6)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-2">
+        <createTable tableName="model_model_parameter_definition">
+            <column name="model_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_model_parameter_definitionPK"/>
+            </column>
+            <column name="parameter_definition_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_model_parameter_definitionPK"/>
+            </column>
+            <column name="origin" type="VARCHAR(255)"/>
+            <column name="origin_name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-3">
+        <createTable tableName="model_model_variable_definition">
+            <column name="model_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_model_variable_definitionPK"/>
+            </column>
+            <column name="variable_definition_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_model_variable_definitionPK"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-4">
+        <createTable tableName="model_model_variable_set">
+            <column name="variable_set_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_model_variable_setPK"/>
+            </column>
+            <column name="model_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_model_variable_setPK"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-5">
+        <createTable tableName="model_parameter">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_parameterPK"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_" type="VARCHAR(255)"/>
+            <column name="set_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-6">
+        <createTable tableName="model_parameter_definition">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_parameter_definitionPK"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP(6)"/>
+            <column name="fixed_value" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="updated_date" type="TIMESTAMP(6)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-7">
+        <createTable tableName="model_parameter_set">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_parameter_setPK"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP(6)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="group_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-8">
+        <createTable tableName="model_sets_group">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_sets_groupPK"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="model_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-9">
+        <createTable tableName="model_variable_definition">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_variable_definitionPK"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP(6)"/>
+            <column name="factor" type="FLOAT(53)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="unit" type="VARCHAR(255)"/>
+            <column name="updated_date" type="TIMESTAMP(6)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-10">
+        <createTable tableName="model_variable_set">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_variable_setPK"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP(6)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_date" type="TIMESTAMP(6)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-11">
+        <createTable tableName="model_variable_set_model_variable_definition">
+            <column name="variable_set_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_variable_set_model_variable_definitionPK"/>
+            </column>
+            <column name="variable_definition_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="model_variable_set_model_variable_definitionPK"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-12">
+        <createIndex indexName="model_name_index" tableName="model">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-13">
+        <createIndex indexName="model_parameter_name_index" tableName="model_parameter">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-14">
+        <createIndex indexName="model_parameter_set_name_index" tableName="model_parameter_set">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-15">
+        <createIndex indexName="model_sets_group_name_index" tableName="model_sets_group">
+            <column name="name"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-16">
+        <addForeignKeyConstraint baseColumnNames="model_id" baseTableName="model_model_parameter_definition" constraintName="model_model_parameter_definition_model_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-17">
+        <addForeignKeyConstraint baseColumnNames="parameter_definition_id" baseTableName="model_model_parameter_definition" constraintName="model_model_parameter_definition_parameter_definition_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model_parameter_definition" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-18">
+        <addForeignKeyConstraint baseColumnNames="model_id" baseTableName="model_model_variable_definition" constraintName="model_model_variable_definition_model_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-19">
+        <addForeignKeyConstraint baseColumnNames="variable_definition_id" baseTableName="model_model_variable_definition" constraintName="model_model_variable_definition_variable_definition_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model_variable_definition" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-20">
+        <addForeignKeyConstraint baseColumnNames="model_id" baseTableName="model_model_variable_set" constraintName="model_model_variable_set_model_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-21">
+        <addForeignKeyConstraint baseColumnNames="variable_set_id" baseTableName="model_model_variable_set" constraintName="model_model_variable_set_variable_set_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model_variable_set" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-22">
+        <addForeignKeyConstraint baseColumnNames="group_id" baseTableName="model_parameter_set" constraintName="model_parameter_set_group_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model_sets_group" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-23">
+        <addForeignKeyConstraint baseColumnNames="set_id" baseTableName="model_parameter" constraintName="model_parameter_set_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model_parameter_set" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-24">
+        <addForeignKeyConstraint baseColumnNames="model_id" baseTableName="model_sets_group" constraintName="model_sets_group_model_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-25">
+        <addForeignKeyConstraint baseColumnNames="variable_definition_id" baseTableName="model_variable_set_model_variable_definition" constraintName="model_variable_set_model_variable_definition_variable_definition_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model_variable_definition" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1763679849050-26">
+        <addForeignKeyConstraint baseColumnNames="variable_set_id" baseTableName="model_variable_set_model_variable_definition" constraintName="model_variable_set_model_variable_definition_variable_set_id_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="model_variable_set" validate="true"/>
+    </changeSet>
+</databaseChangeLog>

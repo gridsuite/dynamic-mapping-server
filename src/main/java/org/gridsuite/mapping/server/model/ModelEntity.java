@@ -6,6 +6,7 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -13,7 +14,6 @@ import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,22 +23,23 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "models")
+@Table(name = "model", indexes = {@Index(name = "model_name_index", columnList = "name")})
 public class ModelEntity implements Serializable {
 
-    // Could be replaced with UUID, but we lose the ease of use of names
     @Id
-    @EqualsAndHashCode.Include
-    @Column(name = "model_name")
+    @Column(name = "id")
+    private UUID id;
+
+    @Column(name = "name", nullable = false)
     private String modelName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "equipment_type")
     private EquipmentType equipmentType;
 
@@ -54,9 +55,11 @@ public class ModelEntity implements Serializable {
     // must exclude CascadeType.REMOVE to avoid unexpected cascade on delete a ModelVariableDefinitionEntity
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
-            name = "models_model_variable_definitions",
-            joinColumns = {@JoinColumn(name = "model_name")},
-            inverseJoinColumns = {@JoinColumn(name = "variable_definition_name")}
+            name = "model_model_variable_definition",
+            joinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "model_model_variable_definition_model_id_fk"))},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "model_model_variable_definition_variable_definition_id_fk"))}
     )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = LinkedHashSet.newLinkedHashSet(0);
 
@@ -64,6 +67,7 @@ public class ModelEntity implements Serializable {
     private Set<ModelVariableSetEntity> variableSets = LinkedHashSet.newLinkedHashSet(0);
 
     public ModelEntity(Model modelToConvert) {
+        id = modelToConvert.getId() == null ? UUID.randomUUID() : modelToConvert.getId();
         modelName = modelToConvert.getModelName();
         equipmentType = modelToConvert.getEquipmentType();
         defaultModel = modelToConvert.isDefaultModel();

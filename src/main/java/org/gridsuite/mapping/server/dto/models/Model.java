@@ -14,6 +14,7 @@ import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Model {
+
+    private UUID id;
 
     private String modelName;
 
@@ -40,6 +43,7 @@ public class Model {
     private List<VariablesSet> variablesSets;
 
     public Model(ModelEntity modelEntity) {
+        id = modelEntity.getId();
         modelName = modelEntity.getModelName();
         equipmentType = modelEntity.getEquipmentType();
         defaultModel = modelEntity.isDefaultModel();

@@ -7,13 +7,16 @@
 
 package org.gridsuite.mapping.server.model;
 
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelVariableDefinition;
 import org.gridsuite.mapping.server.utils.VariableType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
@@ -22,21 +25,23 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "model_variable_definitions")
+@Table(name = "model_variable_definition")
 public class ModelVariableDefinitionEntity implements Serializable {
+
     @Id
-    @EqualsAndHashCode.Include
-    @Column(name = "variable_definition_name")
+    @Column(name = "id")
+    private UUID id;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    @Enumerated
     private VariableType type;
 
     @Column(name = "unit")
@@ -57,9 +62,9 @@ public class ModelVariableDefinitionEntity implements Serializable {
     private Set<ModelVariableSetEntity> variablesSets;
 
     public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
-        this(variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(),
-                model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>(),
-                new LinkedHashSet<>(Arrays.asList(variablesSet)), null, null);
+        this(variableDefinition.getId() == null ? UUID.randomUUID() : variableDefinition.getId(), variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(),
+                model != null ? new LinkedHashSet<>(List.of(model)) : new LinkedHashSet<>(),
+                variablesSet != null ? new LinkedHashSet<>(List.of(variablesSet)) : new LinkedHashSet<>(), null, null);
     }
 
     @CreatedDate

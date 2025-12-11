@@ -1,0 +1,21 @@
+{
+    "modelName": "DefaultBus",
+    "equipmentType": "BUS",
+    "variableDefinitions": [
+        {
+            "name": "U_value",
+            "type": "DOUBLE",
+            "unit": "kV"
+        },
+        {
+            "name": "Upu_value",
+            "type": "DOUBLE"
+        },
+        {
+            "name": "phi_value",
+            "type": "DOUBLE",
+            "unit": "°"
+        }
+    ],
+    "defaultModel": "true"
+}

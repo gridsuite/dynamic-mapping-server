@@ -1,0 +1,60 @@
+{
+    "name": "SynchronousGenerator",
+    "variableDefinitions": [
+        {
+            "name": "generator_omegaPu_value",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "generator_PGen",
+            "type": "DOUBLE",
+            "unit": "MW"
+        },
+        {
+            "name": "generator_QGen",
+            "type": "DOUBLE",
+            "unit": "Mvar"
+        },
+        {
+            "name": "generator_UStatorPu_value",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "generator_QStatorPu_value",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "generator_IRotorPu_value",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "generator_thetaInternal_value",
+            "type": "DOUBLE",
+            "unit": "rad"
+        },
+        {
+            "name": "generator_PmPu_value",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "generator_efdPu_value",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "generator_PePu",
+            "type": "DOUBLE",
+            "unit": "pu"
+        },
+        {
+            "name": "generator_theta",
+            "type": "DOUBLE",
+            "unit": "rad"
+        }
+    ]
+}

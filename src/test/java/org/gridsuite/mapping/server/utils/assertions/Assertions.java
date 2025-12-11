@@ -9,6 +9,10 @@ package org.gridsuite.mapping.server.utils.assertions;
 import org.assertj.core.util.CheckReturnValue;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
+import org.gridsuite.mapping.server.dto.ParameterFile;
+import org.gridsuite.mapping.server.dto.models.ParametersSet;
+
+import java.util.List;
 
 /**
  *  @author Tristan Chuine <tristan.chuine at rte-france.com>
@@ -20,8 +24,21 @@ public class Assertions extends org.assertj.core.api.Assertions {
         return new DTOAssert<>(actual);
     }
 
+    public static <T extends ParametersSet> DTOAssert<ParametersSet> assertThat(T actual) {
+        return new DTOAssert<>(actual);
+    }
+
+    public static <T extends ParameterFile> DTOAssert<ParameterFile> assertThat(T actual) {
+        return new DTOAssert<>(actual);
+    }
+
     @CheckReturnValue
     public static <T extends ExpertFilter> DTOAssert<ExpertFilter> assertThat(T actual) {
+        return new DTOAssert<>(actual);
+    }
+
+    @CheckReturnValue
+    public static DTOAssert<List<?>> assertThatDtoList(List<?> actual) {
         return new DTOAssert<>(actual);
     }
 

@@ -6,37 +6,44 @@
  */
 package org.gridsuite.mapping.server.model;
 
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.ModelParameterDefinition;
 import org.gridsuite.mapping.server.utils.ParameterType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "model_parameter_definitions")
+@Table(name = "model_parameter_definition")
 public class ModelParameterDefinitionEntity implements Serializable {
 
     @Id
-    @EqualsAndHashCode.Include
-    @Column(name = "name")
+    @Column(name = "id")
+    private UUID id;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
-    @Enumerated
     private ParameterType type;
 
     @Column(name = "fixed_value")
@@ -46,7 +53,8 @@ public class ModelParameterDefinitionEntity implements Serializable {
     private List<ModelModelParameterDefinitionEntity> models = new ArrayList<>();
 
     public ModelParameterDefinitionEntity(ModelParameterDefinition parameterDefinition) {
-        this(parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getFixedValue(), new ArrayList<>(), null, null);
+        this(parameterDefinition.getId() == null ? UUID.randomUUID() : parameterDefinition.getId(),
+            parameterDefinition.getName(), parameterDefinition.getType(), parameterDefinition.getFixedValue(), new ArrayList<>(), null, null);
     }
 
     @CreatedDate

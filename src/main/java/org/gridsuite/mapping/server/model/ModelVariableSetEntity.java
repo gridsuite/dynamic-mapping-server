@@ -7,12 +7,15 @@
 
 package org.gridsuite.mapping.server.model;
 
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.dto.models.VariablesSet;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,31 +25,33 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "model_variable_sets")
+@Table(name = "model_variable_set")
 public class ModelVariableSetEntity implements Serializable {
+
     @Id
-    @EqualsAndHashCode.Include
-    @Column(name = "variable_set_name")
+    @Column(name = "id")
+    private UUID id;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinTable(name = "model_variable_sets_model_variable_definitions",
-            joinColumns = {@JoinColumn(name = "variable_set_name")},
-            inverseJoinColumns = {@JoinColumn(name = "variable_definition_name")}
+    @JoinTable(name = "model_variable_set_model_variable_definition",
+            joinColumns = {@JoinColumn(name = "variable_set_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_variable_set_model_variable_definition_variable_set_id_fk"))},
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_variable_set_model_variable_definition_variable_definition_id_fk"))}
     )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
-        name = "models_model_variable_sets",
-        joinColumns = {@JoinColumn(name = "variable_set_name")},
-        inverseJoinColumns = {@JoinColumn(name = "model_name")}
+        name = "model_model_variable_set",
+        joinColumns = {@JoinColumn(name = "variable_set_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_model_variable_set_variable_set_id_fk"))},
+        inverseJoinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_model_variable_set_model_id_fk"))}
     )
     private Set<ModelEntity> models;
 
@@ -61,7 +66,8 @@ public class ModelVariableSetEntity implements Serializable {
     private Date updatedDate;
 
     public ModelVariableSetEntity(ModelEntity model, VariablesSet variablesSet) {
-        this.models = model != null ? new LinkedHashSet<>(Arrays.asList(model)) : new LinkedHashSet<>();
+        this.id = variablesSet.getId() == null ? UUID.randomUUID() : variablesSet.getId();
+        this.models = model != null ? new LinkedHashSet<>(List.of(model)) : new LinkedHashSet<>();
         this.name = variablesSet.getName();
         this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this, variableDefinition)).collect(Collectors.toSet());
     }

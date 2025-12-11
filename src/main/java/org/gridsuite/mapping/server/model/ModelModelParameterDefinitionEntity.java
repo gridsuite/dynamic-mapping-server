@@ -1,34 +1,36 @@
 package org.gridsuite.mapping.server.model;
 
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.gridsuite.mapping.server.utils.ParameterOrigin;
 
-import jakarta.persistence.*;
 import java.io.Serializable;
 
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "models_model_parameter_definitions")
+@Table(name = "model_model_parameter_definition")
 public class ModelModelParameterDefinitionEntity implements Serializable {
     @EmbeddedId
     private ModelModelParameterDefinitionId id;
 
-    @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "model_name")
-    @MapsId("modelName")
+    @JoinColumn(name = "model_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_model_parameter_definition_model_id_fk"))
+    @MapsId("modelId")
     private ModelEntity model;
 
-    @EqualsAndHashCode.Include
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "parameter_definition_name")
-    @MapsId("parameterDefinitionName")
+    @JoinColumn(name = "parameter_definition_id", referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "model_model_parameter_definition_parameter_definition_id_fk"))
+    @MapsId("parameterDefinitionId")
     private ModelParameterDefinitionEntity parameterDefinition;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "origin")
     private ParameterOrigin origin;
 
@@ -40,7 +42,7 @@ public class ModelModelParameterDefinitionEntity implements Serializable {
         this.parameterDefinition = parameterDefinition;
         this.origin = origin;
         this.originName = originName;
-        this.id = new ModelModelParameterDefinitionId(model.getModelName(), parameterDefinition.getName());
+        this.id = new ModelModelParameterDefinitionId(model.getId(), parameterDefinition.getId());
     }
 
 }
