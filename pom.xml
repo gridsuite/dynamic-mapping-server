@@ -37,8 +37,6 @@
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
         <sonar.organization>gridsuite</sonar.organization>
         <sonar.projectKey>org.gridsuite:dynamic-mapping-server</sonar.projectKey>
-        <!-- To remove after when using gridsuite dependencies release and ws-commons version containing merged PR: https://github.com/powsybl/powsybl-ws-commons/pull/167 -->
-        <powsybl-ws-commons.version>1.34.0</powsybl-ws-commons.version>
     </properties>
 
     <build>
@@ -70,11 +68,6 @@
     <dependencyManagement>
         <dependencies>
             <!-- overrides of imports -->
-            <dependency>
-                <groupId>com.powsybl</groupId>
-                <artifactId>powsybl-ws-commons</artifactId>
-                <version>${powsybl-ws-commons.version}</version>
-            </dependency>
 
             <!-- imports -->
             <dependency>
