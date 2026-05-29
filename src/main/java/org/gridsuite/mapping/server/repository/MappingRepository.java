@@ -6,14 +6,15 @@
  */
 package org.gridsuite.mapping.server.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import org.springframework.stereotype.Repository;
 import org.gridsuite.mapping.server.model.MappingEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Repository
-public interface MappingRepository extends JpaRepository<MappingEntity, String> {
+public interface MappingRepository extends JpaRepository<MappingEntity, UUID> {
 }

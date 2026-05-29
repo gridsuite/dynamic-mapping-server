@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
@@ -35,8 +37,8 @@ public class ParameterController {
     @Operation(summary = "Export parameter sets in used models of a given mapping into *.par format")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Used parameter sets serialized in *.par format")})
-    public ResponseEntity<ParameterFile> exportParameters(@RequestParam("mappingName") String mappingName) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(parameterService.exportParameters(mappingName));
+    public ResponseEntity<ParameterFile> exportParameters(@RequestParam("mappingId") UUID mappingId) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(parameterService.exportParameters(mappingId));
     }
 
 }

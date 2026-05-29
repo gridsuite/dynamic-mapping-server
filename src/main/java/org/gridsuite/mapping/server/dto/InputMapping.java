@@ -15,6 +15,7 @@ import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InputMapping implements Mapping {
+    @Schema(description = "Mapping id")
+    private UUID id;
+
     @Schema(description = "Name")
     private String name;
 
@@ -39,7 +43,12 @@ public class InputMapping implements Mapping {
 
     public MappingEntity convertMappingToEntity() {
         MappingEntity convertedMapping = new MappingEntity();
-        convertedMapping.setName(name);
+        if (this.id != null) {
+            convertedMapping.setMappingId(this.id);
+        } else {
+            UUID createdId = UUID.randomUUID();
+            convertedMapping.setMappingId(createdId);
+        }
         convertedMapping.setControlledParameters(controlledParameters);
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
         convertedMapping.setAutomata(automata.stream().map(automaton -> new AutomatonEntity(convertedMapping, automaton)).collect(Collectors.toList()));
@@ -47,7 +56,7 @@ public class InputMapping implements Mapping {
     }
 
     public InputMapping(MappingEntity mappingEntity) {
-        name = mappingEntity.getName();
+        id = mappingEntity.getMappingId();
         controlledParameters = mappingEntity.isControlledParameters();
         rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
         automata = mappingEntity.getAutomata().stream().map(Automaton::new).collect(Collectors.toList());

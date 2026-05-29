@@ -45,7 +45,7 @@ public class AutomatonEntity extends AbstractManuallyAssignedIdentifierEntity<UU
     private List<AutomatonPropertyEntity> properties;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mappingName", foreignKey = @ForeignKey(name = "mapping_automata_fk"), referencedColumnName = "name")
+    @JoinColumn(name = "mapping_id", foreignKey = @ForeignKey(name = "mapping_automata_fk"), referencedColumnName = "mapping_id")
     private MappingEntity mapping;
 
     @Override

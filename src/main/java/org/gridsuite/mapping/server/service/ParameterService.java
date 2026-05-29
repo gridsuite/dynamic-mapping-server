@@ -8,9 +8,11 @@ package org.gridsuite.mapping.server.service;
 
 import org.gridsuite.mapping.server.dto.ParameterFile;
 
+import java.util.UUID;
+
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 public interface ParameterService {
-    ParameterFile exportParameters(String mappingName);
+    ParameterFile exportParameters(UUID mappingId);
 }

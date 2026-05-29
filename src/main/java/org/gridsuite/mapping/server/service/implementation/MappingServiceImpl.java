@@ -7,11 +7,8 @@
 package org.gridsuite.mapping.server.service.implementation;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.dto.InputMapping;
-import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.Rule;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
@@ -34,16 +31,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
-import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.MAPPING_NAME_NOT_PROVIDED;
-
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @Service
 public class MappingServiceImpl implements MappingService {
 
-    private static final String MAPPING_NOT_FOUND_ERROR_MESSAGE = "Mapping not found with name: ";
+    private static final String MAPPING_NOT_FOUND_ERROR_MESSAGE = "Mapping not found with id: ";
 
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
@@ -100,9 +94,9 @@ public class MappingServiceImpl implements MappingService {
 
     @Transactional(readOnly = true)
     @Override
-    public InputMapping getMapping(String mappingName) {
-        Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingName);
-        MappingEntity mappingEntity = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingName));
+    public InputMapping getMapping(UUID mappingId) {
+        Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingId);
+        MappingEntity mappingEntity = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingId));
 
         // --- build mapping dto to return --- //
         InputMapping mapping = new InputMapping(mappingEntity);
@@ -113,17 +107,9 @@ public class MappingServiceImpl implements MappingService {
 
     @Override
     @Transactional
-    public InputMapping saveMapping(String mappingName, InputMapping mapping) {
-        if (!StringUtils.isBlank(mappingName)) {
-            mapping.setName(mappingName);
-        }
-
-        if (StringUtils.isBlank(mapping.getName())) {
-            throw new DynamicMappingException(MAPPING_NAME_NOT_PROVIDED, "Mapping name not provided");
-        }
-
+    public InputMapping saveMapping(UUID mappingId, InputMapping mapping) {
         // get all filterUuids used previously in the mapping to infer to update/create/delete filters
-        List<UUID> filterUuids = ruleRepository.findByMappingNameAndFilterUuidNotNull(mappingName).stream()
+        List<UUID> filterUuids = ruleRepository.findByMappingIdAndFilterUuidNotNull(mappingId).stream()
                 .map(RuleEntity.ProjectionFilterUuid::getFilterUuid)
                 .toList();
 
@@ -192,9 +178,9 @@ public class MappingServiceImpl implements MappingService {
     }
 
     @Override
-    public String deleteMapping(String mappingName) {
+    public UUID deleteMapping(UUID mappingId) {
         // get all filterUuids used in the mapping to delete if exists
-        List<UUID> filterUuids = ruleRepository.findByMappingNameAndFilterUuidNotNull(mappingName).stream()
+        List<UUID> filterUuids = ruleRepository.findByMappingIdAndFilterUuidNotNull(mappingId).stream()
                 .map(RuleEntity.ProjectionFilterUuid::getFilterUuid)
                 .toList();
 
@@ -204,35 +190,17 @@ public class MappingServiceImpl implements MappingService {
         }
 
         // --- delete the whole mapping in local db --- //
-        mappingRepository.deleteById(mappingName);
-        return mappingName;
+        mappingRepository.deleteById(mappingId);
+        return mappingId;
     }
 
     @Override
     @Transactional
-    public RenameObject renameMapping(String oldName, String newName) {
-        Optional<MappingEntity> mappingToRename = mappingRepository.findById(oldName);
-        if (mappingToRename.isPresent()) {
-            MappingEntity mappingToSave = new MappingEntity(newName, mappingToRename.get());
-            mappingRepository.deleteById(oldName);
-            mappingRepository.save(mappingToSave);
-            return new RenameObject(oldName, newName);
-        } else if (oldName.equals(DEFAULT_MAPPING_NAME)) {
-            // In case of naming of new mapping, save it to db.
-            mappingRepository.save(new MappingEntity(newName, new ArrayList<>(), new ArrayList<>(), false));
-            return new RenameObject(DEFAULT_MAPPING_NAME, newName);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + oldName);
-        }
-    }
+    public UUID copyMapping(UUID originalId) {
+        Optional<MappingEntity> mappingToCopyOpt = mappingRepository.findById(originalId);
+        MappingEntity mappingToCopy = mappingToCopyOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + originalId));
 
-    @Override
-    @Transactional
-    public InputMapping copyMapping(String originalName, String copyName) {
-        Optional<MappingEntity> mappingToCopyOpt = mappingRepository.findById(originalName);
-        MappingEntity mappingToCopy = mappingToCopyOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + originalName));
-
-        MappingEntity copiedMapping = new MappingEntity(copyName, mappingToCopy);
+        MappingEntity copiedMapping = new MappingEntity(mappingToCopy);
         // --- duplicate filters in filter-server--- //
         // get all filter uuids that needs to duplicate its corresponding filter
         List<UUID> filterUuids = copiedMapping.getRules().stream()
@@ -250,21 +218,17 @@ public class MappingServiceImpl implements MappingService {
                 .forEach(rule -> rule.setFilterUuid(uuidsMap.get(rule.getFilterUuid())));
         }
 
-        // --- persist in cascade the mapping in local database --- //
-        MappingEntity savedMappingEntity = mappingRepository.save(copiedMapping);
+        // --- persist in cascade the mapping in a local database --- //
+        mappingRepository.save(copiedMapping);
 
-        // --- build mapping dto to return --- //
-        InputMapping mapping = new InputMapping(savedMappingEntity);
-        enrichFiltersForMappings(List.of(mapping));
-
-        return mapping;
+        return copiedMapping.getMappingId();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<Model> getMappedModelsList(String mappingName) {
-        Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingName);
-        MappingEntity mapping = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingName));
+    public List<Model> getMappedModelsList(UUID mappingId) {
+        Optional<MappingEntity> mappingEntityOpt = mappingRepository.findById(mappingId);
+        MappingEntity mapping = mappingEntityOpt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingId));
 
         // models used by rule
         List<RuleEntity> ruleEntities = mapping.getRules();

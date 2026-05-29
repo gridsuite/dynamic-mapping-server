@@ -6,10 +6,11 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import jakarta.persistence.*;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -22,9 +23,10 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<String> {
+public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
     @Id
-    private String name;
+    @Column(name = "mapping_id")
+    private UUID mappingId;
 
     @OneToMany(targetEntity = RuleEntity.class, mappedBy = "mapping", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RuleEntity> rules;
@@ -36,12 +38,13 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<Stri
     private boolean controlledParameters;
 
     @Override
-    public String getId() {
-        return name;
+    public UUID getId() {
+        return mappingId;
     }
 
-    public MappingEntity(String name, MappingEntity mappingToCopy) {
-        this.name = name;
+    public MappingEntity(MappingEntity mappingToCopy) {
+        UUID newID = UUID.randomUUID();
+        this.mappingId = newID;
         this.controlledParameters = mappingToCopy.isControlledParameters();
         this.rules = mappingToCopy.getRules().stream().map(ruleEntity -> new RuleEntity(this, ruleEntity)).collect(Collectors.toList());
         this.automata = mappingToCopy.getAutomata().stream().map(automatonEntity -> new AutomatonEntity(this, automatonEntity)).collect(Collectors.toList());

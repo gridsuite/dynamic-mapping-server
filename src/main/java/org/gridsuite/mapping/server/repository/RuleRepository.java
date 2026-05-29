@@ -19,5 +19,5 @@ import java.util.UUID;
  */
 @Repository
 public interface RuleRepository extends JpaRepository<RuleEntity, UUID> {
-    List<RuleEntity.ProjectionFilterUuid> findByMappingNameAndFilterUuidNotNull(String mappingName);
+    List<RuleEntity.ProjectionFilterUuid> findByMappingIdAndFilterUuidNotNull(UUID mappingId);
 }

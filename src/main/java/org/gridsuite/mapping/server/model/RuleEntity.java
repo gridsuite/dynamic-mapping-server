@@ -51,7 +51,7 @@ public class RuleEntity extends AbstractManuallyAssignedIdentifierEntity<UUID> {
     private UUID filterUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mappingName", foreignKey = @ForeignKey(name = "mapping_rules_fk"), referencedColumnName = "name")
+    @JoinColumn(name = "mapping_id", foreignKey = @ForeignKey(name = "mapping_rules_fk"), referencedColumnName = "mapping_id")
     private MappingEntity mapping;
 
     @Override
