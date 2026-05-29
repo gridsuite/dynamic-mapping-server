@@ -798,7 +798,7 @@ public class ModelServiceImpl implements ModelService {
 
         ModelEntity modelToUpdate = getModelFromOptional(modelName, foundModelOpt);
 
-         // clear the existing list
+        // clear the existing list
         modelToUpdate.removeAllVariableDefinition(modelToUpdate.getVariableDefinitions());
 
         // save modified existing model entity

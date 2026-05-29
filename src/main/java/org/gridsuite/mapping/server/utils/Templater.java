@@ -24,6 +24,7 @@ public final class Templater {
         // Not Called
     }
 
+    @SuppressWarnings("checkstyle:LambdaBodyLength")
     public static String setsToPar(List<ParameterServiceImpl.EnrichedParametersSet> sets) {
         String parFileTemplate;
         String parametersSetTemplate;

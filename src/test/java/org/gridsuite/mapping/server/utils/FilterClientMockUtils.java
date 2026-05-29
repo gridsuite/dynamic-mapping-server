@@ -61,6 +61,7 @@ public final class FilterClientMockUtils {
         }).when(filterClient).getFilters(any());
     }
 
+    @SuppressWarnings("checkstyle:LambdaBodyLength")
     public static void mockDuplicateFilters(Map<UUID, ExpertFilter> filtersMockDB, FilterClient filterClient, ObjectMapper objectMapper) {
         Mockito.doAnswer(invocation -> {
             final Object[] args = invocation.getArguments();

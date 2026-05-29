@@ -62,7 +62,8 @@ public class ModelVariableDefinitionEntity implements Serializable {
     private Set<ModelVariableSetEntity> variablesSets;
 
     public ModelVariableDefinitionEntity(ModelEntity model, ModelVariableSetEntity variablesSet, ModelVariableDefinition variableDefinition) {
-        this(variableDefinition.getId() == null ? UUID.randomUUID() : variableDefinition.getId(), variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(), variableDefinition.getFactor(),
+        this(variableDefinition.getId() == null ? UUID.randomUUID() : variableDefinition.getId(), variableDefinition.getName(), variableDefinition.getType(), variableDefinition.getUnit(),
+                variableDefinition.getFactor(),
                 model != null ? new LinkedHashSet<>(List.of(model)) : new LinkedHashSet<>(),
                 variablesSet != null ? new LinkedHashSet<>(List.of(variablesSet)) : new LinkedHashSet<>(), null, null);
     }

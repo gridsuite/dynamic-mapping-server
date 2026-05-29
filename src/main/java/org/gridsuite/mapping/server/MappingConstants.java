@@ -15,9 +15,13 @@ public final class MappingConstants {
         // Not Called
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public static String EQUIPMENT_ID = "equipment.id";
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public static String IMPORT = "import com.powsybl.iidm.network.";
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public static String AUTOMATON_IMPORT = "import com.powsybl.iidm.network.TwoSides";
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public static String DEFAULT_MAPPING_NAME = "default";
 
     public static final String CASE_API_VERSION = "v1";
