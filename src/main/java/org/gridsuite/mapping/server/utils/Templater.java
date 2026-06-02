@@ -24,7 +24,6 @@ public final class Templater {
         // Not Called
     }
 
-    @SuppressWarnings("checkstyle:LambdaBodyLength")
     public static String setsToPar(List<ParameterServiceImpl.EnrichedParametersSet> sets) {
         String parFileTemplate;
         String parametersSetTemplate;
@@ -40,27 +39,40 @@ public final class Templater {
             throw new RuntimeException("Unable to load templates for .par generation !!");
         }
         ST parFile = new ST(parFileTemplate, '{', '}');
-        parFile.add("sets", sets.stream().map(set -> {
-            ST setText = new ST(parametersSetTemplate, '{', '}');
-            setText.add("id", set.getName());
-            String[] parameterTexts = set.getParameters().stream().map(parameter -> {
-                ST parameterText;
-                if (parameter.origin() == ParameterOrigin.NETWORK) {
-                    parameterText = new ST(refParameterTemplate, '{', '}');
-                    parameterText.add("origData", "IIDM");
-                    parameterText.add("origName", parameter.originName());
-                } else {
-                    parameterText = new ST(parameterTemplate, '{', '}');
-                    parameterText.add("value", parameter.value());
-                }
-                parameterText.add("name", parameter.name());
-                parameterText.add("type", parameter.type());
-                return parameterText.render();
-            }).toArray(String[]::new);
-            setText.add("name", set.getName());
-            setText.add("parameters", parameterTexts);
-            return setText.render();
-        }).toArray(String[]::new));
+        parFile.add("sets", sets.stream()
+                .map(set -> createParametersSetText(set, parametersSetTemplate, parameterTemplate, refParameterTemplate))
+                .toArray(String[]::new));
         return parFile.render();
+    }
+
+    private static String createParametersSetText(ParameterServiceImpl.EnrichedParametersSet set,
+                                                  String parametersSetTemplate,
+                                                  String parameterTemplate,
+                                                  String refParameterTemplate) {
+        ST setText = new ST(parametersSetTemplate, '{', '}');
+        setText.add("id", set.getName());
+        String[] parameterTexts = set.getParameters().stream()
+                .map(parameter -> createParameterText(parameter, parameterTemplate, refParameterTemplate))
+                .toArray(String[]::new);
+        setText.add("name", set.getName());
+        setText.add("parameters", parameterTexts);
+        return setText.render();
+    }
+
+    private static String createParameterText(ParameterServiceImpl.EnrichedParameter parameter,
+                                              String parameterTemplate,
+                                              String refParameterTemplate) {
+        ST parameterText;
+        if (parameter.origin() == ParameterOrigin.NETWORK) {
+            parameterText = new ST(refParameterTemplate, '{', '}');
+            parameterText.add("origData", "IIDM");
+            parameterText.add("origName", parameter.originName());
+        } else {
+            parameterText = new ST(parameterTemplate, '{', '}');
+            parameterText.add("value", parameter.value());
+        }
+        parameterText.add("name", parameter.name());
+        parameterText.add("type", parameter.type());
+        return parameterText.render();
     }
 }
