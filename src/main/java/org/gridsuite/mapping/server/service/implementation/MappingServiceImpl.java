@@ -116,6 +116,9 @@ public class MappingServiceImpl implements MappingService {
         // IMPORTANT: new filter is enriched with new uuid while converting the whole mapping in cascade
         // So must do converting before persisting filter in filter-server to ensure that new uuid is provided
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
+        if (mappingId != null) {
+            mappingToSave.setMappingId(mappingId); // keep the same id if exists, in case of PUT
+        }
 
         // --- update or create filters appeared in rules in remote filter-server --- //
         // filters to update

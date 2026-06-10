@@ -30,8 +30,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MappingController {
 
-    private static final String CONFLICT_MAPPING_ERROR_MESSAGE = "A mapping already exists with uuid: ";
-
     private final MappingService mappingService;
 
     @GetMapping(value = "/")
@@ -55,12 +53,19 @@ public class MappingController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappedModelsList(mappingId));
     }
 
-    @PostMapping(value = "/{mappingId}")
+    @PostMapping(value = "/")
     @Operation(summary = "Save a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping"),
-        @ApiResponse(responseCode = "409", description = "The mapping already exist"),
         @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
-    public ResponseEntity<InputMapping> saveMapping(@PathVariable(name = "mappingId") UUID mappingId, @RequestBody InputMapping mapping) {
+    public ResponseEntity<InputMapping> postMapping(@RequestBody InputMapping mapping) {
+        InputMapping savedMapping = mappingService.saveMapping(null, mapping);
+        return ResponseEntity.ok().body(savedMapping);
+    }
+
+    @PutMapping(value = "/{mappingId}")
+    @Operation(summary = "Replace a mapping by a new one, if mapping id not exist create a new one with given mapping id")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping")})
+    public ResponseEntity<InputMapping> putMapping(@PathVariable(name = "mappingId") UUID mappingId, @RequestBody InputMapping mapping) {
         InputMapping savedMapping = mappingService.saveMapping(mappingId, mapping);
         return ResponseEntity.ok().body(savedMapping);
     }
@@ -76,8 +81,7 @@ public class MappingController {
     @PostMapping(value = "{originalId}/copy")
     @Operation(summary = "Copy a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Mapping Copy"),
-        @ApiResponse(responseCode = "404", description = "Mapping not found"),
-        @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
+        @ApiResponse(responseCode = "404", description = "Mapping not found")})
     public ResponseEntity<UUID> copyMapping(@PathVariable("originalId") UUID originalId) {
         return ResponseEntity.ok().body(mappingService.copyMapping(originalId));
     }

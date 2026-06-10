@@ -150,14 +150,18 @@ public class ParameterControllerTest {
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
         // Put data
-        mvc.perform(post("/mappings/" + name)
+        MvcResult mvcResult = mvc.perform(post("/mappings/")
                         .content(objectMapper.writeValueAsString(inputMapping))
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        UUID mappingId = returnedMapping.getId();
 
         // export parameter file
-        MvcResult mvcResult = mvc.perform(get("/parameters/export")
-                .queryParam("mappingName", name)
+        mvcResult = mvc.perform(get("/parameters/export")
+                .queryParam("mappingId", mappingId.toString())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -172,7 +176,7 @@ public class ParameterControllerTest {
 
         // try to export parameter file with unknown mapping
         mvc.perform(get("/parameters/export")
-                        .queryParam("mappingName", "unknown")
+                        .queryParam("mappingId", UUID.randomUUID().toString())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -214,14 +218,18 @@ public class ParameterControllerTest {
             </parametersSet>""";
 
         // Put data
-        mvc.perform(post("/mappings/" + name)
+        MvcResult mvcResult = mvc.perform(post("/mappings/")
                         .content(mappingToTest)
                         .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        UUID mappingId = returnedMapping.getId();
 
         // export parameter file
-        MvcResult mvcResult = mvc.perform(get("/parameters/export")
-                        .queryParam("mappingName", name)
+        mvcResult = mvc.perform(get("/parameters/export")
+                        .queryParam("mappingId", mappingId.toString())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))

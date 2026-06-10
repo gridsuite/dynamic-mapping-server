@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 @Entity
 @Builder
-@Table(name = "rules", indexes = {@Index(name = "rule_mappingName_index", columnList = "mappingName")})
+@Table(name = "rules", indexes = {@Index(name = "rule_mapping_id_index", columnList = "mapping_id")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
