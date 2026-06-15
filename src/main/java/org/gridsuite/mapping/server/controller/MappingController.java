@@ -6,16 +6,19 @@
  */
 package org.gridsuite.mapping.server.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+import org.gridsuite.mapping.server.RestConfig;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.service.MappingService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +33,18 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/mappings")
 @Tag(name = "Mapping server")
-@AllArgsConstructor
 public class MappingController {
 
     private static final String CONFLICT_MAPPING_ERROR_MESSAGE = "A mapping already exists with name: ";
 
     private final MappingService mappingService;
+    private final ObjectMapper exportMappingObjectMapper;
+
+    public MappingController(MappingService mappingService,
+                             @Qualifier(RestConfig.EXPORT_MAPPING_OBJECT_MAPPER_BEAN) ObjectMapper exportMappingObjectMapper) {
+        this.mappingService = mappingService;
+        this.exportMappingObjectMapper = exportMappingObjectMapper;
+    }
 
     @GetMapping(value = "/")
     @Operation(summary = "Get all mappings")
@@ -49,6 +58,24 @@ public class MappingController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The requested mapping")})
     public ResponseEntity<InputMapping> getMapping(@PathVariable("mappingName") String mappingName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMapping(mappingName));
+    }
+
+    @GetMapping(value = "/{mappingName}/export")
+    @Operation(summary = "Export a mapping to a JSON file")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The mapping exported as a JSON file")})
+    public ResponseEntity<byte[]> exportMapping(@PathVariable("mappingName") String mappingName) {
+        InputMapping mapping = mappingService.getMapping(mappingName);
+        try {
+            byte[] jsonBytes = exportMappingObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(mapping);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentDispositionFormData("attachment", mappingName + ".json");
+
+            return ResponseEntity.ok().headers(headers).body(jsonBytes);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error serializing mapping to JSON", e);
+        }
     }
 
     @GetMapping(value = "/{mappingName}/models")
