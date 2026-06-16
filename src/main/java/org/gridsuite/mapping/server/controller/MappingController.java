@@ -62,7 +62,8 @@ public class MappingController {
 
     @GetMapping(value = "/{mappingName}/export")
     @Operation(summary = "Export a mapping to a JSON file")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The mapping exported as a JSON file")})
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The mapping exported as a JSON file"),
+        @ApiResponse(responseCode = "404", description = "Mapping not found")})
     public ResponseEntity<byte[]> exportMapping(@PathVariable("mappingName") String mappingName) {
         InputMapping mapping = mappingService.getMapping(mappingName);
         try {
