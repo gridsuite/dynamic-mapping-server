@@ -6,19 +6,25 @@
  */
 package org.gridsuite.mapping.server.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+import org.gridsuite.mapping.server.RestConfig;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.service.MappingService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -27,10 +33,16 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = "/mappings")
 @Tag(name = "Mapping server")
-@AllArgsConstructor
 public class MappingController {
 
     private final MappingService mappingService;
+    private final ObjectMapper exportMappingObjectMapper;
+
+    public MappingController(MappingService mappingService,
+                             @Qualifier(RestConfig.EXPORT_MAPPING_OBJECT_MAPPER_BEAN) ObjectMapper exportMappingObjectMapper) {
+        this.mappingService = mappingService;
+        this.exportMappingObjectMapper = exportMappingObjectMapper;
+    }
 
     @GetMapping(value = "/")
     @Operation(summary = "Get all mappings")
@@ -44,6 +56,25 @@ public class MappingController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The requested mapping")})
     public ResponseEntity<InputMapping> getMapping(@PathVariable("mappingId") UUID mappingId) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMapping(mappingId));
+    }
+
+    @GetMapping(value = "/{mappingId}/export")
+    @Operation(summary = "Export a mapping to a JSON file")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The mapping exported as a JSON file"),
+        @ApiResponse(responseCode = "404", description = "Mapping not found")})
+    public ResponseEntity<byte[]> exportMapping(@PathVariable("mappingId") UUID mappingId, @RequestParam(value = "mappingName", required = false) String mappingName) {
+        InputMapping mapping = mappingService.getMapping(mappingId);
+        try {
+            byte[] jsonBytes = exportMappingObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(mapping);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentDispositionFormData("attachment", Optional.ofNullable(mappingName).orElse("dynamic_mapping") + ".json");
+
+            return ResponseEntity.ok().headers(headers).body(jsonBytes);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error serializing mapping to JSON", e);
+        }
     }
 
     @GetMapping(value = "/{mappingId}/models")

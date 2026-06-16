@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
@@ -22,8 +23,11 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -35,10 +39,10 @@ import java.io.InputStream;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -51,6 +55,7 @@ public class MappingControllerTest {
     public static final String RESOURCE_PATH_DELIMITER = "/";
     public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
     public static final String MAPPING_FILE = "mapping_01.json";
+    public static final String MAPPING_FILE_NAME = "mapping_01";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MappingControllerTest.class);
 
@@ -70,6 +75,10 @@ public class MappingControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    @Qualifier(RestConfig.EXPORT_MAPPING_OBJECT_MAPPER_BEAN)
+    ObjectMapper exportMappingObjectMapper;
 
     private void cleanDB() {
         mappingRepository.deleteAll();
@@ -238,5 +247,45 @@ public class MappingControllerTest {
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("LoadAlphaBeta", model.getModelName()))).isTrue();
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("GeneratorSynchronousThreeWindingsProportionalRegulations", model.getModelName()))).isTrue();
         assertThat(resultMappedModelsList.stream().anyMatch(model -> Objects.equals("StaticVarCompensator", model.getModelName()))).isTrue();
+    }
+
+    @Test
+    public void testExportMapping() throws Exception {
+        // --- Load the input mapping file ---
+        String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
+        InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
+        String mappingJson = objectMapper.writeValueAsString(inputMapping);
+        // --- Save the mapping via POST /mappings/{name} ---
+        MvcResult mvcResult = mvc.perform(post("/mappings/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mappingJson))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        UUID mappingId = returnedMapping.getId();
+
+        // --- Export the mapping via GET /mappings/{mappingId}/export ---
+        MvcResult exportResult = mvc.perform(
+                        get("/mappings/{mappingId}/export", mappingId)
+                                .param("mappingName", MAPPING_FILE_NAME))
+                .andExpect(status().isOk())
+                .andExpect(header().string(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "form-data; name=\"attachment\"; filename=\"" + MAPPING_FILE_NAME + ".json\""))
+                .andReturn();
+
+        byte[] exportedBytes = exportResult.getResponse().getContentAsByteArray();
+
+        // --- Build expected JSON using the injected export mapper bean (same as production) ---
+        inputMapping = objectMapper.readValue(mappingJson, InputMapping.class);
+        byte[] expectedBytes = exportMappingObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(inputMapping);
+
+        // --- Compare as JSON trees (order- and whitespace-insensitive) ---
+        JsonNode exportedTree = objectMapper.readTree(exportedBytes);
+        JsonNode expectedTree = objectMapper.readTree(expectedBytes);
+
+        assertEquals(expectedTree, exportedTree,
+                "Exported mapping JSON does not match the expected content");
     }
 }

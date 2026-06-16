@@ -1,5 +1,4 @@
 {
-  "name": "mapping_01",
   "rules": [
     {
       "equipmentType": "LOAD",
@@ -60,7 +59,7 @@
     {
       "equipmentType": "STATIC_VAR_COMPENSATOR",
       "mappedModel": "StaticVarCompensator",
-      "setGroup": "SVarCT",
+      "setGroup": "SVarC",
       "groupType": "FIXED",
       "filter": {
         "equipmentType": "STATIC_VAR_COMPENSATOR",
@@ -137,7 +136,7 @@
     {
       "family": "VOLTAGE",
       "model": "TapChangerBlockingAutomaton",
-      "setGroup": "TCB_2_4",
+      "setGroup": "IEEE14_TCB_1",
       "properties": [
         {
           "name": "dynamicModelId",
@@ -159,7 +158,7 @@
     {
       "family": "VOLTAGE",
       "model": "TapChangerBlockingAutomaton",
-      "setGroup": "TCB_2_5",
+      "setGroup": "IEEE14_TCB_2",
       "properties": [
         {
           "name": "dynamicModelId",
