@@ -115,7 +115,6 @@ public class MappingControllerTest {
                 .andReturn();
         InputMapping mapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
         assertThat(mapping.getId()).isEqualTo(mappingId);
-        inputMapping.setName(null); // to ignore name in the following test
         Assertions.assertThat(mapping).recursivelyEquals(inputMapping);
 
         // get all data
@@ -175,9 +174,7 @@ public class MappingControllerTest {
         });
         assertThat(mappings.get(0).getId()).isEqualTo(originId);
         assertThat(mappings.get(1).getId()).isEqualTo(copyId);
-        inputMapping.setName(null); // to ignore name in the following test
         Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
-        inputMapping.setName(null); // to ignore name in the following test
         Assertions.assertThat(mappings.get(1)).recursivelyEquals(inputMapping);
 
         // Add a new mapping => will replace the whole old mapping by the new one
@@ -268,7 +265,7 @@ public class MappingControllerTest {
         // --- Export the mapping via GET /mappings/{mappingId}/export ---
         MvcResult exportResult = mvc.perform(
                         get("/mappings/{mappingId}/export", mappingId)
-                                .param("mappingName", MAPPING_FILE_NAME))
+                                .param("fileName", MAPPING_FILE_NAME))
                 .andExpect(status().isOk())
                 .andExpect(header().string(
                         HttpHeaders.CONTENT_DISPOSITION,

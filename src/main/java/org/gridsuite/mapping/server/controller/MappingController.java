@@ -62,14 +62,14 @@ public class MappingController {
     @Operation(summary = "Export a mapping to a JSON file")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The mapping exported as a JSON file"),
         @ApiResponse(responseCode = "404", description = "Mapping not found")})
-    public ResponseEntity<byte[]> exportMapping(@PathVariable("mappingId") UUID mappingId, @RequestParam(value = "mappingName", required = false) String mappingName) {
+    public ResponseEntity<byte[]> exportMapping(@PathVariable("mappingId") UUID mappingId, @RequestParam(value = "fileName", required = false) String fileName) {
         InputMapping mapping = mappingService.getMapping(mappingId);
         try {
             byte[] jsonBytes = exportMappingObjectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(mapping);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setContentDispositionFormData("attachment", Optional.ofNullable(mappingName).orElse("dynamic_mapping") + ".json");
+            headers.setContentDispositionFormData("attachment", Optional.ofNullable(fileName).orElse("dynamic_mapping") + ".json");
 
             return ResponseEntity.ok().headers(headers).body(jsonBytes);
         } catch (com.fasterxml.jackson.core.JsonProcessingException e) {

@@ -25,12 +25,9 @@ import java.util.stream.Collectors;
 @Schema(description = "Mapping")
 @AllArgsConstructor
 @NoArgsConstructor
-public class InputMapping implements Mapping {
+public class InputMapping {
     @Schema(description = "Mapping id")
     private UUID id;
-
-    @Schema(description = "Name")
-    private String name;
 
     @Schema(description = "Rules")
     private List<Rule> rules;
