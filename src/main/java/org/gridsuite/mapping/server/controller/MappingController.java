@@ -109,7 +109,7 @@ public class MappingController {
         return ResponseEntity.ok().body(mappingId);
     }
 
-    @PostMapping(value = "{originalId}/copy")
+    @PostMapping(value = "{originalId}/duplicate")
     @Operation(summary = "Copy a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Mapping Copy"),
         @ApiResponse(responseCode = "404", description = "Mapping not found")})
