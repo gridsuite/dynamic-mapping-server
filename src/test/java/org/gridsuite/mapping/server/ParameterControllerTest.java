@@ -156,7 +156,7 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        UUID mappingId= objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // export parameter file
         mvcResult = mvc.perform(get("/parameters/export")
