@@ -156,8 +156,7 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
-        UUID mappingId = returnedMapping.getId();
+        UUID mappingId= objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // export parameter file
         mvcResult = mvc.perform(get("/parameters/export")
@@ -224,8 +223,7 @@ public class ParameterControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
-        UUID mappingId = returnedMapping.getId();
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // export parameter file
         mvcResult = mvc.perform(get("/parameters/export")

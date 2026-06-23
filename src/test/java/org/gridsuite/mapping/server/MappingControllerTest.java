@@ -105,8 +105,8 @@ public class MappingControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
-        UUID mappingId = returnedMapping.getId();
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
+
         // Get one mapping
         mvcResult = mvc.perform(get("/mappings/" + mappingId)
                         .contentType(APPLICATION_JSON))
@@ -153,11 +153,10 @@ public class MappingControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
-        UUID originId = returnedMapping.getId();
+        UUID originId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // copy data
-        mvcResult = mvc.perform(post("/mappings/" + originId + "/copy")
+        mvcResult = mvc.perform(post("/mappings/" + originId + "/duplicate")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -228,8 +227,7 @@ public class MappingControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
-        UUID mappingId = returnedMapping.getId();
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // main test : get the list of used models in the mapping
         mvcResult = mvc.perform(get("/mappings/" + mappingId + "/models"))
@@ -259,8 +257,7 @@ public class MappingControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        InputMapping returnedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
-        UUID mappingId = returnedMapping.getId();
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // --- Export the mapping via GET /mappings/{mappingId}/export ---
         MvcResult exportResult = mvc.perform(
