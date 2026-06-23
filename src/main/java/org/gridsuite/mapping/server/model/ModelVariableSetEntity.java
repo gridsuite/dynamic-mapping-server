@@ -43,7 +43,8 @@ public class ModelVariableSetEntity implements Serializable {
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(name = "model_variable_set_model_variable_definition",
             joinColumns = {@JoinColumn(name = "variable_set_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_variable_set_model_variable_definition_variable_set_id_fk"))},
-            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "model_variable_set_model_variable_definition_variable_definition_id_fk"))}
+            inverseJoinColumns = {@JoinColumn(name = "variable_definition_id", referencedColumnName = "id",
+                    foreignKey = @ForeignKey(name = "model_variable_set_model_variable_definition_variable_definition_id_fk"))}
     )
     private Set<ModelVariableDefinitionEntity> variableDefinitions = new LinkedHashSet<>(0);
 
@@ -69,7 +70,8 @@ public class ModelVariableSetEntity implements Serializable {
         this.id = variablesSet.getId() == null ? UUID.randomUUID() : variablesSet.getId();
         this.models = model != null ? new LinkedHashSet<>(List.of(model)) : new LinkedHashSet<>();
         this.name = variablesSet.getName();
-        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this, variableDefinition)).collect(Collectors.toSet());
+        this.variableDefinitions = variablesSet.getVariableDefinitions().stream().map(variableDefinition -> new ModelVariableDefinitionEntity(model, this,
+                variableDefinition)).collect(Collectors.toSet());
     }
 
     // --- utils methods --- //

@@ -73,7 +73,8 @@ public class ModelController {
     @Operation(summary = "get all parameters sets for a given group")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter sets of the group")})
-    public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType) {
+    public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName,
+            @PathVariable("groupType") SetGroupType groupType) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName, groupType));
     }
 
@@ -105,7 +106,8 @@ public class ModelController {
     @Operation(summary = "Delete a parameter set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "updated parameter group")})
-    public ResponseEntity<ParametersSetsGroup> deleteSet(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType, @PathVariable("setName") String setName) {
+    public ResponseEntity<ParametersSetsGroup> deleteSet(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType,
+            @PathVariable("setName") String setName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
     }
 
@@ -286,7 +288,8 @@ public class ModelController {
     @Operation(summary = "Add new variable definitions to variables set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved variables set")})
-    public ResponseEntity<VariablesSet> addNewVariableDefinitionToVariablesSet(@PathVariable("variableSetName") String variableSetName, @RequestBody List<ModelVariableDefinition> variableDefinitions) {
+    public ResponseEntity<VariablesSet> addNewVariableDefinitionToVariablesSet(@PathVariable("variableSetName") String variableSetName,
+            @RequestBody List<ModelVariableDefinition> variableDefinitions) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addNewVariableDefinitionToVariablesSet(variableSetName, variableDefinitions));
     }
 

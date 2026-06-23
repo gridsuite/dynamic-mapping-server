@@ -12,6 +12,7 @@ import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.Rule;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
@@ -26,7 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

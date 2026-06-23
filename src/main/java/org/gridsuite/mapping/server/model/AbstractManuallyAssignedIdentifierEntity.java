@@ -9,7 +9,6 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Transient;
-
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -18,7 +17,7 @@ import org.springframework.data.domain.Persistable;
 
 // Official documentation: https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.entity-persistence.saving-entites.strategies
 @MappedSuperclass
-public abstract class AbstractManuallyAssignedIdentifierEntity<ID> implements Persistable<ID> {
+public abstract class AbstractManuallyAssignedIdentifierEntity<I> implements Persistable<I> {
 
     @Transient
     private boolean isNew = true;

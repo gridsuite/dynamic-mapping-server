@@ -10,7 +10,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.gridsuite.mapping.server.dto.automata.Automaton;
 import org.gridsuite.mapping.server.utils.AutomatonFamily;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;

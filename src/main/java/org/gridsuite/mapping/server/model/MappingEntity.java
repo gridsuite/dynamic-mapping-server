@@ -8,7 +8,6 @@ package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
