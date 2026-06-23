@@ -72,23 +72,25 @@ public final class FilterClientMockUtils {
 
             Map<UUID, ExpertFilter> newData = new HashMap<>();
             Map<UUID, UUID> uuidsMap = new HashMap<>();
-            data.forEach(sourceUuid -> {
-                ExpertFilter sourceFilter = filtersMockDB.get(sourceUuid);
-                try {
-                    /* deep copy */
-                    ExpertFilter newFilter = objectMapper.readValue(objectMapper.writeValueAsString(sourceFilter), ExpertFilter.class);
-                    UUID newUuid = UUID.randomUUID();
-                    uuidsMap.put(sourceUuid, newUuid);
-                    newFilter.setId(newUuid);
-                    newData.put(newUuid, newFilter);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            data.forEach(sourceUuid -> fillFilterMaps(filtersMockDB, objectMapper, sourceUuid, uuidsMap, newData));
             filtersMockDB.putAll(newData);
 
             return uuidsMap;
         }).when(filterClient).duplicateFilters(any());
+    }
+
+    private static void fillFilterMaps(Map<UUID, ExpertFilter> filtersMockDB, ObjectMapper objectMapper, UUID sourceUuid, Map<UUID, UUID> uuidsMap, Map<UUID, ExpertFilter> newData) {
+        ExpertFilter sourceFilter = filtersMockDB.get(sourceUuid);
+        try {
+            /* deep copy */
+            ExpertFilter newFilter = objectMapper.readValue(objectMapper.writeValueAsString(sourceFilter), ExpertFilter.class);
+            UUID newUuid = UUID.randomUUID();
+            uuidsMap.put(sourceUuid, newUuid);
+            newFilter.setId(newUuid);
+            newData.put(newUuid, newFilter);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void mockCreateFilters(Map<UUID, ExpertFilter> filtersMockDB, FilterClient filterClient) {

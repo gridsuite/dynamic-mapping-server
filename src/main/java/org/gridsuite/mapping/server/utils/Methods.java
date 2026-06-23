@@ -37,7 +37,7 @@ public final class Methods {
     }
 
     public static boolean convertStringToBoolean(String stringBool) {
-        return stringBool.equals("true");
+        return "true".equals(stringBool);
     }
 
     public static String convertBooleanToString(boolean bool) {

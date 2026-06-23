@@ -900,7 +900,8 @@ public class ModelControllerTest {
         List<VariablesSet> variablesSet = model.getVariablesSets();
         // get variable definitions of sets
         List<ModelVariableDefinition> variableDefinitionsOfGeneratorSet = variablesSet.stream().filter(set -> "Generator".equals(set.getName())).findFirst().orElseThrow().getVariableDefinitions();
-        List<ModelVariableDefinition> variableDefinitionsOfVoltageRegulatorSet = variablesSet.stream().filter(set -> "VoltageRegulator".equals(set.getName())).findFirst().orElseThrow().getVariableDefinitions();
+        List<ModelVariableDefinition> variableDefinitionsOfVoltageRegulatorSet = variablesSet.stream().filter(set -> "VoltageRegulator".equals(set.getName())).findFirst().orElseThrow(
+                ).getVariableDefinitions();
 
         // Check result
         assertThat(variablesSet).hasSize(2);

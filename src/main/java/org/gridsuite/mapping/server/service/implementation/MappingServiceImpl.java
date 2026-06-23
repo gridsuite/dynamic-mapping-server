@@ -9,12 +9,12 @@ package org.gridsuite.mapping.server.service.implementation;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
-import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.Rule;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.dto.models.ParametersSetsGroup;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.model.AutomatonEntity;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
@@ -29,11 +29,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import static org.gridsuite.mapping.server.MappingConstants.DEFAULT_MAPPING_NAME;
 import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.MAPPING_NAME_NOT_PROVIDED;
 

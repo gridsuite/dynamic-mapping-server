@@ -15,10 +15,10 @@ public final class MappingConstants {
         // Not Called
     }
 
-    public static String EQUIPMENT_ID = "equipment.id";
-    public static String IMPORT = "import com.powsybl.iidm.network.";
-    public static String AUTOMATON_IMPORT = "import com.powsybl.iidm.network.TwoSides";
-    public static String DEFAULT_MAPPING_NAME = "default";
+    public static final String EQUIPMENT_ID = "equipment.id";
+    public static final String IMPORT = "import com.powsybl.iidm.network.";
+    public static final String AUTOMATON_IMPORT = "import com.powsybl.iidm.network.TwoSides";
+    public static final String DEFAULT_MAPPING_NAME = "default";
 
     public static final String CASE_API_VERSION = "v1";
     public static final String NETWORK_CONVERSION_API_VERSION = "v1";

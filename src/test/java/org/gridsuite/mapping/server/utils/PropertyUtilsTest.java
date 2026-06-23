@@ -26,8 +26,10 @@ public class PropertyUtilsTest {
     @Test
     public void testCopyNonNullProperties() {
         // test with a ModelVariableDefinitionEntity
-        ModelVariableDefinitionEntity variableDefinitionEntity = new ModelVariableDefinitionEntity(UUID.randomUUID(), "load_running_value", VariableType.DOUBLE, "KW", 100.0, null, null, new Date(), new Date());
-        ModelVariableDefinitionEntity variableDefinitionEntity2 = new ModelVariableDefinitionEntity(UUID.randomUUID(), "load_running_value2", VariableType.BOOL, null, 90.0, null, null, null, new Date());
+        ModelVariableDefinitionEntity variableDefinitionEntity = new ModelVariableDefinitionEntity(UUID.randomUUID(), "load_running_value", VariableType.DOUBLE, "KW", 100.0, null, null, new Date(),
+                new Date());
+        ModelVariableDefinitionEntity variableDefinitionEntity2 = new ModelVariableDefinitionEntity(UUID.randomUUID(), "load_running_value2", VariableType.BOOL, null, 90.0, null, null, null,
+                new Date());
 
         // call method to be tested
         PropertyUtils.copyNonNullProperties(variableDefinitionEntity2, variableDefinitionEntity);

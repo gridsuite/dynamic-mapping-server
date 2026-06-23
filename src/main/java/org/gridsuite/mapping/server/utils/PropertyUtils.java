@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 /**
  * This class must be identical to one on study-server
- * @author Jacques Borsenberger <jacques.borsenberger at rte-france.com
+ * @author Jacques Borsenberger <jacques.borsenberger at rte-france.com>
  */
 public final class PropertyUtils {
 

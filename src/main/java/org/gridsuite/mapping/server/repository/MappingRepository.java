@@ -6,10 +6,9 @@
  */
 package org.gridsuite.mapping.server.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import org.springframework.stereotype.Repository;
 import org.gridsuite.mapping.server.model.MappingEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>

@@ -6,14 +6,13 @@
  */
 package org.gridsuite.mapping.server.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.gridsuite.mapping.server.dto.automata.BasicProperty;
 import org.gridsuite.mapping.server.utils.PropertyType;
-
-import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
