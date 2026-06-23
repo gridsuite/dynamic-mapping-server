@@ -1,5 +1,20 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!-- drop data -->
+    <changeSet author="phamquy (generated)" id="1780066311960-0">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="mappings" columnName="name"/>
+        </preConditions>
+        <comment>Clear any existing legacy data in mapping-related tables to allow the next step which drops the column name in primary key of mappings</comment>
+        <comment>This procedure does not clean anonymous filters which are persisted in filter-server, they should be deleted via admin-tools</comment>
+        <sql splitStatements="true">
+            DELETE FROM automaton_properties;
+            DELETE FROM automata;
+            DELETE FROM rules;
+            DELETE FROM mappings;
+        </sql>
+    </changeSet>
+    <!-- schema changes -->
     <changeSet author="phamquy (generated)" id="1780066311960-11">
         <dropForeignKeyConstraint baseTableName="AUTOMATA" constraintName="MAPPING_AUTOMATA_FK"/>
     </changeSet>

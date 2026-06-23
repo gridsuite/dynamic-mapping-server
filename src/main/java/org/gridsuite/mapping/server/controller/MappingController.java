@@ -88,9 +88,9 @@ public class MappingController {
     @Operation(summary = "Save a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping"),
         @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
-    public ResponseEntity<InputMapping> postMapping(@RequestBody InputMapping mapping) {
+    public ResponseEntity<UUID> postMapping(@RequestBody InputMapping mapping) {
         InputMapping savedMapping = mappingService.saveMapping(null, mapping);
-        return ResponseEntity.ok().body(savedMapping);
+        return ResponseEntity.ok().body(savedMapping.getId());
     }
 
     @PutMapping(value = "/{mappingId}")
