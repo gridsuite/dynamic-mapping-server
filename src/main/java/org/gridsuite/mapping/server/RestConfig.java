@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
