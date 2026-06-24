@@ -85,20 +85,19 @@ public class MappingController {
     }
 
     @PostMapping(value = "")
-    @Operation(summary = "Save a mapping")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping"),
-        @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
-    public ResponseEntity<UUID> postMapping(@RequestBody InputMapping mapping) {
+    @Operation(summary = "Create a new mapping")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping")})
+    public ResponseEntity<UUID> createMapping(@RequestBody InputMapping mapping) {
         InputMapping savedMapping = mappingService.saveMapping(null, mapping);
         return ResponseEntity.ok().body(savedMapping.getId());
     }
 
     @PutMapping(value = "/{mappingId}")
-    @Operation(summary = "Replace a mapping by a new one, if mapping id not exist create a new one with given mapping id")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping")})
-    public ResponseEntity<UUID> putMapping(@PathVariable(name = "mappingId") UUID mappingId, @RequestBody InputMapping mapping) {
-        InputMapping savedMapping = mappingService.saveMapping(mappingId, mapping);
-        return ResponseEntity.ok().body(savedMapping.getId());
+    @Operation(summary = "Update a mapping")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Mapping updated")})
+    public ResponseEntity<Void> updateMapping(@PathVariable(name = "mappingId") UUID mappingId, @RequestBody InputMapping mapping) {
+        mappingService.saveMapping(mappingId, mapping);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping(path = "/{mappingId}")

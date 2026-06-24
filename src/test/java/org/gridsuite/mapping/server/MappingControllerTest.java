@@ -98,7 +98,7 @@ public class MappingControllerTest {
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
-        // Put data
+        // Create data
         MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
@@ -128,6 +128,30 @@ public class MappingControllerTest {
         assertThat(mappings.get(0).getId()).isEqualTo(mappingId);
         Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
 
+        // Update a mapping
+        InputMapping mappingToUpdate = mappings.getFirst();
+        int ruleSizeOrigin = mappingToUpdate.getRules().size();
+        mappingToUpdate.getRules().removeFirst(); // remove a rule to test update
+        mvc.perform(put("/mappings/" + mappingId)
+                        .content(objectMapper.writeValueAsString(mappingToUpdate))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        // check updated mapping => check that the rule has been removed
+        mvcResult = mvc.perform(get("/mappings/" + mappingId)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+        InputMapping updatedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        assertThat(updatedMapping.getId()).isEqualTo(mappingId);
+        assertThat(updatedMapping.getRules()).hasSize(ruleSizeOrigin - 1);
+
+        // does not perform update if not exist
+        mvc.perform(put("/mappings/" + UUID.randomUUID())
+                        .content(objectMapper.writeValueAsString(inputMapping))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
         // delete data
         mvc.perform(delete("/mappings/" + mappingId))
                 .andExpect(status().isOk());
@@ -146,7 +170,7 @@ public class MappingControllerTest {
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
-        // Put data
+        // Create data
         MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
@@ -176,17 +200,6 @@ public class MappingControllerTest {
         Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
         Assertions.assertThat(mappings.get(1)).recursivelyEquals(inputMapping);
 
-        // Add a new mapping => will replace the whole old mapping by the new one
-        mvc.perform(put("/mappings/" + originId)
-                        .content(objectMapper.writeValueAsString(inputMapping))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        // create a new one if id not exist
-        mvc.perform(put("/mappings/" + UUID.randomUUID())
-                        .content(objectMapper.writeValueAsString(inputMapping))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
     }
 
     @Test

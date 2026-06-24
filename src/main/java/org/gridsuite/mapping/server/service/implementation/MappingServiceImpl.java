@@ -117,6 +117,8 @@ public class MappingServiceImpl implements MappingService {
         // So must do converting before persisting filter in filter-server to ensure that new uuid is provided
         MappingEntity mappingToSave = mapping.convertMappingToEntity();
         if (mappingId != null) {
+            // check whether mapping exists
+            mappingRepository.findById(mappingId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingId));
             mappingToSave.setMappingId(mappingId); // keep the same id if exists, in case of PUT
         }
 
