@@ -44,7 +44,7 @@ public class MappingController {
         this.exportMappingObjectMapper = exportMappingObjectMapper;
     }
 
-    @GetMapping(value = "/")
+    @GetMapping(value = "")
     @Operation(summary = "Get all mappings")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mappings")})
     public ResponseEntity<List<InputMapping>> getMappingList() {
@@ -84,7 +84,7 @@ public class MappingController {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappedModelsList(mappingId));
     }
 
-    @PostMapping(value = "/")
+    @PostMapping(value = "")
     @Operation(summary = "Save a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping"),
         @ApiResponse(responseCode = "500", description = "The storage is down or a mapping with the same name already exists")})
@@ -96,9 +96,9 @@ public class MappingController {
     @PutMapping(value = "/{mappingId}")
     @Operation(summary = "Replace a mapping by a new one, if mapping id not exist create a new one with given mapping id")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping")})
-    public ResponseEntity<InputMapping> putMapping(@PathVariable(name = "mappingId") UUID mappingId, @RequestBody InputMapping mapping) {
+    public ResponseEntity<UUID> putMapping(@PathVariable(name = "mappingId") UUID mappingId, @RequestBody InputMapping mapping) {
         InputMapping savedMapping = mappingService.saveMapping(mappingId, mapping);
-        return ResponseEntity.ok().body(savedMapping);
+        return ResponseEntity.ok().body(savedMapping.getId());
     }
 
     @DeleteMapping(path = "/{mappingId}")

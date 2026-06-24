@@ -99,7 +99,7 @@ public class MappingControllerTest {
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
         // Put data
-        MvcResult mvcResult = mvc.perform(post("/mappings/")
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -118,7 +118,7 @@ public class MappingControllerTest {
         Assertions.assertThat(mapping).recursivelyEquals(inputMapping);
 
         // get all data
-        mvcResult = mvc.perform(get("/mappings/")
+        mvcResult = mvc.perform(get("/mappings")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -133,7 +133,7 @@ public class MappingControllerTest {
                 .andExpect(status().isOk());
 
         // get to verify deletion
-        mvc.perform(get("/mappings/")
+        mvc.perform(get("/mappings")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -147,7 +147,7 @@ public class MappingControllerTest {
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
         // Put data
-        MvcResult mvcResult = mvc.perform(post("/mappings/")
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -164,7 +164,7 @@ public class MappingControllerTest {
         UUID copyId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // get all data
-        mvcResult = mvc.perform(get("/mappings/")
+        mvcResult = mvc.perform(get("/mappings")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -221,7 +221,7 @@ public class MappingControllerTest {
         // put a mapping which uses the saved models
         String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping/mapping_01.json").readAllBytes());
         // Put data
-        MvcResult mvcResult = mvc.perform(post("/mappings/")
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(mappingJson)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -251,7 +251,7 @@ public class MappingControllerTest {
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
         String mappingJson = objectMapper.writeValueAsString(inputMapping);
         // --- Save the mapping via POST /mappings/{name} ---
-        MvcResult mvcResult = mvc.perform(post("/mappings/")
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mappingJson))
                 .andExpect(status().isOk())

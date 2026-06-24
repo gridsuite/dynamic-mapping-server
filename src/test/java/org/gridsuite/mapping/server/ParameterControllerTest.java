@@ -150,7 +150,7 @@ public class ParameterControllerTest {
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
         // Put data
-        MvcResult mvcResult = mvc.perform(post("/mappings/")
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(objectMapper.writeValueAsString(inputMapping))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -217,7 +217,7 @@ public class ParameterControllerTest {
             </parametersSet>""";
 
         // Put data
-        MvcResult mvcResult = mvc.perform(post("/mappings/")
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(mappingToTest)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
