@@ -95,44 +95,69 @@ public class MappingControllerTest {
 
     @Test
     public void test() throws Exception {
-        String name = "test";
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
-        // Put data
-        mvc.perform(post("/mappings/" + name)
+        // Create data
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(objectMapper.writeValueAsString(inputMapping))
                         .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // Get one mapping
-        MvcResult mvcResult = mvc.perform(get("/mappings/" + name)
+        mvcResult = mvc.perform(get("/mappings/" + mappingId)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
         InputMapping mapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
-        assertThat(mapping.getName()).isEqualTo(name);
-        inputMapping.setName(name); // to ignore name in the following test
+        assertThat(mapping.getId()).isEqualTo(mappingId);
         Assertions.assertThat(mapping).recursivelyEquals(inputMapping);
 
         // get all data
-        mvcResult = mvc.perform(get("/mappings/")
+        mvcResult = mvc.perform(get("/mappings")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
         List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
         });
-        assertThat(mappings.get(0).getName()).isEqualTo(name);
+        assertThat(mappings.get(0).getId()).isEqualTo(mappingId);
         Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
 
+        // Update a mapping
+        InputMapping mappingToUpdate = mappings.getFirst();
+        int ruleSizeOrigin = mappingToUpdate.getRules().size();
+        mappingToUpdate.getRules().removeFirst(); // remove a rule to test update
+        mvc.perform(put("/mappings/" + mappingId)
+                        .content(objectMapper.writeValueAsString(mappingToUpdate))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        // check updated mapping => check that the rule has been removed
+        mvcResult = mvc.perform(get("/mappings/" + mappingId)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+        InputMapping updatedMapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        assertThat(updatedMapping.getId()).isEqualTo(mappingId);
+        assertThat(updatedMapping.getRules()).hasSize(ruleSizeOrigin - 1);
+
+        // does not perform update if not exist
+        mvc.perform(put("/mappings/" + UUID.randomUUID())
+                        .content(objectMapper.writeValueAsString(inputMapping))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
         // delete data
-        mvc.perform(delete("/mappings/" + name))
+        mvc.perform(delete("/mappings/" + mappingId))
                 .andExpect(status().isOk());
 
         // get to verify deletion
-        mvc.perform(get("/mappings/")
+        mvc.perform(get("/mappings")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -140,111 +165,41 @@ public class MappingControllerTest {
     }
 
     @Test
-    public void testRename() throws Exception {
-        String originalName = "origin";
-
-        String newName = "new";
+    public void testCopy() throws Exception {
 
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
-        // Put data
-        mvc.perform(post("/mappings/" + originalName)
+        // Create data
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(objectMapper.writeValueAsString(inputMapping))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        // Rename data
-        mvc.perform(post("/mappings/rename/" + originalName + "/to/" + newName
-                )
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        // get all data
-        MvcResult mvcResult = mvc.perform(get("/mappings/")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
 
-        List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
-        });
-        assertThat(mappings.get(0).getName()).isEqualTo(newName);
-        inputMapping.setName(newName); // to ignore name in the following test
-        Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
-
-        // Add a new mapping
-        mvc.perform(post("/mappings/" + originalName)
-                        .content(objectMapper.writeValueAsString(inputMapping))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        // Fail to rename to existing mapping
-        mvc.perform(post("/mappings/rename/" + originalName + "/to/" + newName
-                )
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isConflict());
-
-        // Fail to rename from missing mapping
-        mvc.perform(post("/mappings/rename/NotUsed/to/AnyMapping"
-                )
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void testCopy() throws Exception {
-        String originalName = "origin";
-
-        String copyName = "copy";
-
-        String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
-        InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
-
-        // Put data
-        mvc.perform(post("/mappings/" + originalName)
-                        .content(objectMapper.writeValueAsString(inputMapping))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+        UUID originId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // copy data
-        mvc.perform(post("/mappings/copy/" + originalName + "/to/" + copyName
-                )
+        mvcResult = mvc.perform(post("/mappings/" + originId + "/duplicate")
                         .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UUID copyId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // get all data
-        MvcResult mvcResult = mvc.perform(get("/mappings/")
+        mvcResult = mvc.perform(get("/mappings")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
                 .andReturn();
         List<InputMapping> mappings = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
         });
-        assertThat(mappings.get(0).getName()).isEqualTo(originalName);
-        assertThat(mappings.get(1).getName()).isEqualTo(copyName);
-        inputMapping.setName(originalName); // to ignore name in the following test
+        assertThat(mappings.get(0).getId()).isEqualTo(originId);
+        assertThat(mappings.get(1).getId()).isEqualTo(copyId);
         Assertions.assertThat(mappings.get(0)).recursivelyEquals(inputMapping);
-        inputMapping.setName(copyName); // to ignore name in the following test
         Assertions.assertThat(mappings.get(1)).recursivelyEquals(inputMapping);
 
-        // Add a new mapping => will replace the whole old mapping by the new one
-        mvc.perform(post("/mappings/" + originalName)
-                        .content(objectMapper.writeValueAsString(inputMapping))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        // Fail to copy to existing mapping
-        mvc.perform(post("/mappings/copy/" + originalName + "/to/" + copyName
-                )
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isConflict());
-
-        // Fail to copy from missing mapping
-        mvc.perform(post("/mappings/copy/NotUsed/to/AnyMapping"
-                )
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -279,18 +234,21 @@ public class MappingControllerTest {
         // put a mapping which uses the saved models
         String mappingJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping/mapping_01.json").readAllBytes());
         // Put data
-        mvc.perform(post("/mappings/" + "mapping_01")
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .content(mappingJson)
                         .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // main test : get the list of used models in the mapping
-        MvcResult result = mvc.perform(get("/mappings/" + "mapping_01" + "/models"))
+        mvcResult = mvc.perform(get("/mappings/" + mappingId + "/models"))
                 .andExpect(status().isOk())
                 .andReturn();
 
         // check result
-        String resultMappedModelsListJson = result.getResponse().getContentAsString();
+        String resultMappedModelsListJson = mvcResult.getResponse().getContentAsString();
         LOGGER.info("resultMappedModelsListJson : " + resultMappedModelsListJson);
         List<Model> resultMappedModelsList = objectMapper.readValue(resultMappedModelsListJson, new TypeReference<>() { });
         // must contain at least LoadAlphaBeta model
@@ -306,14 +264,18 @@ public class MappingControllerTest {
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
         String mappingJson = objectMapper.writeValueAsString(inputMapping);
         // --- Save the mapping via POST /mappings/{name} ---
-        mvc.perform(post("/mappings/{mappingName}", MAPPING_FILE_NAME)
+        MvcResult mvcResult = mvc.perform(post("/mappings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mappingJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
 
-        // --- Export the mapping via GET /mappings/{name}/export ---
+        UUID mappingId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
+
+        // --- Export the mapping via GET /mappings/{mappingId}/export ---
         MvcResult exportResult = mvc.perform(
-                        get("/mappings/{mappingName}/export", MAPPING_FILE_NAME))
+                        get("/mappings/{mappingId}/export", mappingId)
+                                .param("fileName", MAPPING_FILE_NAME))
                 .andExpect(status().isOk())
                 .andExpect(header().string(
                         HttpHeaders.CONTENT_DISPOSITION,

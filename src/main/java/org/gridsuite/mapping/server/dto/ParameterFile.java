@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.UUID;
+
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
@@ -18,8 +20,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class ParameterFile {
 
-    @Schema(description = "Name of the parent mapping")
-    private String mappingName;
+    @Schema(description = "Id of the parent mapping")
+    private UUID mappingId;
 
     @Schema(description = "Parameter file content in *.par format")
     private String fileContent;

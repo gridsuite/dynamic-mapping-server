@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.MAPPING_NAME_NOT_PROVIDED;
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.MAPPING_NOT_PROVIDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -31,11 +31,11 @@ class DynamicMappingExceptionHandlerTest {
     @Test
     void mapsInteralErrorBusinessErrorToStatus() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/results-endpoint/uuid");
-        DynamicMappingException exception = new DynamicMappingException(MAPPING_NAME_NOT_PROVIDED, "mapping name not provided");
+        DynamicMappingException exception = new DynamicMappingException(MAPPING_NOT_PROVIDED, "mapping not provided");
         ResponseEntity<PowsyblWsProblemDetail> response = handler.handleDynamicMappingException(exception, request);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertEquals("dynamicMapping.mappingNameNotProvided", response.getBody().getBusinessErrorCode());
+        assertEquals("dynamicMapping.mappingNotProvided", response.getBody().getBusinessErrorCode());
     }
 }

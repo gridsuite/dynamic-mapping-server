@@ -13,7 +13,7 @@ import com.powsybl.ws.commons.error.BusinessErrorCode;
  * @author Hugo Marcellin <hugo.marcelin at rte-france.com>
  */
 public enum DynamicMappingErrorBusinessCode implements BusinessErrorCode {
-    MAPPING_NAME_NOT_PROVIDED("dynamicMapping.mappingNameNotProvided");
+    MAPPING_NOT_PROVIDED("dynamicMapping.mappingNotProvided");
 
     private final String code;
 

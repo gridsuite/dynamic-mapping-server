@@ -7,10 +7,10 @@
 package org.gridsuite.mapping.server.service;
 
 import org.gridsuite.mapping.server.dto.InputMapping;
-import org.gridsuite.mapping.server.dto.RenameObject;
 import org.gridsuite.mapping.server.dto.models.Model;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -19,15 +19,13 @@ public interface MappingService {
 
     List<InputMapping> getMappingList();
 
-    InputMapping getMapping(String mappingName);
+    InputMapping getMapping(UUID mappingId);
 
-    InputMapping saveMapping(String mappingName, InputMapping mapping);
+    InputMapping saveMapping(UUID mappingId, InputMapping mapping);
 
-    String deleteMapping(String mappingName);
+    UUID deleteMapping(UUID mappingId);
 
-    RenameObject renameMapping(String oldName, String newName);
+    UUID copyMapping(UUID originalId);
 
-    InputMapping copyMapping(String originalName, String copyName);
-
-    List<Model> getMappedModelsList(String mappingName);
+    List<Model> getMappedModelsList(UUID mappingId);
 }

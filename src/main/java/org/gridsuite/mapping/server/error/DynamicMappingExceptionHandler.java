@@ -33,7 +33,7 @@ public class DynamicMappingExceptionHandler extends AbstractBusinessExceptionHan
 
     protected HttpStatus mapStatus(DynamicMappingErrorBusinessCode businessErrorCode) {
         return switch (businessErrorCode) {
-            case MAPPING_NAME_NOT_PROVIDED -> HttpStatus.BAD_REQUEST;
+            case MAPPING_NOT_PROVIDED -> HttpStatus.BAD_REQUEST;
         };
     }
 

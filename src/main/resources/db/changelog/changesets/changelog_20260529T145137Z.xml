@@ -1,0 +1,77 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!-- drop data -->
+    <changeSet author="phamquy (generated)" id="1780066311960-0">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="mappings" columnName="name"/>
+        </preConditions>
+        <comment>Clear any existing legacy data in mapping-related tables to allow the next step which drops the column name in primary key of mappings</comment>
+        <comment>This procedure does not clean anonymous filters which are persisted in filter-server, they should be deleted via admin-tools</comment>
+        <sql splitStatements="true">
+            DELETE FROM automaton_properties;
+            DELETE FROM automata;
+            DELETE FROM rules;
+            DELETE FROM mappings;
+        </sql>
+    </changeSet>
+    <!-- schema changes -->
+    <changeSet author="phamquy (generated)" id="1780066311960-11">
+        <dropForeignKeyConstraint baseTableName="AUTOMATA" constraintName="MAPPING_AUTOMATA_FK"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-12">
+        <dropForeignKeyConstraint baseTableName="RULES" constraintName="MAPPING_RULES_FK"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-3">
+        <addColumn tableName="automata">
+            <column name="mapping_id" type="UUID"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-4">
+        <addColumn tableName="mappings">
+            <column name="mapping_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-5">
+        <addColumn tableName="rules">
+            <column name="mapping_id" type="UUID"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-6">
+        <createIndex indexName="IX_mappingsPK" tableName="mappings" unique="true">
+            <column name="mapping_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-7">
+        <createIndex indexName="automaton_mapping_id_index" tableName="automata">
+            <column name="mapping_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-8">
+        <createIndex indexName="rule_mapping_id_index" tableName="rules">
+            <column name="mapping_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-1">
+        <dropPrimaryKey tableName="mappings"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-2">
+        <addPrimaryKey columnNames="mapping_id" constraintName="mappingsPK" tableName="mappings"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-9">
+        <addForeignKeyConstraint baseColumnNames="mapping_id" baseTableName="automata" constraintName="mapping_automata_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="mapping_id" referencedTableName="mappings" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-10">
+        <addForeignKeyConstraint baseColumnNames="mapping_id" baseTableName="rules" constraintName="mapping_rules_fk" deferrable="false" initiallyDeferred="false" referencedColumnNames="mapping_id" referencedTableName="mappings" validate="true"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-13">
+        <dropColumn columnName="MAPPING_NAME" tableName="AUTOMATA"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-14">
+        <dropColumn columnName="MAPPING_NAME" tableName="RULES"/>
+    </changeSet>
+    <changeSet author="phamquy (generated)" id="1780066311960-15">
+        <dropColumn columnName="NAME" tableName="mappings"/>
+    </changeSet>
+</databaseChangeLog>

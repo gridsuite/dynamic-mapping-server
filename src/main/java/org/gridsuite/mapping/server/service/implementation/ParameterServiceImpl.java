@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
 @Service
 public class ParameterServiceImpl implements ParameterService {
 
-    public static final String MODEL_NOT_FOUND_MSG = "No model has been found with this name: ";
-    public static final String MAPPING_NOT_FOUND_MSG = "No mapping has been found with this name: ";
+    public static final String MODEL_NOT_FOUND_MSG = "No model has been found with id: ";
+    public static final String MAPPING_NOT_FOUND_MSG = "No mapping has been found with id: ";
 
     private final ModelRepository modelRepository;
     private final MappingRepository mappingRepository;
@@ -53,8 +53,8 @@ public class ParameterServiceImpl implements ParameterService {
 
     @Override
     @Transactional(readOnly = true)
-    public ParameterFile exportParameters(String mappingName) {
-        Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingName);
+    public ParameterFile exportParameters(UUID mappingId) {
+        Optional<MappingEntity> foundMapping = mappingRepository.findById(mappingId);
         if (foundMapping.isPresent()) {
             String createdPar = null;
             if (foundMapping.get().isControlledParameters()) {
@@ -77,9 +77,9 @@ public class ParameterServiceImpl implements ParameterService {
                 // generate .par content
                 createdPar = Templater.setsToPar(sets);
             }
-            return new ParameterFile(mappingName, createdPar);
+            return new ParameterFile(mappingId, createdPar);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_MSG + mappingName);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_MSG + mappingId);
         }
     }
 
