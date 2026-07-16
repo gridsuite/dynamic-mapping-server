@@ -54,7 +54,7 @@ class WorkspaceControllerTest {
     // --- GET /workspaces/{userId} --- //
 
     @Test
-    void testGetOrCreateWorkspace_createsNewWhenNotExist() throws Exception {
+    void testGetOrCreateWorkspaceCreatesNewWhenNotExist() throws Exception {
         MvcResult result = mockMvc.perform(get(BASE_URL + "/{userId}", USER_ID))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -67,7 +67,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
-    void testGetOrCreateWorkspace_returnsExistingWorkspace() throws Exception {
+    void testGetOrCreateWorkspaceReturnsExistingWorkspace() throws Exception {
         // First call creates it
         mockMvc.perform(get(BASE_URL + "/{userId}", USER_ID))
             .andExpect(status().isOk());
@@ -86,7 +86,7 @@ class WorkspaceControllerTest {
     // --- PUT /workspaces/{workspaceId} --- //
 
     @Test
-    void testUpdateWorkspace_withMappingItems() throws Exception {
+    void testUpdateWorkspaceWithMappingItems() throws Exception {
         // Create the workspace first
         MvcResult createResult = mockMvc.perform(get(BASE_URL + "/{userId}", USER_ID))
             .andExpect(status().isOk())
@@ -117,7 +117,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
-    void testUpdateWorkspace_clearsMappingItems() throws Exception {
+    void testUpdateWorkspaceClearsMappingItems() throws Exception {
         // Create workspace and populate items
         MvcResult createResult = mockMvc.perform(get(BASE_URL + "/{userId}", USER_ID))
             .andExpect(status().isOk())
@@ -147,7 +147,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
-    void testUpdateWorkspace_updatesExistingMappingItem() throws Exception {
+    void testUpdateWorkspaceUpdatesExistingMappingItem() throws Exception {
         // Create workspace
         MvcResult createResult = mockMvc.perform(get(BASE_URL + "/{userId}", USER_ID))
             .andExpect(status().isOk())
@@ -205,7 +205,7 @@ class WorkspaceControllerTest {
     }
 
     @Test
-    void testDeleteWorkspace_alsoDeletesMappingItems() throws Exception {
+    void testDeleteWorkspaceAlsoDeletesMappingItems() throws Exception {
         // Create workspace with items
         MvcResult createResult = mockMvc.perform(get(BASE_URL + "/{userId}", USER_ID))
             .andExpect(status().isOk())
