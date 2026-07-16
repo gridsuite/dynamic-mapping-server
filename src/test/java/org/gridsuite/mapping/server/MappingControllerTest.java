@@ -118,7 +118,7 @@ public class MappingControllerTest {
         Assertions.assertThat(mapping).recursivelyEquals(inputMapping);
 
         // get all data
-        mvcResult = mvc.perform(get("/mappings")
+        mvcResult = mvc.perform(get("/mappings/all")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -157,7 +157,7 @@ public class MappingControllerTest {
                 .andExpect(status().isOk());
 
         // get to verify deletion
-        mvc.perform(get("/mappings")
+        mvc.perform(get("/mappings/all")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
@@ -188,7 +188,7 @@ public class MappingControllerTest {
         UUID copyId = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), UUID.class);
 
         // get all data
-        mvcResult = mvc.perform(get("/mappings")
+        mvcResult = mvc.perform(get("/mappings/all")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))

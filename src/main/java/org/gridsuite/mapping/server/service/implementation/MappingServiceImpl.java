@@ -82,8 +82,8 @@ public class MappingServiceImpl implements MappingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<InputMapping> getMappingList() {
-        List<MappingEntity> mappingEntities = mappingRepository.findAll();
+    public List<InputMapping> getMappingList(List<UUID> mappingIds) {
+        List<MappingEntity> mappingEntities = CollectionUtils.isEmpty(mappingIds) ? mappingRepository.findAll() : mappingRepository.findAllById(mappingIds);
 
         List<InputMapping> mappings = mappingEntities.stream().map(InputMapping::new).toList();
 
