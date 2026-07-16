@@ -9,6 +9,7 @@ package org.gridsuite.mapping.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.gridsuite.mapping.server.dto.workspace.MappingWorkspaceItem;
 import org.gridsuite.mapping.server.dto.workspace.Workspace;
+import org.gridsuite.mapping.server.repository.MappingWorkspaceItemRepository;
 import org.gridsuite.mapping.server.repository.WorkspaceRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -46,9 +47,12 @@ class WorkspaceControllerTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
+    private MappingWorkspaceItemRepository mappingWorkspaceItemRepository;
+
     @AfterEach
     void cleanUp() {
-        workspaceRepository.deleteAll();
+        workspaceRepository.deleteAll(); // must deleting in cascade in mappingWorkspaceItemRepository
     }
 
     // --- GET /workspaces/{userId} --- //
@@ -112,8 +116,8 @@ class WorkspaceControllerTest {
             .andReturn();
         Workspace fetchedWorkspace = objectMapper.readValue(getResult.getResponse().getContentAsString(), Workspace.class);
         assertThat(fetchedWorkspace.mappingWorkspaceItems()).hasSize(1);
-        assertThat(fetchedWorkspace.mappingWorkspaceItems().get(0).mappingId()).isEqualTo(mappingId);
-        assertThat(fetchedWorkspace.mappingWorkspaceItems().get(0).pinned()).isTrue();
+        assertThat(fetchedWorkspace.mappingWorkspaceItems().getFirst().mappingId()).isEqualTo(mappingId);
+        assertThat(fetchedWorkspace.mappingWorkspaceItems().getFirst().pinned()).isTrue();
     }
 
     @Test
@@ -168,7 +172,7 @@ class WorkspaceControllerTest {
             .andExpect(status().isOk())
             .andReturn();
         Workspace fetchedWorkspace = objectMapper.readValue(getResult.getResponse().getContentAsString(), Workspace.class);
-        UUID workspaceItemId = fetchedWorkspace.mappingWorkspaceItems().get(0).id();
+        UUID workspaceItemId = fetchedWorkspace.mappingWorkspaceItems().getFirst().id();
 
         // Update that item (set pinned = true)
         Workspace workspaceWithUpdatedItem = new Workspace(workspaceId, USER_ID,
@@ -183,8 +187,8 @@ class WorkspaceControllerTest {
             .andReturn();
         Workspace finalWorkspace = objectMapper.readValue(finalResult.getResponse().getContentAsString(), Workspace.class);
         assertThat(finalWorkspace.mappingWorkspaceItems()).hasSize(1);
-        assertThat(finalWorkspace.mappingWorkspaceItems().get(0).id()).isEqualTo(workspaceItemId);
-        assertThat(finalWorkspace.mappingWorkspaceItems().get(0).pinned()).isTrue();
+        assertThat(finalWorkspace.mappingWorkspaceItems().getFirst().id()).isEqualTo(workspaceItemId);
+        assertThat(finalWorkspace.mappingWorkspaceItems().getFirst().pinned()).isTrue();
     }
 
     // --- DELETE /workspaces/{workspaceId} ---
@@ -224,5 +228,6 @@ class WorkspaceControllerTest {
             .andExpect(status().isOk());
 
         assertThat(workspaceRepository.findById(workspaceId)).isEmpty();
+        assertThat(mappingWorkspaceItemRepository.findAll()).isEmpty();
     }
 }

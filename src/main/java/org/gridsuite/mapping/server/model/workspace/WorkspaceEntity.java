@@ -28,9 +28,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Entity
-@Table(name = "workspace", indexes = {
-    @Index(name = "idx_workspace_user_id", columnList = "user_id")
-})
+@Table(name = "workspace")
 public class WorkspaceEntity implements Serializable {
     @Id
     @Column(name = "id")
@@ -71,8 +69,10 @@ public class WorkspaceEntity implements Serializable {
         for (MappingWorkspaceItem mappingWorkspaceItem : mappingWorkspaceItemsList) {
             if (mappingWorkspaceItem.id() != null) {
                 MappingWorkspaceItemEntity existingEntity = mappingWorkspaceItemByIdMap.get(mappingWorkspaceItem.id());
-                existingEntity.update(mappingWorkspaceItem);
-                mergedMappingWorkspaceItems.add(existingEntity);
+                if (existingEntity != null) {
+                    existingEntity.update(mappingWorkspaceItem);
+                    mergedMappingWorkspaceItems.add(existingEntity);
+                }
             } else {
                 mergedMappingWorkspaceItems.add(new MappingWorkspaceItemEntity(mappingWorkspaceItem));
             }

@@ -28,7 +28,7 @@ public class WorkspaceController {
     private final WorkspaceService workspaceService;
 
     @GetMapping(value = "/{userId}")
-    @Operation(summary = "Get a workspace for a given user")
+    @Operation(summary = "Get or create an empty workspace for a given user")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Workspace for the user")})
     public ResponseEntity<Workspace> getWorkspace(@PathVariable("userId") String userId) {
         Workspace workspace = workspaceService.getOrCreateWorkspace(userId);

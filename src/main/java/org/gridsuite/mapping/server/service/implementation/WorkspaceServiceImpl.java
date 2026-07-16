@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server.service.implementation;
 
 import org.gridsuite.mapping.server.dto.workspace.Workspace;
+import org.gridsuite.mapping.server.error.DynamicMappingException;
 import org.gridsuite.mapping.server.model.workspace.WorkspaceEntity;
 import org.gridsuite.mapping.server.repository.WorkspaceRepository;
 import org.gridsuite.mapping.server.service.WorkspaceService;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.WORKSPACE_NOT_ALLOW_CHANGE_USER;
+import static org.gridsuite.mapping.server.error.DynamicMappingErrorBusinessCode.WORKSPACE_NOT_FOUND;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
@@ -43,7 +47,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Transactional
     @Override
     public void updateWorkspace(UUID workspaceId, Workspace workspace) {
-        WorkspaceEntity workspaceEntity = workspaceRepository.findById(workspaceId).orElseThrow(() -> new IllegalArgumentException("User workspace not found"));
+        WorkspaceEntity workspaceEntity = workspaceRepository.findById(workspaceId).orElseThrow(
+            () -> new DynamicMappingException(WORKSPACE_NOT_FOUND, "Workspace not found"));
+        if (workspace.userId() == null || !workspace.userId().equals(workspaceEntity.getUserId())) {
+            throw new DynamicMappingException(WORKSPACE_NOT_ALLOW_CHANGE_USER, "Changing user of an existing workspace is not allowed");
+        }
         workspaceEntity.update(workspace);
     }
 

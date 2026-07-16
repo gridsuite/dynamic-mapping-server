@@ -22,7 +22,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "mapping_workspace_item", indexes = {
-    @Index(name = "idx_mapping_workspace_item_mapping_id", columnList = "mapping_id")
+    @Index(name = "idx_mapping_workspace_item_workspace_id", columnList = "workspace_id")
 })
 public class MappingWorkspaceItemEntity {
     @Id
