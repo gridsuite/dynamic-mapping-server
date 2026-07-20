@@ -12,14 +12,12 @@ import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.repository.RuleRepository;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.gridsuite.mapping.server.utils.SetGroupType;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +32,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Mathieu Deharbe <mathieu.deharbe at rte-france.com>
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
-public class SupervisionControllerTest {
+class SupervisionControllerTest {
 
     @Autowired
     private RuleRepository ruleRepository;
@@ -52,8 +49,8 @@ public class SupervisionControllerTest {
     private final UUID filter1Uuid = UUID.randomUUID();
     private final UUID filter2Uuid = UUID.randomUUID();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         cleanDB();
         RuleEntity rule1 = new RuleEntity(UUID.randomUUID(), EquipmentType.LINE, "null", "setGroup", SetGroupType.FIXED, filter1Uuid, null);
         RuleEntity rule2 = new RuleEntity(UUID.randomUUID(), EquipmentType.LINE, "null", "setGroup", SetGroupType.FIXED, filter2Uuid, null);
@@ -67,7 +64,7 @@ public class SupervisionControllerTest {
 
     @Test
     @Transactional
-    public void testGetFiltersList() throws Exception {
+    void testGetFiltersList() throws Exception {
         MvcResult result = mvc.perform(get("/supervision/filters"))
                 .andExpect(status().isOk())
                 .andReturn();

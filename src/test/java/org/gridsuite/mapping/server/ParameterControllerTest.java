@@ -17,15 +17,13 @@ import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.gridsuite.mapping.server.utils.*;
 import org.gridsuite.mapping.server.utils.assertions.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,14 +39,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
-public class ParameterControllerTest {
-    public static final String RESOURCE_PATH_DELIMITER = "/";
-    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
-    public static final String MAPPING_FILE = "mapping_01.json";
+class ParameterControllerTest {
+    static final String RESOURCE_PATH_DELIMITER = "/";
+    static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
+    static final String MAPPING_FILE = "mapping_01.json";
     private final Map<UUID, ExpertFilter> filtersMockDB = new HashMap<>();
 
     @Autowired
@@ -75,8 +72,8 @@ public class ParameterControllerTest {
         return new ModelParameterDefinitionEntity(new ModelParameterDefinition(UUID.randomUUID(), name, type, null, null, null));
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         FilterClientMockUtils.mockAll(filtersMockDB, filterClient, objectMapper);
         cleanDB();
 
@@ -142,7 +139,7 @@ public class ParameterControllerTest {
 
     @Test
     @Transactional
-    public void exportParametersTest() throws Exception {
+    void exportParametersTest() throws Exception {
 
         String name = "test";
 
@@ -182,7 +179,7 @@ public class ParameterControllerTest {
 
     // Parameters tests
     @Test
-    public void parTest() throws Exception {
+    void parTest() throws Exception {
         String name = "test";
         String modelName = "LoadAlphaBeta";
         String groupName = "LAB";
