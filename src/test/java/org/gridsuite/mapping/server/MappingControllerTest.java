@@ -17,9 +17,8 @@ import org.gridsuite.mapping.server.repository.ModelRepository;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.gridsuite.mapping.server.utils.FilterClientMockUtils;
 import org.gridsuite.mapping.server.utils.assertions.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,15 +45,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
-public class MappingControllerTest {
-    public static final String RESOURCE_PATH_DELIMITER = "/";
-    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
-    public static final String MAPPING_FILE = "mapping_01.json";
-    public static final String MAPPING_FILE_NAME = "mapping_01";
+class MappingControllerTest {
+    static final String RESOURCE_PATH_DELIMITER = "/";
+    static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
+    static final String MAPPING_FILE = "mapping_01.json";
+    static final String MAPPING_FILE_NAME = "mapping_01";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MappingControllerTest.class);
 
@@ -87,14 +84,14 @@ public class MappingControllerTest {
         filtersMockDB.clear();
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         FilterClientMockUtils.mockAll(filtersMockDB, filterClient, objectMapper);
         cleanDB();
     }
 
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
 
@@ -165,7 +162,7 @@ public class MappingControllerTest {
     }
 
     @Test
-    public void testCopy() throws Exception {
+    void testCopy() throws Exception {
 
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);
@@ -204,7 +201,7 @@ public class MappingControllerTest {
 
     @Test
     @Transactional
-    public void testGetMappedModelsList() throws Exception {
+    void testGetMappedModelsList() throws Exception {
         // put LoadAlphaBetaModel model
         InputStream isLoadAlphaBetaModel = getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "model/load/loadAlphaBeta.json");
         String alphaBetaModelJson = new String(isLoadAlphaBetaModel.readAllBytes());
@@ -258,7 +255,7 @@ public class MappingControllerTest {
     }
 
     @Test
-    public void testExportMapping() throws Exception {
+    void testExportMapping() throws Exception {
         // --- Load the input mapping file ---
         String mappingPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "mapping" + RESOURCE_PATH_DELIMITER + MAPPING_FILE;
         InputMapping inputMapping = objectMapper.readValue(getClass().getResourceAsStream(mappingPath), InputMapping.class);

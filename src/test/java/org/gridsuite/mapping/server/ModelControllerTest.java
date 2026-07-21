@@ -21,9 +21,8 @@ import org.gridsuite.mapping.server.utils.ParameterOrigin;
 import org.gridsuite.mapping.server.utils.ParameterType;
 import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.gridsuite.mapping.server.utils.assertions.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,14 +47,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 @TestPropertySource(properties = {"ex-resources.automaton = src/test/resources/data/ex-automaton"})
-public class ModelControllerTest {
+class ModelControllerTest {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(ModelControllerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelControllerTest.class);
 
     @Autowired
     private ModelRepository modelRepository;
@@ -75,7 +72,7 @@ public class ModelControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    public void cleanDB() {
+    void cleanDB() {
         // delete from parent to child
         modelRepository.deleteAll();
         modelVariablesSetRepository.deleteAll();
@@ -87,8 +84,8 @@ public class ModelControllerTest {
         return new ModelParameterDefinitionEntity(new ModelParameterDefinition(UUID.randomUUID(), name, type, null, null, null));
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         cleanDB();
 
         // prepare token model
@@ -113,7 +110,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testGetAutomatonDefinitions() throws Exception {
+    void testGetAutomatonDefinitions() throws Exception {
         MvcResult mvcResult = mvc.perform(get("/models/automaton-definitions")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -132,8 +129,7 @@ public class ModelControllerTest {
 
     @Test
     @Transactional
-    public void test() throws Exception {
-
+    void test() throws Exception {
         String name = "setName";
         String modelName = "LoadAlphaBeta";
         String set = """
@@ -204,7 +200,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void definitionTest() throws Exception {
+    void definitionTest() throws Exception {
         String modelName = "LoadAlphaBeta";
 
         String expectedParamaterDefinitionsJson = """
@@ -259,7 +255,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void invalidTest() throws Exception {
+    void invalidTest() throws Exception {
 
         String name = "errorSet";
         String modelName = "LoadAlphaBeta";
@@ -297,7 +293,7 @@ public class ModelControllerTest {
 
     @Test
     @Transactional
-    public void getTest() throws Exception {
+    void getTest() throws Exception {
 
         // Prepare models
         ModelEntity loadModel = modelRepository.findByModelName("LoadAlphaBeta").get();
@@ -400,12 +396,12 @@ public class ModelControllerTest {
         assertThat(foundParameters).hasSize(2);
     }
 
-    public static String readFileAsString(String file) throws Exception {
+    static String readFileAsString(String file) throws Exception {
         return new String(Files.readAllBytes(Paths.get(file)));
     }
 
     @Test
-    public void testSaveLoadModelThenModifyParameterDefinitions() throws Exception {
+    void testSaveLoadModelThenModifyParameterDefinitions() throws Exception {
         String modelName = "LoadAlphaBeta";
         String newModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
         String newParameterDefinitionsJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta_parameter_definitions.json");
@@ -520,7 +516,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testSaveLoadModelThenModifyVariableDefinitions() throws Exception {
+    void testSaveLoadModelThenModifyVariableDefinitions() throws Exception {
 
         String modelName = "LoadAlphaBeta";
         String newModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
@@ -639,7 +635,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testSaveNewVariablesSetThenModifyVariableDefinitions() throws Exception {
+    void testSaveNewVariablesSetThenModifyVariableDefinitions() throws Exception {
         String newVariablesSetJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_generator2.json");
         String newVariableDefinitionsJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_generator2_variable_definitions.json");
 
@@ -723,7 +719,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testSaveNewVariablesSetsWhichShareVariableDefinitions() throws Exception {
+    void testSaveNewVariablesSetsWhichShareVariableDefinitions() throws Exception {
         String newVariablesSetJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_ThreeWindingsSynchronousGenerator.json");
         String newVariablesSet2Json = readFileAsString("src/test/resources/data/model/generator/variablesSet_FourWindingsSynchronousGenerator.json");
 
@@ -787,7 +783,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testSaveNewLoadModelsWhichShareParameterDefinitionsAndVariableDefinitions() throws Exception {
+    void testSaveNewLoadModelsWhichShareParameterDefinitionsAndVariableDefinitions() throws Exception {
         String newLoadAlphaBetaModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
         String newLoadPQModelJson = readFileAsString("src/test/resources/data/model/load/loadPQ.json");
 
@@ -861,7 +857,7 @@ public class ModelControllerTest {
 
     @Test
     @Transactional
-    public void testSaveGeneratorModel() throws Exception {
+    void testSaveGeneratorModel() throws Exception {
         String modelName = "GeneratorSynchronousThreeWindingsProportionalRegulations";
         String newModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
 
@@ -883,7 +879,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testSaveGeneratorModelThenModifyVariablesSets() throws Exception {
+    void testSaveGeneratorModelThenModifyVariablesSets() throws Exception {
         String newVariablesSetJson = readFileAsString("src/test/resources/data/model/generator/variablesSet_generator2.json");
         String newModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
 
@@ -1013,7 +1009,7 @@ public class ModelControllerTest {
 
     @Test
     @Transactional
-    public void deleteTest() throws Exception {
+    void deleteTest() throws Exception {
 
         String name = "setName";
         String modelName = "LoadAlphaBeta";
@@ -1110,7 +1106,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testDeleteLoadModelsWhichShareParameterDefinitionsAndVariableDefinitions() throws Exception {
+    void testDeleteLoadModelsWhichShareParameterDefinitionsAndVariableDefinitions() throws Exception {
 
         // These model share 4 parameter definitions and 3 variable definitions
         String newLoadAlphaBetaModelJson = readFileAsString("src/test/resources/data/model/load/loadAlphaBeta.json");
@@ -1180,7 +1176,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testDeleteGeneratorModelsWithVariableSets() throws Exception {
+    void testDeleteGeneratorModelsWithVariableSets() throws Exception {
         String newGeneratorModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
 
         cleanDB();
@@ -1217,7 +1213,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testDeleteGeneratorModelsWhichShareVariableSets() throws Exception {
+    void testDeleteGeneratorModelsWhichShareVariableSets() throws Exception {
         String newGeneratorThreeWindingsModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousThreeWindingsProportionalRegulations.json");
         String newGeneratorFourWindingsModelJson = readFileAsString("src/test/resources/data/model/generator/generatorSynchronousFourWindingsProportionalRegulations.json");
 
@@ -1281,7 +1277,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testDeleteGeneratorModelsWhichShareVariableDefinitionsBetweenDifferentVariableSets() throws Exception {
+    void testDeleteGeneratorModelsWhichShareVariableDefinitionsBetweenDifferentVariableSets() throws Exception {
         String newGeneratorPQModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPQ.json");
         String newGeneratorPVModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPV.json");
 
@@ -1339,7 +1335,7 @@ public class ModelControllerTest {
     }
 
     @Test
-    public void testDeleteAllGeneratorModelsWhichShareVariableDefinitionsBetweenDifferentVariableSets() throws Exception {
+    void testDeleteAllGeneratorModelsWhichShareVariableDefinitionsBetweenDifferentVariableSets() throws Exception {
         String newGeneratorPQModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPQ.json");
         String newGeneratorPVModelJson = readFileAsString("src/test/resources/data/model/generator/generatorPV.json");
 
