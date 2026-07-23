@@ -9,30 +9,27 @@ package org.gridsuite.mapping.server.service.client;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.gridsuite.mapping.server.MappingApplication;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextHierarchy({@ContextConfiguration(classes = {MappingApplication.class})})
 public abstract class AbstractWireMockRestClientTest {
 
-    public static final String ERROR_MESSAGE = "Something wrong in remote server";
-    public static final String ERROR_MESSAGE_JSON = """
+    protected static final String ERROR_MESSAGE = "Something wrong in remote server";
+    protected static final String ERROR_MESSAGE_JSON = """
             {"message": "%s"}
         """.formatted(ERROR_MESSAGE);
 
-    public final Logger getLogger() {
+    protected final Logger getLogger() {
         return LoggerFactory.getLogger(this.getClass());
     }
 
@@ -48,13 +45,13 @@ public abstract class AbstractWireMockRestClientTest {
         return wireMockServer.baseUrl();
     }
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    protected void setup() {
 
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    protected void tearDown() {
         try {
             wireMockServer.shutdown();
         } catch (Exception e) {

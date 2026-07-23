@@ -18,13 +18,11 @@ import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +35,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,9 +50,12 @@ import java.util.stream.Stream;
 
 import static org.gridsuite.mapping.server.MappingConstants.CASE_API_VERSION;
 import static org.gridsuite.mapping.server.MappingConstants.NETWORK_CONVERSION_API_VERSION;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -67,15 +67,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
-public class NetworkControllerTest {
+class NetworkControllerTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(NetworkControllerTest.class);
 
-    public static final String RESOURCE_PATH_DELIMITER = "/";
-    public static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
+    static final String RESOURCE_PATH_DELIMITER = "/";
+    static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -96,8 +95,8 @@ public class NetworkControllerTest {
     @MockitoBean
     private NetworkStoreService networkStoreService;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         networkRepository.deleteAll();
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
@@ -106,7 +105,7 @@ public class NetworkControllerTest {
     String networkConversionApiUri = "http://localhost:5003/";
 
     @Test
-    public void fileTest() throws Exception {
+    void fileTest() throws Exception {
         UUID caseUUID = UUID.randomUUID();
         UUID networkUUID = UUID.randomUUID();
         String caseFormat = "iidm";
@@ -145,12 +144,12 @@ public class NetworkControllerTest {
                             .formatted(networkUUID)));
 
         // Stop test at getNetworkValuesFromExistingNetwork
-        Mockito.doReturn(null).when(networkService).getNetworkValuesFromExistingNetwork(networkUUID);
+        doReturn(null).when(networkService).getNetworkValuesFromExistingNetwork(networkUUID);
         // Upload network
         mvc.perform(MockMvcRequestBuilders.multipart("/network/new").file(file))
                 .andExpect(status().isOk());
 
-        Mockito.verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
+        verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
 
         List<NetworkEntity> savedNetworks = networkRepository.findAll();
         assertEquals(1, savedNetworks.size());
@@ -170,7 +169,7 @@ public class NetworkControllerTest {
     }
 
     @Test
-    public void getTest() throws Exception {
+    void getTest() throws Exception {
         UUID id1 = UUID.randomUUID();
         String name1 = "test1.iidm";
         UUID id2 = UUID.randomUUID();
@@ -186,11 +185,11 @@ public class NetworkControllerTest {
     }
 
     @Test
-    public void idTest() throws Exception {
+    void idTest() throws Exception {
         UUID networkUUID = UUID.randomUUID();
 
         Network testNetwork = NetworkTest1Factory.create();
-        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
+        when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
 
         MvcResult mvcResult = mvc.perform(get("/network/" + networkUUID + "/values")
                         .contentType(APPLICATION_JSON))
@@ -211,20 +210,20 @@ public class NetworkControllerTest {
 
         assertEquals(objectMapper.readTree(expectNetworkValuesJson), objectMapper.readTree(resultNetworkValuesJson));
 
-        Mockito.verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
+        verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
     }
 
     @Test
-    public void unknownNetworkTest() throws Exception {
+    void unknownNetworkTest() throws Exception {
         UUID networkUUID = UUID.randomUUID();
 
-        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenThrow(new PowsyblException());
+        when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenThrow(new PowsyblException());
 
         mvc.perform(MockMvcRequestBuilders.get("/network/" + networkUUID + "/values")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        Mockito.verify(networkStoreService, times(1)).getNetwork(networkUUID, PreloadingStrategy.COLLECTION);
+        verify(networkStoreService, times(1)).getNetwork(networkUUID, PreloadingStrategy.COLLECTION);
 
     }
 
@@ -237,7 +236,7 @@ public class NetworkControllerTest {
     void ruleMatchingTest(Network testNetwork, String ruleToMatchFile, int ruleIndex, List<String> expectedMatchedIds) throws Exception {
         UUID networkUUID = UUID.randomUUID();
 
-        Mockito.when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
+        when(networkStoreService.getNetwork(networkUUID, PreloadingStrategy.COLLECTION)).thenReturn(testNetwork);
 
         String ruleToMatchPath = TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "network" + RESOURCE_PATH_DELIMITER + ruleToMatchFile;
         RuleToMatch ruleToMatch = objectMapper.readValue(getClass().getResourceAsStream(ruleToMatchPath), RuleToMatch.class);

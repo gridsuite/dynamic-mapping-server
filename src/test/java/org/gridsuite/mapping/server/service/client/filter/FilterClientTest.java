@@ -21,7 +21,8 @@ import org.gridsuite.filter.utils.expertfilter.FieldType;
 import org.gridsuite.filter.utils.expertfilter.OperatorType;
 import org.gridsuite.mapping.server.service.client.AbstractWireMockRestClientTest;
 import org.gridsuite.mapping.server.service.client.filter.impl.FilterClientImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -42,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-public class FilterClientTest extends AbstractWireMockRestClientTest {
+class FilterClientTest extends AbstractWireMockRestClientTest {
 
     private FilterClient filterClient;
 
@@ -79,7 +80,8 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Override
-    public void setup() {
+    @BeforeEach
+    protected void setup() {
         super.setup();
         filterClient = new FilterClientImpl(
                 // use new WireMockServer(FILTER_PORT) to test with local server if needed
@@ -94,7 +96,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testCreateFilters() throws JsonProcessingException {
+    void testCreateFilters() throws JsonProcessingException {
         // prepare filters to create
         List<ExpertFilter> filterList = createFilterList();
         Map<UUID, ExpertFilter> filtersToCreate = filterList.stream()
@@ -118,7 +120,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testCreateFiltersGivenException() throws JsonProcessingException {
+    void testCreateFiltersGivenException() throws JsonProcessingException {
         // prepare filters to create
         List<ExpertFilter> filterList = createFilterList();
         Map<UUID, ExpertFilter> filtersToCreate = filterList.stream()
@@ -161,7 +163,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testUpdateFiltersGivenException() throws JsonProcessingException {
+    void testUpdateFiltersGivenException() throws JsonProcessingException {
         // prepare filters to update
         List<ExpertFilter> filterList = createFilterList();
         Map<UUID, ExpertFilter> filtersToUpdate = filterList.stream()
@@ -182,7 +184,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testDuplicateFilters() throws JsonProcessingException {
+    void testDuplicateFilters() throws JsonProcessingException {
         // prepare filters to duplicate
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
@@ -205,7 +207,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testDuplicateFiltersGivenException() throws JsonProcessingException {
+    void testDuplicateFiltersGivenException() throws JsonProcessingException {
         // prepare filters to duplicate
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
@@ -224,7 +226,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testDeleteFilters() throws JsonProcessingException {
+    void testDeleteFilters() throws JsonProcessingException {
         // prepare filters to delete
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
@@ -239,7 +241,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testDeleteFiltersGivenException() throws JsonProcessingException {
+    void testDeleteFiltersGivenException() throws JsonProcessingException {
         // prepare filters to delete
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> sourceUuids = filterList.stream().map(ExpertFilter::getId).toList();
@@ -257,7 +259,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testGetFilters() throws JsonProcessingException {
+    void testGetFilters() throws JsonProcessingException {
         // prepare filters to get
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> uuids = filterList.stream().map(ExpertFilter::getId).toList();
@@ -281,7 +283,7 @@ public class FilterClientTest extends AbstractWireMockRestClientTest {
     }
 
     @Test
-    public void testGetFiltersGivenException() {
+    void testGetFiltersGivenException() {
         // prepare filters to get
         List<ExpertFilter> filterList = createFilterList();
         List<UUID> uuids = filterList.stream().map(ExpertFilter::getId).toList();

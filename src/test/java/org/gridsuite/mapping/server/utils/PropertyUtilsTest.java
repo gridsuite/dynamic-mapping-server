@@ -8,23 +8,20 @@
 package org.gridsuite.mapping.server.utils;
 
 import org.gridsuite.mapping.server.model.ModelVariableDefinitionEntity;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
-@RunWith(JUnit4.class)
-public class PropertyUtilsTest {
+class PropertyUtilsTest {
     @Test
-    public void testCopyNonNullProperties() {
+    void testCopyNonNullProperties() {
         // test with a ModelVariableDefinitionEntity
         ModelVariableDefinitionEntity variableDefinitionEntity = new ModelVariableDefinitionEntity(UUID.randomUUID(), "load_running_value", VariableType.DOUBLE, "KW", 100.0, null, null, new Date(),
                 new Date());
