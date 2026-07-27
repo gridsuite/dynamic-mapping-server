@@ -45,7 +45,7 @@ public class MappingController {
     }
 
     @GetMapping(value = "/all")
-    @Operation(summary = "Get mappings by for given ids")
+    @Operation(summary = "Get mappings for the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mappings")})
     public ResponseEntity<List<InputMapping>> getMappingList(@RequestParam(value = "ids", required = false) List<UUID> mappingIds) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappingList(mappingIds));
