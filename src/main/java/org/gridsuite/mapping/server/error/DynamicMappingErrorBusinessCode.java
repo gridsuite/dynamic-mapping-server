@@ -13,9 +13,7 @@ import com.powsybl.ws.commons.error.BusinessErrorCode;
  * @author Hugo Marcellin <hugo.marcelin at rte-france.com>
  */
 public enum DynamicMappingErrorBusinessCode implements BusinessErrorCode {
-    MAPPING_NOT_PROVIDED("dynamicMapping.mappingNotProvided"),
-    WORKSPACE_NOT_ALLOW_CHANGE_USER("dynamicMapping.workspaceNotAllowChangeUser"),
-    WORKSPACE_NOT_FOUND("dynamicMapping.workspaceNotFound");
+    MAPPING_NOT_PROVIDED("dynamicMapping.mappingNotProvided");
 
     private final String code;
 
