@@ -44,7 +44,7 @@ public class MappingController {
         this.exportMappingObjectMapper = exportMappingObjectMapper;
     }
 
-    @GetMapping(value = "/all")
+    @GetMapping(value = "")
     @Operation(summary = "Get mappings for the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mappings")})
     public ResponseEntity<List<InputMapping>> getMappingList(@RequestParam(value = "ids", required = false) List<UUID> mappingIds) {
