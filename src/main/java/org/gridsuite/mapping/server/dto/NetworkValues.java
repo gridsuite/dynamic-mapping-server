@@ -11,7 +11,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -20,6 +19,5 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NetworkValues {
-    private UUID networkId;
     private List<EquipmentValues> propertyValues;
 }
