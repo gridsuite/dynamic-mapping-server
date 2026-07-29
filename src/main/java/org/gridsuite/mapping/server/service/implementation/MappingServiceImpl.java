@@ -82,8 +82,19 @@ public class MappingServiceImpl implements MappingService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<InputMapping> getMappingList() {
-        List<MappingEntity> mappingEntities = mappingRepository.findAll();
+    public List<InputMapping> getMappingList(List<UUID> mappingIds) {
+        List<MappingEntity> mappingEntities;
+        if (CollectionUtils.isEmpty(mappingIds)) {
+            mappingEntities = mappingRepository.findAll();
+        } else {
+            // find and keep the same order as mappingIds
+            Map<UUID, MappingEntity> mappingEntityById = mappingRepository.findAllById(mappingIds)
+                    .stream().collect(Collectors.toMap(MappingEntity::getId, mappingEntity -> mappingEntity));
+            mappingEntities = mappingIds.stream()
+                    .map(mappingEntityById::get)
+                    .filter(Objects::nonNull)
+                    .toList();
+        }
 
         List<InputMapping> mappings = mappingEntities.stream().map(InputMapping::new).toList();
 

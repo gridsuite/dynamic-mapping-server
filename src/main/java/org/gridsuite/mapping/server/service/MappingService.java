@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 public interface MappingService {
 
-    List<InputMapping> getMappingList();
+    List<InputMapping> getMappingList(List<UUID> mappingIds);
 
     InputMapping getMapping(UUID mappingId);
 

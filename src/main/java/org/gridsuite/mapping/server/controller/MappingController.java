@@ -45,10 +45,10 @@ public class MappingController {
     }
 
     @GetMapping(value = "")
-    @Operation(summary = "Get all mappings")
+    @Operation(summary = "Get mappings for the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mappings")})
-    public ResponseEntity<List<InputMapping>> getMappingList() {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappingList());
+    public ResponseEntity<List<InputMapping>> getMappingList(@RequestParam(value = "ids", required = false) List<UUID> mappingIds) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappingList(mappingIds));
     }
 
     @GetMapping(value = "/{mappingId}")
