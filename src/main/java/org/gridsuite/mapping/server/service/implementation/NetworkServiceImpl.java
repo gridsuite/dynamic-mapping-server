@@ -110,7 +110,7 @@ public class NetworkServiceImpl implements NetworkService {
         EquipmentValues hdvcLinesEquipmentValues = getHvdcLinesEquipmentValues(network);
         equipmentValuesList.add(hdvcLinesEquipmentValues);
 
-        return new NetworkValues(networkUuid, equipmentValuesList);
+        return new NetworkValues(equipmentValuesList);
     }
 
     private void setPropertyMap(HashMap<String, Set<String>> propertyMap, String value, String propertyName) {

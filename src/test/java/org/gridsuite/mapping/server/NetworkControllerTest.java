@@ -52,10 +52,7 @@ import static org.gridsuite.mapping.server.MappingConstants.CASE_API_VERSION;
 import static org.gridsuite.mapping.server.MappingConstants.NETWORK_CONVERSION_API_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -202,7 +199,6 @@ class NetworkControllerTest {
 
         String networkValuesJson = new String(getClass().getResourceAsStream(TEST_DATA_DIR + RESOURCE_PATH_DELIMITER + "network/networkValues.json").readAllBytes());
         NetworkValues networkValues = objectMapper.readValue(networkValuesJson, NetworkValues.class);
-        networkValues.setNetworkId(networkUUID);
 
         String expectNetworkValuesJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(networkValues);
         LOGGER.info("expect network values = " + expectNetworkValuesJson);
