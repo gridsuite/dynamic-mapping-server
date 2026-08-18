@@ -15,10 +15,7 @@ import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.gridsuite.mapping.server.dto.NetworkValues;
 import org.gridsuite.mapping.server.dto.RuleToMatch;
-import org.gridsuite.mapping.server.model.NetworkEntity;
-import org.gridsuite.mapping.server.repository.NetworkRepository;
 import org.gridsuite.mapping.server.service.NetworkService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -28,35 +25,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.web.client.ExpectedCount;
-import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.gridsuite.mapping.server.MappingConstants.CASE_API_VERSION;
-import static org.gridsuite.mapping.server.MappingConstants.NETWORK_CONVERSION_API_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,112 +57,16 @@ class NetworkControllerTest {
     static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private NetworkRepository networkRepository;
-
-    @Autowired
     private MockMvc mvc;
-    private MockRestServiceServer mockServer;
 
     @MockitoSpyBean
     NetworkService networkService;
 
     @MockitoBean
     private NetworkStoreService networkStoreService;
-
-    @BeforeEach
-    void setUp() {
-        networkRepository.deleteAll();
-        mockServer = MockRestServiceServer.createServer(restTemplate);
-    }
-
-    String caseApiUri = "http://localhost:5000/";
-    String networkConversionApiUri = "http://localhost:5003/";
-
-    @Test
-    void fileTest() throws Exception {
-        UUID caseUUID = UUID.randomUUID();
-        UUID networkUUID = UUID.randomUUID();
-        String caseFormat = "iidm";
-        MockMultipartFile file = new MockMultipartFile(
-                "file",
-                "test.iidm",
-                MediaType.TEXT_PLAIN_VALUE,
-                "This is a network".getBytes());
-
-        // Mock call to case-server for import case
-        mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases")))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(APPLICATION_JSON)
-                        .body("\"" + caseUUID + "\""));
-
-        // Mock call to case-server for get case format
-        mockServer.expect(ExpectedCount.once(), requestTo(new URI(caseApiUri + CASE_API_VERSION + "/cases/" + caseUUID + "/format")))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(APPLICATION_JSON)
-                        .body(caseFormat));
-
-        // Mock call to case-server for conversion
-        mockServer.expect(ExpectedCount.once(), requestTo(new URI(networkConversionApiUri +
-            NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUUID + "&caseFormat=" + caseFormat + "&isAsyncRun=false")))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK)
-                        .contentType(APPLICATION_JSON)
-                        .body("""
-                                {
-                                    "networkId": "id",
-                                    "networkUuid": "%s"
-                                }
-                            """
-                            .formatted(networkUUID)));
-
-        // Stop test at getNetworkValuesFromExistingNetwork
-        doReturn(null).when(networkService).getNetworkValuesFromExistingNetwork(networkUUID);
-        // Upload network
-        mvc.perform(MockMvcRequestBuilders.multipart("/network/new").file(file))
-                .andExpect(status().isOk());
-
-        verify(networkService, times(1)).getNetworkValuesFromExistingNetwork(networkUUID);
-
-        List<NetworkEntity> savedNetworks = networkRepository.findAll();
-        assertEquals(1, savedNetworks.size());
-        NetworkEntity expectedEntity = new NetworkEntity(networkUUID, "test.iidm");
-        NetworkEntity actualEntity = savedNetworks.get(0);
-        assertTrue(expectedEntity.getNetworkId().equals(actualEntity.getNetworkId()) && expectedEntity.getNetworkName().equals(actualEntity.getNetworkName()));
-    }
-
-    private String network(UUID id, String name) {
-        return """
-                {
-                    "networkId": "%s",
-                    "networkName": "%s"
-                }
-            """
-            .formatted(id, name);
-    }
-
-    @Test
-    void getTest() throws Exception {
-        UUID id1 = UUID.randomUUID();
-        String name1 = "test1.iidm";
-        UUID id2 = UUID.randomUUID();
-        String name2 = "test1.iidm";
-        networkRepository.save(new NetworkEntity(id1, name1));
-        networkRepository.save(new NetworkEntity(id2, name2));
-
-        mvc.perform(get("/network/")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(content().json("[" + network(id1, name1) + ", " + network(id2, name2) + "]", true));
-    }
 
     @Test
     void idTest() throws Exception {

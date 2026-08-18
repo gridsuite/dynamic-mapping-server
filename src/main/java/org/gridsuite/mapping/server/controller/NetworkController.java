@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.gridsuite.mapping.server.dto.MatchedRule;
 import org.gridsuite.mapping.server.dto.NetworkValues;
-import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.service.implementation.NetworkServiceImpl;
@@ -21,9 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -46,23 +43,6 @@ public class NetworkController {
 
     public ResponseEntity<NetworkValues> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
-    }
-
-    @GetMapping(value = "/")
-    @Operation(summary = "Get all known networks names")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "List of the network names")})
-
-    public ResponseEntity<List<OutputNetwork>> getKnownNetworks() {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworks());
-    }
-
-    @PostMapping(value = "/new")
-    @Operation(summary = "Post a network and retrieve its values")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "List of property values of the network")})
-    public ResponseEntity<NetworkValues> getNetworkValues(@RequestPart("file") MultipartFile networkFile) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValues(networkFile));
     }
 
     @PostMapping(value = "/{networkUuid}/matches/rule")
