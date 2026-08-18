@@ -13,29 +13,22 @@ import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.gridsuite.filter.utils.FiltersUtils;
-import org.gridsuite.mapping.server.dto.*;
-import org.gridsuite.mapping.server.model.NetworkEntity;
-import org.gridsuite.mapping.server.repository.NetworkRepository;
+import org.gridsuite.mapping.server.dto.EquipmentValues;
+import org.gridsuite.mapping.server.dto.MatchedRule;
+import org.gridsuite.mapping.server.dto.NetworkValues;
+import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.service.NetworkService;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.io.Resource;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
 import static org.gridsuite.filter.utils.expertfilter.ExpertFilterUtils.getFieldValue;
 import static org.gridsuite.filter.utils.expertfilter.FieldType.*;
-import static org.gridsuite.mapping.server.MappingConstants.CASE_API_VERSION;
-import static org.gridsuite.mapping.server.MappingConstants.NETWORK_CONVERSION_API_VERSION;
 
 /**
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
@@ -44,25 +37,11 @@ import static org.gridsuite.mapping.server.MappingConstants.NETWORK_CONVERSION_A
 @ComponentScan(basePackageClasses = {NetworkStoreService.class})
 public class NetworkServiceImpl implements NetworkService {
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    private final String caseServerBaseUri;
-    private final String networkConversionServerBaseUri;
+    private final NetworkStoreService networkStoreService;
 
     @Autowired
-    private NetworkStoreService networkStoreService;
-
-    private final NetworkRepository networkRepository;
-
-    @Autowired
-    public NetworkServiceImpl(
-            @Value("${powsybl.services.case-server.base-uri:http://case-server/}") String caseServerBaseUri,
-            @Value("${powsybl.services.network-conversion-server.base-uri:http://network-conversion-server/}") String networkConversionServerBaseUri,
-            NetworkRepository networkRepository) {
-        this.caseServerBaseUri = caseServerBaseUri;
-        this.networkConversionServerBaseUri = networkConversionServerBaseUri;
-        this.networkRepository = networkRepository;
+    public NetworkServiceImpl(NetworkStoreService networkStoreService) {
+        this.networkStoreService = networkStoreService;
     }
 
     @Override
@@ -240,63 +219,6 @@ public class NetworkServiceImpl implements NetworkService {
         network.getHvdcLines().forEach(hvdcLine -> setPropertyMap(hvdcLineValuesMap, getFieldValue(ID, "", hvdcLine), ID.name()));
 
         return new EquipmentValues(EquipmentType.HVDC_LINE, hvdcLineValuesMap);
-    }
-
-    @Override
-    public NetworkValues getNetworkValues(MultipartFile multipartFile) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        Resource fileResource = multipartFile.getResource();
-
-        LinkedMultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
-        parts.add("file", fileResource);
-
-        ContentDisposition contentDisposition = ContentDisposition
-                .builder("form-data")
-                .name("file")
-                .filename("network.iidm")
-                .build();
-        parts.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
-
-        // upload case
-        ResponseEntity<UUID> response = restTemplate.exchange(
-                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases",
-                HttpMethod.POST,
-                requestEntity,
-                UUID.class
-        );
-
-        if (response.getBody() == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        }
-
-        UUID caseUuid = response.getBody();
-
-        // get case format after uploaded
-        String caseFormat = restTemplate.getForEntity(
-                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/" + caseUuid + "/format",
-                String.class
-        ).getBody();
-
-        // do conversion
-        String url = networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid + "&caseFormat=" + caseFormat + "&isAsyncRun=false";
-        NetworkIdentification networkIdentification = restTemplate.postForEntity(url, Collections.emptyMap(), NetworkIdentification.class).getBody();
-        if (networkIdentification == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
-        }
-
-        networkRepository.save(new NetworkEntity(networkIdentification.getNetworkUuid(), multipartFile.getOriginalFilename()));
-
-        return getNetworkValuesFromExistingNetwork(networkIdentification.getNetworkUuid());
-    }
-
-    @Override
-    public List<OutputNetwork> getNetworks() {
-        return networkRepository.findAll().stream()
-                .map(networkEntity -> new OutputNetwork(networkEntity.getNetworkId(), networkEntity.getNetworkName()))
-                .toList();
     }
 
     private List<String> matchNetworkToRule(Network network, RuleToMatch rule) {

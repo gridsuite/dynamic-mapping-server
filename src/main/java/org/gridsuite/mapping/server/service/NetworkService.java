@@ -9,11 +9,8 @@ package org.gridsuite.mapping.server.service;
 import com.powsybl.iidm.network.Network;
 import org.gridsuite.mapping.server.dto.MatchedRule;
 import org.gridsuite.mapping.server.dto.NetworkValues;
-import org.gridsuite.mapping.server.dto.OutputNetwork;
 import org.gridsuite.mapping.server.dto.RuleToMatch;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -22,10 +19,6 @@ import java.util.UUID;
 public interface NetworkService {
 
     NetworkValues getNetworkValuesFromExistingNetwork(UUID networkUuid);
-
-    NetworkValues getNetworkValues(MultipartFile file);
-
-    List<OutputNetwork> getNetworks();
 
     Network getNetwork(UUID networkUuid);
 
