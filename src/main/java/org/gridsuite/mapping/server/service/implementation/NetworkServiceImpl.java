@@ -37,7 +37,7 @@ import static org.gridsuite.filter.utils.expertfilter.FieldType.*;
 @ComponentScan(basePackageClasses = {NetworkStoreService.class})
 public class NetworkServiceImpl implements NetworkService {
 
-    final private NetworkStoreService networkStoreService;
+    private final NetworkStoreService networkStoreService;
 
     @Autowired
     public NetworkServiceImpl(NetworkStoreService networkStoreService) {
