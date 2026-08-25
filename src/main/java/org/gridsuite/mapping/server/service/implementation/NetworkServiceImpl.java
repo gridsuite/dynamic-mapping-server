@@ -26,7 +26,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -45,7 +45,7 @@ import static org.gridsuite.mapping.server.MappingConstants.NETWORK_CONVERSION_A
 public class NetworkServiceImpl implements NetworkService {
 
     @Autowired
-    private RestTemplate restTemplate;
+    private RestClient restClient;
 
     private final String caseServerBaseUri;
     private final String networkConversionServerBaseUri;
@@ -261,12 +261,12 @@ public class NetworkServiceImpl implements NetworkService {
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
         // upload case
-        ResponseEntity<UUID> response = restTemplate.exchange(
-                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases",
-                HttpMethod.POST,
-                requestEntity,
-                UUID.class
-        );
+        ResponseEntity<UUID> response = restClient.post()
+                .uri(caseServerBaseUri + "/" + CASE_API_VERSION + "/cases")
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(requestEntity.getBody())
+                .retrieve()
+                .toEntity(UUID.class);
 
         if (response.getBody() == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
@@ -275,14 +275,20 @@ public class NetworkServiceImpl implements NetworkService {
         UUID caseUuid = response.getBody();
 
         // get case format after uploaded
-        String caseFormat = restTemplate.getForEntity(
-                caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/" + caseUuid + "/format",
-                String.class
-        ).getBody();
+        String caseFormat = restClient.get()
+                .uri(caseServerBaseUri + "/" + CASE_API_VERSION + "/cases/" + caseUuid + "/format")
+                .retrieve()
+                .toEntity(String.class)
+                .getBody();
 
         // do conversion
         String url = networkConversionServerBaseUri + "/" + NETWORK_CONVERSION_API_VERSION + "/networks?caseUuid=" + caseUuid + "&caseFormat=" + caseFormat + "&isAsyncRun=false";
-        NetworkIdentification networkIdentification = restTemplate.postForEntity(url, Collections.emptyMap(), NetworkIdentification.class).getBody();
+        NetworkIdentification networkIdentification = restClient.post()
+                .uri(url)
+                .body(Collections.emptyMap())
+                .retrieve()
+                .toEntity(NetworkIdentification.class)
+                .getBody();
         if (networkIdentification == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST);
         }

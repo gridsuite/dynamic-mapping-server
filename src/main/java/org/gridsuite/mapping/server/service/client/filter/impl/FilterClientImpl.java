@@ -19,7 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Collections;
@@ -36,8 +36,9 @@ import static org.gridsuite.mapping.server.service.client.utils.UrlUtils.buildEn
 public class FilterClientImpl extends AbstractRestClient implements FilterClient {
 
     @Autowired
-    public FilterClientImpl(@Value("${gridsuite.services.filter-server.base-uri:http://filter-server/}") String baseUri, RestTemplate restTemplate, ObjectMapper objectMapper) {
-        super(baseUri, restTemplate, objectMapper);
+    public FilterClientImpl(@Value("${gridsuite.services.filter-server.base-uri:http://filter-server/}") String baseUri,
+                            RestClient restClient, ObjectMapper objectMapper) {
+        super(baseUri, restClient, objectMapper);
     }
 
     private String getEndPointUrl(String endpoint) {
@@ -56,12 +57,11 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
         uriComponentsBuilder.queryParam("ids", filterUuids);
 
         // call filter server Rest API
-        return getRestTemplate().exchange(
-                uriComponentsBuilder.build().toUriString(),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<ExpertFilter>>() {
-                }).getBody();
+        return getRestClient().get()
+                .uri(uriComponentsBuilder.build().toUriString())
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ExpertFilter>>() {
+                });
     }
 
     @Override
@@ -80,12 +80,13 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
         HttpEntity<Map<UUID, ExpertFilter>> httpEntity = new HttpEntity<>(filtersToCreateMap, headers);
 
         // call filter server Rest API
-        return getRestTemplate().exchange(
-                uriComponentsBuilder.build().toUriString(),
-                HttpMethod.POST,
-                httpEntity,
-                new ParameterizedTypeReference<List<ExpertFilter>>() {
-                }).getBody();
+        return getRestClient().post()
+                .uri(uriComponentsBuilder.build().toUriString())
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(httpEntity.getBody())
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ExpertFilter>>() {
+                });
 
     }
 
@@ -105,12 +106,13 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
         HttpEntity<Map<UUID, ExpertFilter>> httpEntity = new HttpEntity<>(filtersToUpdateMap, headers);
 
         // call filter server Rest API
-        return getRestTemplate().exchange(
-                uriComponentsBuilder.build().toUriString(),
-                HttpMethod.PUT,
-                httpEntity,
-                new ParameterizedTypeReference<List<ExpertFilter>>() {
-                }).getBody();
+        return getRestClient().put()
+                .uri(uriComponentsBuilder.build().toUriString())
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(httpEntity.getBody())
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ExpertFilter>>() {
+                });
 
     }
 
@@ -130,12 +132,13 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
         HttpEntity<List<UUID>> httpEntity = new HttpEntity<>(filterUuids, headers);
 
         // call filter server Rest API
-        return getRestTemplate().exchange(
-                uriComponentsBuilder.build().toUriString(),
-                HttpMethod.POST,
-                httpEntity,
-                new ParameterizedTypeReference<Map<UUID, UUID>>() {
-                }).getBody();
+        return getRestClient().post()
+                .uri(uriComponentsBuilder.build().toUriString())
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(httpEntity.getBody())
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<UUID, UUID>>() {
+                });
 
     }
 
@@ -155,11 +158,12 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
         HttpEntity<List<UUID>> httpEntity = new HttpEntity<>(filterUuids, headers);
 
         // call filter server Rest API
-        getRestTemplate().exchange(
-                uriComponentsBuilder.build().toUriString(),
-                HttpMethod.DELETE,
-                httpEntity,
-                Void.class);
+        getRestClient().method(HttpMethod.DELETE)
+                .uri(uriComponentsBuilder.build().toUriString())
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(httpEntity.getBody())
+                .retrieve()
+                .toBodilessEntity();
 
     }
 }
