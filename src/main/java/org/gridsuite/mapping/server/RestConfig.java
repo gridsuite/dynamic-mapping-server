@@ -13,12 +13,11 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.util.List;
 import java.util.Set;
@@ -33,8 +32,8 @@ public class RestConfig {
     private static final Set<String> MAPPING_EXPORT_EXCLUDED_FIELDS = Set.of("id", "filterDirty", "modificationDate");
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-        return restTemplateBuilder.build();
+    public RestClient restClient(RestClient.Builder restClientBuilder) {
+        return restClientBuilder.build();
     }
 
     @Bean

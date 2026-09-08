@@ -17,7 +17,7 @@ import org.gridsuite.mapping.server.dto.NetworkValues;
 import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.model.NetworkEntity;
 import org.gridsuite.mapping.server.repository.NetworkRepository;
-import org.gridsuite.mapping.server.service.NetworkService;
+import org.gridsuite.mapping.server.service.implementation.NetworkServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,12 +35,13 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.net.URI;
 import java.util.List;
@@ -74,7 +75,7 @@ class NetworkControllerTest {
     static final String TEST_DATA_DIR = RESOURCE_PATH_DELIMITER + "data";
 
     @Autowired
-    private RestTemplate restTemplate;
+    private RestClient.Builder restClientBuilder;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -87,7 +88,7 @@ class NetworkControllerTest {
     private MockRestServiceServer mockServer;
 
     @MockitoSpyBean
-    NetworkService networkService;
+    NetworkServiceImpl networkService;
 
     @MockitoBean
     private NetworkStoreService networkStoreService;
@@ -95,7 +96,8 @@ class NetworkControllerTest {
     @BeforeEach
     void setUp() {
         networkRepository.deleteAll();
-        mockServer = MockRestServiceServer.createServer(restTemplate);
+        mockServer = MockRestServiceServer.bindTo(restClientBuilder).build();
+        ReflectionTestUtils.setField(networkService, "restClient", restClientBuilder.build());
     }
 
     String caseApiUri = "http://localhost:5000/";
