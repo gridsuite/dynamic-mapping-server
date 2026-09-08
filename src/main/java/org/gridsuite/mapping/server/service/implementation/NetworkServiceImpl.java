@@ -258,13 +258,12 @@ public class NetworkServiceImpl implements NetworkService {
                 .filename("network.iidm")
                 .build();
         parts.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(parts, headers);
 
         // upload case
         ResponseEntity<UUID> response = restClient.post()
                 .uri(caseServerBaseUri + "/" + CASE_API_VERSION + "/cases")
                 .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .body(requestEntity.getBody())
+                .body(parts)
                 .retrieve()
                 .toEntity(UUID.class);
 
