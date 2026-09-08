@@ -100,7 +100,6 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-
         // call filter server Rest API
         return getRestClient().put()
                 .uri(uriComponentsBuilder.build().toUriString())
