@@ -149,6 +149,22 @@ class MappingControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
+        // Update only attached study uuid
+        UUID studyUuid = UUID.randomUUID();
+        mvc.perform(patch("/mappings/" + mappingId + "/study")
+                        .content(objectMapper.writeValueAsString(studyUuid))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        // check updated study uuid => get updated mapping to check
+        mvcResult = mvc.perform(get("/mappings/" + mappingId)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+        mapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        assertThat(mapping.getId()).isEqualTo(mappingId);
+        assertThat(mapping.getStudyUuid()).isEqualTo(studyUuid);
+
         // delete data
         mvc.perform(delete("/mappings/" + mappingId))
                 .andExpect(status().isOk());
