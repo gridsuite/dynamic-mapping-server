@@ -49,6 +49,7 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<UUID
         UUID newID = UUID.randomUUID();
         this.mappingId = newID;
         this.controlledParameters = mappingToCopy.isControlledParameters();
+        this.studyUuid = mappingToCopy.getStudyUuid();
         this.rules = mappingToCopy.getRules().stream().map(ruleEntity -> new RuleEntity(this, ruleEntity)).collect(Collectors.toList());
         this.automata = mappingToCopy.getAutomata().stream().map(automatonEntity -> new AutomatonEntity(this, automatonEntity)).collect(Collectors.toList());
     }
