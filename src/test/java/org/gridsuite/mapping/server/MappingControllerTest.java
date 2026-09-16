@@ -165,6 +165,13 @@ class MappingControllerTest {
         assertThat(mapping.getId()).isEqualTo(mappingId);
         assertThat(mapping.getStudyUuid()).isEqualTo(studyUuid);
 
+        // Update only attached study uuid but with wrong mapping uuid
+        UUID wrongMappingId = UUID.randomUUID();
+        mvc.perform(patch("/mappings/" + wrongMappingId + "/study")
+                        .content(objectMapper.writeValueAsString(studyUuid))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
         // delete data
         mvc.perform(delete("/mappings/" + mappingId))
                 .andExpect(status().isOk());
