@@ -187,7 +187,6 @@ class MappingControllerTest {
         assertThat(mapping.getId()).isEqualTo(mappingId);
         assertThat(mapping.getStudyUuid()).isNull();
 
-
         // delete data
         mvc.perform(delete("/mappings/" + mappingId))
                 .andExpect(status().isOk());
