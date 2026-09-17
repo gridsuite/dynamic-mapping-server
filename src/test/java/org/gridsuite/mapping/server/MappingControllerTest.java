@@ -151,7 +151,7 @@ class MappingControllerTest {
 
         // Update only attached study uuid
         UUID studyUuid = UUID.randomUUID();
-        mvc.perform(patch("/mappings/" + mappingId + "/study")
+        mvc.perform(put("/mappings/" + mappingId + "/study")
                         .content(objectMapper.writeValueAsString(studyUuid))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -167,10 +167,26 @@ class MappingControllerTest {
 
         // Update only attached study uuid but with wrong mapping uuid
         UUID wrongMappingId = UUID.randomUUID();
-        mvc.perform(patch("/mappings/" + wrongMappingId + "/study")
+        mvc.perform(put("/mappings/" + wrongMappingId + "/study")
                         .content(objectMapper.writeValueAsString(studyUuid))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+
+        // reset attached study uuid
+        mvc.perform(put("/mappings/" + mappingId + "/study")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        // check whether study uuid is null => get updated mapping to check
+        mvcResult = mvc.perform(get("/mappings/" + mappingId)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON))
+                .andReturn();
+        mapping = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), InputMapping.class);
+        assertThat(mapping.getId()).isEqualTo(mappingId);
+        assertThat(mapping.getStudyUuid()).isNull();
+
 
         // delete data
         mvc.perform(delete("/mappings/" + mappingId))
