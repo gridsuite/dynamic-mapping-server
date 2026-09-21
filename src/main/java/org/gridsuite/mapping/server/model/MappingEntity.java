@@ -8,6 +8,7 @@ package org.gridsuite.mapping.server.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,6 +37,9 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<UUID
     @Column(name = "control_parameters", nullable = false)
     private boolean controlledParameters;
 
+    @Column(name = "study_uuid")
+    private UUID studyUuid;
+
     @Override
     public UUID getId() {
         return mappingId;
@@ -45,6 +49,7 @@ public class MappingEntity extends AbstractManuallyAssignedIdentifierEntity<UUID
         UUID newID = UUID.randomUUID();
         this.mappingId = newID;
         this.controlledParameters = mappingToCopy.isControlledParameters();
+        this.studyUuid = mappingToCopy.getStudyUuid();
         this.rules = mappingToCopy.getRules().stream().map(ruleEntity -> new RuleEntity(this, ruleEntity)).collect(Collectors.toList());
         this.automata = mappingToCopy.getAutomata().stream().map(automatonEntity -> new AutomatonEntity(this, automatonEntity)).collect(Collectors.toList());
     }

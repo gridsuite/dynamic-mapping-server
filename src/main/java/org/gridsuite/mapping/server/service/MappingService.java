@@ -28,4 +28,6 @@ public interface MappingService {
     UUID copyMapping(UUID originalId);
 
     List<Model> getMappedModelsList(UUID mappingId);
+
+    void updateStudy(UUID mappingId, UUID studyUuid);
 }
