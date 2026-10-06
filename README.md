@@ -13,7 +13,7 @@ It provides the following capabilities:
 - **Manage mappings**: create, read, update, delete, duplicate and export mappings, i.e. sets of rules associating network equipment (identified by property-based filters) with dynamic **models**.
 - **Manage models**: create, read and delete dynamic models along with their **parameter definitions**, **variable definitions**, **variable sets** and **parameter sets** (grouped by parameter set groups).
 - **Manage parameters**: export parameter sets used by the models of a mapping into the `*.par` format expected by dynamic simulation tools.
-- **Match rules against a network**: given a network (from an existing case or an uploaded file), resolve rule/filter criteria to the actual equipment ids they match, and expose the available property values of the network.
+- **Match rules against a network**: given a network (from an existing case in an attached study), resolve rule/filter criteria to the actual equipment ids they match, and expose the available property values of the network.
 - Expose **automaton definitions** used to describe dynamic automata (e.g. protections, controllers) associated with models.
 
 A **rule** is the core building block of a mapping. It answers the question: *"for equipment of a given type matching a given filter, which dynamic model and parameter set should be applied?"* Each rule combines:
