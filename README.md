@@ -84,7 +84,7 @@ The REST API is exposed under the following resource groups:
 |---|---|
 | `/mappings` | CRUD, duplication and JSON export of mappings, and listing of models used in a mapping. |
 | `/models` | CRUD on models, parameter definitions, variable definitions, variable sets and parameter set groups. |
-| `/network` | Load and inspect networks (existing case or uploaded file), and resolve rules to matched equipment ids. |
+| `/network` | Load and inspect networks, and resolve rules to matched equipment ids. |
 | `/parameters` | Export parameter sets used by a mapping's models into `*.par` format. |
 | `/supervision` | Admin-only endpoints (e.g. list filter uuids referenced by the mapping server). |
 
