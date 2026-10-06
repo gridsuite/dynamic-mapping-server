@@ -56,8 +56,6 @@ Please read [liquibase usage](https://github.com/powsybl/powsybl-parent/#liquiba
 ```text
 ┌──────────────────────────┐
 │  dynamic-mapping-server  │──► network-store-server            (read network topology/properties)
-│                          │──► case-server                     (retrieve cases for uploaded networks)
-│                          │──► network-conversion-server       (import networks from uploaded files)
 │                          │──► filter-server                   (resolve equipment filters used by mapping rules)
 └──────────────────────────┘
 ```
