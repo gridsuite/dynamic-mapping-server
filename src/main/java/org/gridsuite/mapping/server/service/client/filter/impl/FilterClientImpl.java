@@ -52,7 +52,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
 
         String endPointUrl = getEndPointUrl(FILTERS_GET_ENDPOINT);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(endPointUrl);
         uriComponentsBuilder.queryParam("ids", filterUuids);
 
         // call filter server Rest API
@@ -71,7 +71,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
 
         String endPointUrl = getEndPointUrl(FILTERS_CREATE_IN_BATCH_ENDPOINT);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(endPointUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -95,7 +95,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
 
         String endPointUrl = getEndPointUrl(FilterClient.FILTERS_UPDATE_IN_BATCH_ENDPOINT);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(endPointUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -119,7 +119,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
 
         String endPointUrl = getEndPointUrl(FILTERS_DUPLICATE_IN_BATCH_ENDPOINT);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(endPointUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -143,7 +143,7 @@ public class FilterClientImpl extends AbstractRestClient implements FilterClient
 
         String endPointUrl = getEndPointUrl(FILTERS_DELETE_IN_BATCH_ENDPOINT);
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(endPointUrl);
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(endPointUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

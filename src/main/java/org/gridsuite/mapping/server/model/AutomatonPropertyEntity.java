@@ -45,8 +45,7 @@ public class AutomatonPropertyEntity implements Serializable {
     private PropertyType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "automaton_id", foreignKey = @ForeignKey(name = "automata_property_fk"))
-    @MapsId("automatonId")
+    @JoinColumn(name = "automaton_id", foreignKey = @ForeignKey(name = "automata_property_fk"), insertable = false, updatable = false)
     private AutomatonEntity automaton;
 
     public AutomatonPropertyEntity(UUID automatonId, AutomatonPropertyEntity automatonPropertyEntity, AutomatonEntity automaton) {
