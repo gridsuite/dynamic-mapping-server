@@ -38,6 +38,9 @@ public class InputMapping {
     @Schema(description = "Mapping should control its parameters")
     private boolean controlledParameters;
 
+    @Schema(description = "Study attached to mapping")
+    private UUID studyUuid;
+
     public MappingEntity convertMappingToEntity() {
         MappingEntity convertedMapping = new MappingEntity();
         if (this.id != null) {
@@ -46,7 +49,10 @@ public class InputMapping {
             UUID createdId = UUID.randomUUID();
             convertedMapping.setMappingId(createdId);
         }
+
         convertedMapping.setControlledParameters(controlledParameters);
+        convertedMapping.setStudyUuid(studyUuid);
+
         convertedMapping.setRules(rules.stream().map(rule -> rule.convertRuleToEntity(convertedMapping)).collect(Collectors.toList()));
         convertedMapping.setAutomata(automata.stream().map(automaton -> new AutomatonEntity(convertedMapping, automaton)).collect(Collectors.toList()));
         return convertedMapping;
@@ -55,6 +61,7 @@ public class InputMapping {
     public InputMapping(MappingEntity mappingEntity) {
         id = mappingEntity.getMappingId();
         controlledParameters = mappingEntity.isControlledParameters();
+        studyUuid = mappingEntity.getStudyUuid();
         rules = mappingEntity.getRules().stream().map(Rule::new).collect(Collectors.toList());
         automata = mappingEntity.getAutomata().stream().map(Automaton::new).collect(Collectors.toList());
     }

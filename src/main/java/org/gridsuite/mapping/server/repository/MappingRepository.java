@@ -8,7 +8,11 @@ package org.gridsuite.mapping.server.repository;
 
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.UUID;
 
 /**
@@ -16,4 +20,8 @@ import java.util.UUID;
  */
 @Repository
 public interface MappingRepository extends JpaRepository<MappingEntity, UUID> {
+
+    @Modifying
+    @Query("UPDATE MappingEntity m SET m.studyUuid = :studyUuid WHERE m.mappingId = :mappingId")
+    int updateStudyUuid(@Param("mappingId") UUID mappingId, @Param("studyUuid") UUID studyUuid);
 }

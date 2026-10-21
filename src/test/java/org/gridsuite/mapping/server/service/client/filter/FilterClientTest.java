@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ class FilterClientTest extends AbstractWireMockRestClientTest {
     private FilterClient filterClient;
 
     @Autowired
-    RestTemplate restTemplate;
+    RestClient restClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -86,7 +86,7 @@ class FilterClientTest extends AbstractWireMockRestClientTest {
         filterClient = new FilterClientImpl(
                 // use new WireMockServer(FILTER_PORT) to test with local server if needed
                 initMockWebServer(new WireMockServer(wireMockConfig().dynamicPort())),
-                restTemplate,
+                restClient,
                 objectMapper);
     }
 

@@ -264,5 +264,14 @@ public class MappingServiceImpl implements MappingService {
                 .map(Model::new).toList();
     }
 
+    @Transactional
+    @Override
+    public void updateStudy(UUID mappingId, UUID studyUuid) {
+        int updatedCount = mappingRepository.updateStudyUuid(mappingId, studyUuid);
+        if (updatedCount == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, MAPPING_NOT_FOUND_ERROR_MESSAGE + mappingId);
+        }
+    }
+
 }
 

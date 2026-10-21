@@ -116,4 +116,14 @@ public class MappingController {
         return ResponseEntity.ok().body(mappingService.copyMapping(originalId));
     }
 
+    @PutMapping(value = "/{mappingId}/study")
+    @Operation(summary = "Update the attached study of a mapping")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Attached study updated"),
+        @ApiResponse(responseCode = "404", description = "Mapping not found")
+    })
+    public ResponseEntity<Void> updateStudy(@PathVariable("mappingId") UUID mappingId, @RequestBody(required = false) UUID studyUuid) {
+        mappingService.updateStudy(mappingId, studyUuid);
+        return ResponseEntity.ok().build();
+    }
 }
