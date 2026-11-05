@@ -39,6 +39,8 @@
         <maven.jib.version>3.5.1</maven.jib.version>
         <jib.from.image>powsybl/java:4.0.0</jib.from.image>
         <gridsuite-dependencies.version>51.1.0</gridsuite-dependencies.version>
+        <!-- FIXME: to be removed at next gridsuite-dependencies upgrade  -->
+        <gridsuite-filter.version>1.34.0</gridsuite-filter.version>
         <string-template.version>4.3.1</string-template.version>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
         <sonar.organization>gridsuite</sonar.organization>
@@ -74,6 +76,12 @@
     <dependencyManagement>
         <dependencies>
             <!-- overrides of imports -->
+            <!-- FIXME: to be removed at next gridsuite-dependencies upgrade  -->
+            <dependency>
+                <groupId>org.gridsuite</groupId>
+                <artifactId>gridsuite-filter</artifactId>
+                <version>${gridsuite-filter.version}</version>
+            </dependency>
 
             <!-- imports -->
             <dependency>
