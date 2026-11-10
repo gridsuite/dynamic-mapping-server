@@ -7,7 +7,7 @@
 package org.gridsuite.mapping.server.service.implementation;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.Rule;
 import org.gridsuite.mapping.server.dto.models.Model;
@@ -274,4 +274,3 @@ public class MappingServiceImpl implements MappingService {
     }
 
 }
-

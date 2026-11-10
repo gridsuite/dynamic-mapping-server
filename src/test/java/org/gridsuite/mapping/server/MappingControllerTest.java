@@ -9,7 +9,7 @@ package org.gridsuite.mapping.server;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.repository.MappingRepository;
