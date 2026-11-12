@@ -8,7 +8,7 @@ package org.gridsuite.mapping.server.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.utils.EquipmentType;
 
 /**
@@ -26,4 +26,3 @@ public class RuleToMatch {
     @Schema(description = "Filter")
     private ExpertFilter filter;
 }
-

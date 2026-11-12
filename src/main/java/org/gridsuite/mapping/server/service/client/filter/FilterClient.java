@@ -6,7 +6,7 @@
  */
 package org.gridsuite.mapping.server.service.client.filter;
 
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 
 import java.util.List;
 import java.util.Map;
