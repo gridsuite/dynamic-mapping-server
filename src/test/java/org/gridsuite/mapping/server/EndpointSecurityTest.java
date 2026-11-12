@@ -20,7 +20,7 @@ import java.util.List;
 class EndpointSecurityTest extends AbstractEndpointSecurityTest {
 
     protected List<String> getControllerPackages() {
-        return List.of("org.gridsuite.mappinf.server.controller");
+        return List.of("org.gridsuite.mapping.server.controller");
     }
 
     /**
