@@ -41,6 +41,8 @@
         <gridsuite-dependencies.version>51.1.0</gridsuite-dependencies.version>
         <!-- FIXME: to be removed at next gridsuite-dependencies upgrade  -->
         <gridsuite-filter.version>1.34.0</gridsuite-filter.version>
+        <powsybl-ws-commons.version>1.42.0-SNAPSHOT</powsybl-ws-commons.version>
+
         <string-template.version>4.3.1</string-template.version>
         <liquibase-hibernate-package>org.gridsuite.mapping.server</liquibase-hibernate-package>
         <sonar.organization>gridsuite</sonar.organization>
@@ -82,6 +84,11 @@
                 <artifactId>gridsuite-filter</artifactId>
                 <version>${gridsuite-filter.version}</version>
             </dependency>
+            <dependency>
+               <groupId>com.powsybl</groupId>
+               <artifactId>powsybl-ws-commons</artifactId>
+               <version>${powsybl-ws-commons.version}</version>
+            </dependency>
 
             <!-- imports -->
             <dependency>
@@ -119,6 +126,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -188,6 +199,13 @@
         <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock-jetty12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powsybl</groupId>
+            <artifactId>powsybl-ws-commons</artifactId>
+            <version>${powsybl-ws-commons.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

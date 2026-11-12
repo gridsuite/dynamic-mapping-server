@@ -7,6 +7,7 @@
 package org.gridsuite.mapping.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.powsybl.ws.commons.security.AllowAllAuthorizationTestConfiguration;
 import org.gridsuite.filter.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.ParameterFile;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Thang PHAM <quyet-thang.pham at rte-france.com>
  */
 @SpringBootTest
+@Import(AllowAllAuthorizationTestConfiguration.class)
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 class ParameterControllerTest {
