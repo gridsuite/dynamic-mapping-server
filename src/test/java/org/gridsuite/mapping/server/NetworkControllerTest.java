@@ -13,6 +13,7 @@ import com.powsybl.iidm.network.test.NetworkTest1Factory;
 import com.powsybl.iidm.network.test.SvcTestCaseFactory;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
+import com.powsybl.ws.commons.security.AllowAllAuthorizationTestConfiguration;
 import org.gridsuite.mapping.server.dto.NetworkValues;
 import org.gridsuite.mapping.server.dto.RuleToMatch;
 import org.gridsuite.mapping.server.service.NetworkService;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -48,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @SpringBootTest
+@Import(AllowAllAuthorizationTestConfiguration.class)
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 class NetworkControllerTest {

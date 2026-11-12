@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -47,6 +48,7 @@ public class MappingController {
     @GetMapping(value = "")
     @Operation(summary = "Get mappings for the given ids")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mappings")})
+    @PreAuthorize("#mappingIds != null ? @authorizationService.canRead(#mappingIds) : true")
     public ResponseEntity<List<InputMapping>> getMappingList(@RequestParam(value = "ids", required = false) List<UUID> mappingIds) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappingList(mappingIds));
     }
@@ -54,6 +56,7 @@ public class MappingController {
     @GetMapping(value = "/{mappingId}")
     @Operation(summary = "Get a mapping by id")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The requested mapping")})
+    @PreAuthorize("@authorizationService.canRead(#mappingId)")
     public ResponseEntity<InputMapping> getMapping(@PathVariable("mappingId") UUID mappingId) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMapping(mappingId));
     }
@@ -62,6 +65,7 @@ public class MappingController {
     @Operation(summary = "Export a mapping to a JSON file")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The mapping exported as a JSON file"),
         @ApiResponse(responseCode = "404", description = "Mapping not found")})
+    @PreAuthorize("@authorizationService.canRead(#mappingId)")
     public ResponseEntity<byte[]> exportMapping(@PathVariable("mappingId") UUID mappingId, @RequestParam(value = "fileName", required = false) String fileName) {
         InputMapping mapping = mappingService.getMapping(mappingId);
         try {
@@ -80,6 +84,7 @@ public class MappingController {
     @GetMapping(value = "/{mappingId}/models")
     @Operation(summary = "Get models used in the given mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The list of mapped models")})
+    @PreAuthorize("@authorizationService.canRead(#mappingId)")
     public ResponseEntity<List<Model>> getMappedModelsList(@PathVariable("mappingId") UUID mappingId) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mappingService.getMappedModelsList(mappingId));
     }
@@ -87,6 +92,7 @@ public class MappingController {
     @PostMapping(value = "")
     @Operation(summary = "Create a new mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "The id of the mapping")})
+    @PreAuthorize("true")
     public ResponseEntity<UUID> createMapping(@RequestBody InputMapping mapping) {
         InputMapping savedMapping = mappingService.saveMapping(null, mapping);
         return ResponseEntity.ok().body(savedMapping.getId());
@@ -95,6 +101,7 @@ public class MappingController {
     @PutMapping(value = "/{mappingId}")
     @Operation(summary = "Update a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Mapping updated")})
+    @PreAuthorize("@authorizationService.canWrite(#mappingId)")
     public ResponseEntity<Void> updateMapping(@PathVariable(name = "mappingId") UUID mappingId, @RequestBody InputMapping mapping) {
         mappingService.saveMapping(mappingId, mapping);
         return ResponseEntity.ok().build();
@@ -103,6 +110,7 @@ public class MappingController {
     @DeleteMapping(path = "/{mappingId}")
     @Operation(summary = "delete the mapping")
     @ApiResponse(responseCode = "200", description = "Mapping deleted")
+    @PreAuthorize("@authorizationService.canDelete(#mappingId)")
     public ResponseEntity<UUID> deleteMapping(@PathVariable("mappingId") UUID mappingId) {
         mappingService.deleteMapping(mappingId);
         return ResponseEntity.ok().body(mappingId);
@@ -112,6 +120,7 @@ public class MappingController {
     @Operation(summary = "Copy a mapping")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Mapping Copy"),
         @ApiResponse(responseCode = "404", description = "Mapping not found")})
+    @PreAuthorize("@authorizationService.canRead(#originalId)")
     public ResponseEntity<UUID> copyMapping(@PathVariable("originalId") UUID originalId) {
         return ResponseEntity.ok().body(mappingService.copyMapping(originalId));
     }
@@ -122,6 +131,7 @@ public class MappingController {
         @ApiResponse(responseCode = "200", description = "Attached study updated"),
         @ApiResponse(responseCode = "404", description = "Mapping not found")
     })
+    @PreAuthorize("@authorizationService.canWrite(#mappingId)")
     public ResponseEntity<Void> updateStudy(@PathVariable("mappingId") UUID mappingId, @RequestBody(required = false) UUID studyUuid) {
         mappingService.updateStudy(mappingId, studyUuid);
         return ResponseEntity.ok().build();
