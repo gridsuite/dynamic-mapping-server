@@ -81,4 +81,3 @@ public class Rule {
         filter = ruleEntity.getFilterUuid() != null ? ExpertFilter.builder().id(ruleEntity.getFilterUuid()).build() : null;
     }
 }
-

@@ -26,4 +26,3 @@ public class RuleToMatch {
     @Schema(description = "Filter")
     private ExpertFilter filter;
 }
-
