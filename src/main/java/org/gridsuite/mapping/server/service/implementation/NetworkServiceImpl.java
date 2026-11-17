@@ -12,7 +12,6 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.network.store.client.NetworkStoreService;
 import com.powsybl.network.store.client.PreloadingStrategy;
 import org.apache.commons.lang3.StringUtils;
-import org.gridsuite.filter.utils.FiltersUtils;
 import org.gridsuite.mapping.server.dto.EquipmentValues;
 import org.gridsuite.mapping.server.dto.MatchedRule;
 import org.gridsuite.mapping.server.dto.NetworkValues;
@@ -225,7 +224,7 @@ public class NetworkServiceImpl implements NetworkService {
         if (rule.getFilter() == null) {
             return Collections.emptyList();
         }
-        List<Identifiable<?>> matchedEquipments = FiltersUtils.getIdentifiables(rule.getFilter(), network, null);
+        List<Identifiable<?>> matchedEquipments = rule.getFilter().toFilter(null).evaluate(network);
 
         // return only ids
         return matchedEquipments.stream().map(Identifiable::getId).toList();

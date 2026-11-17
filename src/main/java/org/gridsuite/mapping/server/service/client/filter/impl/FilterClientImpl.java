@@ -8,7 +8,7 @@ package org.gridsuite.mapping.server.service.client.filter.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.service.client.AbstractRestClient;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.springframework.beans.factory.annotation.Autowired;
