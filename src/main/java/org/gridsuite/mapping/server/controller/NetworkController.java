@@ -19,6 +19,7 @@ import org.gridsuite.mapping.server.service.implementation.NetworkServiceImpl;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -40,7 +41,7 @@ public class NetworkController {
     @Operation(summary = "Fetch property values of a known network from the server")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "List of property values of the network")})
-
+    @PreAuthorize("@authorizationService.canRead(#networkUuid)")
     public ResponseEntity<NetworkValues> getNetworkValuesFromExistingCase(@PathVariable("networkUuid") UUID networkUuid) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkValuesFromExistingNetwork(networkUuid));
     }
@@ -49,6 +50,7 @@ public class NetworkController {
     @Operation(summary = "Get the equipment ids that matches the given rule.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Possible property values of the network")})
+    @PreAuthorize("@authorizationService.canRead(#networkUuid)")
     public ResponseEntity<MatchedRule> getNetworkMatches(@PathVariable("networkUuid") UUID networkUuid, @RequestBody RuleToMatch ruleToMatch) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(networkService.getNetworkMatches(networkUuid, ruleToMatch));
     }
