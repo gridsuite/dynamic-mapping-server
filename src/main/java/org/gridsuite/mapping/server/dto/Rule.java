@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.model.MappingEntity;
 import org.gridsuite.mapping.server.model.RuleEntity;
 import org.gridsuite.mapping.server.utils.EquipmentType;
@@ -81,4 +81,3 @@ public class Rule {
         filter = ruleEntity.getFilterUuid() != null ? ExpertFilter.builder().id(ruleEntity.getFilterUuid()).build() : null;
     }
 }
-
