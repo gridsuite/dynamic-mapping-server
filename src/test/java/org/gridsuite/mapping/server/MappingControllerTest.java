@@ -9,8 +9,8 @@ package org.gridsuite.mapping.server;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.powsybl.ws.commons.security.AllowAllAuthorizationTestConfiguration;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import com.powsybl.ws.commons.security.AllowAllAuthTestConfiguration;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.models.Model;
 import org.gridsuite.mapping.server.repository.MappingRepository;
@@ -48,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Mathieu Scalbert <mathieu.scalbert at rte-france.com>
  */
 @SpringBootTest
-@Import(AllowAllAuthorizationTestConfiguration.class)
+@Import(AllowAllAuthTestConfiguration.class)
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {MappingApplication.class})
 class MappingControllerTest {
