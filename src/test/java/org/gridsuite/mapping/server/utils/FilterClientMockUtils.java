@@ -10,7 +10,7 @@ package org.gridsuite.mapping.server.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.service.client.filter.FilterClient;
 import org.mockito.Mockito;
 

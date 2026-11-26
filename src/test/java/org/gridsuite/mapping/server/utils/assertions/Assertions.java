@@ -7,7 +7,7 @@
 package org.gridsuite.mapping.server.utils.assertions;
 
 import org.assertj.core.util.CheckReturnValue;
-import org.gridsuite.filter.expertfilter.ExpertFilter;
+import org.gridsuite.filter.dto.expertfilter.ExpertFilter;
 import org.gridsuite.mapping.server.dto.InputMapping;
 import org.gridsuite.mapping.server.dto.ParameterFile;
 import org.gridsuite.mapping.server.dto.models.ParametersSet;
