@@ -19,6 +19,7 @@ import org.gridsuite.mapping.server.utils.SetGroupType;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class ModelController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "automaton definitions in json format")
     })
+    @PreAuthorize("true")
     public ResponseEntity<String> getAutomatonDefinitions() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getAutomatonDefinitions());
     }
@@ -49,6 +51,7 @@ public class ModelController {
     @Operation(summary = "get all parameters in database")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "all parameters in database")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelParameter>> getParameters() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameters());
     }
@@ -57,6 +60,7 @@ public class ModelController {
     @Operation(summary = "get all parameter set groups in database")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter set groups in database")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ParametersSetsGroup>> getParametersSetsGroups() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParametersSetsGroups());
     }
@@ -65,6 +69,7 @@ public class ModelController {
     @Operation(summary = "get all parameter sets in database")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter sets in database")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ParametersSet>> getParametersSets() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParametersSets());
     }
@@ -73,6 +78,7 @@ public class ModelController {
     @Operation(summary = "get all parameters sets for a given group")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter sets of the group")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ParametersSet>> getSetsGroupsFromModelName(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName,
             @PathVariable("groupType") SetGroupType groupType) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getSetsFromGroup(modelName, groupName, groupType));
@@ -82,6 +88,7 @@ public class ModelController {
     @Operation(summary = "Save a new parameter sets group without checking sets")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
+    @PreAuthorize("true")
     public ResponseEntity<ParametersSetsGroup> saveParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, true));
     }
@@ -90,6 +97,7 @@ public class ModelController {
     @Operation(summary = "Save a new parameter sets group without checking sets")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Parameter Set Group Saved")})
+    @PreAuthorize("true")
     public ResponseEntity<ParametersSetsGroup> saveSimpleParametersSet(@PathVariable("modelName") String modelName, @RequestBody ParametersSetsGroup setsGroup) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveParametersSetsGroup(modelName, setsGroup, false));
     }
@@ -98,6 +106,7 @@ public class ModelController {
     @Operation(summary = "Post a model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> saveModel(@RequestBody Model model) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveModel(model));
     }
@@ -106,6 +115,7 @@ public class ModelController {
     @Operation(summary = "Delete a parameter set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "updated parameter group")})
+    @PreAuthorize("true")
     public ResponseEntity<ParametersSetsGroup> deleteSet(@PathVariable("modelName") String modelName, @PathVariable("groupName") String groupName, @PathVariable("groupType") SetGroupType groupType,
             @PathVariable("setName") String setName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteSet(modelName, groupName, groupType, setName));
@@ -115,6 +125,7 @@ public class ModelController {
     @Operation(summary = "Get simple infos of all models")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "simple infos of all models")})
+    @PreAuthorize("true")
     public ResponseEntity<List<SimpleModel>> getModels() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getModels());
     }
@@ -123,6 +134,7 @@ public class ModelController {
     @Operation(summary = "Get all model names")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "list of all model names")})
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> getModelNames() {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -136,6 +148,7 @@ public class ModelController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Deleted models")
     })
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> deleteModels(@RequestBody List<String> modelNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteModels(modelNames));
     }
@@ -146,6 +159,7 @@ public class ModelController {
     @Operation(summary = "get all parameters definitions' names in database")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter definitions' names in database")})
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> getParameterDefinitionNames() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameterDefinitionNames());
     }
@@ -154,6 +168,7 @@ public class ModelController {
     @Operation(summary = "get parameters definitions by names")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter definitions found by names")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelParameterDefinition>> getParameterDefinitions(@RequestParam("parameterDefinitionNames") List<String> parameterDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameterDefinitions(parameterDefinitionNames));
     }
@@ -162,6 +177,7 @@ public class ModelController {
     @Operation(summary = "get parameters definitions for a given model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "parameter definitions of the model")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelParameterDefinition>> getParameterDefinitionsFromModel(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getParameterDefinitionsFromModel(modelName));
     }
@@ -170,6 +186,7 @@ public class ModelController {
     @Operation(summary = "Add new parameter definitions to model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> addNewParameterDefinitionsToModel(@PathVariable("modelName") String modelName, @RequestBody List<ModelParameterDefinition> parameterDefinitions) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addNewParameterDefinitionsToModel(modelName, parameterDefinitions));
     }
@@ -178,6 +195,7 @@ public class ModelController {
     @Operation(summary = "Add existing parameter definitions to model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> addExistingParameterDefinitionsToModel(@PathVariable("modelName") String modelName,
                                                                         @RequestParam(value = "origin", required = false) ParameterOrigin origin,
                                                                         @RequestParam(value = "originName", required = false) String originName,
@@ -189,6 +207,7 @@ public class ModelController {
     @Operation(summary = "Remove existing parameter definitions from model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> removeExistingParameterDefinitionsFromModel(@PathVariable("modelName") String modelName, @RequestBody List<String> parameterDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeExistingParameterDefinitionsFromModel(modelName, parameterDefinitionNames));
     }
@@ -197,6 +216,7 @@ public class ModelController {
     @Operation(summary = "Reset empty parameter definitions on model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> removeAllParameterDefinitionsFromModel(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllParameterDefinitionsOnModel(modelName));
     }
@@ -205,6 +225,7 @@ public class ModelController {
     @Operation(summary = "Save new parameter definitions")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Saved parameter definitions")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelParameterDefinition>> saveNewParameterDefinitions(@RequestBody List<ModelParameterDefinition> parameterDefinitions) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewParameterDefinitions(parameterDefinitions));
     }
@@ -213,6 +234,7 @@ public class ModelController {
     @Operation(summary = "Delete parameter definitions")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Deleted parameter definitions")})
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> deleteParameterDefinitions(@RequestBody List<String> parameterDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteParameterDefinitions(parameterDefinitionNames));
     }
@@ -224,6 +246,7 @@ public class ModelController {
     @Operation(summary = "get all variable definitions' names in database")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "variable definitions' names in database")})
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> getVariableDefinitionNames() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitionNames());
     }
@@ -232,6 +255,7 @@ public class ModelController {
     @Operation(summary = "get variable definitions by names")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "variable definitions found by names")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelVariableDefinition>> getVariableDefinitions(@RequestParam(value = "variableDefinitionNames") List<String> variableDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitions(variableDefinitionNames));
     }
@@ -240,6 +264,7 @@ public class ModelController {
     @Operation(summary = "get variable definitions for a given model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "variable definitions of the model")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelVariableDefinition>> getVariablesFromModel(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitionsFromModel(modelName));
     }
@@ -248,6 +273,7 @@ public class ModelController {
     @Operation(summary = "Add new variable definitions to model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> addNewVariablesToModel(@PathVariable("modelName") String modelName, @RequestBody List<ModelVariableDefinition> variableDefinitions) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addNewVariableDefinitionsToModel(modelName, variableDefinitions));
     }
@@ -256,6 +282,7 @@ public class ModelController {
     @Operation(summary = "Add existing variable definitions to model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> addExistingVariablesToModel(@PathVariable("modelName") String modelName, @RequestBody List<String> variableDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingVariableDefinitionsToModel(modelName, variableDefinitionNames));
     }
@@ -264,6 +291,7 @@ public class ModelController {
     @Operation(summary = "Remove existing variable definitions from model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> removeExistingVariablesFromModel(@PathVariable("modelName") String modelName, @RequestBody List<String> variableDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeExistingVariableDefinitionsFromModel(modelName, variableDefinitionNames));
     }
@@ -272,6 +300,7 @@ public class ModelController {
     @Operation(summary = "Reset empty variable definitions on model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> removeAllVariablesOnModel(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllVariableDefinitionsOnModel(modelName));
     }
@@ -280,6 +309,7 @@ public class ModelController {
     @Operation(summary = "Add variable definitions from variables set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "variable definitions of variables set")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelVariableDefinition>> getVariablesFromVariablesSet(@PathVariable("variableSetName") String variableSetName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariableDefinitionsFromVariablesSet(variableSetName));
     }
@@ -288,6 +318,7 @@ public class ModelController {
     @Operation(summary = "Add new variable definitions to variables set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved variables set")})
+    @PreAuthorize("true")
     public ResponseEntity<VariablesSet> addNewVariableDefinitionToVariablesSet(@PathVariable("variableSetName") String variableSetName,
             @RequestBody List<ModelVariableDefinition> variableDefinitions) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addNewVariableDefinitionToVariablesSet(variableSetName, variableDefinitions));
@@ -297,6 +328,7 @@ public class ModelController {
     @Operation(summary = "Remove existing variable definitions from variables set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved variables set")})
+    @PreAuthorize("true")
     public ResponseEntity<VariablesSet> removeExistingVariableDefinitionFromVariablesSet(@PathVariable("variableSetName") String variableSetName, @RequestBody List<String> variableDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeExistingVariableDefinitionFromVariablesSet(variableSetName, variableDefinitionNames));
     }
@@ -305,6 +337,7 @@ public class ModelController {
     @Operation(summary = "Reset empty variable definitions on variables set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved variables set")})
+    @PreAuthorize("true")
     public ResponseEntity<VariablesSet> removeAllVariableDefinitionOnVariablesSet(@PathVariable("variableSetName") String variableSetName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllVariableDefinitionOnVariablesSet(variableSetName));
     }
@@ -313,6 +346,7 @@ public class ModelController {
     @Operation(summary = "get variable sets' names in database")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "variable sets' names in database")})
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> getVariablesSetNames() {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariablesSetNames());
     }
@@ -321,6 +355,7 @@ public class ModelController {
     @Operation(summary = "get variable sets in database")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "variable sets found by names")})
+    @PreAuthorize("true")
     public ResponseEntity<List<VariablesSet>> getVariablesSets(@RequestParam(value = "variablesSetNames") List<String> variablesSetNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariablesSets(variablesSetNames));
     }
@@ -329,6 +364,7 @@ public class ModelController {
     @Operation(summary = "get variable sets for a given model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "variable sets of the model")})
+    @PreAuthorize("true")
     public ResponseEntity<List<VariablesSet>> getVariablesSetsFromModel(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.getVariablesSetsFromModel(modelName));
     }
@@ -337,6 +373,7 @@ public class ModelController {
     @Operation(summary = "Add new variables set to model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> addNewVariablesSetsToModel(@PathVariable("modelName") String modelName, @RequestBody List<VariablesSet> variableSets) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addNewVariablesSetsToModel(modelName, variableSets));
     }
@@ -345,6 +382,7 @@ public class ModelController {
     @Operation(summary = "Add existing variables set to model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> addExistingVariablesSetsToModel(@PathVariable("modelName") String modelName, @RequestBody List<String> variablesSetNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.addExistingVariablesSetsToModel(modelName, variablesSetNames));
     }
@@ -353,6 +391,7 @@ public class ModelController {
     @Operation(summary = "Remove existing variables set from model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> removeExistingVariablesSetsFromModel(@PathVariable("modelName") String modelName, @RequestBody List<String> variablesSetNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeExistingVariablesSetsFromModel(modelName, variablesSetNames));
     }
@@ -361,6 +400,7 @@ public class ModelController {
     @Operation(summary = "Reset empty variables sets on model")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "saved model")})
+    @PreAuthorize("true")
     public ResponseEntity<Model> removeAllExistingVariablesSetsFromModel(@PathVariable("modelName") String modelName) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.removeAllExistingVariablesSetsFromModel(modelName));
     }
@@ -369,6 +409,7 @@ public class ModelController {
     @Operation(summary = "Save new variable definitions")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Saved variable definitions")})
+    @PreAuthorize("true")
     public ResponseEntity<List<ModelVariableDefinition>> saveNewVariables(@RequestBody List<ModelVariableDefinition> variableDefinitions) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewVariableDefinitions(variableDefinitions));
     }
@@ -377,6 +418,7 @@ public class ModelController {
     @Operation(summary = "Delete variables")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Deleted variables")})
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> deleteVariables(@RequestBody List<String> variableDefinitionNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteVariableDefinitions(variableDefinitionNames));
     }
@@ -385,6 +427,7 @@ public class ModelController {
     @Operation(summary = "Save new variables set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Saved variables set")})
+    @PreAuthorize("true")
     public ResponseEntity<VariablesSet> saveNewVariablesSet(@RequestBody VariablesSet variablesSet) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.saveNewVariablesSet(variablesSet));
     }
@@ -393,6 +436,7 @@ public class ModelController {
     @Operation(summary = "Delete variables set")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Deleted variables set")})
+    @PreAuthorize("true")
     public ResponseEntity<List<String>> deleteVariablesSets(@RequestBody List<String> variablesSetNames) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(modelService.deleteVariablesSets(variablesSetNames));
     }

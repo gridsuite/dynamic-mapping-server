@@ -7,6 +7,9 @@ powsybl:
       base-uri: http://localhost:8080/
 
 powsybl-ws:
+  autoconfigure:
+    authorization-system:
+      directory-server-base-uri: http://localhost:5026
   database:
     host: localhost
 

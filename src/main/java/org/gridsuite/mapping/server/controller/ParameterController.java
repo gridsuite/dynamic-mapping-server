@@ -15,6 +15,7 @@ import org.gridsuite.mapping.server.dto.ParameterFile;
 import org.gridsuite.mapping.server.service.ParameterService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +38,7 @@ public class ParameterController {
     @Operation(summary = "Export parameter sets in used models of a given mapping into *.par format")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Used parameter sets serialized in *.par format")})
+    @PreAuthorize("@authorizationService.canRead(#mappingId)")
     public ResponseEntity<ParameterFile> exportParameters(@RequestParam("mappingId") UUID mappingId) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(parameterService.exportParameters(mappingId));
     }
